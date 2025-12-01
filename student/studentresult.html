@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMakFit - Fitness Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .font-manrope { font-family: 'Manrope', sans-serif; }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-down {
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
+        <div class="spinner"></div>
+        <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Tests...</div>
+    </div>
+
+    <div id="mainContent" class="hidden">
+        <!-- Navigation -->
+        <nav class="bg-gradient-to-r from-blue-900 to-blue-500 shadow-lg">
+            <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
+                <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+                    <!-- Logo -->
+                    <a href="#" class="flex items-center gap-2 sm:gap-3">
+                        <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
+                             alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
+                        <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope bg-gradient-to-r from-yellow-400 to-yellow-200 bg-clip-text text-transparent">
+                            UMakFit
+                        </span>
+                    </a>
+                    
+                    <!-- Desktop Navigation -->
+                    <div class="hidden lg:flex items-center gap-2 flex-wrap">
+                        <a href="./studentDashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                            <i class="bi bi-speedometer2"></i> 
+                            <span class="hidden xl:inline">Dashboard</span>
+                        </a>
+                        <a href="#" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                            <i class="bi bi-clipboard-check"></i> 
+                            <span class="hidden xl:inline">Tests</span>
+                        </a>
+                        <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                            <i class="bi bi-graph-up"></i> 
+                            <span class="hidden xl:inline">Progress</span>
+                        </a>
+                        <a href="#" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                            <i class="bi bi-book"></i> 
+                            <span class="hidden xl:inline">Learn</span>
+                        </a>
+                        
+                        <!-- Profile Dropdown -->
+                        <div class="relative">
+                            <img src="" alt="Profile" id="profilePictureBtn" onclick="toggleProfileDropdown()"
+                                 class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
+                            
+                            <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                                <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
+                                    <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                                    <h6 id="profileDropdownName" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
+                                    <p id="profileDropdownEmail" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
+                                </div>
+                                <div class="p-2">
+                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
+                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
+                                    </a>
+                                    <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
+                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                        <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
+                                        <span class="font-medium text-sm sm:text-base">Logout</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile Right Icons -->
+                    <div class="flex lg:hidden items-center gap-2 sm:gap-3">
+                        <!-- Mobile Profile -->
+                        <div class="relative">
+                            <img src="" alt="Profile" id="profilePictureBtnMobile" onclick="toggleProfileDropdown()"
+                                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
+                            
+                            <!-- Mobile Profile Dropdown -->
+                            <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                                <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
+                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                                    <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
+                                    <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
+                                </div>
+                                <div class="p-2">
+                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
+                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
+                                    </a>
+                                    <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
+                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                        <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
+                                        <span class="font-medium text-sm sm:text-base">Logout</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mobile Menu Button -->
+                        <button onclick="toggleMobileMenu()" class="text-white p-1 sm:p-2">
+                            <i class="bi bi-list text-2xl sm:text-3xl"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Mobile Navigation Menu -->
+                <div id="mobileMenu" class="hidden lg:hidden mt-3 sm:mt-4 space-y-2">
+                    <a href="./studentDashboard.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
+                        <i class="bi bi-speedometer2 mr-2"></i> Dashboard
+                    </a>
+                    <a href="#" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm">
+                        <i class="bi bi-clipboard-check mr-2"></i> Tests
+                    </a>
+                    <a href="./progress.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
+                        <i class="bi bi-graph-up mr-2"></i> Progress
+                    </a>
+                    <a href="#" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
+                        <i class="bi bi-book mr-2"></i> Learn
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 max-w-7xl">
+            <!-- Page Title -->
+            <div class="relative mb-6 sm:mb-8">
+                <div class="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-blue-900 to-blue-500 rounded-r"></div>
+                <h1 class="pl-4 sm:pl-6 text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-900">Fitness Assessment Test</h1>
+            </div>
+
+            <!-- Stats Banner -->
+            <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 shadow-md border border-gray-200">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+                    <div class="relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6 text-center border-2 border-blue-200 hover:-translate-y-1 transition-transform overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+                        <div id="testsDone" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-blue-900 mb-1 sm:mb-2">0</div>
+                        <div class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-gray-600">Tests Completed</div>
+                    </div>
+                    <div class="relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6 text-center border-2 border-blue-200 hover:-translate-y-1 transition-transform overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+                        <div id="avgScore" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-blue-900 mb-1 sm:mb-2">0</div>
+                        <div class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-gray-600">Average Score</div>
+                    </div>
+                    <div class="relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6 text-center border-2 border-blue-200 hover:-translate-y-1 transition-transform overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+                        <div id="bestScore" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-blue-900 mb-1 sm:mb-2">0</div>
+                        <div class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-gray-600">Best Score</div>
+                    </div>
+                    <div class="relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6 text-center border-2 border-blue-200 hover:-translate-y-1 transition-transform overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+                        <div id="dayStreak" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-blue-900 mb-1 sm:mb-2">0</div>
+                        <div class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-gray-600">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Cards Container -->
+            <div id="categoryCardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8"></div>
+
+            <!-- Recent Test History -->
+            <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-md border border-gray-200">
+                <div class="flex items-center gap-3 mb-4 sm:mb-6">
+                    <img src="https://c.animaapp.com/HN7hFbsr/img/image-151@2x.png" alt="History Icon" class="w-6 h-6 sm:w-8 sm:h-8" />
+                    <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Recent Test History</h2>
+                </div>
+                <div id="testHistoryContainer">
+                    <div class="text-center py-8 sm:py-12">
+                        <div class="text-5xl sm:text-6xl mb-3 sm:mb-4">📋</div>
+                        <p class="text-base sm:text-lg font-semibold text-gray-600 mb-1 sm:mb-2">No Test History Yet</p>
+                        <small class="text-sm text-gray-400">Your completed tests will appear here</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+            authDomain: "umakfit-e3b1d.firebaseapp.com",
+            projectId: "umakfit-e3b1d",
+            storageBucket: "umakfit-e3b1d.appspot.com",
+            messagingSenderId: "276569891504",
+            appId: "1:276569891504:web:39b1732b519f4d8b785175"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let studentData = null;
+        let availableTests = [];
+        let allTestHistory = [];
+        let showAllHistory = false;
+        const VISIBLE_HISTORY_COUNT = 2;
+
+        const testCategories = {
+            'Cardio Endurance': {
+                tests: ['3-Minute Step Test', '1-Mile Run', '1 Mile Run'],
+                icon: 'https://c.animaapp.com/HN7hFbsr/img/image-148@2x.png',
+                subtitle: 'Cardiovascular fitness tests'
+            },
+            'Strength': {
+                tests: ['Push-Up Test', 'Grip Strength', 'Push-up Test'],
+                icon: 'https://c.animaapp.com/HN7hFbsr/img/image-149@2x.png',
+                subtitle: 'Muscular strength tests'
+            },
+            'Flexibility': {
+                tests: ['Sit-and-Reach', 'Shoulder Flexibility'],
+                icon: 'https://c.animaapp.com/HN7hFbsr/img/image-48@2x.png',
+                subtitle: 'Range of motion tests'
+            },
+            'Core Stability': {
+                tests: ['Plank Hold', 'Sit-Up Test'],
+                icon: 'https://c.animaapp.com/HN7hFbsr/img/image-150@2x.png',
+                subtitle: 'Core strength tests'
+            }
+        };
+
+        // Mobile menu toggle
+        window.toggleMobileMenu = function() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        };
+
+        // Profile dropdown
+        window.toggleProfileDropdown = function() {
+            const isMobile = window.innerWidth < 1024;
+            const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
+            
+            dropdown.classList.toggle('hidden');
+            if (!dropdown.classList.contains('hidden')) {
+                setTimeout(() => {
+                    document.addEventListener('click', closeProfileOnClickOutside);
+                }, 100);
+            } else {
+                document.removeEventListener('click', closeProfileOnClickOutside);
+            }
+        };
+
+        function closeProfileOnClickOutside(event) {
+            const isMobile = window.innerWidth < 1024;
+            const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
+            const profileBtn = document.getElementById('profilePictureBtn');
+            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
+            if (!dropdown.contains(event.target) && !profileBtn?.contains(event.target) && !profileBtnMobile?.contains(event.target)) {
+                dropdown.classList.add('hidden');
+                document.removeEventListener('click', closeProfileOnClickOutside);
+            }
+        }
+
+        function updateProfileUI() {
+            if (!currentUser || !studentData) return;
+            
+            const photoURL = currentUser?.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(studentData?.displayName || 'User') + '&background=3b82f6&color=fff&size=128';
+            
+            const profileBtn = document.getElementById('profilePictureBtn');
+            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
+            if (profileBtn) profileBtn.src = photoURL;
+            if (profileBtnMobile) profileBtnMobile.src = photoURL;
+            
+            const dropdownPic = document.getElementById('profileDropdownPicture');
+            const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
+            if (dropdownPic) dropdownPic.src = photoURL;
+            if (dropdownPicMobile) dropdownPicMobile.src = photoURL;
+            
+            const dropdownName = document.getElementById('profileDropdownName');
+            const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
+            if (dropdownName) dropdownName.textContent = studentData?.displayName || 'Student';
+            if (dropdownNameMobile) dropdownNameMobile.textContent = studentData?.displayName || 'Student';
+            
+            const dropdownEmail = document.getElementById('profileDropdownEmail');
+            const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
+            if (dropdownEmail) dropdownEmail.textContent = studentData?.email || currentUser?.email || '';
+            if (dropdownEmailMobile) dropdownEmailMobile.textContent = studentData?.email || currentUser?.email || '';
+        }
+
+        function getCategoryForTest(testName) {
+            for (const [category, data] of Object.entries(testCategories)) {
+                if (data.tests.some(t => testName.toLowerCase().includes(t.toLowerCase()) || t.toLowerCase().includes(testName.toLowerCase()))) {
+                    return category;
+                }
+            }
+            return 'Cardio Endurance';
+        }
+
+        async function loadStudentData(user) {
+            try {
+                const studentsQuery = query(
+                    collection(db, 'students'),
+                    where('email', '==', user.email)
+                );
+                const studentsSnapshot = await getDocs(studentsQuery);
+                
+                studentData = {
+                    displayName: user.displayName || user.email.split('@')[0] || 'Student',
+                    email: user.email,
+                    section: 'Not Assigned',
+                    testsDone: 0,
+                    overallScore: 0,
+                    weekStreak: 0
+                };
+                
+                if (!studentsSnapshot.empty) {
+                    studentsSnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        studentData = { 
+                            ...studentData,
+                            ...data,
+                            testsDone: data.testsDone || 0,
+                            overallScore: data.overallScore || 0,
+                            weekStreak: data.weekStreak || 0,
+                            section: data.section || 'Not Assigned'
+                        };
+                    });
+                }
+                
+                await calculateAndUpdateStats();
+                updateProfileUI();
+                return studentData;
+            } catch (error) {
+                console.error('Error loading student data:', error);
+                return null;
+            }
+        }
+
+        async function calculateAndUpdateStats() {
+            try {
+                const resultsQuery = query(
+                    collection(db, 'testResults'),
+                    where('studentEmail', '==', studentData.email)
+                );
+                
+                const resultsSnapshot = await getDocs(resultsQuery);
+                
+                let totalTests = 0;
+                let totalScore = 0;
+                let bestScore = 0;
+                const testDates = [];
+                
+                resultsSnapshot.forEach((doc) => {
+                    const result = doc.data();
+                    const score = calculateTestScore(result.testName, result.result, result.testTarget);
+                    
+                    totalTests++;
+                    totalScore += score;
+                    if (score > bestScore) bestScore = score;
+                    
+                    const testDate = result.submittedAt?.toDate?.() || new Date(result.date);
+                    testDates.push(testDate);
+                });
+                
+                const avgScore = totalTests > 0 ? Math.round(totalScore / totalTests) : 0;
+                const dayStreak = calculateDayStreak(testDates);
+                
+                document.getElementById('testsDone').textContent = totalTests;
+                document.getElementById('avgScore').textContent = avgScore;
+                document.getElementById('bestScore').textContent = bestScore;
+                document.getElementById('dayStreak').textContent = dayStreak;
+                
+            } catch (error) {
+                console.error('Error calculating stats:', error);
+                document.getElementById('testsDone').textContent = '0';
+                document.getElementById('avgScore').textContent = '0';
+                document.getElementById('bestScore').textContent = '0';
+                document.getElementById('dayStreak').textContent = '0';
+            }
+        }
+
+        function calculateDayStreak(testDates) {
+            if (testDates.length === 0) return 0;
+            
+            testDates.sort((a, b) => b - a);
+            
+            let streak = 0;
+            let currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0);
+            
+            for (const testDate of testDates) {
+                const date = new Date(testDate);
+                date.setHours(0, 0, 0, 0);
+                
+                const diffTime = currentDate - date;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === streak) {
+                    streak++;
+                    currentDate = date;
+                } else if (diffDays > streak) {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+
+    async function loadAvailableTests() {
+    try {
+        if (!studentData || !studentData.section || studentData.section === 'Not Assigned') {
+            renderEmptyState();
+            return;
+        }
+
+        const testsQuery = query(
+            collection(db, 'scheduledTests'),
+            where('section', '==', studentData.section),
+            where('isVisible', '==', true)
+        );
+        
+        const testsSnapshot = await getDocs(testsQuery);
+        availableTests = [];
+        const now = new Date();
+        
+        // Get all completed tests with their scores and attempt counts
+        const completedTestsQuery = query(
+            collection(db, 'testResults'),
+            where('studentEmail', '==', studentData.email)
+        );
+        const completedTestsSnapshot = await getDocs(completedTestsQuery);
+        
+        // Map to store test completion status
+        const testStatus = new Map();
+        
+        completedTestsSnapshot.forEach(doc => {
+            const result = doc.data();
+            const testId = result.testId;
+            const score = calculateTestScore(result.testName, result.result, result.testTarget);
+            
+            if (!testStatus.has(testId)) {
+                testStatus.set(testId, {
+                    attempts: 0,
+                    bestScore: 0
+                });
+            }
+            
+            const status = testStatus.get(testId);
+            status.attempts++;
+            if (score > status.bestScore) {
+                status.bestScore = score;
+            }
+        });
+        
+        if (!testsSnapshot.empty) {
+            testsSnapshot.forEach((doc) => {
+                const test = { id: doc.id, ...doc.data() };
+                
+                let deadlineDateTime;
+                if (test.deadlineDateTime) {
+                    deadlineDateTime = new Date(test.deadlineDateTime);
+                } else {
+                    deadlineDateTime = new Date(test.deadline);
+                    deadlineDateTime.setHours(23, 59, 59, 999);
+                }
+            
+                // Check if deadline hasn't passed
+                if (deadlineDateTime >= now) {
+                    const status = testStatus.get(test.id);
+                    
+                    // Show test if:
+                    // 1. Never attempted yet, OR
+                    // 2. Has unlimited attempts (attemptsAllowed === 0) and not perfect score, OR
+                    // 3. Has attempts remaining and not perfect score
+                    if (!status) {
+                        // Never attempted
+                        availableTests.push(test);
+                    } else {
+                        const isUnlimited = test.attemptsAllowed === 0;
+                        const isPerfect = status.bestScore === 100;
+                        const hasAttemptsLeft = status.attempts < test.attemptsAllowed;
+                        
+                        if (!isPerfect && (isUnlimited || hasAttemptsLeft)) {
+                            availableTests.push(test);
+                        }
+                    }
+                }
+            });
+        }
+        
+        await renderCategoryCards();
+    } catch (error) {
+        console.error('Error loading tests:', error);
+        renderEmptyState();
+    }
+}
+async function renderCategoryCards() {
+    const container = document.getElementById('categoryCardsContainer');
+    
+    const categorizedTests = {
+        'Cardio Endurance': [],
+        'Strength': [],
+        'Flexibility': [],
+        'Core Stability': []
+    };
+    
+    availableTests.forEach(test => {
+        const category = getCategoryForTest(test.testName);
+        categorizedTests[category].push(test);
+    });
+    
+    let html = '';
+    for (const [category, tests] of Object.entries(categorizedTests)) {
+        const categoryData = testCategories[category];
+        
+        html += `
+            <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-md border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all">
+                <div class="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <img class="w-12 h-12 sm:w-14 sm:h-14 object-contain" src="${categoryData.icon}" alt="${category}" />
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-1">${category}</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">${categoryData.subtitle}</p>
+                    </div>
+                </div>
+                <div class="space-y-2 sm:space-y-3">
+        `;
+        
+        if (tests.length === 0) {
+            html += `
+                <div class="text-center py-4 sm:py-6">
+                    <p class="text-sm text-gray-500">No tests in this category</p>
+                </div>
+            `;
+        } else {
+            // Process all tests for this category
+            for (const test of tests) {
+                const isUnlimited = test.attemptsAllowed === 0;
+                
+                // Check student's attempts for this test
+                const attemptQuery = query(
+                    collection(db, 'testResults'),
+                    where('testId', '==', test.id),
+                    where('studentEmail', '==', studentData.email)
+                );
+                const attemptSnapshot = await getDocs(attemptQuery);
+                const currentAttempts = attemptSnapshot.size;
+                
+                // Calculate best score from attempts
+                let bestScore = 0;
+                attemptSnapshot.forEach(doc => {
+                    const result = doc.data();
+                    const score = calculateTestScore(result.testName, result.result, result.testTarget);
+                    if (score > bestScore) bestScore = score;
+                });
+                
+                const hasAttempts = currentAttempts > 0;
+                const canRetry = isUnlimited ? (bestScore < 100) : (currentAttempts < test.attemptsAllowed && bestScore < 100);
+                const isPerfect = bestScore === 100;
+                
+                html += `
+                    <div class="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:bg-gray-100 transition-colors">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div class="flex-1 min-w-0 w-full sm:w-auto">
+                                <h4 class="font-semibold text-gray-900 text-sm sm:text-base mb-1">${test.testName}</h4>
+                                <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+                                    <p class="${isUnlimited ? 'text-green-600' : 'text-gray-600'}">
+                                        📅 ${test.date || 'No date'}
+                                    </p>
+                                    <p class="text-gray-600">
+                                        ⏰ Due: ${test.deadline} ${test.deadlineTime || ''}
+                                    </p>
+                                    ${hasAttempts ? `
+                                    <p class="${isPerfect ? 'text-green-600 font-bold' : canRetry ? 'text-orange-600 font-semibold' : 'text-gray-600'}">
+                                        ${isPerfect ? '✅ Perfect Score!' : isUnlimited ? `🔄 ${currentAttempts} Attempt${currentAttempts > 1 ? 's' : ''} • Best: ${bestScore}` : `🔄 ${currentAttempts}/${test.attemptsAllowed} Attempts • Best: ${bestScore}`}
+                                    </p>
+                                    ` : `
+                                    <p class="${isUnlimited ? 'text-green-600 font-semibold' : 'text-blue-600 font-semibold'}">
+                                        🔄 ${isUnlimited ? 'Unlimited Attempts' : test.attemptsAllowed + ' Attempt' + (test.attemptsAllowed > 1 ? 's' : '') + ' Allowed'}
+                                    </p>
+                                    `}
+                                </div>
+                            </div>
+                            ${canRetry ? `
+                            <button onclick="startTest('${test.id}')" class="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-semibold text-sm hover:from-orange-600 hover:to-orange-700 hover:-translate-y-0.5 hover:shadow-lg transition-all whitespace-nowrap">
+                                ${isUnlimited ? '🎯 Retry' : `🎯 Retry (${currentAttempts + 1}/${test.attemptsAllowed})`}
+                            </button>
+                            ` : isPerfect ? `
+                            <div class="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-green-100 text-green-700 rounded-lg font-semibold text-sm text-center border-2 border-green-300">
+                                🏆 Completed
+                            </div>
+                            ` : !hasAttempts ? `
+                            <button onclick="startTest('${test.id}')" class="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-sm hover:from-blue-600 hover:to-blue-700 hover:-translate-y-0.5 hover:shadow-lg transition-all whitespace-nowrap">
+                                Start
+                            </button>
+                            ` : `
+                            <div class="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-gray-200 text-gray-600 rounded-lg font-semibold text-sm text-center">
+                                No Attempts Left
+                            </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        html += `
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+}
+
+        function renderEmptyState() {
+            const container = document.getElementById('categoryCardsContainer');
+            
+            let html = '';
+            for (const [category, categoryData] of Object.entries(testCategories)) {
+                html += `
+                    <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-md border border-gray-200">
+                        <div class="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                            <img class="w-12 h-12 sm:w-14 sm:h-14 object-contain" src="${categoryData.icon}" alt="${category}" />
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-1">${category}</h3>
+                                <p class="text-xs sm:text-sm text-gray-600">${categoryData.subtitle}</p>
+                            </div>
+                        </div>
+                        <div class="text-center py-4 sm:py-6">
+                            <p class="text-sm text-gray-500">No tests in this category</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        async function loadRecentTestHistory() {
+            try {
+                if (!studentData) return;
+
+                try {
+                    const historyQuery = query(
+                        collection(db, 'testResults'),
+                        where('studentEmail', '==', studentData.email),
+                        orderBy('submittedAt', 'desc')
+                    );
+                    
+                    const historySnapshot = await getDocs(historyQuery);
+                    allTestHistory = [];
+                    
+                    if (!historySnapshot.empty) {
+                        historySnapshot.forEach((doc) => {
+                            allTestHistory.push({ id: doc.id, ...doc.data() });
+                        });
+                    }
+                    
+                    renderTestHistory();
+                } catch (indexError) {
+                    console.warn('Index not available, fetching without orderBy:', indexError);
+                    
+                    const simpleQuery = query(
+                        collection(db, 'testResults'),
+                        where('studentEmail', '==', studentData.email)
+                    );
+                    
+                    const historySnapshot = await getDocs(simpleQuery);
+                    allTestHistory = [];
+                    
+                    if (!historySnapshot.empty) {
+                        historySnapshot.forEach((doc) => {
+                            allTestHistory.push({ id: doc.id, ...doc.data() });
+                        });
+                        
+                        allTestHistory.sort((a, b) => {
+                            const dateA = a.submittedAt?.toDate ? a.submittedAt.toDate() : (a.submittedAt ? new Date(a.submittedAt) : new Date(0));
+                            const dateB = b.submittedAt?.toDate ? b.submittedAt.toDate() : (b.submittedAt ? new Date(b.submittedAt) : new Date(0));
+                            return dateB - dateA;
+                        });
+                    }
+                    
+                    renderTestHistory();
+                }
+            } catch (error) {
+                console.error('Error loading test history:', error);
+                const container = document.getElementById('testHistoryContainer');
+                container.innerHTML = `
+                    <div class="text-center py-8 sm:py-12">
+                        <div class="text-5xl sm:text-6xl mb-3 sm:mb-4">⚠️</div>
+                        <p class="text-base sm:text-lg font-semibold text-gray-600 mb-1 sm:mb-2">Error Loading History</p>
+                        <small class="text-sm text-gray-400">Please refresh the page to try again</small>
+                    </div>
+                `;
+            }
+        }
+
+        function renderTestHistory() {
+            const container = document.getElementById('testHistoryContainer');
+            
+            if (allTestHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 sm:py-12">
+                        <div class="text-5xl sm:text-6xl mb-3 sm:mb-4">📋</div>
+                        <p class="text-base sm:text-lg font-semibold text-gray-600 mb-1 sm:mb-2">No Test History Yet</p>
+                        <small class="text-sm text-gray-400">Your completed tests will appear here</small>
+                    </div>
+                `;
+                return;
+            }
+
+            const visibleHistory = showAllHistory ? allTestHistory : allTestHistory.slice(0, VISIBLE_HISTORY_COUNT);
+            const hiddenCount = allTestHistory.length - visibleHistory.length;
+
+            let html = `
+                <div class="mb-3 sm:mb-4">
+                    <small class="text-xs sm:text-sm text-gray-500">
+                        Showing ${visibleHistory.length} of ${allTestHistory.length} test results
+                    </small>
+                </div>
+                <div class="space-y-2 sm:space-y-3">
+            `;
+
+            visibleHistory.forEach((result) => {
+                const score = calculateTestScore(result.testName, result.result, result.testTarget);
+                const rating = getRating(score);
+                const date = result.submittedAt?.toDate 
+                    ? result.submittedAt.toDate().toLocaleDateString() 
+                    : new Date().toLocaleDateString();
+                
+                html += `
+                    <div class="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:bg-gray-100 transition-colors">
+                        <div class="flex-1 min-w-0 w-full sm:w-auto">
+                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base mb-1">${result.testName}</h4>
+                            <p class="${rating.class} text-xs sm:text-sm font-medium mb-1">Score: ${score}/100 • ${rating.text}</p>
+                            <small class="text-gray-500 text-xs">Completed: ${date}</small>
+                        </div>
+                        <button onclick="viewResult('${result.id}')" class="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-sm hover:from-blue-600 hover:to-blue-700 hover:-translate-y-0.5 hover:shadow-lg transition-all whitespace-nowrap">
+                            View Result
+                        </button>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+
+            if (allTestHistory.length > VISIBLE_HISTORY_COUNT) {
+                html += `
+                    <div class="text-center mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
+                        <button onclick="toggleHistoryViewMoreLess()" class="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-sm hover:from-blue-600 hover:to-blue-700 hover:-translate-y-0.5 hover:shadow-lg transition-all">
+                            <i class="bi bi-${showAllHistory ? 'chevron-up' : 'chevron-down'}"></i>
+                            ${showAllHistory ? 'View Less' : `View More (${hiddenCount} more)`}
+                        </button>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        window.toggleHistoryViewMoreLess = function() {
+            showAllHistory = !showAllHistory;
+            renderTestHistory();
+            
+            if (showAllHistory) {
+                setTimeout(() => {
+                    document.getElementById('testHistoryContainer').scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'nearest'
+                    });
+                }, 100);
+            }
+        };
+
+        function calculateTestScore(testName, result, testTarget = null) {
+            const normalized = testName.toLowerCase();
+            
+            let numericValue = 0;
+            let resultString = '';
+            
+            if (typeof result === 'object' && result !== null) {
+                resultString = result.value || result.result || result.score || '';
+                numericValue = parseFloat(resultString) || 0;
+            } else if (typeof result === 'string') {
+                resultString = result;
+                const match = result.match(/(\d+\.?\d*)/);
+                if (match) {
+                    numericValue = parseFloat(match[1]);
+                }
+            } else {
+                numericValue = parseFloat(result) || 0;
+            }
+            
+            if (testTarget && testTarget > 0) {
+                if (normalized.includes('push-up') || normalized.includes('pushup') || 
+                    normalized.includes('sit-up') || normalized.includes('situp')) {
+                    const reps = numericValue;
+                    if (reps >= testTarget) return 100;
+                    if (reps >= testTarget * 0.9) return 95;
+                    if (reps >= testTarget * 0.8) return 90;
+                    if (reps >= testTarget * 0.7) return 85;
+                    if (reps >= testTarget * 0.6) return 80;
+                    if (reps >= testTarget * 0.5) return 75;
+                    return Math.max(50, Math.round((reps / testTarget) * 100));
+                } else if (normalized.includes('plank')) {
+                    let seconds = 0;
+                    if (typeof result === 'string' && result.includes(':')) {
+                        const [mins, secs] = result.split(':').map(Number);
+                        seconds = (mins * 60) + (secs || 0);
+                    } else {
+                        seconds = numericValue;
+                    }
+                    if (seconds >= testTarget) return 100;
+                    if (seconds >= testTarget * 0.9) return 95;
+                    if (seconds >= testTarget * 0.8) return 90;
+                    if (seconds >= testTarget * 0.7) return 85;
+                    if (seconds >= testTarget * 0.6) return 80;
+                    if (seconds >= testTarget * 0.5) return 75;
+                    return Math.max(50, Math.round((seconds / testTarget) * 100));
+                } else if (normalized.includes('sit-and-reach')) {
+                    const distance = numericValue;
+                    if (distance >= testTarget) return 100;
+                    if (distance >= testTarget * 0.9) return 95;
+                    if (distance >= testTarget * 0.8) return 90;
+                    if (distance >= testTarget * 0.7) return 85;
+                    if (distance >= testTarget * 0.6) return 80;
+                    if (distance >= testTarget * 0.5) return 75;
+                    return Math.max(50, Math.round((distance / testTarget) * 100));
+                }
+            }
+            
+            if (normalized.includes('push-up') || normalized.includes('pushup')) {
+                const reps = numericValue;
+                if (reps >= 40) return 100;
+                if (reps >= 30) return 90;
+                if (reps >= 20) return 80;
+                if (reps >= 15) return 70;
+                if (reps >= 10) return 60;
+                return 50;
+            } else if (normalized.includes('sit-up') || normalized.includes('situp')) {
+                const reps = numericValue;
+                if (reps >= 50) return 100;
+                if (reps >= 40) return 90;
+                if (reps >= 30) return 80;
+                if (reps >= 20) return 70;
+                if (reps >= 15) return 60;
+                return 50;
+            } else if (normalized.includes('plank')) {
+                let seconds = 0;
+                if (typeof result === 'string' && result.includes(':')) {
+                    const [mins, secs] = result.split(':').map(Number);
+                    seconds = (mins * 60) + (secs || 0);
+                } else {
+                    seconds = numericValue;
+                }
+                if (seconds >= 120) return 100;
+                if (seconds >= 90) return 90;
+                if (seconds >= 60) return 80;
+                if (seconds >= 45) return 70;
+                if (seconds >= 30) return 60;
+                return 50;
+            } else if (normalized.includes('step test') || normalized.includes('3-minute')) {
+                const heartRate = numericValue;
+                if (heartRate <= 80) return 100;
+                if (heartRate <= 100) return 90;
+                if (heartRate <= 120) return 80;
+                if (heartRate <= 140) return 70;
+                if (heartRate <= 160) return 60;
+                return 50;
+            } else if (normalized.includes('mile') || normalized.includes('run')) {
+                let totalSeconds = 0;
+                if (typeof result === 'string' && result.includes(':')) {
+                    const [minutes, seconds] = result.split(':').map(Number);
+                    totalSeconds = (minutes * 60) + (seconds || 0);
+                } else {
+                    totalSeconds = numericValue;
+                }
+                if (totalSeconds <= 420) return 100;
+                if (totalSeconds <= 480) return 90;
+                if (totalSeconds <= 540) return 80;
+                if (totalSeconds <= 600) return 70;
+                if (totalSeconds <= 660) return 60;
+                return 50;
+            } else if (normalized.includes('sit-and-reach')) {
+                const distance = numericValue;
+                if (distance >= 20) return 100;
+                if (distance >= 15) return 90;
+                if (distance >= 10) return 80;
+                if (distance >= 5) return 70;
+                if (distance >= 0) return 60;
+                return 50;
+            }
+            
+            return 75;
+        }
+
+        function getRating(score) {
+            if (score >= 90) return { text: 'Excellent', class: 'text-green-600' };
+            if (score >= 80) return { text: 'Good', class: 'text-blue-600' };
+            if (score >= 70) return { text: 'Fair', class: 'text-yellow-600' };
+            return { text: 'Needs Improvement', class: 'text-red-600' };
+        }
+
+        window.startTest = function(testId) {
+            const test = availableTests.find(t => t.id === testId);
+            if (test) {
+                window.location.href = `./testdetails.html?testId=${testId}&testName=${encodeURIComponent(test.testName)}`;
+            }
+        };
+
+        window.viewResult = function(resultId) {
+            window.location.href = `./studentresult.html?resultId=${resultId}`;
+        };
+
+        window.handleLogout = async function() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    await signOut(auth);
+                    window.location.href = '../login/index.html';
+                } catch (error) {
+                    console.error('Error logging out:', error);
+                    alert('Error logging out. Please try again.');
+                }
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const mainContent = document.getElementById('mainContent');
+
+            if (user) {
+                try {
+                    currentUser = user;
+                    await loadStudentData(user);
+                    await loadAvailableTests();
+                    await loadRecentTestHistory();
+                    
+                    loadingScreen.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                } catch (error) {
+                    console.error('Error loading page:', error);
+                    alert('Error loading page. Please try again.');
+                }
+            } else {
+                window.location.href = '../login/index.html';
+            }
+        });
+    </script>
+</body>
+</html>

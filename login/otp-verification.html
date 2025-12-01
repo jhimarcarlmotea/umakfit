@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMakFit - OTP Verification</title>
+    <link href="https://fonts.googleapis.com/css?family=Inter:600,500,400,700" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Helvetica, sans-serif;
+            background: linear-gradient(180deg, rgba(30, 58, 138, 1) 0%, rgba(59, 130, 246, 1) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 480px;
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .icon-wrapper svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .email-display {
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 14px;
+        }
+
+        .otp-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 60px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e3a8a;
+            transition: all 0.3s;
+        }
+
+        .otp-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+
+        .otp-input.filled {
+            border-color: #10b981;
+            background-color: #f0fdf4;
+        }
+
+        .btn {
+            width: 100%;
+            height: 50px;
+            border-radius: 11px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            margin-bottom: 15px;
+        }
+
+        .btn-verify {
+            background: linear-gradient(270deg, rgba(59, 130, 246, 1) 0%, rgba(30, 58, 138, 1) 100%);
+            color: white;
+        }
+
+        .btn-verify:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-verify:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-resend {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .btn-resend:hover:not(:disabled) {
+            background: #e2e8f0;
+        }
+
+        .btn-resend:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .timer {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            color: #065f46;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            border: 2px solid #dc2626;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .note {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-top: 15px;
+        }
+
+        .status-info {
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #1e40af;
+        }
+
+        .config-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .config-section h3 {
+            font-size: 16px;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+
+        .config-section p {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .config-section ul {
+            font-size: 12px;
+            color: #64748b;
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div style="color: #1e3a8a; font-weight: 600;" id="loadingText">Processing...</div>
+    </div>
+
+    <div class="container">
+        <div class="icon-wrapper">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 8L10.89 13.26C11.56 13.72 12.44 13.72 13.11 13.26L21 8M5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7V17C3 18.1046 3.89543 19 5 19Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+        </div>
+
+        <h1>Enter Verification Code</h1>
+        <p class="subtitle">
+            We've sent a 6-digit verification code to your UMak email
+        </p>
+
+        <div class="email-display" id="emailDisplay">
+            Loading...
+        </div>
+
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="otp-container" id="otpContainer">
+            <input type="text" class="otp-input" maxlength="1" data-index="0">
+            <input type="text" class="otp-input" maxlength="1" data-index="1">
+            <input type="text" class="otp-input" maxlength="1" data-index="2">
+            <input type="text" class="otp-input" maxlength="1" data-index="3">
+            <input type="text" class="otp-input" maxlength="1" data-index="4">
+            <input type="text" class="otp-input" maxlength="1" data-index="5">
+        </div>
+
+        <button class="btn btn-verify" id="verifyBtn" onclick="verifyOTP()" disabled>
+            Verify Code
+        </button>
+
+        <div class="timer" id="timer">You can resend in 60 seconds</div>
+
+        <button class="btn btn-resend" id="resendBtn" onclick="resendOTP()" disabled>
+            Resend Code
+        </button>
+
+        <div class="note">
+            <strong>Didn't receive the code?</strong> Check your spam folder or wait a moment before resending.
+        </div>
+
+        <div class="status-info" id="statusInfo">
+            <strong>Status:</strong> Initializing...
+        </div>
+
+        
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, updateDoc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+            authDomain: "umakfit-e3b1d.firebaseapp.com",
+            projectId: "umakfit-e3b1d",
+            storageBucket: "umakfit-e3b1d.appspot.com",
+            messagingSenderId: "276569891504",
+            appId: "1:276569891504:web:39b1732b519f4d8b785175"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Initialize EmailJS with your credentials
+        console.log('🔧 Initializing EmailJS...');
+        emailjs.init("Bvq89wr_TcM1LUITl");
+        console.log('✅ EmailJS initialized');
+
+        window.auth = auth;
+        window.db = db;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.getDoc = getDoc;
+        window.setDoc = setDoc;
+        window.signOut = signOut;
+
+        let currentUser = null;
+        let currentOTP = null;
+        let resendCountdown = 60;
+        let countdownInterval = null;
+
+        // Generate random 6-digit OTP
+        function generateOTP() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        // Store OTP in Firestore
+        async function storeOTP(otp) {
+            const otpRef = window.doc(window.db, 'otps', currentUser.uid);
+            const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+            
+            await window.setDoc(otpRef, {
+                otp: otp,
+                email: currentUser.email,
+                expiresAt: expiresAt,
+                attempts: 0,
+                createdAt: new Date()
+            });
+        }
+
+        // Send OTP via EmailJS - FIXED VERSION
+        async function sendOTPEmail(email, otp) {
+            console.log('📧 Attempting to send OTP to:', email);
+            console.log('🔑 OTP Generated:', otp);
+            
+            // Validate email
+            if (!email || email.trim() === '') {
+                const errorMsg = 'Recipient email is empty';
+                console.error('❌', errorMsg);
+                document.getElementById('statusInfo').innerHTML = 
+                    `<strong>Status:</strong> ${errorMsg}`;
+                return { success: false, error: errorMsg };
+            }
+            
+            document.getElementById('statusInfo').innerHTML = 
+                `<strong>Status:</strong> Sending verification code to ${email}...`;
+
+            try {
+                // Calculate expiration time (15 minutes from now)
+                const expirationTime = new Date(Date.now() + 15 * 60 * 1000);
+                const formattedTime = expirationTime.toLocaleString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                    month: 'short',
+                    day: 'numeric'
+                });
+
+                // EmailJS template parameters - Match your template exactly
+                const templateParams = {
+                    to_email: email,
+                    passcode: otp, // This matches {(passcode)} in your template
+                    email: email, // This matches {(email)} in your template
+                    time: formattedTime // This matches {(time())} in your template
+                };
+
+                console.log('📤 Sending email with parameters:', templateParams);
+
+                // Send email using EmailJS - Use correct service and template IDs
+                const response = await emailjs.send(
+                    'service_j1jvhff',   // Your Service ID from screenshot
+                    'umakfit-otp',       // Your Template ID from screenshot
+                    templateParams
+                );
+
+                console.log('✅ Email sent successfully!', response);
+                document.getElementById('statusInfo').innerHTML = 
+                    `<strong>Status:</strong> Verification code sent to ${email}`;
+                
+                return { success: true };
+
+            } catch (error) {
+                console.error('❌ Email sending failed:', error);
+                
+                let detailedError = 'Unknown error occurred';
+                
+                if (error.text) {
+                    detailedError = error.text;
+                    console.error('EmailJS Error Text:', error.text);
+                    
+                    // Handle specific Gmail API scope error
+                    if (error.text.includes('insufficient authentication scopes')) {
+                        detailedError = 'Gmail service needs reconfiguration. Please reconnect your Gmail service in EmailJS with proper permissions.';
+                    }
+                }
+                if (error.message) {
+                    detailedError = error.message;
+                    console.error('EmailJS Error Message:', error.message);
+                }
+                if (error.status) {
+                    console.error('EmailJS Status Code:', error.status);
+                }
+                
+                document.getElementById('statusInfo').innerHTML = 
+                    `<strong>Status:</strong> Failed to send email - ${detailedError}`;
+                
+                return { 
+                    success: false, 
+                    error: detailedError 
+                };
+            }
+        }
+
+        // Verify OTP from Firestore
+        async function verifyStoredOTP(otpCode) {
+            const otpRef = window.doc(window.db, 'otps', currentUser.uid);
+            const otpSnap = await window.getDoc(otpRef);
+
+            if (!otpSnap.exists()) {
+                return { success: false, error: 'No OTP found. Please request a new code.' };
+            }
+
+            const otpData = otpSnap.data();
+
+            // Check if OTP is expired
+            if (new Date() > otpData.expiresAt.toDate()) {
+                await window.setDoc(otpRef, { expired: true }, { merge: true });
+                return { success: false, error: 'OTP expired. Please request a new code.' };
+            }
+
+            // Check attempts
+            if (otpData.attempts >= 5) {
+                await window.setDoc(otpRef, { blocked: true }, { merge: true });
+                return { success: false, error: 'Too many attempts. Please request a new code.' };
+            }
+
+            // Verify OTP
+            if (otpData.otp === otpCode) {
+                // OTP is correct - mark as verified
+                await window.setDoc(otpRef, { verified: true }, { merge: true });
+                return { success: true };
+            } else {
+                // Increment attempts
+                await window.setDoc(otpRef, {
+                    attempts: (otpData.attempts || 0) + 1
+                }, { merge: true });
+                return { success: false, error: 'Invalid verification code' };
+            }
+        }
+
+        // Initialize OTP inputs
+        function initializeOTPInputs() {
+            const inputs = document.querySelectorAll('.otp-input');
+            const verifyBtn = document.getElementById('verifyBtn');
+            
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    
+                    // Only allow numbers
+                    if (value && !/^\d+$/.test(value)) {
+                        e.target.value = '';
+                        return;
+                    }
+                    
+                    // Auto-focus next input
+                    if (value && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                    
+                    // Check if all inputs are filled
+                    checkOTPCompletion();
+                });
+                
+                input.addEventListener('keydown', (e) => {
+                    // Handle backspace
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+                
+                input.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const pasteData = e.clipboardData.getData('text').slice(0, 6);
+                    if (/^\d+$/.test(pasteData)) {
+                        pasteData.split('').forEach((char, charIndex) => {
+                            if (inputs[index + charIndex]) {
+                                inputs[index + charIndex].value = char;
+                                inputs[index + charIndex].classList.add('filled');
+                            }
+                        });
+                        checkOTPCompletion();
+                    }
+                });
+            });
+            
+            function checkOTPCompletion() {
+                const allFilled = Array.from(inputs).every(input => input.value);
+                verifyBtn.disabled = !allFilled;
+                
+                // Add filled class to completed inputs
+                inputs.forEach(input => {
+                    if (input.value) {
+                        input.classList.add('filled');
+                    } else {
+                        input.classList.remove('filled');
+                    }
+                });
+            }
+        }
+
+        // Get OTP code from inputs
+        function getOTPCode() {
+            const inputs = document.querySelectorAll('.otp-input');
+            return Array.from(inputs).map(input => input.value).join('');
+        }
+
+        // Verify OTP
+        window.verifyOTP = async function() {
+            const otpCode = getOTPCode();
+            if (otpCode.length !== 6) {
+                showError('Please enter a valid 6-digit code');
+                return;
+            }
+
+            showLoading('Verifying code...');
+
+            try {
+                const result = await verifyStoredOTP(otpCode);
+
+                if (result.success) {
+                    showSuccess('Email verified successfully!');
+                    
+                    // Update Firestore student record
+                    const studentRef = window.doc(window.db, 'students', currentUser.uid);
+                    await window.updateDoc(studentRef, {
+                        emailVerified: true,
+                        emailVerifiedAt: new Date().toISOString()
+                    });
+
+                    // Redirect to next step
+                    setTimeout(() => {
+                        window.location.href = 'dataprivacy.html';
+                    }, 1500);
+                } else {
+                    showError(result.error);
+                    clearOTPInputs();
+                }
+            } catch (error) {
+                console.error('OTP verification error:', error);
+                showError('Verification failed. Please try again.');
+                clearOTPInputs();
+            } finally {
+                hideLoading();
+            }
+        };
+
+        // Send OTP
+        async function sendOTP() {
+            showLoading('Sending verification code...');
+            
+            try {
+                // Generate OTP
+                currentOTP = generateOTP();
+                console.log('🔑 Generated OTP:', currentOTP);
+                
+                // Store OTP in Firestore
+                await storeOTP(currentOTP);
+                console.log('✅ OTP stored in Firestore');
+                
+                // Send email
+                const emailResult = await sendOTPEmail(currentUser.email, currentOTP);
+                
+                if (emailResult.success) {
+                    showSuccess('Verification code sent! Check your UMak email.');
+                    startResendCountdown();
+                } else {
+                    console.error('❌ Email sending failed:', emailResult.error);
+                    showError('Failed to send code. Please try again.');
+                    // Still allow resend
+                    document.getElementById('resendBtn').disabled = false;
+                    document.getElementById('timer').textContent = 'Click resend to try again';
+                }
+            } catch (error) {
+                console.error('Send OTP error:', error);
+                showError('Failed to send code. Please try again.');
+                // Still allow resend
+                document.getElementById('resendBtn').disabled = false;
+                document.getElementById('timer').textContent = 'Click resend to try again';
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Resend OTP
+        window.resendOTP = async function() {
+            await sendOTP();
+            clearOTPInputs();
+        };
+
+        // Clear OTP inputs
+        function clearOTPInputs() {
+            const inputs = document.querySelectorAll('.otp-input');
+            inputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('filled');
+            });
+            document.getElementById('verifyBtn').disabled = true;
+            inputs[0].focus();
+        }
+
+        // Start resend countdown
+        function startResendCountdown() {
+            resendCountdown = 60;
+            const resendBtn = document.getElementById('resendBtn');
+            const timerEl = document.getElementById('timer');
+            
+            resendBtn.disabled = true;
+            timerEl.textContent = `You can resend in ${resendCountdown} seconds`;
+
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            countdownInterval = setInterval(() => {
+                resendCountdown--;
+                timerEl.textContent = `You can resend in ${resendCountdown} seconds`;
+
+                if (resendCountdown <= 0) {
+                    clearInterval(countdownInterval);
+                    resendBtn.disabled = false;
+                    timerEl.textContent = 'You can request a new code now';
+                }
+            }, 1000);
+        }
+
+        // Initialize page
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                alert('Please log in first');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            currentUser = user;
+            document.getElementById('emailDisplay').textContent = user.email;
+
+            // Check if already verified
+            const studentRef = window.doc(window.db, 'students', user.uid);
+            const studentSnap = await window.getDoc(studentRef);
+
+            if (studentSnap.exists()) {
+                const studentData = studentSnap.data();
+                
+                if (studentData.emailVerified) {
+                    // Already verified, redirect to next step
+                    window.location.href = 'dataprivacy.html';
+                    return;
+                }
+            }
+
+            // Initialize OTP inputs
+            initializeOTPInputs();
+
+            // Send initial OTP
+            await sendOTP();
+        });
+
+        function showLoading(message = 'Processing...') {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('loadingText').textContent = message;
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.style.display = 'none';
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            successDiv.style.display = 'none';
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

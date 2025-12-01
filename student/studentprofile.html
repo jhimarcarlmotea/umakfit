@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile - UMakFit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+    * {
+        font-family: 'Inter', sans-serif;
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+        margin: 0;
+        padding: 0;
+    }
+    
+/* Navigation */
+.navbar-custom {
+    background: linear-gradient(180deg, rgba(30, 58, 138, 1) 0%, rgba(59, 130, 246, 1) 100%);
+    padding: 20px 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-bottom: none;
+    height: auto;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-brand-img {
+    height: 60px;
+    width: auto;
+    object-fit: contain;
+}
+
+.navbar-brand-text {
+    font-family: "Manrope", Helvetica;
+    font-weight: 800;
+    font-size: 28px;
+    background: linear-gradient(90deg, rgba(245, 158, 11, 1) 0%, rgba(255, 229, 0, 1) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.nav-pills-custom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.nav-link-custom {
+    font-family: "Manrope", Helvetica;
+    font-weight: 600;
+    color: #000000;
+    font-size: 14px;
+    padding: 12px 18px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition: all 0.3s;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-decoration: none;
+}
+
+.nav-link-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    color: #000000;
+}
+
+.nav-link-custom i {
+    font-size: 14px;
+}
+
+.nav-link-custom.active {
+    background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%);
+    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+}
+
+.notification-bell-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.notification-bell-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+.notification-bell-btn i {
+    font-size: 20px;
+}
+
+.btn-logout-nav {
+    background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%);
+    border: none;
+    color: #000000;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-family: "Manrope", Helvetica;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-logout-nav:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4);
+}
+
+.notification-bell-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 10px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.notification-bell-container {
+    position: relative;
+    display: inline-block;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 380px;
+    max-height: 480px;
+    overflow-y: auto;
+    z-index: 1050;
+    display: none;
+    margin-top: 0.5rem;
+    animation: slideDown 0.3s ease;
+}
+
+.notification-dropdown.show {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notification-dropdown-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 2px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #f8fafc, #ffffff);
+    border-radius: 12px 12px 0 0;
+}
+
+.notification-dropdown-header h6 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.notification-dropdown-body {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.notification-dropdown-item {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.notification-dropdown-item:hover {
+    background-color: #f9fafb;
+}
+
+.notification-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.notification-dropdown-item strong {
+    color: #111827;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+}
+
+.notification-dropdown-item p {
+    color: #6b7280;
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.notification-dropdown-item small {
+    color: #9ca3af;
+    font-size: 11px;
+    display: block;
+    margin-top: 0.35rem;
+}
+
+.notification-dropdown-footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 2px solid #e5e7eb;
+    text-align: center;
+    background-color: #f9fafb;
+    border-radius: 0 0 12px 12px;
+}
+
+.btn-view-all-dropdown {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-view-all-dropdown:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.notification-dropdown-empty {
+    padding: 2rem 1.25rem;
+    text-align: center;
+    color: #9ca3af;
+}
+
+.notification-dropdown-empty i {
+    font-size: 48px;
+    color: #d1d5db;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.notification-dropdown-empty p {
+    color: #6b7280;
+    font-size: 14px;
+    margin: 0;
+}
+
+.navbar-toggler {
+    background-color: #ffffff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255,255,255,0.25);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0,0,0,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
+}
+    
+
+   
+.profile-title {
+    font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    color: #1f3b7c; 
+    font-size: 1.45rem; 
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+    text-transform: capitalize;
+    margin-top: 1.5rem;
+    margin-bottom: 1.25rem;
+    text-align: left;
+    position: relative;
+}
+
+
+.profile-title::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #1f3b7c, #3b82f6);
+    margin-top: 0.5rem;
+    border-radius: 2px;
+}
+
+
+    
+    .profile-sidebar {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 2rem 1.5rem;
+    }
+    
+    .profile-avatar {
+        width: 98px;
+        height: 92px;
+        background-color: transparent;
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .profile-avatar i {
+        font-size: 82px;
+        color: #666;
+    }
+    
+    .profile-name {
+        font-family: 'Inter', Helvetica;
+        font-weight: 600;
+        color: #000000;
+        font-size: 18px;
+        letter-spacing: -0.18px;
+        line-height: 25.2px;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .profile-id {
+        font-family: 'Inter', Helvetica;
+        font-weight: 400;
+        color: #000000;
+        font-size: 13px;
+        letter-spacing: -0.13px;
+        line-height: 18.2px;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .profile-section-badge {
+        background-color: #1e3a8a;
+        border-radius: 18px;
+        padding: 0.5rem 1rem;
+        color: #ffffff;
+        font-family: 'Inter', Helvetica;
+        font-weight: 400;
+        font-size: 12px;
+        letter-spacing: -0.12px;
+        line-height: 16.8px;
+        text-align: center;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .profile-info-item {
+        border-top: 1px solid #e0e0e0;
+        padding: 1rem 0;
+    }
+    
+    .profile-info-label {
+        font-family: 'Inter', Helvetica;
+        font-weight: 400;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 8px;
+        letter-spacing: -0.08px;
+        line-height: 11.2px;
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+    }
+    
+    .profile-info-value {
+        font-family: 'Inter', Helvetica;
+        font-weight: 400;
+        color: #000000;
+        font-size: 11px;
+        letter-spacing: -0.11px;
+        line-height: 15.4px;
+    }
+    
+    .medical-condition-box {
+        background-color: #ffffff;
+        border: 1px solid #1e3a8a;
+        border-radius: 2px;
+        padding: 1rem;
+        min-height: 83px;
+        margin-top: 1rem;
+    }
+    
+    .edit-profile-btn {
+        background: linear-gradient(90deg, rgba(18, 27, 103, 1) 0%, rgba(59, 130, 246, 1) 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 7px;
+        padding: 0.5rem;
+        width: 100%;
+        font-family: 'Inter', Helvetica;
+        font-weight: 400;
+        font-size: 14px;
+        letter-spacing: -0.14px;
+        line-height: 19.6px;
+        margin-top: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .edit-profile-btn:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+    
+    .physiological-card,
+    .test-history-card {
+        background-color: #ffffff;
+        border-radius: 7px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    
+    .card-title-custom {
+        font-family: 'Inter', Helvetica;
+        font-weight: 600;
+        color: #000000;
+        font-size: 18px;
+        letter-spacing: -0.18px;
+        line-height: 25.2px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .physio-box {
+        background-color: #eceff8;
+        border: 1px solid #9f9f9f;
+        border-radius: 6px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .physio-icon {
+        width: 45px;
+        height: 45px;
+        margin-bottom: 0.5rem;
+        object-fit: cover;
+    }
+    
+    .physio-label {
+        font-family: 'Inter', Helvetica;
+        font-weight: 400;
+        color: #000000;
+        font-size: 13px;
+        letter-spacing: -0.13px;
+        line-height: 18.2px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .physio-value {
+        font-family: 'Inter', Helvetica;
+        font-weight: 700;
+        color: #000000;
+        font-size: 24px;
+        letter-spacing: -0.24px;
+        line-height: 33.6px;
+    }
+    
+    .physio-unit {
+        font-size: 13px;
+        font-weight: 400;
+        letter-spacing: -0.13px;
+        line-height: 18.2px;
+    }
+    
+    .test-history-table {
+        width: 100%;
+    }
+    
+    .test-history-header {
+        background-color: #eceff8;
+        border: 1px solid #9f9f9f;
+    }
+    
+    .test-history-header th {
+        font-family: 'Inter', Helvetica;
+        font-weight: 600;
+        color: #000000;
+        font-size: 18px;
+        letter-spacing: -0.18px;
+        line-height: 25.2px;
+        padding: 1rem;
+    }
+    
+    .test-history-row {
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .test-history-cell {
+        font-family: 'Inter', Helvetica;
+        font-weight: 600;
+        color: #000000;
+        font-size: 18px;
+        letter-spacing: -0.18px;
+        line-height: 25.2px;
+        padding: 1rem;
+    }
+    
+    .test-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 14px;
+        font-family: 'Inter', Helvetica;
+        font-weight: 600;
+        font-size: 11px;
+        letter-spacing: 0;
+        line-height: 17.4px;
+        display: inline-block;
+    }
+    
+    .badge-excellent {
+        background-color: #a4fbb1;
+        color: #000000;
+    }
+    
+    .badge-good {
+        background-color: #3b82f6;
+        color: #000000;
+    }
+    
+    .badge-needs-improvement {
+        background-color: #fbbf24;
+        color: #000000;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        color: #64748b;
+    }
+    
+    .empty-state i {
+        font-size: 56px;
+        color: #cbd5e1;
+        margin-bottom: 1rem;
+    }
+    
+    .footer-custom {
+        background-color: #1e3a8a;
+        color: white;
+        padding: 3rem 0 1rem;
+        margin-top: 4rem;
+    }
+    
+    .footer-heading {
+        color: #f59e0b;
+        font-family: 'Inter', Helvetica;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 25.3px;
+        margin-bottom: 1rem;
+    }
+    
+    .footer-text {
+        font-family: 'Inter', Helvetica;
+        font-weight: 600;
+        color: #9f9f9f;
+        font-size: 14px;
+        letter-spacing: 0;
+        line-height: 22.1px;
+    }
+    
+    .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.98);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .spinner {
+        border: 4px solid #e5e7eb;
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+   @media (max-width: 991px) {
+    .nav-link-custom {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .btn-logout-nav {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .notification-bell-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+}
+</style>
+</head>
+<body>
+    <div id="loadingScreen" class="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading Profile...</div>
+    </div>
+
+    <div id="mainContent" style="display: none;">
+        <!-- Navigation -->
+      <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <div class="nav-container w-100">
+            <a class="navbar-brand" href="#">
+                <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
+                     alt="UMak Logo" class="navbar-brand-img">
+                <span class="navbar-brand-text">UMakFit</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="nav-pills-custom ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link-custom" href="./studentdashboard.html">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link-custom" href="./test.html">
+                            <i class="bi bi-clipboard-check"></i> Tests
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link-custom" href="./progress.html">
+                            <i class="bi bi-graph-up"></i> Progress
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link-custom" href="#">
+                            <i class="bi bi-book"></i> Learn
+                        </a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center gap-2 ms-2">
+                        <!-- Notification Bell -->
+                        <div class="notification-bell-container">
+                            <button class="notification-bell-btn" onclick="toggleNotificationDropdown()" id="notificationBellBtn">
+                                <i class="bi bi-bell-fill"></i>
+                                <span class="notification-bell-badge" id="navNotificationCount" style="display: none;">0</span>
+                            </button>
+                            
+                            <!-- Notification Dropdown -->
+                            <div class="notification-dropdown" id="notificationDropdown">
+                                <div class="notification-dropdown-header">
+                                    <h6><i class="bi bi-bell-fill me-2"></i>Notifications</h6>
+                                    <button type="button" class="btn-close" onclick="closeNotificationDropdown()"></button>
+                                </div>
+                                <div class="notification-dropdown-body" id="notificationDropdownBody">
+                                    <div class="notification-dropdown-empty">
+                                        <i class="bi bi-bell-slash"></i>
+                                        <p>No notifications yet</p>
+                                    </div>
+                                </div>
+                                <div class="notification-dropdown-footer">
+                                    <button class="btn-view-all-dropdown" onclick="viewAllNotificationsFromDropdown()">
+                                        View All Notifications
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn-logout-nav" onclick="handleLogout()">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+        <!-- Profile Content -->
+        <div class="container" style="max-width: 1400px;">
+            <h2 class="profile-title">Student Profile</h2>
+            
+            <div class="row">
+                <!-- Left Sidebar -->
+                <div class="col-lg-3">
+                    <div class="profile-sidebar">
+                        <div class="profile-avatar">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <div class="profile-name" id="profileName">Student Name</div>
+                        <div class="profile-id" id="profileId">ID: 000000</div>
+                        <div class="profile-section-badge" id="profileSection">Section</div>
+                        
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Age & Gender</div>
+                            <div class="profile-info-value" id="profileAgeGender">-- years - --</div>
+                        </div>
+                        
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Email Address</div>
+                            <div class="profile-info-value" id="profileEmail">email@umak.edu.ph</div>
+                        </div>
+                        
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Contact Number</div>
+                            <div class="profile-info-value" id="profileContact">+63 000000000</div>
+                        </div>
+                        
+                        <div class="profile-info-item" style="border-bottom: 1px solid #e0e0e0;">
+                            <div class="profile-info-label">Medical Condition</div>
+                        </div>
+                        
+                        <div class="medical-condition-box">
+                            <div class="profile-info-value" id="profileMedical">None</div>
+                        </div>
+                        
+                        <button class="edit-profile-btn" onclick="editProfile()">Edit Profile</button>
+                        <!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white;">
+                <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Edit Profile</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Age</label>
+                            <input type="number" class="form-control" id="editAge" min="15" max="100" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Gender</label>
+                            <select class="form-select" id="editGender" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email Address</label>
+                            <input type="email" class="form-control" id="editEmail" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Contact Number</label>
+                            <input type="tel" class="form-control" id="editContact" placeholder="+63 9XXXXXXXXX" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Height (cm)</label>
+                            <input type="number" class="form-control" id="editHeight" min="100" max="250" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Weight (kg)</label>
+                            <input type="number" class="form-control" id="editWeight" min="30" max="200" required>
+                        </div>
+                       
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Medical Condition</label>
+                            <textarea class="form-control" id="editMedical" rows="3" placeholder="Enter any medical conditions or allergies"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <h6 class="fw-bold mt-3 mb-3" style="color: #1e3a8a;"><i class="bi bi-phone me-2"></i>Emergency Contact</h6>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Contact Name</label>
+                            <input type="text" class="form-control" id="editEmergencyName" placeholder="Full Name">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Contact Number</label>
+                            <input type="tel" class="form-control" id="editEmergencyContact" placeholder="+63 9XXXXXXXXX">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Relationship</label>
+                            <input type="text" class="form-control" id="editEmergencyRelation" placeholder="e.g., Mother, Father">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveProfile()" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6); border: none;">
+                    <i class="bi bi-save me-2"></i>Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+                    </div>
+                </div>
+
+                <!-- Right Content -->
+                <div class="col-lg-9">
+                    <!-- Physiological Data -->
+                    <div class="physiological-card">
+                        <h5 class="card-title-custom">Physiological Data</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="physio-box">
+                                    <img src="https://c.animaapp.com/vkhEa8zW/img/image-126@2x.png" alt="Height" class="physio-icon">
+                                    <div class="physio-label">HEIGHT</div>
+                                    <div class="physio-value">
+                                        <span id="profileHeight">0</span>
+                                        <span class="physio-unit">CM</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="physio-box">
+                                    <img src="https://c.animaapp.com/vkhEa8zW/img/image-127@2x.png" alt="Weight" class="physio-icon">
+                                    <div class="physio-label">WEIGHT</div>
+                                    <div class="physio-value">
+                                        <span id="profileWeight">0</span>
+                                        <span class="physio-unit">KG</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="physio-box">
+                                    <img src="https://c.animaapp.com/vkhEa8zW/img/image-127@2x.png" alt="BMI" class="physio-icon">
+                                    <div class="physio-label">BMI</div>
+                                    <div class="physio-value" id="profileBMI">0.00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Activity -->
+<div class="test-history-card">
+    <h5 class="card-title-custom">Account Activity</h5>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="physio-box">
+                <i class="bi bi-clock-history" style="font-size: 45px; color: #3b82f6;"></i>
+                <div class="physio-label">LAST LOGIN</div>
+                <div class="physio-value" style="font-size: 16px;" id="lastLogin">Never</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="physio-box">
+                <i class="bi bi-calendar-check" style="font-size: 45px; color: #10b981;"></i>
+                <div class="physio-label">ACCOUNT CREATED</div>
+                <div class="physio-value" style="font-size: 16px;" id="accountCreated">N/A</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Emergency Contact -->
+<div class="test-history-card">
+    <h5 class="card-title-custom">Emergency Contact</h5>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="profile-info-item">
+                <div class="profile-info-label">CONTACT NAME</div>
+                <div class="profile-info-value" style="font-size: 16px;" id="emergencyName">Not provided</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="profile-info-item">
+                <div class="profile-info-label">CONTACT NUMBER</div>
+                <div class="profile-info-value" style="font-size: 16px;" id="emergencyContact">Not provided</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="profile-info-item">
+                <div class="profile-info-label">RELATIONSHIP</div>
+                <div class="profile-info-value" style="font-size: 16px;" id="emergencyRelation">Not provided</div>
+            </div>
+        </div>
+    </div>
+</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer-custom">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <h6 class="footer-heading">🏃 UMakFit</h6>
+                        <p class="footer-text">
+                            Empowering the University of Makati community to achieve their fitness goals through comprehensive health assessments and personalized tracking.
+                        </p>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <h6 class="footer-heading">Platform</h6>
+                        <p class="footer-text">
+                            Features<br>
+                            Benefits<br>
+                            Student Login<br>
+                            Faculty Login
+                        </p>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <h6 class="footer-heading">Support</h6>
+                        <p class="footer-text">
+                            Help Center<br>
+                            User Guide<br>
+                            Technical Support<br>
+                            System Status
+                        </p>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <p class="footer-text">© 2025 University of Makati. All rights reserved. | UMakFit Fitness Assessment Platform</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+            authDomain: "umakfit-e3b1d.firebaseapp.com",
+            projectId: "umakfit-e3b1d",
+            storageBucket: "umakfit-e3b1d.appspot.com",
+            messagingSenderId: "276569891504",
+            appId: "1:276569891504:web:39b1732b519f4d8b785175"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.auth = auth;
+        window.signOut = signOut;
+
+        function calculateBMI(weight, height) {
+            const heightInMeters = height / 100;
+            return (weight / (heightInMeters * heightInMeters)).toFixed(2);
+        }
+
+        async function loadStudentProfile(user) {
+    try {
+        const studentsQuery = query(
+            collection(db, 'students'),
+            where('email', '==', user.email)
+        );
+        const studentsSnapshot = await getDocs(studentsQuery);
+        
+        let studentData = null;
+        let studentDocId = null;
+        
+        if (!studentsSnapshot.empty) {
+            studentsSnapshot.forEach((doc) => {
+                studentData = doc.data();
+                studentDocId = doc.id;
+            });
+        } else {
+            const studentRef = doc(db, 'students', user.uid);
+            const studentDoc = await getDoc(studentRef);
+            if (studentDoc.exists()) {
+                studentData = studentDoc.data();
+                studentDocId = user.uid;
+            }
+        }
+        
+        if (studentData) {
+            window.currentStudentId = studentDocId;
+            window.currentStudentData = studentData;
+            
+            document.getElementById('profileName').textContent = 
+                `${studentData.firstName} ${studentData.lastName}`;
+            document.getElementById('profileId').textContent = 
+                `ID: ${studentData.umakId}`;
+            document.getElementById('profileSection').textContent = 
+                `${studentData.yearLevel}-${studentData.section} ${studentData.department}`;
+            document.getElementById('profileAgeGender').textContent = 
+                `${studentData.age} years - ${studentData.gender}`;
+            document.getElementById('profileEmail').textContent = 
+                studentData.email;
+            document.getElementById('profileContact').textContent = 
+                studentData.contactNumber;
+            document.getElementById('profileMedical').textContent = 
+                studentData.medicalCondition || 'None';
+            document.getElementById('profileHeight').textContent = 
+                studentData.height || 0;
+            document.getElementById('profileWeight').textContent = 
+                studentData.weight || 0;
+            
+            if (studentData.height && studentData.weight) {
+                const bmi = calculateBMI(studentData.weight, studentData.height);
+                document.getElementById('profileBMI').textContent = bmi;
+            }
+            
+            // Account Activity
+            if (studentData.lastLogin) {
+                const lastLoginDate = new Date(studentData.lastLogin);
+                document.getElementById('lastLogin').textContent = lastLoginDate.toLocaleString();
+            }
+            
+            if (studentData.createdAt) {
+                const createdDate = new Date(studentData.createdAt);
+                document.getElementById('accountCreated').textContent = createdDate.toLocaleDateString();
+            }
+            
+            // Emergency Contact - THIS IS THE FIX
+            document.getElementById('emergencyName').textContent = studentData.emergencyContactName || 'Not provided';
+            document.getElementById('emergencyContact').textContent = studentData.emergencyContactNumber || 'Not provided';
+            document.getElementById('emergencyRelation').textContent = studentData.emergencyContactRelation || 'Not provided';
+            
+            // Load test statistics
+            await loadTestStatistics(user.uid);
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+    }
+}
+
+       async function loadTestStatistics(userId) {
+    try {
+        const historyQuery = query(
+            collection(db, 'testResults'),
+            where('studentId', '==', userId),
+            where('status', '==', 'completed')
+        );
+        
+        const historySnapshot = await getDocs(historyQuery);
+        const testCount = historySnapshot.size;
+        
+        document.getElementById('testsTaken').textContent = testCount;
+        
+        if (testCount > 0) {
+            let totalScore = 0;
+            historySnapshot.forEach(doc => {
+                const result = doc.data();
+                totalScore += result.score || 0;
+            });
+            const avgScore = (totalScore / testCount).toFixed(1);
+            document.getElementById('avgScore').textContent = avgScore;
+        }
+    } catch (error) {
+        console.error('Error loading test statistics:', error);
+    }
+}
+
+        onAuthStateChanged(auth, async (user) => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const mainContent = document.getElementById('mainContent');
+
+            if (user) {
+                try {
+                    await loadStudentProfile(user);
+                    loadingScreen.style.display = 'none';
+                    mainContent.style.display = 'block';
+                } catch (error) {
+                    console.error('Error loading profile:', error);
+                    loadingScreen.style.display = 'none';
+                    mainContent.style.display = 'block';
+                }
+            } else {
+                window.location.href = '../login/index.html';
+            }
+        });
+
+        window.handleLogout = async function() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    await signOut(auth);
+                    window.location.href = '../login/index.html';
+                } catch (error) {
+                    console.error('Error logging out:', error);
+                }
+            }
+        };
+
+       window.editProfile = function() {
+    const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+    
+    // Populate form with current data
+    const data = window.currentStudentData;
+    document.getElementById('editAge').value = data.age || '';
+    document.getElementById('editGender').value = data.gender || '';
+    document.getElementById('editEmail').value = data.email || '';
+    document.getElementById('editContact').value = data.contactNumber || '';
+    document.getElementById('editHeight').value = data.height || '';
+    document.getElementById('editWeight').value = data.weight || '';
+    document.getElementById('editMedical').value = data.medicalCondition || '';
+    document.getElementById('editEmergencyName').value = data.emergencyContactName || '';
+    document.getElementById('editEmergencyContact').value = data.emergencyContactNumber || '';
+    document.getElementById('editEmergencyRelation').value = data.emergencyContactRelation || '';
+    
+    modal.show();
+};
+
+window.saveProfile = async function() {
+    const form = document.getElementById('editProfileForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    try {
+        const { updateDoc, doc: firestoreDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        
+        const updatedData = {
+            age: parseInt(document.getElementById('editAge').value),
+            gender: document.getElementById('editGender').value,
+            email: document.getElementById('editEmail').value,
+            contactNumber: document.getElementById('editContact').value,
+            height: parseFloat(document.getElementById('editHeight').value),
+            weight: parseFloat(document.getElementById('editWeight').value),
+            medicalCondition: document.getElementById('editMedical').value,
+            emergencyContactName: document.getElementById('editEmergencyName').value,
+            emergencyContactNumber: document.getElementById('editEmergencyContact').value,
+            emergencyContactRelation: document.getElementById('editEmergencyRelation').value,
+            updatedAt: new Date().toISOString()
+        };
+        
+        const studentRef = firestoreDoc(db, 'students', window.currentStudentId);
+        await updateDoc(studentRef, updatedData);
+        
+        alert('Profile updated successfully!');
+        bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+        
+        // Reload profile
+        const user = auth.currentUser;
+        await loadStudentProfile(user);
+        
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('Failed to update profile. Please try again.');
+    }
+};
+    </script>
+</body>
+</html>

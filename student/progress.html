@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMakiFit - Progress</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(180deg, rgba(245, 247, 250, 1) 0%, rgba(232, 238, 245, 1) 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+.navbar-custom {
+    background: linear-gradient(180deg, rgba(30, 58, 138, 1) 0%, rgba(59, 130, 246, 1) 100%);
+    padding: 20px 0px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-bottom: none;
+    height: auto;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-brand-img {
+    height: 60px;
+    width: auto;
+    object-fit: contain;
+}
+
+.navbar-brand-text {
+    font-family: "Manrope", Helvetica;
+    font-weight: 800;
+    font-size: 28px;
+    background: linear-gradient(90deg, rgba(245, 158, 11, 1) 0%, rgba(255, 229, 0, 1) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.nav-pills-custom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.nav-link-custom {
+    font-family: "Manrope", Helvetica;
+    font-weight: 600;
+    color: #000000;
+    font-size: 14px;
+    padding: 12px 18px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition: all 0.3s;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-decoration: none;
+}
+
+.nav-link-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    color: #000000;
+}
+
+.nav-link-custom i {
+    font-size: 14px;
+}
+
+.nav-link-custom.active {
+    background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%);
+    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+}
+
+.notification-bell-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.notification-bell-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+.notification-bell-btn i {
+    font-size: 20px;
+}
+
+.btn-logout-nav {
+    background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%);
+    border: none;
+    color: #000000;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-family: "Manrope", Helvetica;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-logout-nav:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4);
+}
+
+.notification-bell-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 10px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.notification-bell-container {
+    position: relative;
+    display: inline-block;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 380px;
+    max-height: 480px;
+    overflow-y: auto;
+    z-index: 1050;
+    display: none;
+    margin-top: 0.5rem;
+    animation: slideDown 0.3s ease;
+}
+
+.notification-dropdown.show {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notification-dropdown-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 2px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #f8fafc, #ffffff);
+    border-radius: 12px 12px 0 0;
+}
+
+.notification-dropdown-header h6 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.notification-dropdown-body {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.notification-dropdown-item {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.notification-dropdown-item:hover {
+    background-color: #f9fafb;
+}
+
+.notification-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.notification-dropdown-item strong {
+    color: #111827;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+}
+
+.notification-dropdown-item p {
+    color: #6b7280;
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.notification-dropdown-item small {
+    color: #9ca3af;
+    font-size: 11px;
+    display: block;
+    margin-top: 0.35rem;
+}
+
+.notification-dropdown-footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 2px solid #e5e7eb;
+    text-align: center;
+    background-color: #f9fafb;
+    border-radius: 0 0 12px 12px;
+}
+
+.btn-view-all-dropdown {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-view-all-dropdown:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.notification-dropdown-empty {
+    padding: 2rem 1.25rem;
+    text-align: center;
+    color: #9ca3af;
+}
+
+.notification-dropdown-empty i {
+    font-size: 48px;
+    color: #d1d5db;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.notification-dropdown-empty p {
+    color: #6b7280;
+    font-size: 14px;
+    margin: 0;
+}
+
+.navbar-toggler {
+    background-color: #ffffff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255,255,255,0.25);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0,0,0,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
+}
+        /* Main Content */
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 3rem 5rem;
+        }
+
+        /* Professional Page Title with Vertical Accent and Underline */
+.page-title {
+    font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    color: #1f3b7c; /* Professional deep navy */
+    font-size: 2.25rem; /* ~36px */
+    line-height: 1.4;
+    text-align: center;
+    margin: 1.5rem 0 1.5rem 0;
+    letter-spacing: 0.5px;
+    text-transform: capitalize;
+    position: relative;
+    display: inline-block; /* keeps underline and bar aligned with text */
+    padding-left: 1rem; /* space for the vertical line */
+}
+
+/* Vertical Accent Line */
+.page-title::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 5px;
+    background: linear-gradient(180deg, #1e3a8a, #3b82f6);
+    border-radius: 2px;
+}
+
+        /* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 2rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    min-height: 160px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+.stat-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 18px;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover .stat-icon::after {
+    opacity: 1;
+}
+
+.stat-icon.blue {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+}
+
+.stat-icon.green {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.stat-icon.purple {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+}
+
+.stat-icon.pink {
+    background: linear-gradient(135deg, #ec4899, #db2777);
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-label {
+    font-weight: 600;
+    color: #64748b;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+}
+
+.stat-value {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    font-family: 'Manrope', sans-serif;
+}
+
+.stat-value.empty {
+    color: #cbd5e1;
+}
+
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.stat-trend.positive {
+    color: #10b981;
+}
+
+.stat-trend.negative {
+    color: #ef4444;
+}
+
+.stat-trend.neutral {
+    color: #64748b;
+}
+
+       /* Charts Grid */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.chart-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 2.5rem;
+    border-radius: 20px;
+    min-height: 450px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.chart-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+.chart-card:hover::before {
+    opacity: 1;
+}
+
+.chart-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.chart-icon {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-title {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 18px;
+    font-family: 'Manrope', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: #f1f5f9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 2.5rem;
+        }
+
+        .empty-title {
+            font-weight: 600;
+            color: #475569;
+            font-size: 18px;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-description {
+            color: #94a3b8;
+            font-size: 14px;
+            max-width: 300px;
+        }
+
+        .take-test-btn {
+            margin-top: 1.5rem;
+            padding: 0.75rem 2rem;
+            background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%);
+            border: none;
+            border-radius: 8px;
+            color: #000000;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .take-test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+        @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-down {
+    animation: slideDown 0.3s ease;
+}
+/* Add to your CSS */
+.improvement-tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.improvement-tooltip:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+}
+        /* Responsive */
+        /* Responsive */
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-card.large {
+        grid-column: span 1;
+    }
+
+    .container {
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 991px) {
+    .nav-link-custom {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .btn-logout-nav {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .notification-bell-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .container {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 1.75rem;
+    }
+    
+    .stat-value {
+        font-size: 28px;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+<nav class="bg-gradient-to-r from-blue-900 to-blue-500 shadow-lg">
+    <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
+        <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-2 sm:gap-3">
+                <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
+                     alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
+                <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope bg-gradient-to-r from-yellow-400 to-yellow-200 bg-clip-text text-transparent">
+                    UMakFit
+                </span>
+            </a>
+            
+            <!-- Desktop Navigation -->
+            <div class="hidden lg:flex items-center gap-2 flex-wrap">
+                <a href="./studentdashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                    <i class="bi bi-speedometer2"></i> 
+                    <span class="hidden xl:inline">Dashboard</span>
+                </a>
+                <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                    <i class="bi bi-clipboard-check"></i> 
+                    <span class="hidden xl:inline">Tests</span>
+                </a>
+                <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                    <i class="bi bi-graph-up"></i> 
+                    <span class="hidden xl:inline">Progress</span>
+                </a>
+                <a href="#" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                    <i class="bi bi-book"></i> 
+                    <span class="hidden xl:inline">Learn</span>
+                </a>
+                
+                <!-- Notification Bell -->
+                <div class="relative">
+                    <button onclick="toggleNotificationDropdown()" id="notificationBellBtn" 
+                            class="w-9 h-9 xl:w-10 xl:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
+                        <i class="bi bi-bell-fill text-base xl:text-lg"></i>
+                        <span id="navNotificationCount" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-4.5 flex items-center justify-center pulse-animation">0</span>
+                    </button>
+                    
+                    <!-- Notification Dropdown -->
+                    <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl z-[9999] slide-down max-h-[480px] overflow-y-auto">
+                        <div class="p-3 sm:p-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center rounded-t-xl sticky top-0 z-10">
+                            <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
+                                <i class="bi bi-bell-fill text-blue-500"></i> Notifications
+                            </h6>
+                            <button onclick="closeNotificationDropdown()" class="text-gray-400 hover:text-gray-600 p-1">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        <div id="notificationDropdownBody" class="max-h-96 overflow-y-auto">
+                            <div class="p-6 sm:p-8 text-center text-gray-400">
+                                <i class="bi bi-bell-slash text-4xl sm:text-5xl mb-3 block"></i>
+                                <p class="text-gray-600 text-sm sm:text-base">No notifications yet</p>
+                            </div>
+                        </div>
+                        <div class="p-2 sm:p-3 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0">
+                            <button onclick="viewAllNotificationsFromDropdown()" 
+                                    class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
+                                View All Notifications
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Dropdown -->
+                <div class="relative">
+                    <img src="" alt="Profile" id="profilePictureBtn" onclick="toggleProfileDropdown()"
+                         class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
+                    
+                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                        <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
+                            <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                            <h6 id="profileDropdownName" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
+                            <p id="profileDropdownEmail" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
+                        </div>
+                        <div class="p-2">
+                            <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
+                                <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
+                            </a>
+                            <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
+                            <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
+                                <span class="font-medium text-sm sm:text-base">Logout</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile Right Icons -->
+            <div class="flex lg:hidden items-center gap-2 sm:gap-3">
+                <!-- Mobile Notification -->
+                <div class="relative">
+                    <button onclick="toggleNotificationDropdown()" id="notificationBellBtnMobile" 
+                            class="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all">
+                        <i class="bi bi-bell-fill text-base"></i>
+                        <span id="navNotificationCountMobile" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-4.5 flex items-center justify-center pulse-animation">0</span>
+                    </button>
+                    
+                    <!-- Mobile Notification Dropdown (positioned fixed for mobile) -->
+                    <div id="notificationDropdownMobile" class="hidden fixed right-2 left-2 top-20 bg-white rounded-xl shadow-2xl z-[9999] slide-down max-h-[calc(100vh-6rem)] overflow-y-auto">
+                        <div class="p-3 sm:p-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center rounded-t-xl sticky top-0 z-10">
+                            <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
+                                <i class="bi bi-bell-fill text-blue-500"></i> Notifications
+                            </h6>
+                            <button onclick="closeNotificationDropdown()" class="text-gray-400 hover:text-gray-600 p-1">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        <div id="notificationDropdownBodyMobile" class="max-h-96 overflow-y-auto">
+                            <div class="p-6 sm:p-8 text-center text-gray-400">
+                                <i class="bi bi-bell-slash text-4xl sm:text-5xl mb-3 block"></i>
+                                <p class="text-gray-600 text-sm sm:text-base">No notifications yet</p>
+                            </div>
+                        </div>
+                        <div class="p-2 sm:p-3 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0">
+                            <button onclick="viewAllNotificationsFromDropdown()" 
+                                    class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
+                                View All Notifications
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile Profile -->
+                <div class="relative">
+                    <img src="" alt="Profile" id="profilePictureBtnMobile" onclick="toggleProfileDropdown()"
+                         class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
+                    
+                    <!-- Mobile Profile Dropdown (positioned fixed for mobile) -->
+                    <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                        <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
+                            <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                            <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
+                            <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
+                        </div>
+                        <div class="p-2">
+                            <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
+                                <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
+                            </a>
+                            <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
+                            <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
+                                <span class="font-medium text-sm sm:text-base">Logout</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="text-white p-1 sm:p-2">
+                    <i class="bi bi-list text-2xl sm:text-3xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div id="mobileMenu" class="hidden lg:hidden mt-3 sm:mt-4 space-y-2">
+            <a href="./studentdashboard.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
+                <i class="bi bi-speedometer2 mr-2"></i> Dashboard
+            </a>
+            <a href="./test.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
+                <i class="bi bi-clipboard-check mr-2"></i> Tests
+            </a>
+            <a href="./progress.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm">
+                <i class="bi bi-graph-up mr-2"></i> Progress
+            </a>
+            <a href="#" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
+                <i class="bi bi-book mr-2"></i> Learn
+            </a>
+        </div>
+    </div>
+</nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1 class="page-title">Progress</h1>
+
+              <!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <i class="bi bi-clipboard-check-fill" style="color: white; font-size: 32px;"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-label">Total Tests</div>
+            <div class="stat-value" id="totalTests">0</div>
+            <div class="stat-trend neutral" id="totalTestsTrend">
+                <i class="bi bi-dash"></i>
+                <span>No data yet</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <i class="bi bi-graph-up-arrow" style="color: white; font-size: 32px;"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-label">Improvement</div>
+            <div class="stat-value" id="overallImprovement">0%</div>
+            <div class="stat-trend neutral" id="improvementTrend">
+                <i class="bi bi-dash"></i>
+                <span>Take more tests</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon purple">
+            <i class="bi bi-trophy-fill" style="color: white; font-size: 32px;"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-label">Best Category</div>
+            <div class="stat-value" style="font-size: 1.5rem;" id="bestCategory">--</div>
+            <div class="stat-trend neutral" id="bestCategoryScore">
+                <i class="bi bi-star-fill"></i>
+                <span id="bestCategoryScoreText">No data</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon pink">
+            <i class="bi bi-calendar-check-fill" style="color: white; font-size: 32px;"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-label">Last Test</div>
+            <div class="stat-value" style="font-size: 1.3rem;" id="lastTestDate">--</div>
+            <div class="stat-trend neutral" id="lastTestName">
+                <i class="bi bi-clock-history"></i>
+                <span>No tests taken</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Charts -->
+<div class="charts-grid">
+    <!-- Cardio Endurance Progress -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <img class="chart-icon" src="https://c.animaapp.com/ZXSXG5cb/img/image-139@2x.png" alt="Chart">
+            <h2 class="chart-title">Cardio Endurance Progress</h2>
+        </div>
+        <div id="cardioChart"></div>
+    </div>
+
+    <!-- Strength Progress -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <img class="chart-icon" src="https://c.animaapp.com/ZXSXG5cb/img/image-139@2x.png" alt="Chart">
+            <h2 class="chart-title">Strength Progress</h2>
+        </div>
+        <div id="strengthChart"></div>
+    </div>
+
+    <!-- Flexibility Progress -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <img class="chart-icon" src="https://c.animaapp.com/ZXSXG5cb/img/image-139@2x.png" alt="Chart">
+            <h2 class="chart-title">Flexibility Progress</h2>
+        </div>
+        <div id="flexibilityChart"></div>
+    </div>
+
+    <!-- Core Stability Progress -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <img class="chart-icon" src="https://c.animaapp.com/ZXSXG5cb/img/image-139@2x.png" alt="Chart">
+            <h2 class="chart-title">Core Stability Progress</h2>
+        </div>
+        <div id="coreChart"></div>
+    </div>
+</div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+    import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getFirestore, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+        authDomain: "umakfit-e3b1d.firebaseapp.com",
+        projectId: "umakfit-e3b1d",
+        storageBucket: "umakfit-e3b1d.appspot.com",
+        messagingSenderId: "276569891504",
+        appId: "1:276569891504:web:39b1732b519f4d8b785175"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const testCategories = {
+    'Cardio Endurance': ['3-Minute Step Test', '1-Mile Run', '1 Mile Run', 'step test', 'mile run'],
+    'Strength': ['Push-Up Test', 'Grip Strength', 'Push-up Test', 'push up', 'grip'],
+    'Flexibility': ['Sit-and-Reach', 'Shoulder Flexibility', 'sit and reach', 'flexibility'],
+    'Core Stability': ['Plank Hold', 'Sit-Up Test', 'plank', 'sit up', 'core']
+};
+    function getCategoryForTest(testName) {
+    const normalizedTestName = testName.toLowerCase().trim();
+    
+    for (const [category, tests] of Object.entries(testCategories)) {
+        if (tests.some(t => normalizedTestName.includes(t.toLowerCase()) || 
+                           t.toLowerCase().includes(normalizedTestName))) {
+            return category;
+        }
+    }
+    
+    // Fallback category detection
+    if (normalizedTestName.includes('cardio') || normalizedTestName.includes('run') || normalizedTestName.includes('step')) {
+        return 'Cardio Endurance';
+    } else if (normalizedTestName.includes('strength') || normalizedTestName.includes('push') || normalizedTestName.includes('grip')) {
+        return 'Strength';
+    } else if (normalizedTestName.includes('flexibility') || normalizedTestName.includes('reach')) {
+        return 'Flexibility';
+    } else if (normalizedTestName.includes('core') || normalizedTestName.includes('plank') || normalizedTestName.includes('sit-up')) {
+        return 'Core Stability';
+    }
+    
+    return null;
+}
+
+    function calculateTestScore(testName, result, testTarget = null) {
+    console.log(`Calculating score for: ${testName}`, result, testTarget);
+    
+    const normalized = testName.toLowerCase();
+    
+    let numericValue = 0;
+    
+    // Handle different result formats
+    if (typeof result === 'object' && result !== null) {
+        numericValue = parseFloat(result.value || result.result || result.score || result.count || 0);
+        console.log('Object result - numeric value:', numericValue);
+    } else if (typeof result === 'string') {
+        // Extract numbers from strings like "25 push-ups", "1:30 minutes", etc.
+        const match = result.match(/(\d+\.?\d*)/);
+        numericValue = match ? parseFloat(match[1]) : 0;
+        
+        // Handle time format (minutes:seconds)
+        if (result.includes(':') && result.split(':').length === 2) {
+            const [mins, secs] = result.split(':').map(Number);
+            numericValue = (mins * 60) + (secs || 0);
+            console.log('Time format - seconds:', numericValue);
+        }
+        console.log('String result - numeric value:', numericValue);
+    } else {
+        numericValue = parseFloat(result) || 0;
+        console.log('Other result - numeric value:', numericValue);
+    }
+    
+    // Use test target if available
+    if (testTarget && testTarget > 0) {
+        if (normalized.includes('push-up') || normalized.includes('pushup') || 
+            normalized.includes('sit-up') || normalized.includes('situp')) {
+            return Math.min(100, Math.max(50, Math.round((numericValue / testTarget) * 100)));
+        } else if (normalized.includes('plank')) {
+            let seconds = numericValue;
+            if (typeof result === 'string' && result.includes(':') && !normalized.includes('minute')) {
+                const [mins, secs] = result.split(':').map(Number);
+                seconds = (mins * 60) + (secs || 0);
+            }
+            return Math.min(100, Math.max(50, Math.round((seconds / testTarget) * 100)));
+        }
+    }
+    
+    // Default scoring based on common fitness standards
+    if (normalized.includes('push-up') || normalized.includes('pushup')) {
+        if (numericValue >= 40) return 100;
+        if (numericValue >= 30) return 90;
+        if (numericValue >= 20) return 80;
+        return Math.max(60, numericValue * 2); // Minimum 60
+    } else if (normalized.includes('sit-up') || normalized.includes('situp')) {
+        if (numericValue >= 50) return 100;
+        if (numericValue >= 40) return 90;
+        if (numericValue >= 30) return 80;
+        return Math.max(60, numericValue * 1.8);
+    } else if (normalized.includes('plank')) {
+        let seconds = numericValue;
+        if (typeof result === 'string' && result.includes(':')) {
+            const [mins, secs] = result.split(':').map(Number);
+            seconds = (mins * 60) + (secs || 0);
+        }
+        if (seconds >= 120) return 100;
+        if (seconds >= 90) return 90;
+        if (seconds >= 60) return 80;
+        return Math.max(60, (seconds / 60) * 80);
+    } else if (normalized.includes('step') || normalized.includes('cardio')) {
+        // Cardio tests - higher heart rate recovery = lower score
+        return Math.max(60, 100 - (numericValue / 2));
+    }
+    
+    return 75; // Default score
+}
+
+    function renderEmptyState(containerId, category) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📊</div>
+                <div class="empty-title">No Data Available</div>
+                <div class="empty-description">Take your first ${category} test to see your progress</div>
+                <button class="take-test-btn" onclick="window.location.href='./test.html'">Take Test</button>
+            </div>
+        `;
+    }
+
+    function createProgressChart(containerId, data, category) {
+    const container = document.getElementById(containerId);
+    
+    if (!container) {
+        console.error(`Container ${containerId} not found`);
+        return;
+    }
+    
+    if (!data || data.length === 0) {
+        renderEmptyState(containerId, category);
+        return;
+    }
+
+    try {
+        // Clear container and create canvas
+        container.innerHTML = '<canvas id="' + containerId + 'Canvas"></canvas>';
+        const canvas = document.getElementById(containerId + 'Canvas');
+        
+        if (!canvas) {
+            throw new Error('Canvas element not created');
+        }
+        
+        const ctx = canvas.getContext('2d');
+
+        // Prepare chart data
+        const labels = data.map(item => item.date);
+        const scores = data.map(item => item.score);
+        
+        // Color based on category
+        const colors = {
+            'Cardio Endurance': {
+                bg: 'rgba(59, 130, 246, 0.2)',
+                border: 'rgba(59, 130, 246, 1)',
+                point: 'rgba(30, 58, 138, 1)',
+                gradient: ctx.createLinearGradient(0, 0, 0, 400)
+            },
+            'Strength': {
+                bg: 'rgba(16, 185, 129, 0.2)',
+                border: 'rgba(16, 185, 129, 1)',
+                point: 'rgba(5, 150, 105, 1)',
+                gradient: ctx.createLinearGradient(0, 0, 0, 400)
+            },
+            'Flexibility': {
+                bg: 'rgba(245, 158, 11, 0.2)',
+                border: 'rgba(245, 158, 11, 1)',
+                point: 'rgba(217, 119, 6, 1)',
+                gradient: ctx.createLinearGradient(0, 0, 0, 400)
+            },
+            'Core Stability': {
+                bg: 'rgba(236, 72, 153, 0.2)',
+                border: 'rgba(236, 72, 153, 1)',
+                point: 'rgba(219, 39, 119, 1)',
+                gradient: ctx.createLinearGradient(0, 0, 0, 400)
+            }
+        };
+
+        // Set up gradients
+        Object.values(colors).forEach(color => {
+            color.gradient.addColorStop(0, color.bg);
+            color.gradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+        });
+
+        const colorScheme = colors[category] || colors['Cardio Endurance'];
+
+        // Calculate trend line
+        const trendData = calculateTrendLine(scores);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Score',
+                        data: scores,
+                        backgroundColor: colorScheme.gradient,
+                        borderColor: colorScheme.border,
+                        borderWidth: 3,
+                        pointBackgroundColor: colorScheme.point,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        tension: 0.4,
+                        fill: true,
+                        order: 2
+                    },
+                    {
+                        label: 'Trend',
+                        data: trendData,
+                        borderColor: 'rgba(0, 0, 0, 0.3)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        tension: 0.4,
+                        fill: false,
+                        order: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        callbacks: {
+                            title: function(context) {
+                                return data[context[0].dataIndex].testName;
+                            },
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return 'Score: ' + context.parsed.y + '/100';
+                                } else {
+                                    return 'Trend: ' + Math.round(context.parsed.y) + '/100';
+                                }
+                            },
+                            afterLabel: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return 'Result: ' + data[context.dataIndex].result;
+                                }
+                                return null;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20,
+                            callback: function(value) {
+                                return value;
+                            },
+                            font: {
+                                size: 12,
+                                weight: '600'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            },
+                            maxRotation: 45,
+                            minRotation: 45
+                        },
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                animations: {
+                    tension: {
+                        duration: 1000,
+                        easing: 'linear'
+                    }
+                }
+            }
+        });
+
+        // Set canvas dimensions for better rendering
+        canvas.style.width = '100%';
+        canvas.style.height = '300px';
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+    } catch (error) {
+        console.error(`Error creating chart for ${containerId}:`, error);
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">⚠️</div>
+                <div class="empty-title">Chart Error</div>
+                <div class="empty-description">Failed to load chart data</div>
+            </div>
+        `;
+    }
+}
+
+// Helper function to calculate trend line
+function calculateTrendLine(data) {
+    if (data.length < 2) return data;
+    
+    const n = data.length;
+    let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+    
+    for (let i = 0; i < n; i++) {
+        sumX += i;
+        sumY += data[i];
+        sumXY += i * data[i];
+        sumXX += i * i;
+    }
+    
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+    
+    return Array.from({length: n}, (_, i) => slope * i + intercept);
+}
+        let currentUser = null;
+let studentData = null;
+
+// Mobile menu toggle
+window.toggleMobileMenu = function() {
+    const menu = document.getElementById('mobileMenu');
+    if (menu) {
+        menu.classList.toggle('hidden');
+    }
+};
+
+// Notification dropdown
+window.toggleNotificationDropdown = function() {
+    const isMobile = window.innerWidth < 1024;
+    const dropdown = document.getElementById(isMobile ? 'notificationDropdownMobile' : 'notificationDropdown');
+    const dropdownBody = document.getElementById(isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody');
+    
+    dropdown.classList.toggle('hidden');
+    if (!dropdown.classList.contains('hidden')) {
+        loadNotificationDropdown(dropdownBody);
+        setTimeout(() => {
+            document.addEventListener('click', closeOnClickOutside);
+        }, 100);
+    } else {
+        document.removeEventListener('click', closeOnClickOutside);
+    }
+};
+
+window.closeNotificationDropdown = function() {
+    const dropdownDesktop = document.getElementById('notificationDropdown');
+    const dropdownMobile = document.getElementById('notificationDropdownMobile');
+    if (dropdownDesktop) dropdownDesktop.classList.add('hidden');
+    if (dropdownMobile) dropdownMobile.classList.add('hidden');
+    document.removeEventListener('click', closeOnClickOutside);
+};
+
+function closeOnClickOutside(event) {
+    const isMobile = window.innerWidth < 1024;
+    const dropdown = document.getElementById(isMobile ? 'notificationDropdownMobile' : 'notificationDropdown');
+    const bellBtn = document.getElementById('notificationBellBtn');
+    const bellBtnMobile = document.getElementById('notificationBellBtnMobile');
+    if (!dropdown.contains(event.target) && !bellBtn?.contains(event.target) && !bellBtnMobile?.contains(event.target)) {
+        closeNotificationDropdown();
+    }
+}
+
+// Profile dropdown
+window.toggleProfileDropdown = function() {
+    const isMobile = window.innerWidth < 1024;
+    const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
+    
+    dropdown.classList.toggle('hidden');
+    if (!dropdown.classList.contains('hidden')) {
+        closeNotificationDropdown();
+        setTimeout(() => {
+            document.addEventListener('click', closeProfileOnClickOutside);
+        }, 100);
+    } else {
+        document.removeEventListener('click', closeProfileOnClickOutside);
+    }
+};
+
+window.closeProfileDropdown = function() {
+    const dropdownDesktop = document.getElementById('profileDropdown');
+    const dropdownMobile = document.getElementById('profileDropdownMobile');
+    if (dropdownDesktop) dropdownDesktop.classList.add('hidden');
+    if (dropdownMobile) dropdownMobile.classList.add('hidden');
+    document.removeEventListener('click', closeProfileOnClickOutside);
+};
+
+function closeProfileOnClickOutside(event) {
+    const isMobile = window.innerWidth < 1024;
+    const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
+    const profileBtn = document.getElementById('profilePictureBtn');
+    const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
+    if (!dropdown.contains(event.target) && !profileBtn?.contains(event.target) && !profileBtnMobile?.contains(event.target)) {
+        closeProfileDropdown();
+    }
+}
+
+async function loadNotificationDropdown(customBody = null) {
+    // Placeholder - you can implement notification loading here
+    console.log('Loading notifications...');
+}
+
+window.viewAllNotificationsFromDropdown = function() {
+    closeNotificationDropdown();
+    alert('View all notifications feature');
+};
+
+function updateProfileUI() {
+    if (!currentUser) return;
+    
+    const photoURL = currentUser?.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(studentData?.displayName || 'User') + '&background=3b82f6&color=fff&size=128';
+    
+    // Update all profile pictures
+    const profileBtn = document.getElementById('profilePictureBtn');
+    const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
+    if (profileBtn) profileBtn.src = photoURL;
+    if (profileBtnMobile) profileBtnMobile.src = photoURL;
+    
+    // Update dropdown pictures
+    const dropdownPic = document.getElementById('profileDropdownPicture');
+    const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
+    if (dropdownPic) dropdownPic.src = photoURL;
+    if (dropdownPicMobile) dropdownPicMobile.src = photoURL;
+    
+    // Update names
+    const dropdownName = document.getElementById('profileDropdownName');
+    const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
+    if (dropdownName) dropdownName.textContent = studentData?.displayName || currentUser.email.split('@')[0];
+    if (dropdownNameMobile) dropdownNameMobile.textContent = studentData?.displayName || currentUser.email.split('@')[0];
+    
+    // Update emails
+    const dropdownEmail = document.getElementById('profileDropdownEmail');
+    const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
+    if (dropdownEmail) dropdownEmail.textContent = currentUser.email;
+    if (dropdownEmailMobile) dropdownEmailMobile.textContent = currentUser.email;
+    
+}document.querySelectorAll('.stat-value').forEach(el => {
+    if (el.textContent === '0' || el.textContent === '--') {
+        el.innerHTML = '<div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>';
+    }
+});
+    async function loadProgressData(userEmail) {
+    try {
+        console.log('Loading progress data for:', userEmail);
+        
+        const resultsQuery = query(
+            collection(db, 'testResults'),
+            where('studentEmail', '==', userEmail)
+        );
+        
+        const resultsSnapshot = await getDocs(resultsQuery);
+        
+        console.log('Total test results found:', resultsSnapshot.size);
+            
+            const categoryData = {
+                'Cardio Endurance': [],
+                'Strength': [],
+                'Flexibility': [],
+                'Core Stability': []
+            };
+            
+            const categoryScores = {
+                'Cardio Endurance': [],
+                'Strength': [],
+                'Flexibility': [],
+                'Core Stability': []
+            };
+            
+            resultsSnapshot.forEach((doc) => {
+                const result = doc.data();
+                const category = getCategoryForTest(result.testName);
+                
+                if (category) {
+                    const score = calculateTestScore(result.testName, result.result, result.testTarget);
+                    const date = result.submittedAt?.toDate?.() 
+                        ? result.submittedAt.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                        : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    
+                    const timestamp = result.submittedAt?.toDate?.() 
+                        ? result.submittedAt.toDate().getTime()
+                        : new Date().getTime();
+                    
+                    categoryData[category].push({
+                        testName: result.testName,
+                        score: score,
+                        result: result.result,
+                        date: date,
+                        timestamp: timestamp
+                    });
+                    
+                    categoryScores[category].push(score);
+                }
+            });
+            
+            // Sort by timestamp (chronological order for charts)
+            Object.keys(categoryData).forEach(category => {
+                categoryData[category].sort((a, b) => a.timestamp - b.timestamp);
+            });
+            
+             // Calculate useful statistics
+// Calculate useful statistics
+const totalTests = resultsSnapshot.size;
+
+// SIMPLE IMPROVEMENT CALCULATION
+let overallImprovement = 0;
+
+// Get all test results sorted by date
+let allTestResults = [];
+resultsSnapshot.forEach((doc) => {
+    const result = doc.data();
+    const score = calculateTestScore(result.testName, result.result, result.testTarget);
+    const timestamp = result.submittedAt?.toDate?.()?.getTime() || new Date().getTime();
+    
+    allTestResults.push({
+        testName: result.testName,
+        score: score,
+        timestamp: timestamp,
+        date: result.submittedAt?.toDate?.() 
+            ? result.submittedAt.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    });
+});
+
+// Sort all tests by timestamp (oldest first)
+allTestResults.sort((a, b) => a.timestamp - b.timestamp);
+
+console.log('All test results:', allTestResults);
+
+// Calculate improvement only if we have at least 2 tests
+if (allTestResults.length >= 2) {
+    const firstTest = allTestResults[0];
+    const lastTest = allTestResults[allTestResults.length - 1];
+    
+    console.log(`First test: ${firstTest.score}, Last test: ${lastTest.score}`);
+    
+    // Simple improvement calculation
+    if (firstTest.score > 0) {
+        overallImprovement = Math.round(((lastTest.score - firstTest.score) / firstTest.score) * 100);
+        console.log(`Raw improvement: ${overallImprovement}%`);
+    }
+}
+
+// Apply bounds and handle edge cases
+if (Math.abs(overallImprovement) < 5) {
+    overallImprovement = 0;
+}
+
+// FALLBACK: If we have tests but no improvement calculated, show a small positive
+if (overallImprovement === 0 && totalTests > 1) {
+    overallImprovement = 1; // Small positive to indicate progress
+    console.log('Applied fallback improvement:', overallImprovement);
+}
+
+console.log('Final improvement:', overallImprovement);
+
+// For debugging - create simple test type improvements
+let testTypeImprovements = {};
+allTestResults.forEach((test, index) => {
+    if (!testTypeImprovements[test.testName]) {
+        testTypeImprovements[test.testName] = {
+            improvement: overallImprovement, // Use overall for now
+            firstScore: allTestResults[0]?.score || 0,
+            lastScore: allTestResults[allTestResults.length - 1]?.score || 0,
+            testCount: allTestResults.length
+        };
+    }
+});
+
+// Calculate weighted overall improvement based on test type improvements
+let totalWeight = 0;
+let weightedImprovement = 0;
+
+Object.values(testTypeImprovements).forEach(testData => {
+    const weight = testData.testCount; // More tests = more weight
+    weightedImprovement += testData.improvement * weight;
+    totalWeight += weight;
+});
+
+if (totalWeight > 0) {
+    overallImprovement = Math.round(weightedImprovement / totalWeight);
+    // Apply reasonable bounds
+    overallImprovement = Math.max(-30, Math.min(100, overallImprovement));
+}
+
+// If no test type improvements, fall back to category-based calculation
+if (Object.keys(testTypeImprovements).length === 0) {
+    let allDataPoints = [];
+    Object.values(categoryData).forEach(catData => {
+        allDataPoints = allDataPoints.concat(catData);
+    });
+    allDataPoints.sort((a, b) => a.timestamp - b.timestamp);
+
+    if (allDataPoints.length >= 4) {
+        // Use first half vs second half for more stable comparison
+        const midpoint = Math.floor(allDataPoints.length / 2);
+        const firstHalf = allDataPoints.slice(0, midpoint);
+        const secondHalf = allDataPoints.slice(midpoint);
+        
+        const avgFirst = firstHalf.reduce((sum, item) => sum + item.score, 0) / firstHalf.length;
+        const avgSecond = secondHalf.reduce((sum, item) => sum + item.score, 0) / secondHalf.length;
+        
+        if (avgFirst > 0) {
+            overallImprovement = Math.round(((avgSecond - avgFirst) / avgFirst) * 100);
+            overallImprovement = Math.max(-30, Math.min(100, overallImprovement));
+        }
+    }
+}
+
+if (Math.abs(overallImprovement) < 5) {
+    overallImprovement = 0;
+}
+
+// Find best category
+let bestCategory = '--';
+let bestScore = 0;
+Object.entries(categoryScores).forEach(([category, scores]) => {
+    if (scores.length > 0) {
+        const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+        if (avgScore > bestScore) {
+            bestScore = avgScore;
+            bestCategory = category;
+        }
+    }
+});
+
+// Get last test info
+let lastTestDate = '--';
+let lastTestNameText = 'No tests taken';
+let allDataPoints = [];
+Object.values(categoryData).forEach(catData => {
+    allDataPoints = allDataPoints.concat(catData);
+});
+allDataPoints.sort((a, b) => a.timestamp - b.timestamp);
+
+if (allDataPoints.length > 0) {
+    const lastTest = allDataPoints[allDataPoints.length - 1];
+    lastTestDate = lastTest.date;
+    lastTestNameText = lastTest.testName;
+}
+
+// UPDATE STAT CARDS - ITO ANG KULANG MO
+document.getElementById('totalTests').textContent = totalTests;
+document.getElementById('totalTestsTrend').innerHTML = totalTests > 0 
+    ? `<i class="bi bi-check-circle-fill"></i><span>${totalTests} completed</span>`
+    : `<i class="bi bi-dash"></i><span>No data yet</span>`;
+
+document.getElementById('overallImprovement').textContent = 
+    overallImprovement > 0 ? `+${overallImprovement}%` : `${overallImprovement}%`;
+
+// Use the new detailed improvement display
+displayTestImprovements(testTypeImprovements, overallImprovement);
+
+document.getElementById('bestCategory').textContent = bestCategory;
+document.getElementById('bestCategoryScore').className = bestScore > 0 ? 'stat-trend positive' : 'stat-trend neutral';
+document.getElementById('bestCategoryScoreText').textContent = bestScore > 0 
+    ? `${Math.round(bestScore)} avg score`
+    : 'No data';
+
+document.getElementById('lastTestDate').textContent = lastTestDate;
+document.getElementById('lastTestName').innerHTML = `<i class="bi bi-clock-history"></i><span>${lastTestNameText}</span>`;
+
+// Create progress charts
+createProgressChart('cardioChart', categoryData['Cardio Endurance'], 'Cardio Endurance');
+            createProgressChart('strengthChart', categoryData['Strength'], 'Strength');
+            createProgressChart('flexibilityChart', categoryData['Flexibility'], 'Flexibility');
+            createProgressChart('coreChart', categoryData['Core Stability'], 'Core Stability');
+            
+        } catch (error) {
+            console.error('Error loading progress data:', error);
+            ['cardioChart', 'strengthChart', 'flexibilityChart', 'coreChart'].forEach(id => {
+                document.getElementById(id).innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <div class="empty-title">Error Loading Data</div>
+                        <div class="empty-description">Please refresh the page to try again</div>
+                    </div>
+                `;
+            });
+        }
+    }
+
+       window.handleLogout = async function() {
+        if (confirm('Are you sure you want to logout?')) {
+            try {
+                await auth.signOut();
+                window.location.href = '../login/index.html';
+            } catch (error) {
+                console.error('Error logging out:', error);
+                alert('Error logging out. Please try again.');
+            }
+        }
+    };
+
+// Add this function to show detailed test improvements
+// Add this function to show detailed test improvements
+function displayTestImprovements(testTypeImprovements, overallImprovement) {
+    const improvementTrend = document.getElementById('improvementTrend');
+    
+    if (Object.keys(testTypeImprovements).length === 0) {
+        improvementTrend.className = 'stat-trend neutral';
+        improvementTrend.innerHTML = `<i class="bi bi-dash"></i><span>Take more tests</span>`;
+        return;
+    }
+    
+    // Find the test with highest improvement
+    let bestImprovement = { testName: '', improvement: -100 };
+    let totalTestsWithImprovement = 0;
+    let positiveImprovements = 0;
+    
+    Object.entries(testTypeImprovements).forEach(([testName, data]) => {
+        if (data.improvement > bestImprovement.improvement) {
+            bestImprovement = { testName: testName, improvement: data.improvement };
+        }
+        if (data.improvement > 0) {
+            positiveImprovements++;
+        }
+        totalTestsWithImprovement++;
+    });
+    
+    const positivePercentage = Math.round((positiveImprovements / totalTestsWithImprovement) * 100);
+    
+    if (overallImprovement > 5) {
+        improvementTrend.className = 'stat-trend positive';
+        if (bestImprovement.improvement > 20) {
+            improvementTrend.innerHTML = `<i class="bi bi-arrow-up-circle-fill"></i><span>Excellent! ${bestImprovement.improvement}% in ${bestImprovement.testName}</span>`;
+        } else {
+            improvementTrend.innerHTML = `<i class="bi bi-arrow-up-circle-fill"></i><span>${positivePercentage}% of tests improved</span>`;
+        }
+    } else if (overallImprovement < -5) {
+        improvementTrend.className = 'stat-trend negative';
+        improvementTrend.innerHTML = `<i class="bi bi-arrow-down-circle-fill"></i><span>Focus on ${bestImprovement.testName}</span>`;
+    } else {
+        improvementTrend.className = 'stat-trend neutral';
+        improvementTrend.innerHTML = `<i class="bi bi-dash-circle"></i><span>Stable performance</span>`;
+    }
+}
+    onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        
+        // Load student data
+        const studentRef = doc(db, 'students', user.uid);
+        const studentDoc = await getDoc(studentRef);
+        
+        if (studentDoc.exists()) {
+            const data = studentDoc.data();
+            studentData = {
+                displayName: `${data.firstName || ''} ${data.lastName || ''}`.trim() || user.email.split('@')[0],
+                email: user.email
+            };
+        }
+        
+        updateProfileUI();
+        await loadProgressData(user.email);
+    } else {
+        window.location.href = '../login/index.html';
+    }
+});
+</script>
+</body>
+</html>

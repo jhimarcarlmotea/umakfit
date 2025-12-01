@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMakFit - Lessons Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Manrope:600,800|Inter:300,500,400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
+        body { font-family: 'Inter', Helvetica, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
+        
+        .header-top { background-color: #ffffff; padding: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.08); position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .nav-section { background: linear-gradient(180deg, rgba(30, 58, 138, 1) 0%, rgba(59, 130, 246, 1) 100%); padding: 20px 0; margin-top: 74px; }
+        .nav-pills-custom { display: flex; flex-wrap: wrap; gap: 8px; }
+        .nav-pills-custom .nav-link { padding: 12px 18px; border-radius: 8px; background-color: #ffffff; font-weight: 600; transition: all 0.3s; }
+        .nav-pills-custom .nav-link.active { background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%); }
+        
+        .page-header { background: white; border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        
+        .lesson-card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s; border-left: 4px solid #3b82f6; }
+        .lesson-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+        .lesson-title { font-size: 20px; font-weight: 700; color: #1e3a8a; margin-bottom: 10px; }
+        .lesson-meta { display: flex; gap: 20px; color: #64748b; font-size: 14px; margin-bottom: 15px; flex-wrap: wrap; }
+        .lesson-content { color: #475569; line-height: 1.8; margin-bottom: 15px; }
+        
+        .btn-primary-custom { background: linear-gradient(90deg, rgba(16, 185, 129, 1) 0%, rgba(5, 150, 105, 1) 100%); border: none; border-radius: 8px; padding: 12px 24px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3); }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .modal-content { background-color: white; border-radius: 12px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); }
+        .modal-header { padding: 20px 25px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-weight: 600; color: #1e3a8a; font-size: 20px; margin: 0; }
+        .modal-body { padding: 25px; }
+        .modal-footer { padding: 20px 25px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-weight: 600; color: #374151; font-size: 14px; margin-bottom: 8px; }
+        .form-control { width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; transition: border-color 0.3s; }
+        .form-control:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        .video-preview { width: 100%; aspect-ratio: 16/9; border-radius: 8px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+        
+        .loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .spinner { border: 4px solid #f1f5f9; border-top: 4px solid #3b82f6; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="loadingScreen" class="loading">
+        <div class="spinner"></div>
+    </div>
+    
+    <div id="mainContent" style="display: none;">
+        <div class="header-top">
+            <div class="container">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-weight: 700; color: #1e3a8a; font-size: 24px;">
+                        <i class="fas fa-graduation-cap"></i> University of Makati
+                    </div>
+                    <button class="btn btn-warning" onclick="handleLogout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-section">
+            <div class="container">
+                <ul class="nav nav-pills-custom">
+                    <li class="nav-item"><a class="nav-link" href="professor.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="student-management.html"><i class="fas fa-user-graduate"></i> Student Management</a></li>
+                    <li class="nav-item"><a class="nav-link" href="activities.html"><i class="fas fa-running"></i> Activities</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="lessons.html"><i class="fas fa-book"></i> Lessons</a></li>
+                    <li class="nav-item"><a class="nav-link" href="monitoring.html"><i class="fas fa-desktop"></i> Monitor Activities</a></li>
+                    <li class="nav-item"><a class="nav-link" href="grades.html"><i class="fas fa-chart-bar"></i> Grades</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="container" style="margin-top: 30px; margin-bottom: 50px;">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <h2 style="margin: 0; color: #1e3a8a;"><i class="fas fa-book"></i> Lessons Management</h2>
+                        <p style="margin-top: 8px; color: #64748b;">Create and share educational content with your students</p>
+                    </div>
+                    <button class="btn-primary-custom" onclick="showAddLessonModal()">
+                        <i class="fas fa-plus"></i> Add Lesson
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Filter by Section</label>
+                <select class="form-select" id="sectionFilter" onchange="filterLessons()">
+                    <option value="">All Sections</option>
+                </select>
+            </div>
+            
+            <div id="lessonsContainer">
+                <div class="text-center py-5">
+                    <div class="text-muted">Loading lessons...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Lesson Modal -->
+    <div id="addLessonModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Lesson</h3>
+                <button class="btn-close" onclick="closeLessonModal()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Lesson Title *</label>
+                    <input type="text" class="form-control" id="lessonTitle" placeholder="e.g., Introduction to Cardiovascular Fitness">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category *</label>
+                    <select class="form-control" id="lessonCategory">
+                        <option value="">Select Category</option>
+                        <option value="Cardiovascular Fitness">Cardiovascular Fitness</option>
+                        <option value="Strength Training">Strength Training</option>
+                        <option value="Flexibility">Flexibility</option>
+                        <option value="Nutrition">Nutrition</option>
+                        <option value="Mental Health">Mental Health</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Target Section *</label>
+                    <select class="form-control" id="lessonSection">
+                        <option value="">Select Section</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Lesson Content *</label>
+                    <textarea class="form-control" id="lessonContent" rows="8" placeholder="Write your lesson content here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Video URL (Optional - YouTube)</label>
+                    <input type="url" class="form-control" id="lessonVideoUrl" placeholder="https://www.youtube.com/watch?v=...">
+                    <small class="text-muted">Paste a YouTube video link to embed it in the lesson</small>
+                    <div id="videoPreview" class="video-preview" style="display: none;">
+                        <iframe id="videoIframe" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Additional Resources (Optional)</label>
+                    <textarea class="form-control" id="lessonResources" rows="3" placeholder="Add links or references to additional resources..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeLessonModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveLesson()">Add Lesson</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc, serverTimestamp, orderBy, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+            authDomain: "umakfit-e3b1d.firebaseapp.com",
+            projectId: "umakfit-e3b1d",
+            storageBucket: "umakfit-e3b1d.appspot.com",
+            messagingSenderId: "276569891504",
+            appId: "1:276569891504:web:39b1732b519f4d8b785175"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentProfessor = null;
+        let allLessons = [];
+
+        onAuthStateChanged(auth, async (user) => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const mainContent = document.getElementById('mainContent');
+            
+            if (user) {
+                try {
+                    const userRef = doc(db, 'users', user.uid);
+                    const userDoc = await getDoc(userRef);
+                    
+                    if (userDoc.exists() && userDoc.data().role === 'professor') {
+                        currentProfessor = { id: user.uid, ...userDoc.data() };
+                        await loadProfessorSections();
+                        await loadLessons();
+                        
+                        loadingScreen.style.display = 'none';
+                        mainContent.style.display = 'block';
+                    } else {
+                        alert('Access Denied');
+                        await signOut(auth);
+                        window.location.href = '/login/index.html';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error loading page');
+                }
+            } else {
+                window.location.href = '/login/index.html';
+            }
+        });
+
+        async function loadProfessorSections() {
+            try {
+                const sectionsQuery = query(collection(db, 'sections'), where('professorId', '==', currentProfessor.id));
+                const sectionsSnapshot = await getDocs(sectionsQuery);
+                
+                const sectionFilter = document.getElementById('sectionFilter');
+                const lessonSection = document.getElementById('lessonSection');
+                
+                sectionFilter.innerHTML = '<option value="">All Sections</option>';
+                lessonSection.innerHTML = '<option value="">Select Section</option>';
+                
+                sectionsSnapshot.forEach(doc => {
+                    const section = doc.data();
+                    const option1 = document.createElement('option');
+                    option1.value = section.name;
+                    option1.textContent = section.name;
+                    sectionFilter.appendChild(option1);
+                    
+                    const option2 = document.createElement('option');
+                    option2.value = section.name;
+                    option2.textContent = section.name;
+                    lessonSection.appendChild(option2);
+                });
+            } catch (error) {
+                console.error('Error loading sections:', error);
+            }
+        }
+
+        async function loadLessons() {
+            try {
+                const lessonsQuery = query(
+                    collection(db, 'lessons'),
+                    where('professorId', '==', currentProfessor.id),
+                    orderBy('createdAt', 'desc')
+                );
+                const lessonsSnapshot = await getDocs(lessonsQuery);
+                
+                allLessons = [];
+                lessonsSnapshot.forEach(doc => {
+                    allLessons.push({ id: doc.id, ...doc.data() });
+                });
+                
+                renderLessons(allLessons);
+            } catch (error) {
+                console.error('Error loading lessons:', error);
+                document.getElementById('lessonsContainer').innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="text-muted">Error loading lessons</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderLessons(lessons) {
+            const container = document.getElementById('lessonsContainer');
+            
+            if (lessons.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-book" style="font-size: 64px; color: #cbd5e1; margin-bottom: 20px;"></i>
+                        <div class="text-muted">No lessons created yet. Click "Add Lesson" to start!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            lessons.forEach(lesson => {
+                const createdDate = lesson.createdAt ? new Date(lesson.createdAt.toDate()).toLocaleDateString() : 'N/A';
+                const videoEmbed = lesson.videoUrl ? getYouTubeEmbedUrl(lesson.videoUrl) : null;
+                
+                html += `
+                    <div class="lesson-card">
+                        <div class="lesson-title">${lesson.title}</div>
+                        <div class="lesson-meta">
+                            <div><i class="fas fa-tag"></i> ${lesson.category}</div>
+                            <div><i class="fas fa-users"></i> ${lesson.section}</div>
+                            <div><i class="fas fa-calendar"></i> ${createdDate}</div>
+                        </div>
+                        <div class="lesson-content">${lesson.content}</div>
+                        ${videoEmbed ? `
+                            <div class="video-preview" style="display: block; margin-bottom: 15px;">
+                                <iframe src="${videoEmbed}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                        ` : ''}
+                        ${lesson.resources ? `<div class="mt-2" style="color: #64748b; font-size: 14px;"><strong>Resources:</strong> ${lesson.resources}</div>` : ''}
+                        <div class="mt-3" style="display: flex; gap: 10px;">
+                            <button class="btn btn-sm btn-danger" onclick="deleteLesson('${lesson.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function getYouTubeEmbedUrl(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+        }
+
+        window.filterLessons = function() {
+            const selectedSection = document.getElementById('sectionFilter').value;
+            if (selectedSection) {
+                const filtered = allLessons.filter(l => l.section === selectedSection);
+                renderLessons(filtered);
+            } else {
+                renderLessons(allLessons);
+            }
+        };
+
+        window.showAddLessonModal = function() {
+            document.getElementById('addLessonModal').style.display = 'flex';
+        };
+
+        window.closeLessonModal = function() {
+            document.getElementById('addLessonModal').style.display = 'none';
+            document.getElementById('videoPreview').style.display = 'none';
+        };
+
+        document.getElementById('lessonVideoUrl').addEventListener('input', function(e) {
+            const url = e.target.value;
+            const embedUrl = getYouTubeEmbedUrl(url);
+            if (embedUrl) {
+                document.getElementById('videoIframe').src = embedUrl;
+                document.getElementById('videoPreview').style.display = 'flex';
+            } else {
+                document.getElementById('videoPreview').style.display = 'none';
+            }
+        });
+
+        window.saveLesson = async function() {
+            const title = document.getElementById('lessonTitle').value.trim();
+            const category = document.getElementById('lessonCategory').value;
+            const section = document.getElementById('lessonSection').value;
+            const content = document.getElementById('lessonContent').value.trim();
+            const videoUrl = document.getElementById('lessonVideoUrl').value.trim();
+            const resources = document.getElementById('lessonResources').value.trim();
+
+            if (!title || !category || !section || !content) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, 'lessons'), {
+                    title,
+                    category,
+                    section,
+                    content,
+                    videoUrl: videoUrl || null,
+                    resources: resources || null,
+                    professorId: currentProfessor.id,
+                    professorName: currentProfessor.name,
+                    professorEmail: currentProfessor.email,
+                    createdAt: serverTimestamp()
+                });
+
+                alert('✅ Lesson added successfully!');
+                closeLessonModal();
+                await loadLessons();
+            } catch (error) {
+                console.error('Error adding lesson:', error);
+                alert('Error adding lesson');
+            }
+        };
+
+        window.deleteLesson = async function(lessonId) {
+            if (!confirm('Are you sure you want to delete this lesson?')) return;
+            
+            try {
+                await deleteDoc(doc(db, 'lessons', lessonId));
+                alert('✅ Lesson deleted successfully!');
+                await loadLessons();
+            } catch (error) {
+                console.error('Error deleting lesson:', error);
+                alert('Error deleting lesson');
+            }
+        };
+
+        window.handleLogout = async function() {
+            if (confirm('Are you sure you want to logout?')) {
+                await signOut(auth);
+                window.location.href = '/login/index.html';
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UmakFit - Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Inter:600,500,400,700" rel="stylesheet">
+    <style>
+        * {
+            -webkit-font-smoothing: antialiased;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', Helvetica, sans-serif;
+            overflow-x: hidden;
+            width: 100vw;
+            height: 100vh;
+            margin: 0;  
+            padding: 0;
+        }
+
+        .log-in {
+            background-color: #ffffff;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .frame {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(270deg, rgba(6, 182, 212, 1) 0%, rgba(59, 130, 246, 1) 52%, rgba(30, 58, 138, 1) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rectangle {
+            position: absolute;
+            width: 555px;
+            max-width: 90%;
+            background-color: #ffffff;
+            border-radius: 33px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .rectangle-2 {
+            width: 53px;
+            height: 50px;
+            border-radius: 7px;
+            background: linear-gradient(270deg, rgba(59, 130, 246, 1) 0%, rgba(30, 58, 138, 1) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .text-wrapper-4 {
+            font-weight: 700;
+            color: #000000;
+            font-size: 32px;
+        }
+
+        .text-wrapper-3 {
+            background: linear-gradient(90deg, rgba(18, 27, 103, 1) 0%, rgba(59, 130, 246, 1) 100%);
+            -webkit-background-clip: text !important;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 500;
+            font-size: 32px;
+            letter-spacing: -0.32px;
+        }
+
+        .text-wrapper-5 {
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .p {
+            font-weight: 600;
+            color: #1e3a8a80;
+            font-size: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .rectangle-4 {
+            width: 187px;
+            height: 42px;
+            border-radius: 31px;
+            background: linear-gradient(270deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto 30px;
+        }
+
+        .text-wrapper-6 {
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 15px;
+        }
+
+        .image {
+            width: 16px;
+            height: 14px;
+        }
+
+        .rectangle-7 {
+            width: 100%;
+            height: 48px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #00000033;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .rectangle-7:hover {
+            background-color: #f9fafb;
+        }
+
+        .img {
+            width: 21px;
+            height: 21px;
+        }
+
+        .text-wrapper-11 {
+            font-weight: 400;
+            color: #000000;
+            font-size: 14px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-weight: 500;
+            color: #1e3a8a;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 12px;
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: #fee2e2;
+            border-radius: 8px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .rectangle {
+                width: 95%;
+                padding: 30px 20px;
+                margin: 20px;
+            }
+        }
+        .logo-image {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .rectangle-2 {
+            width: 53px;
+            height: 50px;
+            border-radius: 7px;
+            background: linear-gradient(270deg, rgba(59, 130, 246, 1) 0%, rgba(30, 58, 138, 1) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Checking your account status...</div>
+    </div>
+
+    <div class="log-in">
+        <div class="frame">
+            <div class="rectangle">
+                <div class="logo-container">
+                    <div class="rectangle-2">
+                        <img src="logo.png" alt="UmakFit Logo" class="logo-image">
+                    </div>
+                    <div class="text-wrapper-3">UmakFit</div>
+                </div>
+
+                <div class="text-wrapper-5">Welcome Back</div>
+                <p class="p">Sign in to access your fitness dashboard</p>
+
+                <div class="rectangle-4">
+                    <img class="image" src="https://c.animaapp.com/U8pJpe80/img/image-48@2x.png" alt="University Logo" />
+                    <span class="text-wrapper-6">University of Makati</span>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+
+                <div class="rectangle-7" onclick="handleGoogleSignIn()">
+                    <img class="img" src="https://c.animaapp.com/U8pJpe80/img/image-49@2x.png" alt="Google" />
+                    <span class="text-wrapper-11">Continue with Umak Gmail</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getDatabase, ref, set, onDisconnect, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+            authDomain: "umakfit-e3b1d.firebaseapp.com",
+            projectId: "umakfit-e3b1d",
+            storageBucket: "umakfit-e3b1d.appspot.com",
+            messagingSenderId: "276569891504",
+            appId: "1:276569891504:web:39b1732b519f4d8b785175"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const database = getDatabase(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        googleProvider.setCustomParameters({
+            prompt: 'select_account',
+            hd: 'umak.edu.ph'
+        });
+
+        window.auth = auth;
+        window.db = db;
+        window.database = database;
+        window.googleProvider = googleProvider;
+        window.signInWithPopup = signInWithPopup;
+        window.signOut = signOut;
+        window.doc = doc;
+        window.setDoc = setDoc;
+        window.getDoc = getDoc;
+        window.ref = ref;
+        window.set = set;
+        window.onDisconnect = onDisconnect;
+        window.serverTimestamp = serverTimestamp;
+    </script>
+
+   <script>
+    function showLoading(message = 'Checking your account status...') {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        document.getElementById('loadingText').textContent = message;
+    }
+
+    function hideLoading() {
+        document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    function showError(message) {
+        const errorDiv = document.getElementById('errorMessage');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000);
+    }
+
+    async function setupUserPresence(user) {
+        try {
+            console.log('Setting up user presence tracking for:', user.email);
+            
+            // Get user role from both collections
+            let userRole = 'student';
+            const userEmail = user.email.toLowerCase();
+            
+            // Check users first
+            try {
+                const emailLookupRef = window.doc(window.db, 'users', userEmail.replace(/\./g, '_'));
+                const emailLookupSnap = await window.getDoc(emailLookupRef);
+                if (emailLookupSnap.exists()) {
+                    userRole = emailLookupSnap.data().role || 'student';
+                }
+            } catch (error) {
+                console.log('Error checking users for role:', error);
+            }
+            
+            // Check users collection
+            try {
+                const userRef = window.doc(window.db, 'users', user.uid);
+                const userSnap = await window.getDoc(userRef);
+                if (userSnap.exists()) {
+                    userRole = userSnap.data().role || userRole;
+                }
+            } catch (error) {
+                console.log('Error checking users collection for role:', error);
+            }
+            
+            console.log('Detected user role for presence:', userRole);
+            
+            // Set user as online in Realtime Database with proper connection handling
+            const userPresenceRef = window.ref(window.database, `presence/${user.uid}`);
+            
+            // Set the presence data
+            await window.set(userPresenceRef, {
+                status: 'online',
+                lastActive: window.serverTimestamp(),
+                userId: user.uid,
+                email: user.email,
+                name: user.displayName || user.email.split('@')[0],
+                role: userRole,
+                lastLogin: new Date().toISOString()
+            });
+
+            // Setup disconnect cleanup - FIXED VERSION
+            const connectedRef = window.ref(window.database, '.info/connected');
+            
+            window.onValue(connectedRef, (snap) => {
+                if (snap.val() === true) {
+                    // When we disconnect, remove the presence
+                    window.onDisconnect(userPresenceRef).remove();
+                }
+            });
+            
+            console.log('✓ Presence tracking setup complete for', user.email);
+
+        } catch (error) {
+            console.error('Error setting up presence:', error);
+            // Don't throw error - presence shouldn't block login
+        }
+    }
+
+    async function updatePresenceRole(userId, role) {
+        try {
+            const userPresenceRef = window.ref(window.database, `presence/${userId}`);
+            await window.set(userPresenceRef, {
+                status: 'online',
+                lastActive: window.serverTimestamp(),
+                userId: userId,
+                role: role
+            }, { merge: true });
+            console.log(`✓ Updated presence role to: ${role}`);
+        } catch (error) {
+            console.error('Error updating presence role:', error);
+        }
+    }
+
+    // NEW FUNCTION: Check professor collection specifically
+    async function checkProfessorStatus(user) {
+        try {
+            console.log('🔍 Checking professor collection for:', user.uid);
+            
+            const professorRef = window.doc(window.db, 'professors', user.uid);
+            const professorSnap = await window.getDoc(professorRef);
+            
+            if (professorSnap.exists()) {
+                const professorData = professorSnap.data();
+                console.log('✅ PROFESSOR FOUND in professors collection:', professorData.role);
+                return professorData;
+            }
+            
+            console.log('✗ Professor not found in professors collection');
+            return null;
+            
+        } catch (error) {
+            console.error('Error checking professor status:', error);
+            return null;
+        }
+    }
+
+    // NEW FUNCTION: Check if account is deactivated
+    async function checkAccountStatus(user) {
+        try {
+            console.log('🔍 Checking account status for:', user.email);
+            
+            const userEmail = user.email.toLowerCase();
+            
+            // Check professors collection first (HIGHEST PRIORITY)
+            try {
+                const professorRef = window.doc(window.db, 'professors', user.uid);
+                const professorSnap = await window.getDoc(professorRef);
+                
+                if (professorSnap.exists()) {
+                    const professorData = professorSnap.data();
+                    console.log('Account status in professors:', professorData.status);
+                    
+                    // Check if account is deactivated
+                    if (professorData.status === 'inactive') {
+                        console.log('❌ ACCOUNT DEACTIVATED in professors');
+                        return false;
+                    }
+                }
+            } catch (error) {
+                console.log('Error checking professors status:', error);
+            }
+            
+            // Check users collection first
+            try {
+                const emailLookupRef = window.doc(window.db, 'users', userEmail.replace(/\./g, '_'));
+                const emailLookupSnap = await window.getDoc(emailLookupRef);
+                
+                if (emailLookupSnap.exists()) {
+                    const lookupData = emailLookupSnap.data();
+                    console.log('Account status in users:', lookupData.status);
+                    
+                    // Check if account is deactivated
+                    if (lookupData.status === 'inactive') {
+                        console.log('❌ ACCOUNT DEACTIVATED in users');
+                        return false;
+                    }
+                }
+            } catch (error) {
+                console.log('Error checking users status:', error);
+            }
+            
+            // Check users collection
+            try {
+                const userRef = window.doc(window.db, 'users', user.uid);
+                const userSnap = await window.getDoc(userRef);
+                
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    console.log('Account status in users collection:', userData.status);
+                    
+                    // Check if account is deactivated
+                    if (userData.status === 'inactive') {
+                        console.log('❌ ACCOUNT DEACTIVATED in users collection');
+                        return false;
+                    }
+                }
+            } catch (error) {
+                console.log('Error checking users collection status:', error);
+            }
+            
+            // Check students collection
+            try {
+                const studentRef = window.doc(window.db, 'students', user.uid);
+                const studentSnap = await window.getDoc(studentRef);
+                
+                if (studentSnap.exists()) {
+                    const studentData = studentSnap.data();
+                    console.log('Account status in students collection:', studentData.status);
+                    
+                    // Check if account is deactivated
+                    if (studentData.status === 'inactive') {
+                        console.log('❌ ACCOUNT DEACTIVATED in students collection');
+                        return false;
+                    }
+                }
+            } catch (error) {
+                console.log('Error checking students collection status:', error);
+            }
+            
+            console.log('✅ Account is ACTIVE');
+            return true;
+            
+        } catch (error) {
+            console.error('Error checking account status:', error);
+            // If we can't determine status, allow login for safety
+            return true;
+        }
+    }
+
+    // NEW FUNCTION: Check college secretary status
+    async function checkSecretaryStatus(user) {
+        try {
+            console.log('🔍 Checking secretary collection for:', user.uid);
+            
+            const secretaryRef = window.doc(window.db, 'secretaries', user.uid);
+            const secretarySnap = await window.getDoc(secretaryRef);
+            
+            if (secretarySnap.exists()) {
+                const secretaryData = secretarySnap.data();
+                console.log('✅ SECRETARY FOUND in secretaries collection:', secretaryData.role);
+                return secretaryData;
+            }
+            
+            console.log('✗ Secretary not found in secretaries collection');
+            return null;
+            
+        } catch (error) {
+            console.error('Error checking secretary status:', error);
+            return null;
+        }
+    }
+
+    // NEW FUNCTION: Check dean status
+    async function checkDeanStatus(user) {
+        try {
+            console.log('🔍 Checking dean collection for:', user.uid);
+            
+            const deanRef = window.doc(window.db, 'deans', user.uid);
+            const deanSnap = await window.getDoc(deanRef);
+            
+            if (deanSnap.exists()) {
+                const deanData = deanSnap.data();
+                console.log('✅ DEAN FOUND in deans collection:', deanData.role);
+                return deanData;
+            }
+            
+            console.log('✗ Dean not found in deans collection');
+            return null;
+            
+        } catch (error) {
+            console.error('Error checking dean status:', error);
+            return null;
+        }
+    }
+
+    // Update the checkUserStatus function to include all role checks
+    async function checkUserStatus(user) {
+        try {
+            console.log('=== CHECKING USER STATUS ===');
+            console.log('User Email:', user.email);
+            console.log('User UID:', user.uid);
+
+            // FIRST: Check if account is deactivated
+            const isAccountActive = await checkAccountStatus(user);
+            if (!isAccountActive) {
+                console.log('❌ LOGIN BLOCKED: Account is deactivated');
+                await window.signOut(window.auth);
+                hideLoading();
+                showError('Your account has been deactivated. Please contact the administrator.');
+                return;
+            }
+
+            const userEmail = user.email.toLowerCase();
+            const currentTime = new Date().toISOString();
+            
+            // Setup presence tracking immediately
+            await setupUserPresence(user);
+            
+            // Check for DEAN role first (highest priority)
+            const deanData = await checkDeanStatus(user);
+            if (deanData) {
+                console.log('🎯 DEAN ACCOUNT DETECTED');
+                
+                await updatePresenceRole(user.uid, 'dean');
+                
+                // Update last login in deans collection
+                try {
+                    const deanRef = window.doc(window.db, 'deans', user.uid);
+                    await window.setDoc(deanRef, {
+                        lastLogin: currentTime,
+                        isActive: true
+                    }, { merge: true });
+                    console.log('✓ Updated dean last login');
+                } catch (error) {
+                    console.error('Error updating dean:', error);
+                }
+                
+                // Also update users collection for backward compatibility
+                try {
+                    const userRef = window.doc(window.db, 'users', user.uid);
+                    await window.setDoc(userRef, {
+                        role: 'dean',
+                        lastLogin: currentTime,
+                        isActive: true,
+                        displayName: deanData.displayName || user.displayName,
+                        email: user.email
+                    }, { merge: true });
+                    console.log('✓ Updated users collection for dean');
+                } catch (error) {
+                    console.error('Error updating users for dean:', error);
+                }
+                
+                // Redirect to dean dashboard
+                console.log('→ Going to dean dashboard');
+                showLoading('Welcome back Dean! Redirecting to your dashboard...');
+                
+                setTimeout(() => {
+                    window.location.href = '/dean/dean.html';
+                }, 1000);
+                return;
+            }
+            
+            // Check for SECRETARY role
+            const secretaryData = await checkSecretaryStatus(user);
+            if (secretaryData) {
+                console.log('🎯 SECRETARY ACCOUNT DETECTED');
+                
+                await updatePresenceRole(user.uid, 'secretary');
+                
+                // Update last login in secretaries collection
+                try {
+                    const secretaryRef = window.doc(window.db, 'secretaries', user.uid);
+                    await window.setDoc(secretaryRef, {
+                        lastLogin: currentTime,
+                        isActive: true
+                    }, { merge: true });
+                    console.log('✓ Updated secretary last login');
+                } catch (error) {
+                    console.error('Error updating secretary:', error);
+                }
+                
+                // Also update users collection for backward compatibility
+                try {
+                    const userRef = window.doc(window.db, 'users', user.uid);
+                    await window.setDoc(userRef, {
+                        role: 'secretary',
+                        lastLogin: currentTime,
+                        isActive: true,
+                        displayName: secretaryData.displayName || user.displayName,
+                        email: user.email
+                    }, { merge: true });
+                    console.log('✓ Updated users collection for secretary');
+                } catch (error) {
+                    console.error('Error updating users for secretary:', error);
+                }
+                
+                // Redirect to secretary dashboard
+                console.log('→ Going to secretary dashboard');
+                showLoading('Welcome back Secretary! Redirecting to your dashboard...');
+                
+                setTimeout(() => {
+                    window.location.href = '/secretary/secretary.html';
+                }, 1000);
+                return;
+            }
+            
+            // Check for PROFESSOR role
+            const professorData = await checkProfessorStatus(user);
+            if (professorData) {
+                console.log('🎯 PROFESSOR ACCOUNT DETECTED');
+                
+                await updatePresenceRole(user.uid, 'professor');
+                
+                // Update last login in professors collection
+                try {
+                    const professorRef = window.doc(window.db, 'professors', user.uid);
+                    await window.setDoc(professorRef, {
+                        lastLogin: currentTime,
+                        isActive: true
+                    }, { merge: true });
+                    console.log('✓ Updated professor last login');
+                } catch (error) {
+                    console.error('Error updating professor:', error);
+                }
+                
+                // Also update users collection for backward compatibility
+                try {
+                    const userRef = window.doc(window.db, 'users', user.uid);
+                    await window.setDoc(userRef, {
+                        role: 'professor',
+                        lastLogin: currentTime,
+                        isActive: true,
+                        displayName: professorData.displayName || user.displayName,
+                        email: user.email
+                    }, { merge: true });
+                    console.log('✓ Updated users collection for professor');
+                } catch (error) {
+                    console.error('Error updating users for professor:', error);
+                }
+                
+                // Redirect to professor dashboard
+                console.log('→ Going to professor dashboard');
+                showLoading('Welcome back Professor! Redirecting to your dashboard...');
+                
+                setTimeout(() => {
+                    window.location.href = '/professor/professor.html';
+                }, 1000);
+                return;
+            }
+            
+            // Update last login in users collection
+            try {
+                const emailLookupRef = window.doc(window.db, 'users', userEmail.replace(/\./g, '_'));
+                const emailLookupSnap = await window.getDoc(emailLookupRef);
+                
+                if (emailLookupSnap.exists()) {
+                    await window.setDoc(emailLookupRef, {
+                        lastLogin: currentTime,
+                        isActive: true
+                    }, { merge: true });
+                    console.log('✓ Updated last login in users');
+                }
+            } catch (error) {
+                console.error('Error updating users:', error);
+            }
+            
+            // Update last login in users collection
+            try {
+                const userRef = window.doc(window.db, 'users', user.uid);
+                const userSnap = await window.getDoc(userRef);
+                
+                if (userSnap.exists()) {
+                    await window.setDoc(userRef, {
+                        lastLogin: currentTime,
+                        isActive: true
+                    }, { merge: true });
+                    console.log('✓ Updated last login in users collection');
+                }
+            } catch (error) {
+                console.error('Error updating users collection:', error);
+            }
+            
+            // Check if admin/professor in users (PRIORITY CHECK)
+            const emailLookupRef = window.doc(window.db, 'users', userEmail.replace(/\./g, '_'));
+            const emailLookupSnap = await window.getDoc(emailLookupRef);
+            
+            if (emailLookupSnap.exists()) {
+                const lookupData = emailLookupSnap.data();
+                console.log('Found in users:', lookupData.role);
+                
+                // Update presence with correct role
+                await updatePresenceRole(user.uid, lookupData.role);
+                
+                // ADMIN/PROFESSOR: Direct dashboard access
+                if (lookupData.role === 'head_admin' || lookupData.role === 'dean') {
+                    console.log('✅ DEAN DETECTED in users');
+                    console.log('→ Going directly to dean dashboard');
+                    
+                    showLoading('Welcome back Dean! Redirecting to your dashboard...');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/dean/dean.html';
+                    }, 1000);
+                    return;
+                }
+                if (lookupData.role === 'professor') {
+                    console.log('✅ PROFESSOR DETECTED in users');
+                    console.log('→ Going directly to professor dashboard');
+                    
+                    showLoading('Welcome back Professor! Redirecting to your dashboard...');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/professor/professor.html';
+                    }, 1000);
+                    return;
+                }
+                if (lookupData.role === 'secretary' || lookupData.role === 'college_secretary') {
+                    console.log('✅ SECRETARY DETECTED in users');
+                    console.log('→ Going directly to secretary dashboard');
+                    
+                    showLoading('Welcome back Secretary! Redirecting to your dashboard...');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/secretary/secretary.html';
+                    }, 1000);
+                    return;
+                }
+            }
+            
+            // Check if admin/professor in users collection
+            const userRef = window.doc(window.db, 'users', user.uid);
+            const userSnap = await window.getDoc(userRef);
+            
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                console.log('Found in users collection:', userData.role);
+                
+                // Update presence with correct role
+                await updatePresenceRole(user.uid, userData.role);
+                
+                // ADMIN/PROFESSOR: Direct dashboard access
+                if (userData.role === 'head_admin' || userData.role === 'dean') {
+                    console.log('✅ DEAN DETECTED in users collection');
+                    console.log('→ Going directly to dean dashboard');
+                    
+                    showLoading('Welcome back Dean! Redirecting to your dashboard...');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/dean/dean.html';
+                    }, 1000);
+                    return;
+                }
+                if (userData.role === 'professor') {
+                    console.log('✅ PROFESSOR DETECTED in users collection');
+                    console.log('→ Going directly to professor dashboard');
+                    
+                    showLoading('Welcome back Professor! Redirecting to your dashboard...');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/professor/professor.html';
+                    }, 1000);
+                    return;
+                }
+                if (userData.role === 'secretary' || userData.role === 'college_secretary') {
+                    console.log('✅ SECRETARY DETECTED in users collection');
+                    console.log('→ Going directly to secretary dashboard');
+                    
+                    showLoading('Welcome back Secretary! Redirecting to your dashboard...');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/secretary/secretary.html';
+                    }, 1000);
+                    return;
+                }
+            }
+            
+            // STUDENT: Update presence with student role
+            await updatePresenceRole(user.uid, 'student');
+            
+            // Update student last login
+            const studentRef = window.doc(window.db, 'students', user.uid);
+            const studentSnap = await window.getDoc(studentRef);
+            
+            if (studentSnap.exists()) {
+                await window.setDoc(studentRef, {
+                    lastLogin: currentTime,
+                    isActive: true
+                }, { merge: true });
+                console.log('✓ Updated student last login');
+            }
+            
+            // ... rest of your existing student logic remains the same ...
+            // ONLY STUDENTS reach this point - check student-specific requirements
+            console.log('→ Student account detected, checking verification steps...');
+            
+            if (studentSnap.exists()) {
+                const studentData = studentSnap.data();
+                console.log('=== STUDENT STATUS ===');
+                console.log('Email Verified:', studentData.emailVerified);
+                console.log('Privacy Accepted:', studentData.privacyAccepted);
+                console.log('Profile Complete:', studentData.profileComplete);
+                
+                // COMPLETE: All steps done → DASHBOARD
+                if (studentData.emailVerified && studentData.privacyAccepted && studentData.profileComplete) {
+                    console.log('✅ ALL COMPLETE → studentDashboard.html');
+                    showLoading('Login successful! Loading your dashboard...');
+                    setTimeout(() => {
+                        window.location.href = '/student/studentDashboard.html';
+                    }, 1000);
+                    return;
+                }
+                
+                // STEP 1: Email NOT verified → OTP VERIFICATION
+                if (!studentData.emailVerified) {
+                    console.log('⚠️ EMAIL NOT VERIFIED → otp-verification.html');
+                    showLoading('Please verify your email...');
+                    setTimeout(() => {
+                        window.location.href = 'otp-verification.html';
+                    }, 1000);
+                    return;
+                }
+                
+                // STEP 2: Email verified but NO privacy → DATA PRIVACY
+                if (studentData.emailVerified && !studentData.privacyAccepted) {
+                    console.log('⚠️ PRIVACY NOT ACCEPTED → dataprivacy.html');
+                    showLoading('Please accept Data Privacy Agreement...');
+                    setTimeout(() => {
+                        window.location.href = 'dataprivacy.html';
+                    }, 1000);
+                    return;
+                }
+                
+                // STEP 3: Email + Privacy OK but NO profile → PROFILE SETUP
+                if (studentData.emailVerified && studentData.privacyAccepted && !studentData.profileComplete) {
+                    console.log('⚠️ PROFILE INCOMPLETE → profilesetup.html');
+                    showLoading('Please complete your profile...');
+                    setTimeout(() => {
+                        window.location.href = 'profilesetup.html';
+                    }, 1000);
+                    return;
+                }
+            }
+            
+            // NEW STUDENT: Create record → OTP VERIFICATION
+            console.log('🆕 NEW STUDENT - Creating account...');
+            showLoading('Creating your account...');
+            
+            try {
+                await window.setDoc(studentRef, {
+                    email: user.email,
+                    uid: user.uid,
+                    displayName: user.displayName || '',
+                    photoURL: user.photoURL || '',
+                    role: 'student',
+                    emailVerified: false,
+                    privacyAccepted: false,
+                    profileComplete: false,
+                    isActive: true,
+                    lastLogin: currentTime,
+                    createdAt: currentTime
+                });
+                
+                console.log('✓ Student record created');
+                console.log('→ Redirecting to OTP verification');
+                showLoading('Account created! Redirecting to email verification...');
+                
+                setTimeout(() => {
+                    window.location.href = 'otp-verification.html';
+                }, 1000);
+                
+            } catch (error) {
+                console.error('❌ Error creating student record:', error);
+                showError('Error creating account. Please try again.');
+                await window.signOut(window.auth);
+                hideLoading();
+            }
+            
+        } catch (error) {
+            console.error('❌ Error in checkUserStatus:', error);
+            showError('Error checking account status. Please try again.');
+            await window.signOut(window.auth);
+            hideLoading();
+        }
+    }
+
+    async function handleGoogleSignIn() {
+        showLoading('Connecting to Google...');
+
+        try {
+            // Force sign out first
+            try {
+                await window.signOut(window.auth);
+                console.log('✓ Signed out existing session');
+            } catch (e) {
+                console.log('No session to sign out');
+            }
+
+            // Configure provider
+            window.googleProvider.setCustomParameters({
+                prompt: 'select_account',
+                hd: 'umak.edu.ph'
+            });
+
+            console.log('📝 Opening Google sign-in...');
+            const result = await window.signInWithPopup(window.auth, window.googleProvider);
+            
+            console.log('✓ Google sign-in successful');
+            console.log('User:', result.user.email);
+            
+            // Validate UMak email
+            if (!result.user.email.endsWith('@umak.edu.ph')) {
+                console.log('❌ Invalid email domain');
+                await window.signOut(window.auth);
+                hideLoading();
+                showError('Please use your UMak Gmail account (@umak.edu.ph)');
+                return;
+            }
+            
+            console.log('✓ Valid UMak email');
+            
+            // Check user status and redirect
+            await checkUserStatus(result.user);
+
+        } catch (error) {
+            console.error('❌ Google sign-in error:', error);
+            hideLoading();
+            
+            let errorMessage = 'Failed to sign in with Google';
+            if (error.code === 'auth/popup-closed-by-user') {
+                errorMessage = 'Sign in was cancelled. Please try again.';
+            } else if (error.code === 'auth/popup-blocked') {
+                errorMessage = 'Popup blocked. Please allow popups for this site.';
+            } else if (error.code === 'auth/cancelled-popup-request') {
+                errorMessage = 'Please complete the sign-in process.';
+            }
+            
+            showError(errorMessage);
+        }
+    }
+
+    // Clear session on page load
+    window.addEventListener('DOMContentLoaded', async () => {
+        console.log('🔄 Page loaded - Clearing session');
+        try {
+            await window.signOut(window.auth);
+            console.log('✓ Session cleared');
+        } catch (e) {
+            console.log('No session to clear');
+        }
+    });
+
+    window.handleGoogleSignIn = handleGoogleSignIn;
+</script>
+</body>
+</html>
