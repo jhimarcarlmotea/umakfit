@@ -531,7 +531,93 @@
             height: 40px;
             width: auto;
         }
+        .file-preview-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 15px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
 
+    .file-preview-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+    }
+
+    .file-preview-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 16px;
+    }
+
+    .file-preview-details {
+        flex: 1;
+    }
+
+    .file-preview-name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+
+    .file-preview-size {
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .file-preview-remove {
+        padding: 6px 12px;
+        background: #fee2e2;
+        color: #dc2626;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .file-preview-remove:hover {
+        background: #fecaca;
+    }
+
+    .uploaded-file-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: #dbeafe;
+        border: 1px solid #93c5fd;
+        border-radius: 6px;
+        margin-bottom: 6px;
+        font-size: 13px;
+    }
+
+    .uploaded-file-item i {
+        color: #2563eb;
+    }
+
+    .uploaded-file-item a {
+        color: #1e40af;
+        text-decoration: none;
+        flex: 1;
+    }
+
+    .uploaded-file-item a:hover {
+        text-decoration: underline;
+    }
         @media (max-width: 768px) {
             .lessons-header {
                 flex-direction: column;
@@ -660,12 +746,12 @@
                             <input type="text" class="form-control" id="lessonTitle" required placeholder="Enter lesson title">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Section <span style="color: #ef4444;">*</span></label>
-                            <select class="form-select" id="lessonSection" required>
-                                <option value="">Select Section</option>
-                            </select>
-                        </div>
-                    </div>
+                    <label class="form-label">Section <span style="color: #ef4444;">*</span></label>
+                    <select class="form-select" id="lessonSection" required>
+                        <option value="">Select Section</option>
+                    </select>
+                    <small class="text-muted" id="sectionStudentInfo" style="display: block; margin-top: 5px;"></small>
+                </div>
                     
                     <div class="form-group">
                         <label class="form-label">Lesson Type</label>
@@ -704,17 +790,16 @@
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">Attachments (Optional)</label>
-                        <input type="text" class="form-control" id="lessonAttachments" placeholder="Comma-separated file names or URLs">
-                        <small class="text-muted">Example: lesson.pdf, video.mp4, https://youtube.com/...</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">YouTube Video URL (Optional)</label>
-                        <input type="url" class="form-control" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
-                    </div>
-                    
+                <div class="form-group">
+                <label class="form-label">Upload Files (Optional)</label>
+                <input type="file" class="form-control" id="lessonFiles" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png">
+                <small class="text-muted" style="display: block; margin-top: 5px;">
+                    📎 Supported: PDF, Word, PowerPoint, Images (Max 1MB per file)
+                </small>
+                <div id="filePreviewContainer" class="mt-3"></div>
+            </div>
+
+                                    
                     <input type="hidden" id="lessonId">
                 </form>
             </div>
@@ -730,7 +815,7 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, collection, getDocs, query, where, doc, getDoc, addDoc, updateDoc, deleteDoc, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
         const firebaseConfig = {
             apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
             authDomain: "umakfit-e3b1d.firebaseapp.com",
@@ -743,12 +828,142 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
+        const storage = getStorage(app);
         let currentProfessor = null;
         let assignedSections = [];
         let allLessons = [];
         let editingLessonId = null;
+        let selectedFiles = [];
 
+function handleFileSelection(event) {
+    const files = Array.from(event.target.files);
+    const maxSize = 50 * 1024 * 1024; // 50MB
+    
+    files.forEach(file => {
+        if (file.size > maxSize) {
+            alert(`File "${file.name}" is too large. Maximum size is 50MB.`);
+            return;
+        }
+        
+        const exists = selectedFiles.find(f => f.name === file.name && f.size === file.size);
+        if (!exists) {
+            selectedFiles.push(file);
+        }
+    });
+    
+    displayFilePreview();
+    event.target.value = '';
+}
+
+function displayFilePreview() {
+    const container = document.getElementById('filePreviewContainer');
+    if (!container) return;
+    
+    if (selectedFiles.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    let html = '<div class="mt-2"><strong class="text-sm text-gray-700">Selected Files:</strong></div>';
+    
+    selectedFiles.forEach((file, index) => {
+        const size = formatFileSize(file.size);
+        const icon = getFileIcon(file.name);
+        
+        html += `
+            <div class="file-preview-item">
+                <div class="file-preview-info">
+                    <div class="file-preview-icon">
+                        <i class="${icon}"></i>
+                    </div>
+                    <div class="file-preview-details">
+                        <div class="file-preview-name">${file.name}</div>
+                        <div class="file-preview-size">${size}</div>
+                    </div>
+                </div>
+                <button type="button" class="file-preview-remove" onclick="removeSelectedFile(${index})">
+                    <i class="fas fa-times"></i> Remove
+                </button>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+window.removeSelectedFile = function(index) {
+    selectedFiles.splice(index, 1);
+    displayFilePreview();
+};
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+function getFileIcon(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    const iconMap = {
+        'pdf': 'fas fa-file-pdf',
+        'doc': 'fas fa-file-word',
+        'docx': 'fas fa-file-word',
+        'ppt': 'fas fa-file-powerpoint',
+        'pptx': 'fas fa-file-powerpoint',
+        'xls': 'fas fa-file-excel',
+        'xlsx': 'fas fa-file-excel',
+        'jpg': 'fas fa-file-image',
+        'jpeg': 'fas fa-file-image',
+        'png': 'fas fa-file-image',
+        'gif': 'fas fa-file-image',
+        'mp4': 'fas fa-file-video',
+        'avi': 'fas fa-file-video',
+        'mov': 'fas fa-file-video',
+        'zip': 'fas fa-file-archive',
+        'rar': 'fas fa-file-archive'
+    };
+    return iconMap[ext] || 'fas fa-file';
+}
+
+// Initialize file input when modal is shown
+window.showAddLessonModal = function() {
+    editingLessonId = null;
+    selectedFiles = [];
+    document.getElementById('modalTitle').textContent = 'Create New Lesson';
+    document.getElementById('saveLessonBtn').textContent = 'Create Lesson';
+    
+    document.getElementById('lessonForm').reset();
+    document.getElementById('lessonId').value = '';
+    document.getElementById('filePreviewContainer').innerHTML = '';
+    
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('publishDate').value = today;
+    
+    document.getElementById('lessonModal').style.display = 'flex';
+    
+    // Attach file input listener
+    setTimeout(() => {
+        const fileInput = document.getElementById('lessonFiles');
+        if (fileInput) {
+            fileInput.removeEventListener('change', handleFileSelection);
+            fileInput.addEventListener('change', handleFileSelection);
+        }
+    }, 100);
+};
+
+window.closeLessonModal = function() {
+    document.getElementById('lessonModal').style.display = 'none';
+    editingLessonId = null;
+    selectedFiles = [];
+    document.getElementById('filePreviewContainer').innerHTML = '';
+};
+
+window.saveLesson = saveLesson;
+window.editLesson = editLesson;
+window.deleteLesson = deleteLesson;
+window.publishLesson = publishLesson;
         onAuthStateChanged(auth, async (user) => {
             const loadingScreen = document.getElementById('loadingScreen');
             const mainContent = document.getElementById('mainContent');
@@ -764,7 +979,10 @@
                     
                     loadingScreen.style.display = 'none';
                     mainContent.style.display = 'block';
-                    
+                     const fileInput = document.getElementById('lessonFiles');
+            if (fileInput) {
+                fileInput.addEventListener('change', handleFileSelection);
+            }
                 } catch (error) {
                     console.error('Error loading lesson management:', error);
                     loadingScreen.style.display = 'none';
@@ -775,391 +993,778 @@
                 window.location.href = '/login/index.html';
             }
         });
-
-        async function loadProfessorData() {
-            try {
-                const userRef = doc(db, 'users', currentProfessor.id);
-                const userDoc = await getDoc(userRef);
-                
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    if (userData.role !== 'professor') {
-                        await signOut(auth);
-                        window.location.href = '/login/index.html';
-                        return;
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading professor data:', error);
-            }
-        }
-
-        async function loadAssignedSections() {
-            try {
-                assignedSections = [];
-                
-                // Load from professorProfiles
-                const profileRef = doc(db, 'professorProfiles', currentProfessor.email);
-                const profileDoc = await getDoc(profileRef);
-                
-                if (profileDoc.exists()) {
-                    const profileData = profileDoc.data();
-                    if (profileData.assignedClass) {
-                        const studentsQuery = query(
-                            collection(db, 'students'),
-                            where('section', '==', profileData.assignedClass)
-                        );
-                        const studentsSnapshot = await getDocs(studentsQuery);
-                        
-                        assignedSections.push({
-                            section: profileData.assignedClass,
-                            students: studentsSnapshot.size
-                        });
-                    }
-                }
-                
-                // Load from sections collection
-                const sectionsQuery = query(
-                    collection(db, 'sections'),
-                    where('professorEmail', '==', currentProfessor.email)
-                );
-                const sectionsSnapshot = await getDocs(sectionsQuery);
-                
-                for (const docSnap of sectionsSnapshot.docs) {
-                    const sectionData = docSnap.data();
-                    const exists = assignedSections.find(s => s.section === sectionData.name);
-                    
-                    if (!exists) {
-                        const studentsQuery = query(
-                            collection(db, 'students'),
-                            where('section', '==', sectionData.name)
-                        );
-                        const studentsSnapshot = await getDocs(studentsQuery);
-                        
-                        assignedSections.push({
-                            section: sectionData.name,
-                            students: studentsSnapshot.size
-                        });
-                    }
-                }
-                
-                // Populate section dropdown
-                const sectionSelect = document.getElementById('lessonSection');
-                sectionSelect.innerHTML = '<option value="">Select Section</option>';
-                
-                assignedSections.forEach(section => {
-                    const option = document.createElement('option');
-                    option.value = section.section;
-                    option.textContent = `${section.section} (${section.students} students)`;
-                    sectionSelect.appendChild(option);
-                });
-                
-                console.log('Assigned sections:', assignedSections);
-                
-            } catch (error) {
-                console.error('Error loading assigned sections:', error);
-            }
-        }
-
-        async function loadLessons() {
-            try {
-                allLessons = [];
-                
-                // Load lessons from the database
-                const lessonsQuery = query(
-                    collection(db, 'lessons'),
-                    where('professorEmail', '==', currentProfessor.email),
-                    orderBy('createdAt', 'desc')
-                );
-                
-                const lessonsSnapshot = await getDocs(lessonsQuery);
-                
-                lessonsSnapshot.forEach(docSnap => {
-                    const lesson = docSnap.data();
-                    allLessons.push({
-                        id: docSnap.id,
-                        ...lesson,
-                        createdAt: lesson.createdAt ? lesson.createdAt.toDate() : new Date(),
-                        publishDate: lesson.publishDate ? lesson.publishDate.toDate() : null
-                    });
-                });
-                
-                console.log('Loaded lessons:', allLessons.length);
-                displayLessons();
-                
-            } catch (error) {
-                console.error('Error loading lessons:', error);
-                // If collection doesn't exist, we'll create it when adding first lesson
-                displayLessons();
-            }
-        }
-
-        function displayLessons() {
-            const lessonsGrid = document.getElementById('lessonsGrid');
+            // Add event listener to section dropdown after loading sections
+        window.addEventListener('load', () => {
+    const sectionSelect = document.getElementById('lessonSection');
+    if (sectionSelect) {
+        sectionSelect.addEventListener('change', function() {
+            const selectedSection = this.value;
+            const sectionInfo = assignedSections.find(s => s.section === selectedSection);
+            const infoElement = document.getElementById('sectionStudentInfo');
             
-            if (allLessons.length === 0) {
-                lessonsGrid.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📚</div>
-                        <div class="empty-title">No Lessons Created</div>
-                        <div class="empty-text">You haven't created any lessons yet. Click "Create New Lesson" to add your first lesson.</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            
-            // Sort lessons: published first, then scheduled, then draft
-            const sortedLessons = [...allLessons].sort((a, b) => {
-                const statusOrder = { published: 1, scheduled: 2, draft: 3 };
-                return statusOrder[a.status] - statusOrder[b.status];
-            });
-            
-            sortedLessons.forEach(lesson => {
-                // Format date
-                const date = lesson.publishDate ? 
-                    lesson.publishDate.toLocaleDateString() : 
-                    lesson.createdAt.toLocaleDateString();
-                
-                // Truncate content for preview
-                const contentPreview = lesson.content.length > 150 ? 
-                    lesson.content.substring(0, 150) + '...' : 
-                    lesson.content;
-                
-                // Get badge class based on status
-                let badgeClass = 'badge-draft';
-                if (lesson.status === 'published') badgeClass = 'badge-published';
-                else if (lesson.status === 'scheduled') badgeClass = 'badge-scheduled';
-                
-                // Check if lesson has attachments
-                const hasAttachments = lesson.attachments && lesson.attachments.length > 0;
-                const hasVideo = lesson.youtubeUrl && lesson.youtubeUrl.trim() !== '';
-                
-                html += `
-                    <div class="lesson-card">
-                        <div class="lesson-card-header">
-                            <h4 class="lesson-card-title">${lesson.title}</h4>
-                            <span class="lesson-badge ${badgeClass}">${lesson.status}</span>
-                        </div>
-                        
-                        <div class="lesson-card-meta">
-                            <div>
-                                <i class="fas fa-users"></i> ${lesson.section}
-                            </div>
-                            <div>
-                                <i class="fas fa-calendar"></i> ${date}
-                            </div>
-                            <div>
-                                <i class="fas fa-tag"></i> ${lesson.type}
-                            </div>
-                        </div>
-                        
-                        ${lesson.description ? `
-                            <div class="lesson-card-content">
-                                <strong>Description:</strong> ${lesson.description}
-                            </div>
-                        ` : ''}
-                        
-                        <div class="lesson-card-content">
-                            ${contentPreview}
-                        </div>
-                        
-                        ${(hasAttachments || hasVideo) ? `
-                            <div class="lesson-card-content">
-                                <strong>Resources:</strong><br>
-                                ${hasAttachments ? `<i class="fas fa-paperclip"></i> ${lesson.attachments.split(',').length} attachment(s)<br>` : ''}
-                                ${hasVideo ? `<i class="fab fa-youtube"></i> Video included` : ''}
-                            </div>
-                        ` : ''}
-                        
-                        <div class="lesson-card-footer">
-                            <div class="lesson-actions">
-                                <button class="btn-warning" onclick="editLesson('${lesson.id}')">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
-                                <button class="btn-danger" onclick="deleteLesson('${lesson.id}')">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </div>
-                            <div>
-                                <button class="btn-primary" onclick="publishLesson('${lesson.id}')">
-                                    <i class="fas fa-share"></i> ${lesson.status === 'published' ? 'View' : 'Publish'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            lessonsGrid.innerHTML = html;
-        }
-
-        function showAddLessonModal() {
-            editingLessonId = null;
-            document.getElementById('modalTitle').textContent = 'Create New Lesson';
-            document.getElementById('saveLessonBtn').textContent = 'Create Lesson';
-            
-            // Reset form
-            document.getElementById('lessonForm').reset();
-            document.getElementById('lessonId').value = '';
-            
-            // Set default publish date to today
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('publishDate').value = today;
-            
-            // Show modal
-            document.getElementById('lessonModal').style.display = 'flex';
-        }
-
-        function closeLessonModal() {
-            document.getElementById('lessonModal').style.display = 'none';
-            editingLessonId = null;
-        }
-
-        async function saveLesson() {
-            // Get form values
-            const title = document.getElementById('lessonTitle').value.trim();
-            const section = document.getElementById('lessonSection').value;
-            const type = document.getElementById('lessonType').value;
-            const description = document.getElementById('lessonDescription').value.trim();
-            const content = document.getElementById('lessonContent').value.trim();
-            const publishDate = document.getElementById('publishDate').value;
-            const status = document.getElementById('lessonStatus').value;
-            const attachments = document.getElementById('lessonAttachments').value.trim();
-            const youtubeUrl = document.getElementById('youtubeUrl').value.trim();
-
-            // Validation
-            if (!title || !section || !content) {
-                alert('Please fill in all required fields: Title, Section, and Content');
-                return;
-            }
-
-            try {
-                const saveBtn = document.getElementById('saveLessonBtn');
-                saveBtn.disabled = true;
-                saveBtn.textContent = 'Saving...';
-
-                const lessonData = {
-                    title: title,
-                    section: section,
-                    type: type,
-                    description: description,
-                    content: content,
-                    publishDate: publishDate ? new Date(publishDate) : new Date(),
-                    status: status,
-                    attachments: attachments ? attachments.split(',').map(a => a.trim()) : [],
-                    youtubeUrl: youtubeUrl,
-                    professorEmail: currentProfessor.email,
-                    professorId: currentProfessor.id,
-                    createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp()
-                };
-
-                let lessonId;
-                let isNew = false;
-
-                if (editingLessonId) {
-                    // Update existing lesson
-                    const lessonRef = doc(db, 'lessons', editingLessonId);
-                    await updateDoc(lessonRef, {
-                        ...lessonData,
-                        updatedAt: serverTimestamp()
-                    });
-                    lessonId = editingLessonId;
+            if (sectionInfo && infoElement) {
+                const studentCount = sectionInfo.students || 0;
+                if (studentCount > 0) {
+                    infoElement.textContent = `✓ This lesson will be available to ${studentCount} student${studentCount !== 1 ? 's' : ''} in this section`;
+                    infoElement.style.color = '#10b981';
                 } else {
-                    // Create new lesson
-                    const docRef = await addDoc(collection(db, 'lessons'), lessonData);
-                    lessonId = docRef.id;
-                    isNew = true;
+                    infoElement.textContent = '⚠️ No students enrolled in this section';
+                    infoElement.style.color = '#f59e0b';
                 }
-
-                // Create notification for students
-                if (status === 'published') {
-                    await createLessonNotification(lessonData, lessonId);
-                }
-
-                // Close modal and refresh
-                closeLessonModal();
-                alert(`Lesson ${isNew ? 'created' : 'updated'} successfully!`);
-                
-                await loadLessons();
-                
-            } catch (error) {
-                console.error('Error saving lesson:', error);
-                alert('Error saving lesson: ' + error.message);
-                
-                const saveBtn = document.getElementById('saveLessonBtn');
-                saveBtn.disabled = false;
-                saveBtn.textContent = editingLessonId ? 'Update Lesson' : 'Create Lesson';
+                infoElement.style.fontWeight = '500';
+            } else if (infoElement) {
+                infoElement.textContent = '';
             }
-        }
-
-        async function createLessonNotification(lessonData, lessonId) {
-            try {
-                const notificationData = {
-                    type: 'new_lesson',
-                    title: `New Lesson: ${lessonData.title}`,
-                    message: `A new ${lessonData.type} lesson has been published for ${lessonData.section} section.`,
-                    section: lessonData.section,
-                    lessonId: lessonId,
-                    lessonTitle: lessonData.title,
-                    professorEmail: currentProfessor.email,
-                    isRead: false,
-                    createdAt: serverTimestamp()
-                };
-
-                await addDoc(collection(db, 'notifications'), notificationData);
-                console.log('Notification created for new lesson');
-                
-            } catch (error) {
-                console.error('Error creating notification:', error);
-            }
-        }
-
-        async function editLesson(lessonId) {
-            try {
-                const lesson = allLessons.find(l => l.id === lessonId);
-                if (!lesson) {
-                    alert('Lesson not found');
+        });
+    }
+});
+        async function loadProfessorData() {
+    try {
+        // First check professors collection
+        const professorsQuery = query(
+            collection(db, 'professors'),
+            where('email', '==', currentProfessor.email)
+        );
+        const professorsSnapshot = await getDocs(professorsQuery);
+        
+        if (!professorsSnapshot.empty) {
+            const professorData = professorsSnapshot.docs[0].data();
+            currentProfessor = {
+                ...currentProfessor,
+                name: professorData.name,
+                fullName: professorData.name,
+                firstName: professorData.firstName,
+                lastName: professorData.lastName
+            };
+            console.log('Professor data loaded:', currentProfessor);
+        } else {
+            // Try users collection
+            const userRef = doc(db, 'users', currentProfessor.id);
+            const userDoc = await getDoc(userRef);
+            
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                if (userData.role !== 'professor') {
+                    await signOut(auth);
+                    window.location.href = '/login/index.html';
                     return;
                 }
-
-                editingLessonId = lessonId;
-                document.getElementById('modalTitle').textContent = 'Edit Lesson';
-                document.getElementById('saveLessonBtn').textContent = 'Update Lesson';
-
-                // Fill form with lesson data
-                document.getElementById('lessonTitle').value = lesson.title || '';
-                document.getElementById('lessonSection').value = lesson.section || '';
-                document.getElementById('lessonType').value = lesson.type || 'lecture';
-                document.getElementById('lessonDescription').value = lesson.description || '';
-                document.getElementById('lessonContent').value = lesson.content || '';
                 
-                // Format date for input
-                if (lesson.publishDate) {
-                    const date = new Date(lesson.publishDate);
-                    const formattedDate = date.toISOString().split('T')[0];
-                    document.getElementById('publishDate').value = formattedDate;
-                } else {
-                    document.getElementById('publishDate').value = '';
-                }
-                
-                document.getElementById('lessonStatus').value = lesson.status || 'draft';
-                document.getElementById('lessonAttachments').value = 
-                    lesson.attachments ? lesson.attachments.join(', ') : '';
-                document.getElementById('youtubeUrl').value = lesson.youtubeUrl || '';
-                document.getElementById('lessonId').value = lessonId;
-
-                // Show modal
-                document.getElementById('lessonModal').style.display = 'flex';
-                
-            } catch (error) {
-                console.error('Error loading lesson for editing:', error);
-                alert('Error loading lesson: ' + error.message);
+                currentProfessor = {
+                    ...currentProfessor,
+                    name: userData.name,
+                    fullName: userData.name
+                };
             }
         }
+    } catch (error) {
+        console.error('Error loading professor data:', error);
+    }
+}
 
+        async function loadAssignedSections() {
+    try {
+        assignedSections = [];
+        
+        console.log('Loading sections for professor:', currentProfessor.email);
+        
+        // Get all sections
+        const sectionsQuery = query(collection(db, 'sections'));
+        const sectionsSnapshot = await getDocs(sectionsQuery);
+        
+        console.log('Total sections in database:', sectionsSnapshot.size);
+        
+        for (const docSnap of sectionsSnapshot.docs) {
+            const sectionData = docSnap.data();
+            
+            // Check if current professor is assigned to this section
+            // Check both professorEmail field and professor field
+            const isProfessorAssigned = 
+                sectionData.professorEmail === currentProfessor.email ||
+                sectionData.professor === currentProfessor.email ||
+                (sectionData.professor && currentProfessor.name && 
+                 sectionData.professor.toLowerCase().includes(currentProfessor.name.toLowerCase()));
+            
+            if (isProfessorAssigned) {
+                console.log(`✓ Section assigned: ${sectionData.name}`);
+                
+                // Get actual student count from students subcollection
+                let studentCount = 0;
+                let studentList = [];
+                
+                try {
+                    const studentsRef = collection(db, 'sections', docSnap.id, 'students');
+                    const studentsSnapshot = await getDocs(studentsRef);
+                    studentCount = studentsSnapshot.size;
+                    
+                    studentsSnapshot.forEach(studentDoc => {
+                        studentList.push({
+                            ...studentDoc.data(),
+                            id: studentDoc.id
+                        });
+                    });
+                } catch (err) {
+                    console.log('No students subcollection, using array');
+                    studentList = sectionData.students || [];
+                    studentCount = studentList.length;
+                }
+                
+                assignedSections.push({
+                    id: docSnap.id,
+                    section: sectionData.name,
+                    students: studentCount,
+                    studentList: studentList,
+                    ...sectionData
+                });
+            }
+        }
+        
+        console.log(`Found ${assignedSections.length} assigned sections`);
+        
+        // Populate section dropdown
+        const sectionSelect = document.getElementById('lessonSection');
+        if (!sectionSelect) return;
+        
+        sectionSelect.innerHTML = '<option value="">Select Section</option>';
+        
+        if (assignedSections.length === 0) {
+            sectionSelect.innerHTML = '<option value="">No sections assigned</option>';
+            console.log('⚠️ No sections found for this professor');
+        } else {
+            assignedSections.forEach(section => {
+                const option = document.createElement('option');
+                option.value = section.section;
+                option.textContent = `${section.section} (${section.students} students)`;
+                sectionSelect.appendChild(option);
+            });
+        }
+        
+    } catch (error) {
+        console.error('Error loading assigned sections:', error);
+    }
+}
+            
+            // Add this in the onAuthStateChanged function after loadAssignedSections()
+        const sectionSelect = document.getElementById('lessonSection');
+        if (sectionSelect) {
+            sectionSelect.addEventListener('change', function() {
+                const selectedSection = this.value;
+                const sectionInfo = assignedSections.find(s => s.section === selectedSection);
+                const infoElement = document.getElementById('sectionStudentInfo');
+                
+                if (sectionInfo && infoElement) {
+                    infoElement.textContent = `This lesson will be available to ${sectionInfo.students} student${sectionInfo.students !== 1 ? 's' : ''} in this section`;
+                    infoElement.style.color = '#3b82f6';
+                    infoElement.style.fontWeight = '500';
+                } else if (infoElement) {
+                    infoElement.textContent = '';
+                }
+            });
+        }
+        async function loadLessons() {
+    try {
+        allLessons = [];
+        
+        console.log('Loading lessons for professor:', currentProfessor.email);
+        
+        // Load lessons from the database
+        const lessonsQuery = query(
+            collection(db, 'lessons'),
+            where('professorEmail', '==', currentProfessor.email)
+        );
+        
+        const lessonsSnapshot = await getDocs(lessonsQuery);
+        
+        console.log(`Found ${lessonsSnapshot.size} lessons`);
+        
+        lessonsSnapshot.forEach(docSnap => {
+            const lesson = docSnap.data();
+            allLessons.push({
+                id: docSnap.id,
+                ...lesson,
+                createdAt: lesson.createdAt?.toDate() || new Date(),
+                publishDate: lesson.publishDate?.toDate() || null,
+                updatedAt: lesson.updatedAt?.toDate() || null
+            });
+        });
+        
+        // Sort by creation date (newest first)
+        allLessons.sort((a, b) => b.createdAt - a.createdAt);
+        
+        console.log('All lessons loaded:', allLessons);
+        displayLessons();
+        
+    } catch (error) {
+        console.error('Error loading lessons:', error);
+        alert('Error loading lessons: ' + error.message);
+        displayLessons(); // Show empty state
+    }
+}
+
+        function displayLessons() {
+    const lessonsGrid = document.getElementById('lessonsGrid');
+    
+    if (!lessonsGrid) {
+        console.error('Lessons grid element not found');
+        return;
+    }
+    
+    console.log('Displaying lessons:', allLessons.length);
+    
+    if (allLessons.length === 0) {
+        lessonsGrid.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <div class="empty-icon">📚</div>
+                <div class="empty-title">No Lessons Created Yet</div>
+                <div class="empty-text">You haven't created any lessons yet.<br>Click "Create New Lesson" button above to get started!</div>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    
+    allLessons.forEach(lesson => {
+        const date = lesson.publishDate ? 
+            lesson.publishDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 
+            lesson.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        
+        const contentPreview = lesson.content && lesson.content.length > 120 ? 
+            lesson.content.substring(0, 120) + '...' : 
+            (lesson.content || 'No content');
+        
+        let badgeClass = 'badge-draft';
+        let badgeText = lesson.status || 'draft';
+        if (lesson.status === 'published') {
+            badgeClass = 'badge-published';
+            badgeText = 'Published';
+        } else if (lesson.status === 'scheduled') {
+            badgeClass = 'badge-scheduled';
+            badgeText = 'Scheduled';
+        } else {
+            badgeText = 'Draft';
+        }
+        
+        const hasFiles = lesson.materials && lesson.materials.length > 0;
+        const fileCount = hasFiles ? lesson.materials.length : 0;
+        
+        html += `
+            <div class="lesson-card">
+                <div class="lesson-card-header">
+                    <h4 class="lesson-card-title">${lesson.title || 'Untitled Lesson'}</h4>
+                    <span class="lesson-badge ${badgeClass}">${badgeText}</span>
+                </div>
+                
+                <div class="lesson-card-meta">
+                    <div><i class="fas fa-chalkboard-teacher"></i> ${lesson.section || 'No Section'}</div>
+                    <div><i class="fas fa-calendar-alt"></i> ${date}</div>
+                    <div><i class="fas fa-tag"></i> ${lesson.type || 'lecture'}</div>
+                    ${hasFiles ? `<div><i class="fas fa-paperclip"></i> ${fileCount} file${fileCount > 1 ? 's' : ''}</div>` : ''}
+                </div>
+                
+                ${lesson.description ? `
+                    <div class="lesson-card-content">
+                        <strong style="color: #1e3a8a;">Description:</strong><br>
+                        ${lesson.description}
+                    </div>
+                ` : ''}
+                
+                <div class="lesson-card-content">
+                    <strong style="color: #1e3a8a;">Content Preview:</strong><br>
+                    ${contentPreview}
+                </div>
+                
+                ${hasFiles ? `
+                    <div class="lesson-card-content" style="background: #f0f9ff; padding: 10px; border-radius: 6px; border-left: 3px solid #3b82f6;">
+                        <strong style="color: #1e40af;"><i class="fas fa-folder-open"></i> Attached Files:</strong><br>
+                        <div style="margin-top: 8px;">
+                            ${lesson.materials.map((file, index) => `
+                                <div class="uploaded-file-item" style="background: white; margin-top: 5px;">
+                                    <i class="${getFileIcon(file.name)}"></i>
+                                    <a href="#" onclick="viewFile('${lesson.id}', ${index}); return false;" style="flex: 1;">${file.name}</a>
+                                    <span style="font-size: 11px; color: #64748b;">${formatFileSize(file.size)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div class="lesson-card-footer">
+                    <div class="lesson-actions">
+                        <button class="btn-warning" onclick="editLesson('${lesson.id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn-danger" onclick="deleteLesson('${lesson.id}')">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </button>
+                    </div>
+                    <div>
+                        ${lesson.status === 'published' ? `
+                            <button class="btn-success" onclick="viewLessonDetails('${lesson.id}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        ` : `
+                            <button class="btn-primary" onclick="publishLesson('${lesson.id}')">
+                                <i class="fas fa-paper-plane"></i> Publish
+                            </button>
+                        `}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    lessonsGrid.innerHTML = html;
+}
+
+        function showAddLessonModal() {
+    editingLessonId = null;
+    selectedFiles = [];
+    document.getElementById('modalTitle').textContent = 'Create New Lesson';
+    document.getElementById('saveLessonBtn').textContent = 'Create Lesson';
+    
+    document.getElementById('lessonForm').reset();
+    document.getElementById('lessonId').value = '';
+    document.getElementById('filePreviewContainer').innerHTML = '';
+    
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('publishDate').value = today;
+    
+    document.getElementById('lessonModal').style.display = 'flex';
+}
+
+        function closeLessonModal() {
+    document.getElementById('lessonModal').style.display = 'none';
+    editingLessonId = null;
+    selectedFiles = [];
+    document.getElementById('filePreviewContainer').innerHTML = '';
+}
+    async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}       
+        window.viewFile = function(lessonId, fileIndex) {
+    const lesson = allLessons.find(l => l.id === lessonId);
+    if (!lesson || !lesson.materials || !lesson.materials[fileIndex]) {
+        alert('File not found');
+        return;
+    }
+    
+    const file = lesson.materials[fileIndex];
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    
+    // Create modal for viewing file
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.style.display = 'flex';
+    modal.style.zIndex = '3000';
+    
+    let content = '';
+    
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExt)) {
+        // Image viewer
+        content = `
+            <div class="modal-content" style="max-width: 90vw; max-height: 90vh;">
+                <div class="modal-header">
+                    <h3 class="modal-title">${file.name}</h3>
+                    <button class="close-modal" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                </div>
+                <div class="modal-body" style="overflow: auto; max-height: calc(90vh - 120px);">
+                    <img src="${file.data}" alt="${file.name}" style="max-width: 100%; height: auto;">
+                </div>
+                <div class="modal-footer">
+                    <a href="${file.data}" download="${file.name}" class="btn-primary">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                    <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+                </div>
+            </div>
+        `;
+    } else if (fileExt === 'pdf') {
+        // PDF viewer
+        content = `
+            <div class="modal-content" style="max-width: 90vw; max-height: 90vh;">
+                <div class="modal-header">
+                    <h3 class="modal-title">${file.name}</h3>
+                    <button class="close-modal" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 0; height: calc(90vh - 120px);">
+                    <iframe src="${file.data}" style="width: 100%; height: 100%; border: none;"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <a href="${file.data}" download="${file.name}" class="btn-primary">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                    <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+                </div>
+            </div>
+        `;
+    } else {
+        // For other files, just offer download
+        content = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">${file.name}</h3>
+                    <button class="close-modal" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                </div>
+                <div class="modal-body" style="text-align: center; padding: 40px;">
+                    <i class="${getFileIcon(file.name)}" style="font-size: 64px; color: #3b82f6;"></i>
+                    <p style="margin-top: 20px; color: #64748b;">Preview not available for this file type.</p>
+                    <p style="color: #64748b;">Click download to view the file.</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="${file.data}" download="${file.name}" class="btn-primary">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                    <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+                </div>
+            </div>
+        `;
+    }
+    
+    modal.innerHTML = content;
+    document.body.appendChild(modal);
+};
+        async function saveLesson() {
+    const title = document.getElementById('lessonTitle').value.trim();
+    const section = document.getElementById('lessonSection').value;
+    const type = document.getElementById('lessonType').value;
+    const description = document.getElementById('lessonDescription').value.trim();
+    const content = document.getElementById('lessonContent').value.trim();
+    const publishDate = document.getElementById('publishDate').value;
+    const status = document.getElementById('lessonStatus').value;
+
+    if (!title || !section || !content) {
+        alert('Please fill in all required fields: Title, Section, and Content');
+        return;
+    }
+
+    const sectionInfo = assignedSections.find(s => s.section === section);
+    if (!sectionInfo || !sectionInfo.studentList || sectionInfo.studentList.length === 0) {
+        if (!confirm('Warning: This section has no students. Continue anyway?')) {
+            return;
+        }
+    }
+
+    try {
+        const saveBtn = document.getElementById('saveLessonBtn');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        // Convert NEW files to Base64
+        let newUploadedFiles = [];
+        if (selectedFiles.length > 0) {
+            console.log(`Processing ${selectedFiles.length} new files...`);
+            saveBtn.textContent = `Processing files (0/${selectedFiles.length})...`;
+            
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                
+                if (file.size > 1024 * 1024) {
+                    alert(`File "${file.name}" is too large (${formatFileSize(file.size)}). Maximum size is 1MB.`);
+                    continue;
+                }
+                
+                console.log(`Processing file ${i + 1}: ${file.name}`);
+                
+                try {
+                    const base64Data = await fileToBase64(file);
+                    
+                    newUploadedFiles.push({
+                        name: file.name,
+                        data: base64Data,
+                        size: file.size,
+                        type: file.type,
+                        uploadedAt: new Date().toISOString()
+                    });
+                    
+                    saveBtn.textContent = `Processing files (${i + 1}/${selectedFiles.length})...`;
+                } catch (fileError) {
+                    console.error(`Error processing file ${file.name}:`, fileError);
+                    alert(`Failed to process file: ${file.name}`);
+                }
+            }
+            
+            console.log(`Successfully processed ${newUploadedFiles.length} new files`);
+        }
+
+        saveBtn.textContent = 'Saving lesson...';
+
+        const lessonData = {
+            title: title,
+            section: section,
+            type: type,
+            description: description,
+            content: content,
+            publishDate: publishDate ? new Date(publishDate) : new Date(),
+            status: status,
+            professorEmail: currentProfessor.email,
+            professorName: currentProfessor.name || currentProfessor.fullName || 'Professor',
+            professorId: currentProfessor.id,
+            updatedAt: serverTimestamp()
+        };
+
+        let lessonId;
+        let isNew = false;
+
+        if (editingLessonId) {
+            // EDITING EXISTING LESSON
+            const lessonRef = doc(db, 'lessons', editingLessonId);
+            
+            const existingDoc = await getDoc(lessonRef);
+            if (existingDoc.exists()) {
+                const existingData = existingDoc.data();
+                
+                // Keep existing materials and add new ones
+                let allMaterials = existingData.materials || [];
+                if (newUploadedFiles.length > 0) {
+                    allMaterials = [...allMaterials, ...newUploadedFiles];
+                }
+                
+                lessonData.materials = allMaterials;
+            } else {
+                lessonData.materials = newUploadedFiles;
+            }
+            
+            await updateDoc(lessonRef, lessonData);
+            lessonId = editingLessonId;
+            
+            console.log('✓ Lesson updated successfully');
+        } else {
+            // CREATING NEW LESSON
+            lessonData.createdAt = serverTimestamp();
+            lessonData.materials = newUploadedFiles;
+            
+            const docRef = await addDoc(collection(db, 'lessons'), lessonData);
+            lessonId = docRef.id;
+            isNew = true;
+            
+            console.log('✓ New lesson created');
+        }
+
+        // Send notification if published
+        if (status === 'published') {
+            await createLessonNotification(lessonData, lessonId);
+        }
+
+        closeLessonModal();
+        selectedFiles = [];
+        
+        alert(`Lesson ${isNew ? 'created' : 'updated'} successfully!${newUploadedFiles.length > 0 ? ` ${newUploadedFiles.length} file(s) added.` : ''}`);
+        
+        await loadLessons();
+        
+    } catch (error) {
+        console.error('Error saving lesson:', error);
+        alert('Error saving lesson: ' + error.message);
+        
+        const saveBtn = document.getElementById('saveLessonBtn');
+        saveBtn.disabled = false;
+        saveBtn.textContent = editingLessonId ? 'Update Lesson' : 'Create Lesson';
+    }
+}
+
+        async function createLessonNotification(lessonData, lessonId) {
+    try {
+        // Find the section data to get student list
+        const sectionInfo = assignedSections.find(s => s.section === lessonData.section);
+        
+        if (!sectionInfo || !sectionInfo.studentList || sectionInfo.studentList.length === 0) {
+            console.log('No students found in section');
+            return;
+        }
+        
+        console.log(`Creating notifications for ${sectionInfo.studentList.length} students in ${lessonData.section}`);
+        
+        // Create notification for each student in the section
+        const notificationPromises = sectionInfo.studentList.map(student => {
+            const notificationData = {
+                type: 'new_lesson',
+                title: `New Lesson: ${lessonData.title}`,
+                message: `A new ${lessonData.type} lesson "${lessonData.title}" has been published for ${lessonData.section}.`,
+                section: lessonData.section,
+                lessonId: lessonId,
+                lessonTitle: lessonData.title,
+                professorEmail: currentProfessor.email,
+                studentEmail: student.email,
+                studentId: student.studentId || student.uid || student.email,
+                isRead: false,
+                createdAt: serverTimestamp()
+            };
+            
+            console.log('Creating notification for student:', student.email);
+            return addDoc(collection(db, 'notifications'), notificationData);
+        });
+        
+        await Promise.all(notificationPromises);
+        console.log(`✓ Successfully created ${notificationPromises.length} notifications`);
+        
+    } catch (error) {
+        console.error('Error creating notifications:', error);
+        // Don't throw error - lesson was already saved
+        alert('Lesson saved but failed to create some notifications. Students may not be notified.');
+    }
+}
+
+        async function editLesson(lessonId) {
+    try {
+        const lesson = allLessons.find(l => l.id === lessonId);
+        if (!lesson) {
+            alert('Lesson not found');
+            return;
+        }
+
+        editingLessonId = lessonId;
+        selectedFiles = []; // Reset selected files
+        
+        document.getElementById('modalTitle').textContent = 'Edit Lesson';
+        document.getElementById('saveLessonBtn').textContent = 'Update Lesson';
+
+        // Fill form with lesson data
+        document.getElementById('lessonTitle').value = lesson.title || '';
+        document.getElementById('lessonSection').value = lesson.section || '';
+        document.getElementById('lessonType').value = lesson.type || 'lecture';
+        document.getElementById('lessonDescription').value = lesson.description || '';
+        document.getElementById('lessonContent').value = lesson.content || '';
+        
+        // Format date for input
+        if (lesson.publishDate) {
+            const date = new Date(lesson.publishDate);
+            const formattedDate = date.toISOString().split('T')[0];
+            document.getElementById('publishDate').value = formattedDate;
+        } else {
+            document.getElementById('publishDate').value = '';
+        }
+        
+        document.getElementById('lessonStatus').value = lesson.status || 'draft';
+        document.getElementById('lessonId').value = lessonId;
+
+        // Display existing files
+        const filePreviewContainer = document.getElementById('filePreviewContainer');
+        if (lesson.materials && lesson.materials.length > 0) {
+            let html = '<div class="mt-2"><strong class="text-sm text-gray-700">Existing Files:</strong></div>';
+            
+            lesson.materials.forEach((file, index) => {
+                const size = formatFileSize(file.size);
+                const icon = getFileIcon(file.name);
+                
+                html += `
+                    <div class="file-preview-item" style="background: #e0f2fe; border-color: #93c5fd;">
+                        <div class="file-preview-info">
+                            <div class="file-preview-icon" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);">
+                                <i class="${icon}"></i>
+                            </div>
+                            <div class="file-preview-details">
+                                <div class="file-preview-name">${file.name}</div>
+                                <div class="file-preview-size">${size}</div>
+                            </div>
+                        </div>
+                        <button type="button" class="file-preview-remove" onclick="removeExistingFile('${lessonId}', ${index})">
+                            <i class="fas fa-times"></i> Remove
+                        </button>
+                    </div>
+                `;
+            });
+            
+            filePreviewContainer.innerHTML = html;
+        } else {
+            filePreviewContainer.innerHTML = '';
+        }
+
+        // Show modal FIRST
+        document.getElementById('lessonModal').style.display = 'flex';
+        
+        // Then attach file input listener after a slight delay
+        setTimeout(() => {
+            const fileInput = document.getElementById('lessonFiles');
+            if (fileInput) {
+                fileInput.value = ''; // Reset file input
+                fileInput.removeEventListener('change', handleFileSelection);
+                fileInput.addEventListener('change', handleFileSelection);
+            }
+            
+            // Re-attach the save button click handler
+            const saveBtn = document.getElementById('saveLessonBtn');
+            if (saveBtn) {
+                // Remove old onclick if exists
+                saveBtn.onclick = null;
+                // Add new click handler
+                saveBtn.onclick = saveLesson;
+                saveBtn.disabled = false;
+            }
+        }, 100);
+        
+    } catch (error) {
+        console.error('Error loading lesson for editing:', error);
+        alert('Error loading lesson: ' + error.message);
+    }
+}
+window.removeExistingFile = async function(lessonId, fileIndex) {
+    if (!confirm('Are you sure you want to remove this file?')) {
+        return;
+    }
+    
+    try {
+        const lesson = allLessons.find(l => l.id === lessonId);
+        if (!lesson || !lesson.materials) return;
+        
+        // Remove file from array
+        lesson.materials.splice(fileIndex, 1);
+        
+        // Update in Firestore
+        const lessonRef = doc(db, 'lessons', lessonId);
+        await updateDoc(lessonRef, {
+            materials: lesson.materials,
+            updatedAt: serverTimestamp()
+        });
+        
+        // Refresh the lesson data in background
+        await loadLessons();
+        
+        // Update the file preview without closing modal
+        const filePreviewContainer = document.getElementById('filePreviewContainer');
+        const updatedLesson = allLessons.find(l => l.id === lessonId);
+        
+        if (updatedLesson.materials && updatedLesson.materials.length > 0) {
+            let html = '<div class="mt-2"><strong class="text-sm text-gray-700">Existing Files:</strong></div>';
+            
+            updatedLesson.materials.forEach((file, index) => {
+                const size = formatFileSize(file.size);
+                const icon = getFileIcon(file.name);
+                
+                html += `
+                    <div class="file-preview-item" style="background: #e0f2fe; border-color: #93c5fd;">
+                        <div class="file-preview-info">
+                            <div class="file-preview-icon" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);">
+                                <i class="${icon}"></i>
+                            </div>
+                            <div class="file-preview-details">
+                                <div class="file-preview-name">${file.name}</div>
+                                <div class="file-preview-size">${size}</div>
+                            </div>
+                        </div>
+                        <button type="button" class="file-preview-remove" onclick="removeExistingFile('${lessonId}', ${index})">
+                            <i class="fas fa-times"></i> Remove
+                        </button>
+                    </div>
+                `;
+            });
+            
+            filePreviewContainer.innerHTML = html;
+        } else {
+            filePreviewContainer.innerHTML = '<div class="mt-2"><strong class="text-sm text-gray-700">No files attached</strong></div>';
+        }
+        
+        alert('File removed successfully!');
+    } catch (error) {
+        console.error('Error removing file:', error);
+        alert('Error removing file: ' + error.message);
+    }
+};
         async function deleteLesson(lessonId) {
             if (!confirm('Are you sure you want to delete this lesson? This action cannot be undone.')) {
                 return;
@@ -1205,7 +1810,79 @@
                 alert('Error publishing lesson: ' + error.message);
             }
         }
-
+            window.viewLessonDetails = function(lessonId) {
+    const lesson = allLessons.find(l => l.id === lessonId);
+    if (!lesson) {
+        alert('Lesson not found');
+        return;
+    }
+    
+    // Create a modal to show full lesson details
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.style.display = 'flex';
+    modal.style.zIndex = '3000';
+    
+    const date = lesson.publishDate ? 
+        lesson.publishDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 
+        lesson.createdAt.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-book-open"></i> ${lesson.title}</h3>
+                <button class="close-modal" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; font-size: 14px;">
+                        <div><i class="fas fa-chalkboard-teacher"></i> <strong>Section:</strong> ${lesson.section}</div>
+                        <div><i class="fas fa-calendar-alt"></i> <strong>Date:</strong> ${date}</div>
+                        <div><i class="fas fa-tag"></i> <strong>Type:</strong> ${lesson.type}</div>
+                        <div><i class="fas fa-info-circle"></i> <strong>Status:</strong> ${lesson.status}</div>
+                    </div>
+                </div>
+                
+                ${lesson.description ? `
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #1e3a8a; margin-bottom: 10px;"><i class="fas fa-align-left"></i> Description</h4>
+                        <p style="color: #475569; line-height: 1.6;">${lesson.description}</p>
+                    </div>
+                ` : ''}
+                
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #1e3a8a; margin-bottom: 10px;"><i class="fas fa-file-alt"></i> Lesson Content</h4>
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; color: #334155; line-height: 1.8;">
+                        ${lesson.content.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+                
+                ${lesson.materials && lesson.materials.length > 0 ? `
+                    <div>
+                        <h4 style="color: #1e3a8a; margin-bottom: 10px;"><i class="fas fa-paperclip"></i> Attached Files (${lesson.materials.length})</h4>
+                        <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; border: 1px solid #bfdbfe;">
+                            ${lesson.materials.map((file, index) => `
+                                <div class="uploaded-file-item" style="background: white;">
+                                    <i class="${getFileIcon(file.name)}"></i>
+                                    <a href="#" onclick="viewFile('${lesson.id}', ${index}); return false;">${file.name}</a>
+                                    <span style="font-size: 12px; color: #64748b;">${formatFileSize(file.size)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+            <div class="modal-footer">
+                <button class="btn-warning" onclick="this.closest('.modal-overlay').remove(); editLesson('${lesson.id}')">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+};
         window.handleLogout = async function() {
             if (confirm('Are you sure you want to logout?')) {
                 try {
@@ -1217,6 +1894,7 @@
                 }
             }
         };
+
     </script>
 </body>
 </html>

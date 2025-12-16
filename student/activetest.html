@@ -1278,7 +1278,7 @@ async function loadTestData() {
 
     // Get input values based on test type
     let resultValue = '';
-    let rawResult = ''; // Store raw numeric value for scoring
+    let rawResult = '';
     const testName = currentTest.testName.toLowerCase();
 
     if (testName.includes('push-up') || testName.includes('pushup') || 
@@ -1304,7 +1304,6 @@ async function loadTestData() {
             alert('Please complete the timer and stop it');
             return;
         }
-        // Convert MM:SS to seconds for scoring
         const [mins, secs] = input.value.split(':').map(Number);
         rawResult = (mins * 60 + secs).toString();
         resultValue = input.value;
@@ -1322,7 +1321,6 @@ async function loadTestData() {
             alert('Please complete the timer and stop it');
             return;
         }
-        // Convert MM:SS to total seconds for scoring
         const [mins, secs] = input.value.split(':').map(Number);
         rawResult = (mins * 60 + secs).toString();
         resultValue = input.value;
@@ -1376,7 +1374,6 @@ async function loadTestData() {
     const notes = document.getElementById('notesField').value;
     const timerValue = `${document.getElementById('minutes').textContent}:${document.getElementById('seconds').textContent}.${document.getElementById('milliseconds').textContent}`;
 
-    // CALCULATE SCORE using the target
     const calculatedScore = calculateScoreWithTarget(currentTest.testName, rawResult, currentTest.testTarget);
 
     try {
@@ -1392,7 +1389,8 @@ async function loadTestData() {
         const attemptsSnapshot = await getDocs(attemptsQuery);
         const currentAttempts = attemptsSnapshot.size;
 
-        const docRef = await addDoc(collection(db, 'testResults'), {
+         const isFirstAttempt = currentAttempts === 0;
+          const docRef = await addDoc(collection(db, 'testResults'), {
             testId: currentTest.id,
             testName: currentTest.testName,
             studentEmail: studentData.email,
@@ -1400,9 +1398,9 @@ async function loadTestData() {
             studentId: currentUser.uid,
             section: studentData.section || currentTest.section,
             result: resultValue,
-            resultData: rawResult, // Store raw result for recalculation
+            resultData: rawResult,
             testTarget: currentTest.testTarget || null,
-            score: calculatedScore, // STORE THE CALCULATED SCORE
+            score: calculatedScore,
             timerValue: timerValue,
             notes: notes,
             attemptNumber: currentAttempts + 1,
@@ -1420,15 +1418,18 @@ async function loadTestData() {
             });
         }
 
-        // Update scheduled test completion count
-        const testRef = doc(db, 'scheduledTests', currentTest.id);
-        await updateDoc(testRef, {
-            completedStudents: increment(1)
-        });
+          if (isFirstAttempt) {
+            const testRef = doc(db, 'scheduledTests', currentTest.id);
+            await updateDoc(testRef, {
+                completedStudents: increment(1)
+            });
+            console.log('✅ Incremented completedStudents (first attempt)');
+        } else {
+            console.log('⚠️ NOT incrementing completedStudents (retry attempt)');
+        }
 
         alert(`Test submitted successfully! (Attempt ${currentAttempts + 1} of ${currentTest.attemptsAllowed || 1})\nYour Score: ${calculatedScore}/100`);
         
-        // Redirect to result page
         window.location.href = `./studentresult.html?resultId=${docRef.id}&testId=${currentTest.id}`;
     } catch (error) {
         console.error('Error submitting test:', error);
@@ -1450,13 +1451,15 @@ function calculateScoreWithTarget(testName, rawResult, testTarget) {
         return calculateDefaultScore(normalized, numericValue);
     }
     
-    // TARGET-BASED SCORING
+    // REPETITION TESTS (push-ups, sit-ups, curl-ups)
     if (normalized.includes('push-up') || normalized.includes('pushup') || 
         normalized.includes('sit-up') || normalized.includes('situp') ||
         normalized.includes('curl-up') || normalized.includes('curl up')) {
-        // Repetition-based tests
+        
+        // Perfect score if meets or exceeds target
+        if (numericValue >= testTarget) return 100;
+        
         const percentage = (numericValue / testTarget) * 100;
-        if (percentage >= 100) return 100;
         if (percentage >= 90) return 95;
         if (percentage >= 80) return 90;
         if (percentage >= 70) return 85;
@@ -1466,10 +1469,11 @@ function calculateScoreWithTarget(testName, rawResult, testTarget) {
         return Math.max(50, Math.round(percentage));
     }
     
+    // PLANK (seconds)
     if (normalized.includes('plank')) {
-        // Time-based (seconds)
+        if (numericValue >= testTarget) return 100;
+        
         const percentage = (numericValue / testTarget) * 100;
-        if (percentage >= 100) return 100;
         if (percentage >= 90) return 95;
         if (percentage >= 80) return 90;
         if (percentage >= 70) return 85;
@@ -1478,10 +1482,11 @@ function calculateScoreWithTarget(testName, rawResult, testTarget) {
         return Math.max(50, Math.round(percentage));
     }
     
+    // GRIP STRENGTH (kg)
     if (normalized.includes('grip')) {
-        // Strength-based (kg)
+        if (numericValue >= testTarget) return 100;
+        
         const percentage = (numericValue / testTarget) * 100;
-        if (percentage >= 100) return 100;
         if (percentage >= 90) return 95;
         if (percentage >= 80) return 90;
         if (percentage >= 70) return 85;
@@ -1490,10 +1495,11 @@ function calculateScoreWithTarget(testName, rawResult, testTarget) {
         return Math.max(50, Math.round(percentage));
     }
     
+    // SIT-AND-REACH (cm)
     if (normalized.includes('sit-and-reach')) {
-        // Distance-based (cm)
+        if (numericValue >= testTarget) return 100;
+        
         const percentage = (numericValue / testTarget) * 100;
-        if (percentage >= 100) return 100;
         if (percentage >= 90) return 95;
         if (percentage >= 80) return 90;
         if (percentage >= 70) return 85;
@@ -1502,10 +1508,12 @@ function calculateScoreWithTarget(testName, rawResult, testTarget) {
         return Math.max(50, Math.round(percentage));
     }
     
+    // 1-MILE RUN (seconds - LOWER IS BETTER)
     if (normalized.includes('mile') || normalized.includes('run')) {
-        // Time-based - LOWER IS BETTER
+        // If student time is <= target, perfect score
+        if (numericValue <= testTarget) return 100;
+        
         const percentage = (testTarget / numericValue) * 100;
-        if (percentage >= 100) return 100;
         if (percentage >= 90) return 95;
         if (percentage >= 80) return 90;
         if (percentage >= 70) return 85;
@@ -1514,11 +1522,11 @@ function calculateScoreWithTarget(testName, rawResult, testTarget) {
         return Math.max(50, Math.round(percentage));
     }
     
+    // STEP TEST (heart rate - LOWER IS BETTER)
     if (normalized.includes('step test') || normalized.includes('3-minute')) {
-        // Heart rate - LOWER IS BETTER
-        // If target is 100 bpm, and student gets 90, that's better (110%)
+        if (numericValue <= testTarget) return 100;
+        
         const percentage = (testTarget / numericValue) * 100;
-        if (percentage >= 100) return 100;
         if (percentage >= 90) return 95;
         if (percentage >= 80) return 90;
         if (percentage >= 70) return 85;

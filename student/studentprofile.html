@@ -1080,9 +1080,9 @@
                 lastName: '' 
             };
         } else if (parts.length >= 3) {
-            // firstname.lastname.id pattern or firstname.middlename.lastname.id
+            
             const firstName = parts[0];
-            const lastName = parts[parts.length - 2]; // Second to last is last name
+            const lastName = parts[parts.length - 2]; 
             
             return {
                 firstName: capitalize(firstName),
@@ -1097,7 +1097,13 @@
         const heightInMeters = height / 100;
         return (weight / (heightInMeters * heightInMeters)).toFixed(2);
     }
-
+    function getBMICategory(bmi) {
+    const bmiValue = parseFloat(bmi);
+    if (bmiValue < 18.5) return 'Underweight';
+    if (bmiValue >= 18.5 && bmiValue < 25) return 'Normal';
+    if (bmiValue >= 25 && bmiValue < 30) return 'Overweight';
+    return 'Obese';
+}
     async function loadStudentProfile(user) {
         try {
             console.log('Loading student profile for:', user.email);
@@ -1316,52 +1322,98 @@
     };
 
     window.saveProfile = async function() {
-        const form = document.getElementById('editProfileForm');
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
+    const form = document.getElementById('editProfileForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    try {
+        // Extract UMak ID from email when saving
+        const email = document.getElementById('editEmail').value;
+        const extractedId = extractUmakIdFromEmail(email);
+        const nameInfo = extractNameFromEmail(email);
         
-        try {
-            // Extract UMak ID from email when saving
-            const email = document.getElementById('editEmail').value;
-            const extractedId = extractUmakIdFromEmail(email);
-            const nameInfo = extractNameFromEmail(email);
+        const height = parseFloat(document.getElementById('editHeight').value) || 0;
+        const weight = parseFloat(document.getElementById('editWeight').value) || 0;
+        
+        // Get old height and weight to check if BMI changed
+        const oldHeight = window.currentStudentData?.height || 0;
+        const oldWeight = window.currentStudentData?.weight || 0;
+        
+        const updatedData = {
+            firstName: nameInfo.firstName,
+            lastName: nameInfo.lastName,
+            age: parseInt(document.getElementById('editAge').value) || 0,
+            gender: document.getElementById('editGender').value,
+            email: email,
+            contactNumber: document.getElementById('editContact').value,
+            height: height,
+            weight: weight,
+            medicalCondition: document.getElementById('editMedical').value,
+            emergencyContactName: document.getElementById('editEmergencyName').value,
+            emergencyContactNumber: document.getElementById('editEmergencyContact').value,
+            emergencyContactRelation: document.getElementById('editEmergencyRelation').value,
+            umakId: extractedId,
+            updatedAt: new Date().toISOString()
+        };
+        
+        console.log('Updating student profile:', updatedData);
+        
+        // Import necessary Firestore functions if not already imported
+        const { collection, addDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+        
+        // Update student profile
+        const studentRef = doc(db, 'students', window.currentStudentId);
+        await updateDoc(studentRef, updatedData);
+        
+        // Check if height and weight changed and are valid
+        const bmiChanged = (height !== oldHeight || weight !== oldWeight) && height > 0 && weight > 0;
+        
+        if (bmiChanged) {
+            // Calculate BMI
+            const bmi = calculateBMI(weight, height);
+            const category = getBMICategory(bmi);
             
-            const updatedData = {
-                firstName: nameInfo.firstName,
-                lastName: nameInfo.lastName,
-                age: parseInt(document.getElementById('editAge').value) || 0,
-                gender: document.getElementById('editGender').value,
+            // Store BMI record in BMI collection
+            const bmiData = {
+                studentId: window.currentStudentId,
+                studentName: `${nameInfo.firstName} ${nameInfo.lastName}`.trim(),
+                umakId: extractedId,
+                section: window.currentStudentData?.section || 'Not Assigned',
                 email: email,
-                contactNumber: document.getElementById('editContact').value,
-                height: parseFloat(document.getElementById('editHeight').value) || 0,
-                weight: parseFloat(document.getElementById('editWeight').value) || 0,
-                medicalCondition: document.getElementById('editMedical').value,
-                emergencyContactName: document.getElementById('editEmergencyName').value,
-                emergencyContactNumber: document.getElementById('editEmergencyContact').value,
-                emergencyContactRelation: document.getElementById('editEmergencyRelation').value,
-                umakId: extractedId, // Also update the stored UMak ID
+                height: height,
+                weight: weight,
+                bmi: parseFloat(bmi),
+                category: category,
+                testType: 'pre', // Default to pre-test, can be updated by professor later
+                recordedAt: new Date().toISOString(),
+                recordedBy: 'student', // Indicates this was self-recorded
                 updatedAt: new Date().toISOString()
             };
             
-            console.log('Updating student profile:', updatedData);
+            console.log('Creating BMI record:', bmiData);
             
-            const studentRef = doc(db, 'students', window.currentStudentId);
-            await updateDoc(studentRef, updatedData);
+            // Add to BMI collection
+            await addDoc(collection(db, 'BMI'), bmiData);
             
+            console.log('BMI record created successfully');
+            alert('Profile and BMI record updated successfully!');
+        } else {
             alert('Profile updated successfully!');
-            bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
-            
-            // Reload profile
-            const user = auth.currentUser;
-            await loadStudentProfile(user);
-            
-        } catch (error) {
-            console.error('Error updating profile:', error);
-            alert('Failed to update profile. Please try again.');
         }
-    };
+        
+        bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+        
+        // Reload profile
+        const user = auth.currentUser;
+        await loadStudentProfile(user);
+        
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('Failed to update profile. Please try again.');
+    }
+};
 
     // Notification dropdown functions
     window.toggleNotificationDropdown = function() {
