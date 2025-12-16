@@ -993,7 +993,7 @@
     </div>
 </div>
 
-        <!-- Charts -->
+       <!-- Charts Grid -->
 <div class="charts-grid">
     <!-- Cardiorespiratory Endurance -->
     <div class="chart-card">
@@ -1004,22 +1004,13 @@
         <div id="cardioChart"></div>
     </div>
 
-    <!-- Muscular Strength -->
+    <!-- Combined Muscular Strength and Endurance -->
     <div class="chart-card">
         <div class="chart-header">
             <img class="chart-icon" src="https://c.animaapp.com/ZXSXG5cb/img/image-139@2x.png" alt="Chart">
-            <h2 class="chart-title">Muscular Strength</h2>
+            <h2 class="chart-title">Muscular Strength and Endurance</h2>
         </div>
-        <div id="strengthChart"></div>
-    </div>
-
-    <!-- Muscular Endurance -->
-    <div class="chart-card">
-        <div class="chart-header">
-            <img class="chart-icon" src="https://c.animaapp.com/ZXSXG5cb/img/image-139@2x.png" alt="Chart">
-            <h2 class="chart-title">Muscular Endurance</h2>
-        </div>
-        <div id="enduranceChart"></div>
+        <div id="muscularChart"></div>
     </div>
 
     <!-- Flexibility -->
@@ -1067,15 +1058,10 @@
         icon: '❤️',
         color: 'from-red-500 to-pink-500'
     },
-    'Muscular Strength': {
-        tests: ['Push-Up Test', 'Grip Strength', 'Push-up Test'],
+    'Muscular Strength and Endurance': {
+        tests: ['Push-Up Test', 'Grip Strength', 'Push-up Test', 'Curl-Up Test', 'Sit-Up Test', 'Plank Hold'],
         icon: '💪',
         color: 'from-blue-500 to-indigo-500'
-    },
-    'Muscular Endurance': {
-        tests: ['Curl-Up Test', 'Push-up Test', 'Plank Hold', 'Sit-Up Test'],
-        icon: '🔁',
-        color: 'from-orange-500 to-red-500'
     },
     'Flexibility': {
         tests: ['Sit-and-Reach', 'Shoulder Flexibility'],
@@ -1088,13 +1074,28 @@
         color: 'from-purple-500 to-violet-500'
     }
 };
-    function getCategoryForTest(testName) {
+   function getCategoryForTest(testName) {
     const normalized = testName.toLowerCase().trim();
-    for (const [category, data] of Object.entries(testCategories)) {
-        if (data.tests.some(t => normalized.includes(t.toLowerCase()) || t.toLowerCase().includes(normalized))) {
-            return category;
-        }
+    
+    // Check for combined muscular category
+    const muscularTests = ['push-up', 'pushup', 'grip', 'curl-up', 'sit-up', 'situp', 'plank'];
+    if (muscularTests.some(test => normalized.includes(test))) {
+        return 'Muscular Strength and Endurance';
     }
+    
+    // Other categories...
+    if (normalized.includes('step') || normalized.includes('minute') || normalized.includes('run')) {
+        return 'Cardiorespiratory Endurance';
+    }
+    
+    if (normalized.includes('sit-and-reach') || normalized.includes('shoulder')) {
+        return 'Flexibility';
+    }
+    
+    if (normalized.includes('bmi') || normalized.includes('skinfold') || normalized.includes('body mass')) {
+        return 'Body Composition';
+    }
+    
     return 'Cardiorespiratory Endurance'; // Default fallback
 }
 
@@ -1341,32 +1342,27 @@
         
         // Color schemes matching the reference images
         const colorSchemes = {
-            'Cardiorespiratory Endurance': {
-                bg: 'rgba(167, 139, 250, 0.3)',
-                border: 'rgb(139, 92, 246)',
-                point: 'rgb(124, 58, 237)'
-            },
-            'Muscular Strength': {
-                bg: 'rgba(251, 113, 133, 0.3)',
-                border: 'rgb(244, 63, 94)',
-                point: 'rgb(225, 29, 72)'
-            },
-            'Muscular Endurance': {
-                bg: 'rgba(251, 191, 36, 0.3)',
-                border: 'rgb(245, 158, 11)',
-                point: 'rgb(217, 119, 6)'
-            },
-            'Flexibility': {
-                bg: 'rgba(134, 239, 172, 0.3)',
-                border: 'rgb(34, 197, 94)',
-                point: 'rgb(22, 163, 74)'
-            },
-            'Body Composition': {
-                bg: 'rgba(147, 197, 253, 0.3)',
-                border: 'rgb(59, 130, 246)',
-                point: 'rgb(37, 99, 235)'
-            }
-        };
+    'Cardiorespiratory Endurance': {
+        bg: 'rgba(167, 139, 250, 0.3)',
+        border: 'rgb(139, 92, 246)',
+        point: 'rgb(124, 58, 237)'
+    },
+    'Muscular Strength and Endurance': {
+        bg: 'rgba(251, 113, 133, 0.3)',
+        border: 'rgb(244, 63, 94)',
+        point: 'rgb(225, 29, 72)'
+    },
+    'Flexibility': {
+        bg: 'rgba(134, 239, 172, 0.3)',
+        border: 'rgb(34, 197, 94)',
+        point: 'rgb(22, 163, 74)'
+    },
+    'Body Composition': {
+        bg: 'rgba(147, 197, 253, 0.3)',
+        border: 'rgb(59, 130, 246)',
+        point: 'rgb(37, 99, 235)'
+    }
+};
 
         const colorScheme = colorSchemes[category] || colorSchemes['Cardiorespiratory Endurance'];
 
@@ -1684,31 +1680,28 @@ function updateProfileUI() {
             document.getElementById('overallImprovement').textContent = '0%';
             document.getElementById('bestCategory').textContent = '--';
             document.getElementById('lastTestDate').textContent = '--';
-            
-            // Render empty states for all charts using CORRECT categories
+        
+        
             renderEmptyState('cardioChart', 'Cardiorespiratory Endurance');
-            renderEmptyState('strengthChart', 'Muscular Strength');
-            renderEmptyState('enduranceChart', 'Muscular Endurance');
+            renderEmptyState('muscularChart', 'Muscular Strength and Endurance');
             renderEmptyState('flexibilityChart', 'Flexibility');
             renderEmptyState('bodyCompChart', 'Body Composition');
             return;
         }
         
-        const categoryData = {
-            'Cardiorespiratory Endurance': [],
-            'Muscular Strength': [],
-            'Muscular Endurance': [],
-            'Flexibility': [],
-            'Body Composition': []
-        };
-        
-        const categoryScores = {
-            'Cardiorespiratory Endurance': [],
-            'Muscular Strength': [],
-            'Muscular Endurance': [],
-            'Flexibility': [],
-            'Body Composition': []
-        };
+            const categoryData = {
+        'Cardiorespiratory Endurance': [],
+        'Muscular Strength and Endurance': [],
+        'Flexibility': [],
+        'Body Composition': []
+    };
+
+    const categoryScores = {
+        'Cardiorespiratory Endurance': [],
+        'Muscular Strength and Endurance': [],
+        'Flexibility': [],
+        'Body Composition': []
+    };
         
         let allTestResults = [];
         
@@ -1852,11 +1845,10 @@ function updateProfileUI() {
         document.getElementById('lastTestName').innerHTML = `<i class="bi bi-clock-history"></i><span>${lastTestNameText}</span>`;
         
         // Create progress charts with CORRECT category names
-        createProgressChart('cardioChart', categoryData['Cardiorespiratory Endurance'], 'Cardiorespiratory Endurance');
-        createProgressChart('strengthChart', categoryData['Muscular Strength'], 'Muscular Strength');
-        createProgressChart('enduranceChart', categoryData['Muscular Endurance'], 'Muscular Endurance');
-        createProgressChart('flexibilityChart', categoryData['Flexibility'], 'Flexibility');
-        createProgressChart('bodyCompChart', categoryData['Body Composition'], 'Body Composition');
+    createProgressChart('cardioChart', categoryData['Cardiorespiratory Endurance'], 'Cardiorespiratory Endurance');
+    createProgressChart('muscularChart', categoryData['Muscular Strength and Endurance'], 'Muscular Strength and Endurance');
+    createProgressChart('flexibilityChart', categoryData['Flexibility'], 'Flexibility');
+    createProgressChart('bodyCompChart', categoryData['Body Composition'], 'Body Composition');
         
         console.log('Progress data loaded successfully');
         

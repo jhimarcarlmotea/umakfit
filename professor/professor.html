@@ -3,1932 +3,1326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMakiFit - Progress</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <title>UmakFit - Professor Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Manrope:600,800|Inter:300,500,400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
+        body { font-family: 'Inter', Helvetica, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
+        
+        .header-top { 
+            background-color: #ffffff; 
+            padding: 15px 0; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); 
+            position: fixed; 
+            top: 0; 
+            width: 100%; 
+            z-index: 1000; 
+            border-bottom: 1px solid #e2e8f0;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(180deg, rgba(245, 247, 250, 1) 0%, rgba(232, 238, 245, 1) 100%);
-            min-height: 100vh;
+        .header-top .container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
         }
-
-        /* Navigation */
-.navbar-custom {
-    background: linear-gradient(180deg, rgba(30, 58, 138, 1) 0%, rgba(59, 130, 246, 1) 100%);
-    padding: 20px 0px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    border-bottom: none;
-    height: auto;
-}
-
-.navbar-brand {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin: 0;
-    padding: 0;
-}
-
-.navbar-brand-img {
-    height: 60px;
-    width: auto;
-    object-fit: contain;
-}
-
-.navbar-brand-text {
-    font-family: "Manrope", Helvetica;
-    font-weight: 800;
-    font-size: 28px;
-    background: linear-gradient(90deg, rgba(245, 158, 11, 1) 0%, rgba(255, 229, 0, 1) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    line-height: 1;
-}
-
-.nav-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.nav-pills-custom {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-}
-
-.nav-link-custom {
-    font-family: "Manrope", Helvetica;
-    font-weight: 600;
-    color: #000000;
-    font-size: 14px;
-    padding: 12px 18px;
-    border-radius: 8px;
-    background-color: #ffffff;
-    transition: all 0.3s;
-    border: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    text-decoration: none;
-}
-
-.nav-link-custom:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    color: #000000;
-}
-
-.nav-link-custom i {
-    font-size: 14px;
-}
-
-.nav-link-custom.active {
-    background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%);
-    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
-}
-
-.notification-bell-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin: 0;
-}
-
-.notification-bell-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: scale(1.1);
-}
-
-.notification-bell-btn i {
-    font-size: 20px;
-}
-
-.btn-logout-nav {
-    background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%);
-    border: none;
-    color: #000000;
-    padding: 8px 20px;
-    border-radius: 8px;
-    font-family: "Manrope", Helvetica;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-logout-nav:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4);
-}
-
-.notification-bell-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: #ef4444;
-    color: white;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 0.15rem 0.4rem;
-    border-radius: 10px;
-    min-width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.notification-bell-container {
-    position: relative;
-    display: inline-block;
-}
-
-.notification-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    width: 380px;
-    max-height: 480px;
-    overflow-y: auto;
-    z-index: 1050;
-    display: none;
-    margin-top: 0.5rem;
-    animation: slideDown 0.3s ease;
-}
-
-.notification-dropdown.show {
-    display: block;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.notification-dropdown-header {
-    padding: 1rem 1.25rem;
-    border-bottom: 2px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(135deg, #f8fafc, #ffffff);
-    border-radius: 12px 12px 0 0;
-}
-
-.notification-dropdown-header h6 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 700;
-    color: #111827;
-}
-
-.notification-dropdown-body {
-    max-height: 360px;
-    overflow-y: auto;
-}
-
-.notification-dropdown-item {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid #f3f4f6;
-    transition: background-color 0.2s ease;
-    cursor: pointer;
-}
-
-.notification-dropdown-item:hover {
-    background-color: #f9fafb;
-}
-
-.notification-dropdown-item:last-child {
-    border-bottom: none;
-}
-
-.notification-dropdown-item strong {
-    color: #111827;
-    font-size: 14px;
-    display: block;
-    margin-bottom: 0.35rem;
-    font-weight: 600;
-}
-
-.notification-dropdown-item p {
-    color: #6b7280;
-    font-size: 13px;
-    margin: 0;
-    line-height: 1.5;
-}
-
-.notification-dropdown-item small {
-    color: #9ca3af;
-    font-size: 11px;
-    display: block;
-    margin-top: 0.35rem;
-}
-
-.notification-dropdown-footer {
-    padding: 0.75rem 1.25rem;
-    border-top: 2px solid #e5e7eb;
-    text-align: center;
-    background-color: #f9fafb;
-    border-radius: 0 0 12px 12px;
-}
-
-.btn-view-all-dropdown {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
-    border: none;
-    padding: 0.5rem 1.25rem;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
-}
-
-.btn-view-all-dropdown:hover {
-    background: linear-gradient(135deg, #2563eb, #1e40af);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-}
-
-.notification-dropdown-empty {
-    padding: 2rem 1.25rem;
-    text-align: center;
-    color: #9ca3af;
-}
-
-.notification-dropdown-empty i {
-    font-size: 48px;
-    color: #d1d5db;
-    margin-bottom: 0.75rem;
-    display: block;
-}
-
-.notification-dropdown-empty p {
-    color: #6b7280;
-    font-size: 14px;
-    margin: 0;
-}
-
-.navbar-toggler {
-    background-color: #ffffff;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-}
-
-.navbar-toggler:focus {
-    box-shadow: 0 0 0 0.25rem rgba(255,255,255,0.25);
-}
-
-.navbar-toggler-icon {
-    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0,0,0,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
-}
-        /* Main Content */
-        .container {
-            max-width: 1440px;
-            margin: 0 auto;
-            padding: 3rem 5rem;
-        }
-
-        /* Professional Page Title with Vertical Accent and Underline */
-.page-title {
-    font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-weight: 700;
-    color: #1f3b7c; /* Professional deep navy */
-    font-size: 2.25rem; /* ~36px */
-    line-height: 1.4;
-    text-align: center;
-    margin: 1.5rem 0 1.5rem 0;
-    letter-spacing: 0.5px;
-    text-transform: capitalize;
-    position: relative;
-    display: inline-block; /* keeps underline and bar aligned with text */
-    padding-left: 1rem; /* space for the vertical line */
-}
-
-/* Vertical Accent Line */
-.page-title::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 5px;
-    background: linear-gradient(180deg, #1e3a8a, #3b82f6);
-    border-radius: 2px;
-}
-
-        /* Stats Grid */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 3rem;
-}
-
-.stat-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    padding: 2rem;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    min-height: 160px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-}
-
-.stat-card:hover::before {
-    opacity: 1;
-}
-
-.stat-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    position: relative;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.stat-icon::after {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border-radius: 18px;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.stat-card:hover .stat-icon::after {
-    opacity: 1;
-}
-
-.stat-icon.blue {
-    background: linear-gradient(135deg, #3b82f6, #1e40af);
-}
-
-.stat-icon.green {
-    background: linear-gradient(135deg, #10b981, #059669);
-}
-
-.stat-icon.purple {
-    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-}
-
-.stat-icon.pink {
-    background: linear-gradient(135deg, #ec4899, #db2777);
-}
-
-.stat-info {
-    flex: 1;
-}
-
-.stat-label {
-    font-weight: 600;
-    color: #64748b;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.75rem;
-}
-
-.stat-value {
-    font-weight: 700;
-    color: #1e293b;
-    font-size: 2.5rem;
-    line-height: 1.2;
-    font-family: 'Manrope', sans-serif;
-}
-
-.stat-value.empty {
-    color: #cbd5e1;
-}
-
-.stat-trend {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.stat-trend.positive {
-    color: #10b981;
-}
-
-.stat-trend.negative {
-    color: #ef4444;
-}
-
-.stat-trend.neutral {
-    color: #64748b;
-}
-
-       /* Charts Grid */
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
-}
-
-.chart-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    padding: 2.5rem;
-    border-radius: 20px;
-    min-height: 400px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    position: relative;
-    overflow: hidden;
-}
-
-.chart-card canvas {
-    max-height: 300px !important;
-    height: 300px !important;
-}
-
-.chart-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 6px;
-    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.chart-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
-}
-
-.chart-card:hover::before {
-    opacity: 1;
-}
-
-.chart-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #f1f5f9;
-}
-
-.chart-icon {
-    width: 32px;
-    height: 32px;
-    padding: 6px;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.chart-title {
-    font-weight: 700;
-    color: #1e293b;
-    font-size: 18px;
-    font-family: 'Manrope', sans-serif;
-    letter-spacing: -0.5px;
-}
-
-        .empty-state {
+        .logo-text { 
+            font-family: "Inter", Helvetica; 
+            font-weight: 700; 
+            color: #1e3a8a; 
+            font-size: 24px; 
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 300px;
-            text-align: center;
+            gap: 10px;
         }
-
-        .empty-icon {
-            width: 80px;
-            height: 80px;
-            background: #f1f5f9;
+        .logo-text i {
+            color: #f59e0b;
+            font-size: 26px;
+        }
+        .header-actions { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
+        .logout-btn { 
+            padding: 8px 20px; 
+            background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%); 
+            border: none; 
+            border-radius: 8px; 
+            color: #000; 
+            font-weight: 600; 
+            font-size: 14px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+        }
+        .logout-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4); 
+        }
+        .account-circle { 
+            width: 44px; 
+            height: 44px; 
+            cursor: pointer; 
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            font-size: 2.5rem;
-        }
-
-        .empty-title {
-            font-weight: 600;
-            color: #475569;
-            font-size: 18px;
-            margin-bottom: 0.5rem;
-        }
-
-        .empty-description {
-            color: #94a3b8;
-            font-size: 14px;
-            max-width: 300px;
-        }
-
-        .take-test-btn {
-            margin-top: 1.5rem;
-            padding: 0.75rem 2rem;
-            background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%);
-            border: none;
-            border-radius: 8px;
-            color: #000000;
-            font-family: 'Manrope', sans-serif;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
+            border: 2px solid #e2e8f0;
             transition: all 0.3s;
         }
-
-        .take-test-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        .account-circle:hover {
+            border-color: #f59e0b;
         }
-        @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.pulse-animation {
-    animation: pulse 2s infinite;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.slide-down {
-    animation: slideDown 0.3s ease;
-}
-/* Add to your CSS */
-.improvement-tooltip {
-    position: relative;
-    cursor: help;
-}
-
-.improvement-tooltip:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    white-space: nowrap;
-    z-index: 1000;
-}
-        /* Responsive */
-        /* Responsive */
-@media (max-width: 1200px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .charts-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .chart-card.large {
-        grid-column: span 1;
-    }
-
-    .container {
-        padding: 2rem;
-    }
-}
-
-@media (max-width: 991px) {
-    .nav-link-custom {
-        width: 100%;
-        justify-content: flex-start;
-    }
-    
-    .btn-logout-nav {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .notification-bell-container {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-    }
-    
-    .container {
-        padding: 1.5rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .page-title {
-        font-size: 1.75rem;
-    }
-    
-    .stat-value {
-        font-size: 28px;
-    }
-}
-@media (max-width: 1200px) {
-    .chart-card {
-        min-height: 380px;
-    }
-    
-    .chart-card canvas {
-        max-height: 280px !important;
-        height: 280px !important;
-    }
-}
-
-@media (max-width: 768px) {
-    .chart-card {
-        padding: 1.5rem;
-        min-height: 350px;
-    }
-    
-    .chart-card canvas {
-        max-height: 250px !important;
-        height: 250px !important;
-    }
-}
+        
+        .nav-section { 
+            background: linear-gradient(180deg, rgba(30, 58, 138, 1) 0%, rgba(59, 130, 246, 1) 100%); 
+            padding: 20px 0; 
+            margin-top: 74px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .nav-brand { 
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-family: "Manrope", Helvetica; 
+            font-weight: 800; 
+            font-size: 28px; 
+            background: linear-gradient(90deg, rgba(245, 158, 11, 1) 0%, rgba(255, 229, 0, 1) 100%); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+        .nav-brand-logo {
+            height: 60px;
+            width: auto;
+        }
+        .nav-pills-custom { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+            padding: 0; 
+            margin: 0;
+        }
+        .nav-pills-custom .nav-link { 
+            font-family: "Manrope", Helvetica; 
+            font-weight: 600; 
+            color: #000000; 
+            font-size: 14px; 
+            padding: 12px 18px;
+            border-radius: 8px; 
+            background-color: #ffffff; 
+            transition: all 0.3s; 
+            border: none; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .nav-pills-custom .nav-link.active { 
+            background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%); 
+            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+        }
+        .nav-pills-custom .nav-link:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); 
+        }
+        
+        .main-content { 
+            background: linear-gradient(180deg, rgba(248, 250, 252, 1) 0%, rgba(241, 245, 249, 1) 100%); 
+            padding: 40px 0 80px 0; 
+            min-height: calc(100vh - 200px); 
+        }
+        
+        .profile-section { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 30px; 
+            margin-bottom: 40px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+            border: 1px solid #e2e8f0;
+        }
+        .profile-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+            margin-bottom: 20px; 
+        }
+        .profile-logo { 
+            width: 77px; 
+            height: 90px; 
+        }
+        .profile-title { 
+            font-family: "Inter", Helvetica; 
+            font-weight: 700; 
+            color: #1e3a8a; 
+            font-size: 32px; 
+        }
+        .profile-divider { 
+            width: 100%; 
+            height: 2px; 
+            background: linear-gradient(90deg, transparent, #e5e7eb, transparent); 
+            margin: 20px 0; 
+        }
+        .profile-content { 
+            display: flex; 
+            align-items: center; 
+            gap: 30px; 
+            padding: 25px; 
+            background: #f9fafb; 
+            border-radius: 12px; 
+            border: 1px solid #f1f5f9;
+        }
+        .profile-photo { 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 3px solid #e2e8f0;
+        }
+        .profile-info { 
+            display: flex; 
+            gap: 80px; 
+            flex: 1; 
+            flex-wrap: wrap; 
+        }
+        .profile-field { 
+            flex: 1; 
+            min-width: 150px; 
+        }
+        .profile-label { 
+            font-family: "Inter", Helvetica; 
+            font-weight: 500; 
+            color: #64748b; 
+            font-size: 13px; 
+            margin-bottom: 5px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .profile-value { 
+            font-family: "Inter", Helvetica; 
+            font-weight: 700; 
+            color: #1e3a8a; 
+            font-size: 16px; 
+        }
+        .profile-value.email { 
+            font-weight: 500; 
+            color: #475569; 
+        }
+        
+        .stats-row { 
+            margin-bottom: 40px; 
+        }
+        .stat-card { 
+            border-radius: 16px; 
+            padding: 25px; 
+            color: white; 
+            transition: all 0.3s; 
+            border: none;
+            height: 100%; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+        .stat-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
+        }
+        .stat-card.purple { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .stat-card.blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .stat-card.green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .stat-card.orange { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .stat-card.red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .stat-card.cyan { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+        .stat-label { 
+            font-family: "Inter", Helvetica; 
+            font-weight: 600; 
+            font-size: 14px; 
+            margin-bottom: 10px; 
+            opacity: 0.95; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stat-value { 
+            font-family: "Inter", Helvetica; 
+            font-weight: 800; 
+            font-size: 32px; 
+        }
+        
+        .monitoring-container { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 25px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+            border: 1px solid #e2e8f0;
+        }
+        .monitoring-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; 
+        }
+        .monitoring-title { 
+            font-family: "Inter", Helvetica; 
+            font-weight: 700; 
+            color: #1f2937; 
+            font-size: 22px; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .live-indicator { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-family: "Inter", Helvetica; 
+            font-weight: 600; 
+            color: #10b981; 
+            font-size: 14px; 
+            background: #ecfdf5;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #d1fae5;
+        }
+        .live-dot { 
+            width: 8px; 
+            height: 8px; 
+            background: #10b981; 
+            border-radius: 50%; 
+            animation: pulse 2s infinite; 
+        }
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0.5; } 
+        }
+        
+        /* Enhanced Monitoring Grid */
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .monitoring-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .monitoring-card-title {
+            font-family: "Inter", Helvetica;
+            font-weight: 600;
+            color: #374151;
+            font-size: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .student-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .student-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: white;
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s;
+        }
+        .student-item:hover {
+            background: #f8fafc;
+            transform: translateX(4px);
+        }
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: 600;
+            color: #64748b;
+        }
+        .student-info {
+            flex: 1;
+        }
+        .student-name {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+        .student-details {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #64748b;
+        }
+        .student-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-online {
+            color: #10b981;
+        }
+        .status-offline {
+            color: #64748b;
+        }
+        .status-active {
+            color: #3b82f6;
+        }
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .status-dot.online {
+            background: #10b981;
+        }
+        .status-dot.offline {
+            background: #64748b;
+        }
+        .status-dot.active {
+            background: #3b82f6;
+        }
+        
+        .empty-state { 
+            padding: 40px 20px; 
+            text-align: center; 
+        }
+        .empty-icon { 
+            font-size: 48px; 
+            margin-bottom: 15px; 
+            opacity: 0.4; 
+        }
+        .empty-title { 
+            font-family: "Inter", Helvetica; 
+            font-weight: 600; 
+            color: #6b7280; 
+            font-size: 16px; 
+            margin-bottom: 8px; 
+        }
+        .empty-text { 
+            font-family: "Inter", Helvetica; 
+            font-weight: 400; 
+            color: #9ca3af; 
+            font-size: 13px; 
+            line-height: 1.4; 
+        }
+        
+        .footer { 
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); 
+            padding: 40px 0; 
+            margin-top: 40px; 
+        }
+        .footer-title { 
+            font-family: "Inter", Helvetica; 
+            font-weight: 700; 
+            color: #f59e0b; 
+            font-size: 18px; 
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        .footer-text { 
+            font-family: "Inter", Helvetica; 
+            font-weight: 400; 
+            color: #cbd5e1; 
+            font-size: 13px; 
+            line-height: 1.6; 
+        }
+        
+        .loading { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(255,255,255,0.95); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 9999; 
+            flex-direction: column;
+            gap: 20px;
+        }
+        .loading-text {
+            font-family: "Inter", Helvetica;
+            font-weight: 500;
+            color: #475569;
+            font-size: 16px;
+        }
+        .spinner { 
+            border: 4px solid #f1f5f9; 
+            border-top: 4px solid #3b82f6; 
+            border-radius: 50%; 
+            width: 50px; 
+            height: 50px; 
+            animation: spin 1s linear infinite; 
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        
+        @media (max-width: 992px) {
+            .nav-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .nav-pills-custom {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        @media (max-width: 768px) {
+            .header-top .container { padding: 0 15px; }
+            .logo-text { font-size: 20px; }
+            .profile-content { flex-direction: column; align-items: flex-start; }
+            .profile-info { gap: 20px; }
+            .stat-value { font-size: 24px; }
+            .monitoring-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .nav-pills-custom {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding-bottom: 5px;
+            }
+            .nav-brand-logo {
+                height: 50px;
+            }
+            .nav-brand {
+                font-size: 24px;
+            }
+            .monitoring-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .umak-logo {
+            height: 40px;
+            width: auto;
+        }
+        
+        /* Section Cards */
+        .sections-container {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+        .sections-title {
+            font-family: "Inter", Helvetica;
+            font-weight: 700;
+            color: #1f2937;
+            font-size: 22px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .section-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+        .section-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-color: #f59e0b;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .section-name {
+            font-family: "Inter", Helvetica;
+            font-weight: 700;
+            color: #1e3a8a;
+            font-size: 18px;
+        }
+        .section-student-count {
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .section-details {
+            margin-bottom: 15px;
+        }
+        .section-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .section-students {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .section-students-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .student-badge {
+            display: inline-flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 4px;
+            font-size: 11px;
+            color: #4b5563;
+        }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-<nav class="bg-gradient-to-r from-blue-900 to-blue-500 shadow-lg">
-    <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
-        <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-            <!-- Logo -->
-            <a href="#" class="flex items-center gap-2 sm:gap-3">
-                <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
-                     alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
-                <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope bg-gradient-to-r from-yellow-400 to-yellow-200 bg-clip-text text-transparent">
-                    UMakFit
-                </span>
-            </a>
-            
-            <!-- Desktop Navigation -->
-            <div class="hidden lg:flex items-center gap-2 flex-wrap">
-                <a href="./studentdashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                    <i class="bi bi-speedometer2"></i> 
-                    <span class="hidden xl:inline">Dashboard</span>
-                </a>
-                <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                    <i class="bi bi-clipboard-check"></i> 
-                    <span class="hidden xl:inline">Tests</span>
-                </a>
-                <a href="./studentlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                    <i class="bi bi-book"></i> 
-                    <span class="hidden xl:inline">Lesson</span>
-                </a>
-                <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                    <i class="bi bi-book"></i> 
-                    <span class="hidden xl:inline">Grade</span>
-                </a>
-                <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
-                    <i class="bi bi-graph-up"></i> 
-                    <span class="hidden xl:inline">Progress</span>
-                </a>
-                <a href="#" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                    <i class="bi bi-book"></i> 
-                    <span class="hidden xl:inline">Achievements</span>
-                </a>
-                
-                <!-- Notification Bell -->
-                <div class="relative">
-                    <button onclick="toggleNotificationDropdown()" id="notificationBellBtn" 
-                            class="w-9 h-9 xl:w-10 xl:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
-                        <i class="bi bi-bell-fill text-base xl:text-lg"></i>
-                        <span id="navNotificationCount" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-4.5 flex items-center justify-center pulse-animation">0</span>
+    <div id="loadingScreen" class="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading Dashboard...</div>
+    </div>
+    
+    <div id="dashboardContent" style="display: none;">
+        <div class="header-top">
+            <div class="container">
+                <div class="logo-text">
+                    <img class="umak-logo" src="umaklogo.png" alt="University of Makati">
+                    University of Makati
+                </div>
+                <div class="header-actions">
+                    <button class="logout-btn" onclick="handleLogout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
-                    
-                    <!-- Notification Dropdown -->
-                    <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl z-[9999] slide-down max-h-[480px] overflow-y-auto">
-                        <div class="p-3 sm:p-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center rounded-t-xl sticky top-0 z-10">
-                            <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
-                                <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                            </h6>
-                            <button onclick="closeNotificationDropdown()" class="text-gray-400 hover:text-gray-600 p-1">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        </div>
-                        <div id="notificationDropdownBody" class="max-h-96 overflow-y-auto">
-                            <div class="p-6 sm:p-8 text-center text-gray-400">
-                                <i class="bi bi-bell-slash text-4xl sm:text-5xl mb-3 block"></i>
-                                <p class="text-gray-600 text-sm sm:text-base">No notifications yet</p>
-                            </div>
-                        </div>
-                        <div class="p-2 sm:p-3 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0">
-                            <button onclick="viewAllNotificationsFromDropdown()" 
-                                    class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
-                                View All Notifications
-                            </button>
-                        </div>
-                    </div>
+                    <img class="account-circle" src="https://c.animaapp.com/tzMzyNnw/img/icon.svg" alt="Account">
                 </div>
-                
-                <!-- Profile Dropdown -->
-                <div class="relative">
-                    <img src="" alt="Profile" id="profilePictureBtn" onclick="toggleProfileDropdown()"
-                         class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
-                    
-                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-                        <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                            <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
-                            <h6 id="profileDropdownName" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
-                            <p id="profileDropdownEmail" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
-                        </div>
-                        <div class="p-2">
-                            <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                                <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-                                <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-                            </a>
-                            <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                            <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
-                                <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
-                                <span class="font-medium text-sm sm:text-base">Logout</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Mobile Right Icons -->
-            <div class="flex lg:hidden items-center gap-2 sm:gap-3">
-                <!-- Mobile Notification -->
-                <div class="relative">
-                    <button onclick="toggleNotificationDropdown()" id="notificationBellBtnMobile" 
-                            class="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all">
-                        <i class="bi bi-bell-fill text-base"></i>
-                        <span id="navNotificationCountMobile" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-4.5 flex items-center justify-center pulse-animation">0</span>
-                    </button>
-                    
-                    <!-- Mobile Notification Dropdown (positioned fixed for mobile) -->
-                    <div id="notificationDropdownMobile" class="hidden fixed right-2 left-2 top-20 bg-white rounded-xl shadow-2xl z-[9999] slide-down max-h-[calc(100vh-6rem)] overflow-y-auto">
-                        <div class="p-3 sm:p-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center rounded-t-xl sticky top-0 z-10">
-                            <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
-                                <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                            </h6>
-                            <button onclick="closeNotificationDropdown()" class="text-gray-400 hover:text-gray-600 p-1">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        </div>
-                        <div id="notificationDropdownBodyMobile" class="max-h-96 overflow-y-auto">
-                            <div class="p-6 sm:p-8 text-center text-gray-400">
-                                <i class="bi bi-bell-slash text-4xl sm:text-5xl mb-3 block"></i>
-                                <p class="text-gray-600 text-sm sm:text-base">No notifications yet</p>
-                            </div>
-                        </div>
-                        <div class="p-2 sm:p-3 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0">
-                            <button onclick="viewAllNotificationsFromDropdown()" 
-                                    class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
-                                View All Notifications
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Mobile Profile -->
-                <div class="relative">
-                    <img src="" alt="Profile" id="profilePictureBtnMobile" onclick="toggleProfileDropdown()"
-                         class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
-                    
-                    <!-- Mobile Profile Dropdown (positioned fixed for mobile) -->
-                    <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-                        <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                            <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
-                            <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
-                            <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
-                        </div>
-                        <div class="p-2">
-                            <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                                <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-                                <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-                            </a>
-                            <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                            <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
-                                <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
-                                <span class="font-medium text-sm sm:text-base">Logout</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Mobile Menu Button -->
-                <button onclick="toggleMobileMenu()" class="text-white p-1 sm:p-2">
-                    <i class="bi bi-list text-2xl sm:text-3xl"></i>
-                </button>
             </div>
         </div>
         
-        <!-- Mobile Navigation Menu -->
-        <div id="mobileMenu" class="hidden lg:hidden mt-3 sm:mt-4 space-y-2">
-            <a href="./studentdashboard.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
-                <i class="bi bi-speedometer2 mr-2"></i> Dashboard
-            </a>
-            <a href="./test.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
-                <i class="bi bi-clipboard-check mr-2"></i> Tests
-            </a>
-            <a href="./progress.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm">
-                <i class="bi bi-graph-up mr-2"></i> Progress
-            </a>
-            <a href="#" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
-                <i class="bi bi-book mr-2"></i> Learn
-            </a>
+        <div class="nav-section">
+            <div class="container">
+                <div class="nav-container">
+                    <div class="nav-brand">
+                        <img class="nav-brand-logo" src="logo.png" alt="UMakFit">
+                        UMakFit
+                    </div>
+                    <ul class="nav nav-pills-custom">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="studentmanagement.html">
+                                <i class="fas fa-users"></i> Student Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="addactivities.html">
+                                <i class="fas fa-dumbbell"></i> Add Activities
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="addlesson.html">
+                                <i class="fas fa-book-open"></i> Add Lesson
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="monitoringactivities.html">
+                                <i class="fas fa-chart-bar"></i> Monitoring Activities
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="grades.html">
+                                <i class="fas fa-graduation-cap"></i> Grades
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-    </div>
-</nav>
-
-    <!-- Main Content -->
-    <div class="container">
-        <h1 class="page-title">Progress</h1>
-
-              <!-- Stats Cards -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon blue">
-            <i class="bi bi-clipboard-check-fill" style="color: white; font-size: 32px;"></i>
+        
+        <div class="main-content">
+            <div class="container">
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <div class="profile-header">
+                        <div class="profile-title">Professor Profile</div>
+                    </div>
+                    <div class="profile-divider"></div>
+                    <div class="profile-content">
+                        <img class="profile-photo" id="userPhoto" src="https://c.animaapp.com/tzMzyNnw/img/image-13@2x.png" alt="Profile">
+                        <div class="profile-info">
+                            <div class="profile-field">
+                                <div class="profile-label">Name</div>
+                                <div class="profile-value" id="userName">Loading...</div>
+                            </div>
+                            <div class="profile-field">
+                                <div class="profile-label">College</div>
+                                <div class="profile-value" id="userCollege">College of Human Kinetics</div>
+                            </div>
+                            <div class="profile-field">
+                                <div class="profile-label">Email</div>
+                                <div class="profile-value email" id="userEmail">Loading...</div>
+                            </div>
+                            <div class="profile-field">
+                                <div class="profile-label">Assigned Sections</div>
+                                <div class="profile-value" id="assignedSections">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Section -->
+                <div class="row stats-row g-3">
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                        <div class="stat-card purple">
+                            <div class="stat-label">
+                                <i class="fas fa-layer-group"></i> My Sections
+                            </div>
+                            <div class="stat-value" id="statSections">0</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                        <div class="stat-card blue">
+                            <div class="stat-label">
+                                <i class="fas fa-user-graduate"></i> My Students
+                            </div>
+                            <div class="stat-value" id="statStudents">0</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                        <div class="stat-card green">
+                            <div class="stat-label">
+                                <i class="fas fa-check-circle"></i> Activities Completed
+                            </div>
+                            <div class="stat-value" id="statCompleted">0</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                        <div class="stat-card orange">
+                            <div class="stat-label">
+                                <i class="fas fa-chart-line"></i> Average Score
+                            </div>
+                            <div class="stat-value" id="statAverage">0</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                        <div class="stat-card red">
+                            <div class="stat-label">
+                                <i class="fas fa-clock"></i> Pending Activities
+                            </div>
+                            <div class="stat-value" id="statPending">0</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                        <div class="stat-card cyan">
+                            <div class="stat-label">
+                                <i class="fas fa-percentage"></i> Completion Rate
+                            </div>
+                            <div class="stat-value" id="statRate">0%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- My Sections Section -->
+                <div class="sections-container" id="sectionsContainer" style="display: none;">
+                    <div class="sections-title">
+                        <i class="fas fa-chalkboard"></i> My Assigned Sections
+                    </div>
+                    <div class="sections-grid" id="sectionsGrid">
+                        <!-- Sections will be dynamically added here -->
+                    </div>
+                </div>
+                
+                <!-- Real-time Monitoring -->
+                <div class="monitoring-container">
+                    <div class="monitoring-header">
+                        <div class="monitoring-title">
+                            <i class="fas fa-desktop"></i> Real-time Activity Monitoring
+                        </div>
+                        <div class="live-indicator">
+                            <div class="live-dot"></div>
+                            <span>Live Updates</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Monitoring Grid -->
+                    <div class="monitoring-grid">
+                        <div class="monitoring-card">
+                            <div class="monitoring-card-title">
+                                <i class="fas fa-user-check" style="color: #10b981;"></i>
+                                Active Activity Sessions
+                            </div>
+                            <div class="student-list" id="activeTestsList">
+                                <div class="empty-state">
+                                    <div class="empty-icon">👥</div>
+                                    <div class="empty-title">No Active Activities</div>
+                                    <div class="empty-text">Students will appear here when they start activities</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="monitoring-card">
+                            <div class="monitoring-card-title">
+                                <i class="fas fa-history" style="color: #f59e0b;"></i>
+                                Recent Activity Completions
+                            </div>
+                            <div class="student-list" id="recentCompletions">
+                                <div class="empty-state">
+                                    <div class="empty-icon">✅</div>
+                                    <div class="empty-title">No Recent Activities</div>
+                                    <div class="empty-text">Completed activities will appear here</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="stat-info">
-            <div class="stat-label">Total Tests</div>
-            <div class="stat-value" id="totalTests">0</div>
-            <div class="stat-trend neutral" id="totalTestsTrend">
-                <i class="bi bi-dash"></i>
-                <span>No data yet</span>
+        
+        <div class="footer">
+            <div class="container">
+                <div class="footer-title">About CTBL</div>
+                <div class="row g-4">
+                    <div class="col-12 col-md-4">
+                        <div class="footer-text">
+                            The Center for Technology Based Learning serves as the learning management system operating hub, 
+                            reporting to the university MANCOM officials, with a director on duty who manages and handles the 
+                            center's daily operations.
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="footer-text">
+                            Working closely with the Office of the President, the Center for Information Technology, and the 
+                            Deans and Directors to support the LMS end-users' day-to-day activity.
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="footer-text">
+                            The center focuses on implementing new forms of training and determining the validity of data to 
+                            support the university's educational objectives.
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="stat-card">
-        <div class="stat-icon green">
-            <i class="bi bi-graph-up-arrow" style="color: white; font-size: 32px;"></i>
-        </div>
-        <div class="stat-info">
-            <div class="stat-label">Improvement</div>
-            <div class="stat-value" id="overallImprovement">0%</div>
-            <div class="stat-trend neutral" id="improvementTrend">
-                <i class="bi bi-dash"></i>
-                <span>Take more tests</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon purple">
-            <i class="bi bi-trophy-fill" style="color: white; font-size: 32px;"></i>
-        </div>
-        <div class="stat-info">
-            <div class="stat-label">Best Category</div>
-            <div class="stat-value" style="font-size: 1.5rem;" id="bestCategory">--</div>
-            <div class="stat-trend neutral" id="bestCategoryScore">
-                <i class="bi bi-star-fill"></i>
-                <span id="bestCategoryScoreText">No data</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon pink">
-            <i class="bi bi-calendar-check-fill" style="color: white; font-size: 32px;"></i>
-        </div>
-        <div class="stat-info">
-            <div class="stat-label">Last Test</div>
-            <div class="stat-value" style="font-size: 1.3rem;" id="lastTestDate">--</div>
-            <div class="stat-trend neutral" id="lastTestName">
-                <i class="bi bi-clock-history"></i>
-                <span>No tests taken</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-       <!-- Charts Grid -->
-<div class="charts-grid">
-    <!-- Cardiorespiratory Endurance -->
-    <div class="chart-card">
-        <div class="chart-header">
-            <img class="chart-icon" src="https://c.animaapp.com/ZXSXG5cb/img/image-139@2x.png" alt="Chart">
-            <h2 class="chart-title">Cardiorespiratory Endurance</h2>
-        </div>
-        <div id="cardioChart"></div>
-    </div>
-
-    <!-- Combined Muscular Strength and Endurance -->
-    <div class="chart-card">
-        <div class="chart-header">
-            <img class="chart-icon" src="https://c.animaapp.com/ZXSXG5cb/img/image-139@2x.png" alt="Chart">
-            <h2 class="chart-title">Muscular Strength and Endurance</h2>
-        </div>
-        <div id="muscularChart"></div>
-    </div>
-
-    <!-- Flexibility -->
-    <div class="chart-card">
-        <div class="chart-header">
-            <img class="chart-icon" src="https://c.animaapp.com/ZXSXG5cb/img/image-139@2x.png" alt="Chart">
-            <h2 class="chart-title">Flexibility</h2>
-        </div>
-        <div id="flexibilityChart"></div>
-    </div>
-
-    <!-- Body Composition -->
-    <div class="chart-card">
-        <div class="chart-header">
-            <img class="chart-icon" src="https://c.animaapp.com/ZXSXG5cb/img/image-139@2x.png" alt="Chart">
-            <h2 class="chart-title">Body Composition</h2>
-        </div>
-        <div id="bodyCompChart"></div>
-    </div>
-</div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script type="module">
-    import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getFirestore, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, onSnapshot, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
-        authDomain: "umakfit-e3b1d.firebaseapp.com",
-        projectId: "umakfit-e3b1d",
-        storageBucket: "umakfit-e3b1d.appspot.com",
-        messagingSenderId: "276569891504",
-        appId: "1:276569891504:web:39b1732b519f4d8b785175"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+            authDomain: "umakfit-e3b1d.firebaseapp.com",
+            projectId: "umakfit-e3b1d",
+            storageBucket: "umakfit-e3b1d.appspot.com",
+            messagingSenderId: "276569891504",
+            appId: "1:276569891504:web:39b1732b519f4d8b785175"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    const testCategories = {
-    'Cardiorespiratory Endurance': {
-        tests: ['3-Minute Step Test', '1-Mile Run', '1 Mile Run'],
-        icon: '❤️',
-        color: 'from-red-500 to-pink-500'
-    },
-    'Muscular Strength and Endurance': {
-        tests: ['Push-Up Test', 'Grip Strength', 'Push-up Test', 'Curl-Up Test', 'Sit-Up Test', 'Plank Hold'],
-        icon: '💪',
-        color: 'from-blue-500 to-indigo-500'
-    },
-    'Flexibility': {
-        tests: ['Sit-and-Reach', 'Shoulder Flexibility'],
-        icon: '🤸',
-        color: 'from-green-500 to-emerald-500'
-    },
-    'Body Composition': {
-        tests: ['BMI Assessment', 'Skinfold Caliper Measurements'],
-        icon: '⚖️',
-        color: 'from-purple-500 to-violet-500'
-    }
-};
-   function getCategoryForTest(testName) {
-    const normalized = testName.toLowerCase().trim();
-    
-    // Check for combined muscular category
-    const muscularTests = ['push-up', 'pushup', 'grip', 'curl-up', 'sit-up', 'situp', 'plank'];
-    if (muscularTests.some(test => normalized.includes(test))) {
-        return 'Muscular Strength and Endurance';
-    }
-    
-    // Other categories...
-    if (normalized.includes('step') || normalized.includes('minute') || normalized.includes('run')) {
-        return 'Cardiorespiratory Endurance';
-    }
-    
-    if (normalized.includes('sit-and-reach') || normalized.includes('shoulder')) {
-        return 'Flexibility';
-    }
-    
-    if (normalized.includes('bmi') || normalized.includes('skinfold') || normalized.includes('body mass')) {
-        return 'Body Composition';
-    }
-    
-    return 'Cardiorespiratory Endurance'; // Default fallback
-}
+        let currentProfessor = null;
+        let professorSections = [];
+        let professorStudents = [];
 
-
-    function calculateTestScore(testName, result, testTarget = null) {
-    const normalized = testName.toLowerCase().trim();
-    
-    // Extract numeric value from result
-    let numericValue = 0;
-    
-    if (typeof result === 'object' && result !== null) {
-        numericValue = result.repetitions || result.time || result.distance || result.value || result.score || 0;
-    } else if (typeof result === 'string') {
-        const match = result.match(/(\d+\.?\d*)/);
-        if (match) {
-            numericValue = parseFloat(match[1]);
-        } else {
-            numericValue = parseFloat(result) || 0;
-        }
-    } else {
-        numericValue = parseFloat(result) || 0;
-    }
-    
-    // Use test target if available for more accurate scoring
-    if (testTarget && testTarget > 0) {
-        if (normalized.includes('push-up') || normalized.includes('pushup') || 
-            normalized.includes('sit-up') || normalized.includes('situp') ||
-            normalized.includes('curl-up')) {
-            const reps = numericValue;
-            const percentage = (reps / testTarget) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
+        onAuthStateChanged(auth, async (user) => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const dashboardContent = document.getElementById('dashboardContent');
             
-            // Apply grading curve for better distribution
-            if (percentage >= 100) score = 100;
-            else if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-            
-        } else if (normalized.includes('plank')) {
-            let seconds = 0;
-            if (typeof result === 'string' && result.includes(':')) {
-                const [mins, secs] = result.split(':').map(Number);
-                seconds = (mins * 60) + (secs || 0);
-            } else {
-                seconds = numericValue;
-            }
-            
-            const percentage = (seconds / testTarget) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            if (percentage >= 100) score = 100;
-            else if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-            
-        } else if (normalized.includes('sit-and-reach')) {
-            const distance = numericValue;
-            const percentage = (distance / testTarget) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            if (percentage >= 100) score = 100;
-            else if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-        }
-    }
-    
-    // Fallback to standard scoring if no target available
-    if (normalized.includes('push-up') || normalized.includes('pushup')) {
-        const reps = numericValue;
-        if (reps >= 40) return 100;
-        if (reps >= 35) return 95;
-        if (reps >= 30) return 90;
-        if (reps >= 25) return 85;
-        if (reps >= 20) return 80;
-        if (reps >= 15) return 75;
-        if (reps >= 10) return 70;
-        if (reps >= 5) return 65;
-        return 60;
-        
-    } else if (normalized.includes('sit-up') || normalized.includes('situp')) {
-        const reps = numericValue;
-        if (reps >= 50) return 100;
-        if (reps >= 45) return 95;
-        if (reps >= 40) return 90;
-        if (reps >= 35) return 85;
-        if (reps >= 30) return 80;
-        if (reps >= 25) return 75;
-        if (reps >= 20) return 70;
-        if (reps >= 15) return 65;
-        return 60;
-        
-    } else if (normalized.includes('curl-up')) {
-        const reps = numericValue;
-        if (reps >= 75) return 100;
-        if (reps >= 60) return 95;
-        if (reps >= 50) return 90;
-        if (reps >= 40) return 85;
-        if (reps >= 30) return 80;
-        if (reps >= 25) return 75;
-        if (reps >= 20) return 70;
-        return 65;
-        
-    } else if (normalized.includes('plank')) {
-        let seconds = 0;
-        if (typeof result === 'string' && result.includes(':')) {
-            const [mins, secs] = result.split(':').map(Number);
-            seconds = (mins * 60) + (secs || 0);
-        } else {
-            seconds = numericValue;
-        }
-        
-        if (seconds >= 180) return 100;
-        if (seconds >= 150) return 95;
-        if (seconds >= 120) return 90;
-        if (seconds >= 100) return 85;
-        if (seconds >= 80) return 80;
-        if (seconds >= 60) return 75;
-        if (seconds >= 45) return 70;
-        if (seconds >= 30) return 65;
-        return 60;
-        
-    } else if (normalized.includes('step test') || normalized.includes('3-minute')) {
-        const heartRate = numericValue;
-        if (heartRate <= 70) return 100;
-        if (heartRate <= 80) return 95;
-        if (heartRate <= 90) return 90;
-        if (heartRate <= 100) return 85;
-        if (heartRate <= 110) return 80;
-        if (heartRate <= 120) return 75;
-        if (heartRate <= 130) return 70;
-        return 65;
-        
-    } else if (normalized.includes('mile') || normalized.includes('run')) {
-        let totalSeconds = 0;
-        if (typeof result === 'string' && result.includes(':')) {
-            const [minutes, seconds] = result.split(':').map(Number);
-            totalSeconds = (minutes * 60) + (seconds || 0);
-        } else {
-            totalSeconds = numericValue;
-        }
-        
-        if (totalSeconds <= 360) return 100;
-        if (totalSeconds <= 420) return 95;
-        if (totalSeconds <= 480) return 90;
-        if (totalSeconds <= 540) return 85;
-        if (totalSeconds <= 600) return 80;
-        if (totalSeconds <= 660) return 75;
-        if (totalSeconds <= 720) return 70;
-        if (totalSeconds <= 780) return 65;
-        return 60;
-        
-    } else if (normalized.includes('sit-and-reach')) {
-        const distance = numericValue;
-        if (distance >= 25) return 100;
-        if (distance >= 20) return 95;
-        if (distance >= 15) return 90;
-        if (distance >= 10) return 85;
-        if (distance >= 5) return 80;
-        if (distance >= 0) return 75;
-        if (distance >= -5) return 70;
-        return 65;
-        
-    } else if (normalized.includes('grip')) {
-        const strength = numericValue;
-        if (strength >= 60) return 100;
-        if (strength >= 55) return 95;
-        if (strength >= 50) return 90;
-        if (strength >= 45) return 85;
-        if (strength >= 40) return 80;
-        if (strength >= 35) return 75;
-        if (strength >= 30) return 70;
-        return 65;
-    } else if (normalized.includes('bmi')) {
-        const bmi = numericValue;
-        // Healthy BMI range is 18.5-24.9
-        if (bmi >= 18.5 && bmi <= 24.9) return 100;
-        if (bmi >= 17.5 && bmi < 18.5) return 85;
-        if (bmi >= 25 && bmi <= 27) return 85;
-        if (bmi >= 15 && bmi < 17.5) return 70;
-        if (bmi > 27 && bmi <= 30) return 70;
-        return 60;
-    }
-    
-    return 75;
-}
-
-    function renderEmptyState(containerId, category) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">📊</div>
-                <div class="empty-title">No Data Available</div>
-                <div class="empty-description">Take your first ${category} test to see your progress</div>
-                <button class="take-test-btn" onclick="window.location.href='./test.html'">Take Test</button>
-            </div>
-        `;
-    }
-
-    function createProgressChart(containerId, data, category) {
-    const container = document.getElementById(containerId);
-    
-    if (!container) {
-        console.error(`Container ${containerId} not found`);
-        return;
-    }
-    
-    if (!data || data.length === 0) {
-        renderEmptyState(containerId, category);
-        return;
-    }
-
-    try {
-        // Store chart instance for cleanup
-        if (container.chartInstance) {
-            container.chartInstance.destroy();
-        }
-        
-        // Clear container and create canvas
-        container.innerHTML = '<canvas id="' + containerId + 'Canvas"></canvas>';
-        const canvas = document.getElementById(containerId + 'Canvas');
-        
-        if (!canvas) {
-            throw new Error('Canvas element not created');
-        }
-        
-        const ctx = canvas.getContext('2d');
-
-        // Prepare chart data
-        const labels = data.map(item => item.date);
-        const scores = data.map(item => item.score);
-        
-        // Color schemes matching the reference images
-        const colorSchemes = {
-    'Cardiorespiratory Endurance': {
-        bg: 'rgba(167, 139, 250, 0.3)',
-        border: 'rgb(139, 92, 246)',
-        point: 'rgb(124, 58, 237)'
-    },
-    'Muscular Strength and Endurance': {
-        bg: 'rgba(251, 113, 133, 0.3)',
-        border: 'rgb(244, 63, 94)',
-        point: 'rgb(225, 29, 72)'
-    },
-    'Flexibility': {
-        bg: 'rgba(134, 239, 172, 0.3)',
-        border: 'rgb(34, 197, 94)',
-        point: 'rgb(22, 163, 74)'
-    },
-    'Body Composition': {
-        bg: 'rgba(147, 197, 253, 0.3)',
-        border: 'rgb(59, 130, 246)',
-        point: 'rgb(37, 99, 235)'
-    }
-};
-
-        const colorScheme = colorSchemes[category] || colorSchemes['Cardiorespiratory Endurance'];
-
-        // Create gradient
-        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, colorScheme.bg);
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
-
-        // Calculate highest score for annotation
-        const maxScore = Math.max(...scores);
-        const maxIndex = scores.indexOf(maxScore);
-
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Score',
-                    data: scores,
-                    backgroundColor: gradient,
-                    borderColor: colorScheme.border,
-                    borderWidth: 3,
-                    pointBackgroundColor: colorScheme.point,
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 3,
-                    pointRadius: 5,
-                    pointHoverRadius: 7,
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                        titleColor: '#1f2937',
-                        bodyColor: '#6b7280',
-                        borderColor: colorScheme.border,
-                        borderWidth: 2,
-                        padding: 12,
-                        displayColors: false,
-                        titleFont: {
-                            size: 14,
-                            weight: 'bold'
-                        },
-                        bodyFont: {
-                            size: 13
-                        },
-                        callbacks: {
-                            title: function(context) {
-                                return data[context[0].dataIndex].testName;
-                            },
-                            label: function(context) {
-                                return 'Score: ' + context.parsed.y + '/100';
-                            },
-                            afterLabel: function(context) {
-                                return 'Result: ' + data[context.dataIndex].result;
-                            }
-                        }
-                    },
-                    annotation: {
-                        annotations: {
-                            label1: {
-                                type: 'label',
-                                xValue: maxIndex,
-                                yValue: maxScore,
-                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                                borderColor: colorScheme.border,
-                                borderWidth: 2,
-                                borderRadius: 8,
-                                padding: 8,
-                                content: [maxScore.toString()],
-                                color: colorScheme.point,
-                                font: {
-                                    size: 16,
-                                    weight: 'bold'
-                                }
-                            }
+            if (user) {
+                try {
+                    console.log('=== PROFESSOR AUTHENTICATION ===');
+                    console.log('User authenticated:', user.email);
+                    
+                    const userEmail = user.email.toLowerCase();
+                    
+                    // First try to find professor by email in professors collection
+                    const professorsQuery = query(
+                        collection(db, 'professors'),
+                        where('email', '==', userEmail)
+                    );
+                    const professorsSnapshot = await getDocs(professorsQuery);
+                    
+                    if (!professorsSnapshot.empty) {
+                        const professorDoc = professorsSnapshot.docs[0];
+                        currentProfessor = { id: professorDoc.id, ...professorDoc.data() };
+                        console.log('✓ Professor found in professors collection:', currentProfessor);
+                    } else {
+                        // Try users collection
+                        const usersQuery = query(
+                            collection(db, 'users'),
+                            where('email', '==', userEmail),
+                            where('role', '==', 'professor')
+                        );
+                        const usersSnapshot = await getDocs(usersQuery);
+                        
+                        if (!usersSnapshot.empty) {
+                            const userDoc = usersSnapshot.docs[0];
+                            currentProfessor = { id: userDoc.id, ...userDoc.data() };
+                            console.log('✓ Professor found in users collection:', currentProfessor);
+                        } else {
+                            throw new Error('Professor account not found. Please contact the secretary.');
                         }
                     }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 140,
-                        ticks: {
-                            stepSize: 20,
-                            callback: function(value) {
-                                return value;
-                            },
-                            font: {
-                                size: 11,
-                                weight: '500'
-                            },
-                            color: '#9ca3af'
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)',
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            font: {
-                                size: 11,
-                                weight: '500'
-                            },
-                            color: '#9ca3af',
-                            maxRotation: 0,
-                            minRotation: 0
-                        },
-                        grid: {
-                            display: false,
-                            drawBorder: false
-                        }
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
+                    
+                    // Update UI with professor information
+                    document.getElementById('userName').textContent = 
+                        currentProfessor.fullName || currentProfessor.name || user.displayName || 'Professor';
+                    document.getElementById('userEmail').textContent = userEmail;
+                    
+                    // Load professor's sections and students
+                    await loadProfessorSections();
+                    await loadProfessorStatistics();
+                    setupRealtimeMonitoring();
+                    
+                    // Show dashboard
+                    loadingScreen.style.display = 'none';
+                    dashboardContent.style.display = 'block';
+                    
+                } catch (error) {
+                    console.error('=== ERROR IN AUTHENTICATION ===');
+                    console.error('Error:', error);
+                    
+                    loadingScreen.style.display = 'none';
+                    alert(error.message || 'Error loading dashboard. Please try again.');
+                    await signOut(auth);
+                    window.location.href = '/login/index.html';
                 }
+            } else {
+                console.log('No user authenticated, redirecting to login...');
+                window.location.href = '/login/index.html';
             }
         });
 
-        // Store chart instance for cleanup
-        container.chartInstance = chart;
-
-    } catch (error) {
-        console.error(`Error creating chart for ${containerId}:`, error);
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">⚠️</div>
-                <div class="empty-title">Chart Error</div>
-                <div class="empty-description">Failed to load chart data</div>
-            </div>
-        `;
-    }
-}
-                    // Handle window resize to prevent chart issues
-            let resizeTimeout;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(function() {
-                    // Destroy and recreate charts on resize
-                    if (currentUser && studentData) {
-                        loadProgressData(currentUser.email);
-                    }
-                }, 250);
-            });
-// Helper function to calculate trend line
-function calculateTrendLine(data) {
-    if (data.length < 2) return data;
-    
-    const n = data.length;
-    let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-    
-    for (let i = 0; i < n; i++) {
-        sumX += i;
-        sumY += data[i];
-        sumXY += i * data[i];
-        sumXX += i * i;
-    }
-    
-    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-    const intercept = (sumY - slope * sumX) / n;
-    
-    return Array.from({length: n}, (_, i) => slope * i + intercept);
-}
-        let currentUser = null;
-let studentData = null;
-
-// Mobile menu toggle
-window.toggleMobileMenu = function() {
-    const menu = document.getElementById('mobileMenu');
-    if (menu) {
-        menu.classList.toggle('hidden');
-    }
-};
-
-// Notification dropdown
-window.toggleNotificationDropdown = function() {
-    const isMobile = window.innerWidth < 1024;
-    const dropdown = document.getElementById(isMobile ? 'notificationDropdownMobile' : 'notificationDropdown');
-    const dropdownBody = document.getElementById(isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody');
-    
-    dropdown.classList.toggle('hidden');
-    if (!dropdown.classList.contains('hidden')) {
-        loadNotificationDropdown(dropdownBody);
-        setTimeout(() => {
-            document.addEventListener('click', closeOnClickOutside);
-        }, 100);
-    } else {
-        document.removeEventListener('click', closeOnClickOutside);
-    }
-};
-
-window.closeNotificationDropdown = function() {
-    const dropdownDesktop = document.getElementById('notificationDropdown');
-    const dropdownMobile = document.getElementById('notificationDropdownMobile');
-    if (dropdownDesktop) dropdownDesktop.classList.add('hidden');
-    if (dropdownMobile) dropdownMobile.classList.add('hidden');
-    document.removeEventListener('click', closeOnClickOutside);
-};
-
-function closeOnClickOutside(event) {
-    const isMobile = window.innerWidth < 1024;
-    const dropdown = document.getElementById(isMobile ? 'notificationDropdownMobile' : 'notificationDropdown');
-    const bellBtn = document.getElementById('notificationBellBtn');
-    const bellBtnMobile = document.getElementById('notificationBellBtnMobile');
-    if (!dropdown.contains(event.target) && !bellBtn?.contains(event.target) && !bellBtnMobile?.contains(event.target)) {
-        closeNotificationDropdown();
-    }
-}
-
-// Profile dropdown
-window.toggleProfileDropdown = function() {
-    const isMobile = window.innerWidth < 1024;
-    const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
-    
-    dropdown.classList.toggle('hidden');
-    if (!dropdown.classList.contains('hidden')) {
-        closeNotificationDropdown();
-        setTimeout(() => {
-            document.addEventListener('click', closeProfileOnClickOutside);
-        }, 100);
-    } else {
-        document.removeEventListener('click', closeProfileOnClickOutside);
-    }
-};
-
-window.closeProfileDropdown = function() {
-    const dropdownDesktop = document.getElementById('profileDropdown');
-    const dropdownMobile = document.getElementById('profileDropdownMobile');
-    if (dropdownDesktop) dropdownDesktop.classList.add('hidden');
-    if (dropdownMobile) dropdownMobile.classList.add('hidden');
-    document.removeEventListener('click', closeProfileOnClickOutside);
-};
-
-function closeProfileOnClickOutside(event) {
-    const isMobile = window.innerWidth < 1024;
-    const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
-    const profileBtn = document.getElementById('profilePictureBtn');
-    const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-    if (!dropdown.contains(event.target) && !profileBtn?.contains(event.target) && !profileBtnMobile?.contains(event.target)) {
-        closeProfileDropdown();
-    }
-}
-
-async function loadNotificationDropdown(customBody = null) {
-    // Placeholder - you can implement notification loading here
-    console.log('Loading notifications...');
-}
-
-window.viewAllNotificationsFromDropdown = function() {
-    closeNotificationDropdown();
-    alert('View all notifications feature');
-};
-
-function updateProfileUI() {
-    if (!currentUser) return;
-    
-    const photoURL = currentUser?.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(studentData?.displayName || 'User') + '&background=3b82f6&color=fff&size=128';
-    
-    // Update all profile pictures
-    const profileBtn = document.getElementById('profilePictureBtn');
-    const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-    if (profileBtn) profileBtn.src = photoURL;
-    if (profileBtnMobile) profileBtnMobile.src = photoURL;
-    
-    // Update dropdown pictures
-    const dropdownPic = document.getElementById('profileDropdownPicture');
-    const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
-    if (dropdownPic) dropdownPic.src = photoURL;
-    if (dropdownPicMobile) dropdownPicMobile.src = photoURL;
-    
-    // Update names
-    const dropdownName = document.getElementById('profileDropdownName');
-    const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
-    if (dropdownName) dropdownName.textContent = studentData?.displayName || currentUser.email.split('@')[0];
-    if (dropdownNameMobile) dropdownNameMobile.textContent = studentData?.displayName || currentUser.email.split('@')[0];
-    
-    // Update emails
-    const dropdownEmail = document.getElementById('profileDropdownEmail');
-    const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
-    if (dropdownEmail) dropdownEmail.textContent = currentUser.email;
-    if (dropdownEmailMobile) dropdownEmailMobile.textContent = currentUser.email;
-    
-}document.querySelectorAll('.stat-value').forEach(el => {
-    if (el.textContent === '0' || el.textContent === '--') {
-        el.innerHTML = '<div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>';
-    }
-});
-    async function loadProgressData(userEmail) {
-    try {
-        console.log('Loading progress data for:', userEmail);
-        
-        const resultsQuery = query(
-            collection(db, 'testResults'),
-            where('studentEmail', '==', userEmail)
-        );
-        
-        const resultsSnapshot = await getDocs(resultsQuery);
-        
-        console.log('Total test results found:', resultsSnapshot.size);
-        
-        if (resultsSnapshot.empty) {
-            console.log('No test results found');
-            // Show empty state for all stats
-            document.getElementById('totalTests').textContent = '0';
-            document.getElementById('overallImprovement').textContent = '0%';
-            document.getElementById('bestCategory').textContent = '--';
-            document.getElementById('lastTestDate').textContent = '--';
-        
-        
-            renderEmptyState('cardioChart', 'Cardiorespiratory Endurance');
-            renderEmptyState('muscularChart', 'Muscular Strength and Endurance');
-            renderEmptyState('flexibilityChart', 'Flexibility');
-            renderEmptyState('bodyCompChart', 'Body Composition');
-            return;
-        }
-        
-            const categoryData = {
-        'Cardiorespiratory Endurance': [],
-        'Muscular Strength and Endurance': [],
-        'Flexibility': [],
-        'Body Composition': []
-    };
-
-    const categoryScores = {
-        'Cardiorespiratory Endurance': [],
-        'Muscular Strength and Endurance': [],
-        'Flexibility': [],
-        'Body Composition': []
-    };
-        
-        let allTestResults = [];
-        
-        resultsSnapshot.forEach((doc) => {
-            const result = doc.data();
-            console.log('Processing result:', result.testName, result.result);
-            
-            const category = getCategoryForTest(result.testName);
-            
-            if (category) {
-                const score = calculateTestScore(result.testName, result.result, result.testTarget);
+        async function loadProfessorSections() {
+            try {
+                console.log('Loading professor sections...');
                 
-                // Parse the date properly
-                let testDate;
-                let timestamp;
+                professorSections = [];
+                professorStudents = [];
                 
-                if (result.submittedAt) {
-                    if (result.submittedAt.toDate) {
-                        testDate = result.submittedAt.toDate();
-                    } else if (result.submittedAt.seconds) {
-                        testDate = new Date(result.submittedAt.seconds * 1000);
-                    } else {
-                        testDate = new Date(result.submittedAt);
+                // Get professor's name for matching
+                const professorName = currentProfessor.fullName || currentProfessor.name || '';
+                const professorEmail = currentProfessor.email;
+                
+                console.log('Professor name for matching:', professorName);
+                console.log('Professor email:', professorEmail);
+                
+                // Query sections collection for this professor
+                // Try multiple matching strategies
+                const sectionsQuery = query(
+                    collection(db, 'sections')
+                );
+                const sectionsSnapshot = await getDocs(sectionsQuery);
+                
+                console.log('Total sections in database:', sectionsSnapshot.size);
+                
+                sectionsSnapshot.forEach((doc) => {
+                    const sectionData = doc.data();
+                    
+                    // Check if this professor teaches this section
+                    // Match by email or name
+                    const professorMatches = 
+                        sectionData.professor === professorName ||
+                        sectionData.professorEmail === professorEmail ||
+                        (sectionData.professor && professorName.includes(sectionData.professor)) ||
+                        (sectionData.professor && sectionData.professor.includes(professorName));
+                    
+                    if (professorMatches) {
+                        console.log(`✓ Section assigned: ${sectionData.name}`);
+                        
+                        professorSections.push({
+                            id: doc.id,
+                            ...sectionData
+                        });
+                        
+                        // Add students from this section
+                        if (sectionData.students && Array.isArray(sectionData.students)) {
+                            sectionData.students.forEach(student => {
+                                professorStudents.push({
+                                    ...student,
+                                    section: sectionData.name,
+                                    sectionId: doc.id
+                                });
+                            });
+                        }
                     }
-                } else {
-                    testDate = new Date();
+                });
+                
+                console.log(`Found ${professorSections.length} sections with ${professorStudents.length} students`);
+                
+                // Update UI
+                document.getElementById('assignedSections').textContent = professorSections.length;
+                document.getElementById('statSections').textContent = professorSections.length;
+                document.getElementById('statStudents').textContent = professorStudents.length;
+                
+                // Display sections if any found
+                if (professorSections.length > 0) {
+                    document.getElementById('sectionsContainer').style.display = 'block';
+                    displaySections();
                 }
                 
-                timestamp = testDate.getTime();
-                const formattedDate = testDate.toLocaleDateString('en-US', { 
-                    month: 'short', 
+            } catch (error) {
+                console.error('Error loading sections:', error);
+            }
+        }
+
+        function displaySections() {
+            const sectionsGrid = document.getElementById('sectionsGrid');
+            
+            if (professorSections.length === 0) {
+                sectionsGrid.innerHTML = `
+                    <div class="col-12">
+                        <div class="empty-state">
+                            <div class="empty-icon">📚</div>
+                            <div class="empty-title">No Sections Assigned</div>
+                            <div class="empty-text">Sections assigned by the secretary will appear here</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            professorSections.forEach(section => {
+                const students = section.students || [];
+                const firstFewStudents = students.slice(0, 5);
+                const remainingCount = Math.max(0, students.length - 5);
+                
+                let studentsHtml = '';
+                firstFewStudents.forEach(student => {
+                    const displayName = student.name || student.email || 'Unknown Student';
+                    studentsHtml += `<span class="student-badge">${displayName}</span>`;
+                });
+                
+                if (remainingCount > 0) {
+                    studentsHtml += `<span class="student-badge">+${remainingCount} more</span>`;
+                }
+                
+                html += `
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-name">${section.name || 'Unnamed Section'}</div>
+                            <div class="section-student-count">${students.length} students</div>
+                        </div>
+                        <div class="section-details">
+                            <div class="section-detail">
+                                <i class="fas fa-book" style="color: #6b7280;"></i>
+                                <span>${section.courseCode || 'PE 3'}</span>
+                            </div>
+                            <div class="section-detail">
+                                <i class="fas fa-user-tie" style="color: #6b7280;"></i>
+                                <span>${section.professor || 'Professor'}</span>
+                            </div>
+                            <div class="section-detail">
+                                <i class="fas fa-calendar-alt" style="color: #6b7280;"></i>
+                                <span>Updated: ${formatDate(section.lastUpdated || section.createdAt)}</span>
+                            </div>
+                        </div>
+                        ${students.length > 0 ? `
+                            <div class="section-students">
+                                <div class="section-students-title">
+                                    <i class="fas fa-users"></i>
+                                    Students in this section:
+                                </div>
+                                <div>${studentsHtml}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            sectionsGrid.innerHTML = html;
+        }
+
+        async function loadProfessorStatistics() {
+            try {
+                // Initialize stats
+                document.getElementById('statCompleted').textContent = '0';
+                document.getElementById('statAverage').textContent = '0';
+                document.getElementById('statPending').textContent = '0';
+                document.getElementById('statRate').textContent = '0%';
+                
+                // Get student IDs for querying activities
+                const studentIds = professorStudents.map(s => s.studentId || s.uid || s.email);
+                if (studentIds.length === 0) return;
+                
+                // Query activity results for these students
+                const activitiesQuery = query(
+                    collection(db, 'activityResults'),
+                    where('studentId', 'in', studentIds.slice(0, 10)) // Firestore limit of 10 for 'in' queries
+                );
+                const activitiesSnapshot = await getDocs(activitiesQuery);
+                
+                let completedCount = 0;
+                let totalScore = 0;
+                let pendingCount = 0;
+                
+                activitiesSnapshot.forEach(doc => {
+                    const activity = doc.data();
+                    if (activity.status === 'completed') {
+                        completedCount++;
+                        const score = parseFloat(activity.score) || 0;
+                        totalScore += score;
+                    } else if (activity.status === 'pending') {
+                        pendingCount++;
+                    }
+                });
+                
+                // Update stats
+                document.getElementById('statCompleted').textContent = completedCount;
+                document.getElementById('statPending').textContent = pendingCount;
+                
+                const averageScore = completedCount > 0 ? Math.round(totalScore / completedCount) : 0;
+                document.getElementById('statAverage').textContent = averageScore;
+                
+                const totalAssigned = completedCount + pendingCount;
+                const completionRate = totalAssigned > 0 ? Math.round((completedCount / totalAssigned) * 100) : 0;
+                document.getElementById('statRate').textContent = completionRate + '%';
+                
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        function setupRealtimeMonitoring() {
+            try {
+                // Get student IDs for monitoring
+                const studentIds = professorStudents.map(s => s.studentId || s.uid || s.email);
+                
+                if (studentIds.length > 0) {
+                    // Set up real-time listener for active tests
+                    const activeTestsQuery = query(
+                        collection(db, 'activeTests'),
+                        where('studentId', 'in', studentIds.slice(0, 10)),
+                        where('status', '==', 'active')
+                    );
+                    
+                    onSnapshot(activeTestsQuery, (snapshot) => {
+                        updateActiveTestsList(snapshot);
+                    });
+                    
+                    // Set up real-time listener for recent completions
+                    const recentCompletionsQuery = query(
+                        collection(db, 'activityResults'),
+                        where('studentId', 'in', studentIds.slice(0, 10)),
+                        where('status', '==', 'completed'),
+                        orderBy('submittedAt', 'desc')
+                    );
+                    
+                    onSnapshot(recentCompletionsQuery, (snapshot) => {
+                        updateRecentCompletions(snapshot);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error setting up real-time monitoring:', error);
+            }
+        }
+
+        function updateActiveTestsList(snapshot) {
+            const container = document.getElementById('activeTestsList');
+            
+            if (snapshot.empty) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👥</div>
+                        <div class="empty-title">No Active Activities</div>
+                        <div class="empty-text">Students will appear here when they start activities</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            let count = 0;
+            snapshot.forEach((doc) => {
+                if (count >= 8) return; // Limit to 8
+                count++;
+                
+                const activity = doc.data();
+                const progress = activity.progress || 0;
+                const studentName = activity.studentName || 'Unknown Student';
+                const initials = getInitials(studentName);
+                
+                // Find student info
+                const studentInfo = professorStudents.find(s => 
+                    s.studentId === activity.studentId || 
+                    s.email === activity.studentEmail ||
+                    s.uid === activity.studentId
+                );
+                
+                const section = studentInfo?.section || 'N/A';
+                
+                html += `
+                    <div class="student-item">
+                        <div class="student-avatar">${initials}</div>
+                        <div class="student-info">
+                            <div class="student-name">${studentName}</div>
+                            <div class="student-details">
+                                <span>${section}</span>
+                                <span>${activity.activityName || 'Unnamed Activity'}</span>
+                            </div>
+                        </div>
+                        <div class="student-status">
+                            <div class="status-dot active"></div>
+                            <span class="status-active">${progress}%</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function updateRecentCompletions(snapshot) {
+            const container = document.getElementById('recentCompletions');
+            
+            if (snapshot.empty) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">✅</div>
+                        <div class="empty-title">No Recent Activities</div>
+                        <div class="empty-text">Completed activities will appear here</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            let count = 0;
+            snapshot.forEach((doc) => {
+                if (count >= 5) return; // Show only 5 most recent
+                count++;
+                
+                const result = doc.data();
+                const studentName = result.studentName || 'Unknown Student';
+                const activityName = result.activityName || 'Unknown Activity';
+                const score = result.score || 0;
+                const initials = getInitials(studentName);
+                
+                // Find student info
+                const studentInfo = professorStudents.find(s => 
+                    s.studentId === result.studentId || 
+                    s.email === result.studentEmail ||
+                    s.uid === result.studentId
+                );
+                
+                const section = studentInfo?.section || 'N/A';
+                
+                html += `
+                    <div class="student-item">
+                        <div class="student-avatar">${initials}</div>
+                        <div class="student-info">
+                            <div class="student-name">${studentName}</div>
+                            <div class="student-details">
+                                <span>${section}</span>
+                                <span>${activityName}</span>
+                            </div>
+                        </div>
+                        <div class="student-status">
+                            <span>Score: ${score}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function getInitials(name) {
+            if (!name) return '??';
+            const nameParts = name.split(' ');
+            if (nameParts.length >= 2) {
+                return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+            }
+            return name.substring(0, 2).toUpperCase();
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return 'Unknown';
+            
+            try {
+                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+                return date.toLocaleDateString('en-US', {
+                    month: 'short',
                     day: 'numeric',
                     year: 'numeric'
                 });
-                
-                const testData = {
-                    testName: result.testName,
-                    score: score,
-                    result: result.result,
-                    date: formattedDate,
-                    timestamp: timestamp
-                };
-                
-                // Add to category data
-                categoryData[category].push(testData);
-                categoryScores[category].push(score);
-                
-                // Add to all test results
-                allTestResults.push(testData);
-                
-                console.log(`Added ${result.testName} to ${category}: score=${score}, date=${formattedDate}`);
-            } else {
-                console.warn('No category found for test:', result.testName);
-            }
-        });
-        
-        // Sort all data by timestamp (chronological order)
-        Object.keys(categoryData).forEach(category => {
-            categoryData[category].sort((a, b) => a.timestamp - b.timestamp);
-            console.log(`${category} has ${categoryData[category].length} tests`);
-        });
-        
-        allTestResults.sort((a, b) => a.timestamp - b.timestamp);
-        
-        // Calculate statistics
-        const totalTests = resultsSnapshot.size;
-        let overallImprovement = 0;
-        
-        // Calculate improvement
-        if (allTestResults.length >= 2) {
-            const firstTest = allTestResults[0];
-            const lastTest = allTestResults[allTestResults.length - 1];
-            
-            if (firstTest.score > 0) {
-                overallImprovement = Math.round(((lastTest.score - firstTest.score) / firstTest.score) * 100);
-            }
-            
-            // Apply bounds
-            overallImprovement = Math.max(-50, Math.min(100, overallImprovement));
-            
-            // If improvement is very small, treat as stable
-            if (Math.abs(overallImprovement) < 3) {
-                overallImprovement = 0;
+            } catch (error) {
+                return 'Invalid date';
             }
         }
-        
-        // Find best category
-        let bestCategory = '--';
-        let bestScore = 0;
-        Object.entries(categoryScores).forEach(([category, scores]) => {
-            if (scores.length > 0) {
-                const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
-                if (avgScore > bestScore) {
-                    bestScore = avgScore;
-                    bestCategory = category;
+
+        async function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    await signOut(auth);
+                    window.location.href = '/login/index.html';
+                } catch (error) {
+                    console.error('Error logging out:', error);
+                    alert('Error logging out. Please try again.');
                 }
             }
-        });
-        
-        // Get last test info
-        let lastTestDate = '--';
-        let lastTestNameText = 'No tests taken';
-        
-        if (allTestResults.length > 0) {
-            const lastTest = allTestResults[allTestResults.length - 1];
-            lastTestDate = lastTest.date;
-            lastTestNameText = lastTest.testName;
         }
-        
-        // UPDATE STAT CARDS
-        document.getElementById('totalTests').textContent = totalTests;
-        document.getElementById('totalTestsTrend').innerHTML = totalTests > 0 
-            ? `<i class="bi bi-check-circle-fill"></i><span>${totalTests} completed</span>`
-            : `<i class="bi bi-dash"></i><span>No data yet</span>`;
-        
-        document.getElementById('overallImprovement').textContent = 
-            overallImprovement > 0 ? `+${overallImprovement}%` : `${overallImprovement}%`;
-        
-        // Update improvement trend
-        const improvementTrend = document.getElementById('improvementTrend');
-        if (overallImprovement > 5) {
-            improvementTrend.className = 'stat-trend positive';
-            improvementTrend.innerHTML = `<i class="bi bi-arrow-up-circle-fill"></i><span>Great progress!</span>`;
-        } else if (overallImprovement < -5) {
-            improvementTrend.className = 'stat-trend negative';
-            improvementTrend.innerHTML = `<i class="bi bi-arrow-down-circle-fill"></i><span>Keep practicing</span>`;
-        } else {
-            improvementTrend.className = 'stat-trend neutral';
-            improvementTrend.innerHTML = totalTests > 1 
-                ? `<i class="bi bi-dash-circle"></i><span>Stable performance</span>`
-                : `<i class="bi bi-dash"></i><span>Take more tests</span>`;
-        }
-        
-        document.getElementById('bestCategory').textContent = bestCategory;
-        document.getElementById('bestCategoryScore').className = bestScore > 0 ? 'stat-trend positive' : 'stat-trend neutral';
-        document.getElementById('bestCategoryScoreText').textContent = bestScore > 0 
-            ? `${Math.round(bestScore)} avg score`
-            : 'No data';
-        
-        document.getElementById('lastTestDate').textContent = lastTestDate;
-        document.getElementById('lastTestName').innerHTML = `<i class="bi bi-clock-history"></i><span>${lastTestNameText}</span>`;
-        
-        // Create progress charts with CORRECT category names
-    createProgressChart('cardioChart', categoryData['Cardiorespiratory Endurance'], 'Cardiorespiratory Endurance');
-    createProgressChart('muscularChart', categoryData['Muscular Strength and Endurance'], 'Muscular Strength and Endurance');
-    createProgressChart('flexibilityChart', categoryData['Flexibility'], 'Flexibility');
-    createProgressChart('bodyCompChart', categoryData['Body Composition'], 'Body Composition');
-        
-        console.log('Progress data loaded successfully');
-        
-    } catch (error) {
-        console.error('Error loading progress data:', error);
-        
-        // Show error state
-        document.getElementById('totalTests').textContent = 'Error';
-        document.getElementById('overallImprovement').textContent = 'Error';
-        document.getElementById('bestCategory').textContent = 'Error';
-        document.getElementById('lastTestDate').textContent = 'Error';
-        
-        ['cardioChart', 'strengthChart', 'enduranceChart', 'flexibilityChart', 'bodyCompChart'].forEach(id => {
-            const container = document.getElementById(id);
-            if (container) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">⚠️</div>
-                        <div class="empty-title">Error Loading Data</div>
-                        <div class="empty-description">Please refresh the page to try again</div>
-                    </div>
-                `;
-            }
-        });
-    }
-}
 
+        // Export functions to global scope
+        window.handleLogout = handleLogout;
 
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        try {
-            console.log('User authenticated:', user.email);
-            currentUser = user;
-            
-            // Load student data from Firestore
-            const studentsQuery = query(
-                collection(db, 'students'),
-                where('email', '==', user.email)
-            );
-            
-            const studentsSnapshot = await getDocs(studentsQuery);
-            
-            if (!studentsSnapshot.empty) {
-                const studentDoc = studentsSnapshot.docs[0];
-                const data = studentDoc.data();
-                studentData = {
-                    displayName: `${data.firstName || ''} ${data.lastName || ''}`.trim() || user.email.split('@')[0],
-                    email: user.email,
-                    firstName: data.firstName || '',
-                    lastName: data.lastName || ''
-                };
-                console.log('Student data loaded:', studentData);
-            } else {
-                // Fallback if student document doesn't exist
-                studentData = {
-                    displayName: user.displayName || user.email.split('@')[0],
-                    email: user.email
-                };
-                console.log('Using fallback student data:', studentData);
-            }
-            
-            // Update profile UI
-            updateProfileUI();
-            
-            // Load progress data
-            console.log('Loading progress for:', user.email);
-            await loadProgressData(user.email);
-            
-            console.log('Page fully loaded');
-            
-        } catch (error) {
-            console.error('Error loading page:', error);
-            console.error('Error stack:', error.stack);
-            alert('Error loading your progress data. Please refresh the page.');
-        }
-    } else {
-        console.log('No user authenticated, redirecting to login');
-        window.location.href = '../login/index.html';
-    }
-});
-</script>
+    </script>
 </body>
 </html>
