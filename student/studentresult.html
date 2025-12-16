@@ -781,140 +781,150 @@ function calculateScore(testName, result, testTarget = null) {
     
     console.log(`🎯 Score Calculation: ${testName} | Value: ${numericValue} | Target: ${testTarget}`);
     
-    // Use test target if available
-    if (testTarget && testTarget > 0) {
-        if (normalized.includes('push-up') || normalized.includes('pushup') || 
-            normalized.includes('sit-up') || normalized.includes('situp') ||
-            normalized.includes('curl-up') || normalized.includes('curl up')) {
-            // Repetition-based tests - MORE IS BETTER
-            const percentage = (numericValue / testTarget) * 100;
-            if (percentage >= 100) return 100;
-            if (percentage >= 90) return 95;
-            if (percentage >= 80) return 90;
-            if (percentage >= 70) return 85;
-            if (percentage >= 60) return 80;
-            if (percentage >= 50) return 75;
-            if (percentage >= 40) return 70;
-            return Math.max(50, Math.round(percentage));
-        }
-        
-        if (normalized.includes('plank')) {
-            // Time-based (seconds) - MORE IS BETTER
-            const percentage = (numericValue / testTarget) * 100;
-            if (percentage >= 100) return 100;
-            if (percentage >= 90) return 95;
-            if (percentage >= 80) return 90;
-            if (percentage >= 70) return 85;
-            if (percentage >= 60) return 80;
-            if (percentage >= 50) return 75;
-            return Math.max(50, Math.round(percentage));
-        }
-        
-        if (normalized.includes('grip')) {
-            // Strength (kg) - MORE IS BETTER
-            const percentage = (numericValue / testTarget) * 100;
-            if (percentage >= 100) return 100;
-            if (percentage >= 90) return 95;
-            if (percentage >= 80) return 90;
-            if (percentage >= 70) return 85;
-            if (percentage >= 60) return 80;
-            if (percentage >= 50) return 75;
-            return Math.max(50, Math.round(percentage));
-        }
-        
-        if (normalized.includes('sit-and-reach')) {
-            // Distance (cm) - MORE IS BETTER
-            const percentage = (numericValue / testTarget) * 100;
-            if (percentage >= 100) return 100;
-            if (percentage >= 90) return 95;
-            if (percentage >= 80) return 90;
-            if (percentage >= 70) return 85;
-            if (percentage >= 60) return 80;
-            if (percentage >= 50) return 75;
-            return Math.max(50, Math.round(percentage));
-        }
-        
-        if (normalized.includes('mile') || normalized.includes('run')) {
-            // Time-based - LOWER IS BETTER (faster = better)
-            const percentage = (testTarget / numericValue) * 100;
-            if (percentage >= 100) return 100;
-            if (percentage >= 90) return 95;
-            if (percentage >= 80) return 90;
-            if (percentage >= 70) return 85;
-            if (percentage >= 60) return 80;
-            if (percentage >= 50) return 75;
-            return Math.max(50, Math.round(percentage));
-        }
-        
-        if (normalized.includes('step test') || normalized.includes('3-minute')) {
-            // Heart rate - LOWER IS BETTER
-            const percentage = (testTarget / numericValue) * 100;
-            if (percentage >= 100) return 100;
-            if (percentage >= 90) return 95;
-            if (percentage >= 80) return 90;
-            if (percentage >= 70) return 85;
-            if (percentage >= 60) return 80;
-            if (percentage >= 50) return 75;
-            return Math.max(50, Math.round(percentage));
-        }
-        
-        if (normalized.includes('bmi')) {
-            const bmi = numericValue;
-            // Optimal BMI range is 18.5-24.9
-            if (bmi >= 18.5 && bmi <= 24.9) return 100;
-            if (bmi >= 17.0 && bmi < 18.5) return 85;
-            if (bmi >= 25.0 && bmi < 27.0) return 85;
-            if (bmi >= 16.0 && bmi < 17.0) return 70;
-            if (bmi >= 27.0 && bmi < 30.0) return 70;
-            if (bmi >= 15.0 && bmi < 16.0) return 60;
-            if (bmi >= 30.0 && bmi < 35.0) return 60;
-            return 50;
-        }
-        
-        if (normalized.includes('skinfold')) {
-            // Body fat percentage - depends on target
-            const percentage = Math.abs(1 - Math.abs(numericValue - testTarget) / testTarget) * 100;
-            return Math.max(50, Math.round(percentage));
-        }
+    // If no target set, use default scoring
+    if (!testTarget || testTarget <= 0) {
+        return calculateDefaultScore(normalized, numericValue);
     }
     
-    // Fallback to default scoring if no target
+    // REPETITION TESTS (push-ups, sit-ups, curl-ups)
+    if (normalized.includes('push-up') || normalized.includes('pushup') || 
+        normalized.includes('sit-up') || normalized.includes('situp') ||
+        normalized.includes('curl-up') || normalized.includes('curl up')) {
+        
+        // Perfect score if meets or exceeds target
+        if (numericValue >= testTarget) return 100;
+        
+        const percentage = (numericValue / testTarget) * 100;
+        if (percentage >= 90) return 95;
+        if (percentage >= 80) return 90;
+        if (percentage >= 70) return 85;
+        if (percentage >= 60) return 80;
+        if (percentage >= 50) return 75;
+        if (percentage >= 40) return 70;
+        return Math.max(50, Math.round(percentage));
+    }
+    
+    // PLANK (seconds)
+    if (normalized.includes('plank')) {
+        if (numericValue >= testTarget) return 100;
+        
+        const percentage = (numericValue / testTarget) * 100;
+        if (percentage >= 90) return 95;
+        if (percentage >= 80) return 90;
+        if (percentage >= 70) return 85;
+        if (percentage >= 60) return 80;
+        if (percentage >= 50) return 75;
+        return Math.max(50, Math.round(percentage));
+    }
+    
+    // GRIP STRENGTH (kg)
+    if (normalized.includes('grip')) {
+        if (numericValue >= testTarget) return 100;
+        
+        const percentage = (numericValue / testTarget) * 100;
+        if (percentage >= 90) return 95;
+        if (percentage >= 80) return 90;
+        if (percentage >= 70) return 85;
+        if (percentage >= 60) return 80;
+        if (percentage >= 50) return 75;
+        return Math.max(50, Math.round(percentage));
+    }
+    
+    // SIT-AND-REACH (cm)
+    if (normalized.includes('sit-and-reach')) {
+        if (numericValue >= testTarget) return 100;
+        
+        const percentage = (numericValue / testTarget) * 100;
+        if (percentage >= 90) return 95;
+        if (percentage >= 80) return 90;
+        if (percentage >= 70) return 85;
+        if (percentage >= 60) return 80;
+        if (percentage >= 50) return 75;
+        return Math.max(50, Math.round(percentage));
+    }
+    
+    // 1-MILE RUN (seconds - LOWER IS BETTER)
+    if (normalized.includes('mile') || normalized.includes('run')) {
+        // If student time is <= target, perfect score
+        if (numericValue <= testTarget) return 100;
+        
+        const percentage = (testTarget / numericValue) * 100;
+        if (percentage >= 90) return 95;
+        if (percentage >= 80) return 90;
+        if (percentage >= 70) return 85;
+        if (percentage >= 60) return 80;
+        if (percentage >= 50) return 75;
+        return Math.max(50, Math.round(percentage));
+    }
+    
+    // STEP TEST (heart rate - LOWER IS BETTER)
+    if (normalized.includes('step test') || normalized.includes('3-minute')) {
+        if (numericValue <= testTarget) return 100;
+        
+        const percentage = (testTarget / numericValue) * 100;
+        if (percentage >= 90) return 95;
+        if (percentage >= 80) return 90;
+        if (percentage >= 70) return 85;
+        if (percentage >= 60) return 80;
+        if (percentage >= 50) return 75;
+        return Math.max(50, Math.round(percentage));
+    }
+    
+    // BMI
+    if (normalized.includes('bmi')) {
+        const bmi = numericValue;
+        if (bmi >= 18.5 && bmi <= 24.9) return 100;
+        if (bmi >= 17.0 && bmi < 18.5) return 85;
+        if (bmi >= 25.0 && bmi < 27.0) return 85;
+        if (bmi >= 16.0 && bmi < 17.0) return 70;
+        if (bmi >= 27.0 && bmi < 30.0) return 70;
+        return 60;
+    }
+    
+    // SKINFOLD
+    if (normalized.includes('skinfold')) {
+        const difference = Math.abs(numericValue - testTarget);
+        const percentage = Math.abs(1 - difference / testTarget) * 100;
+        return Math.max(50, Math.round(percentage));
+    }
+    
+    // Default for other tests
     return calculateDefaultScore(normalized, numericValue);
 }
 
-function calculateDefaultScore(normalized, numericValue) {
-    if (normalized.includes('push-up') || normalized.includes('pushup')) {
-        if (numericValue >= 40) return 100;
-        if (numericValue >= 30) return 90;
-        if (numericValue >= 20) return 80;
-        return 70;
-    }
-    if (normalized.includes('curl-up')) {
-        if (numericValue >= 75) return 100;
-        if (numericValue >= 50) return 90;
-        if (numericValue >= 30) return 80;
-        return 70;
-    }
-    if (normalized.includes('grip')) {
-        if (numericValue >= 60) return 100;
-        if (numericValue >= 50) return 90;
-        if (numericValue >= 40) return 80;
-        return 70;
-    }
-    if (normalized.includes('plank')) {
-        if (numericValue >= 120) return 100;
-        if (numericValue >= 90) return 90;
-        if (numericValue >= 60) return 80;
-        return 70;
-    }
-    if (normalized.includes('sit-and-reach')) {
-        if (numericValue >= 20) return 100;
-        if (numericValue >= 15) return 90;
-        if (numericValue >= 10) return 80;
-        return 70;
-    }
-    return 75;
-}
+            function calculateDefaultScore(normalized, numericValue) {
+                if (normalized.includes('push-up') || normalized.includes('pushup')) {
+                    if (numericValue >= 40) return 100;
+                    if (numericValue >= 30) return 90;
+                    if (numericValue >= 20) return 80;
+                    return 70;
+                }
+                if (normalized.includes('curl-up')) {
+                    if (numericValue >= 75) return 100;
+                    if (numericValue >= 50) return 90;
+                    if (numericValue >= 30) return 80;
+                    return 70;
+                }
+                if (normalized.includes('grip')) {
+                    if (numericValue >= 60) return 100;
+                    if (numericValue >= 50) return 90;
+                    if (numericValue >= 40) return 80;
+                    return 70;
+                }
+                if (normalized.includes('plank')) {
+                    if (numericValue >= 120) return 100;
+                    if (numericValue >= 90) return 90;
+                    if (numericValue >= 60) return 80;
+                    return 70;
+                }
+                if (normalized.includes('sit-and-reach')) {
+                    if (numericValue >= 20) return 100;
+                    if (numericValue >= 15) return 90;
+                    if (numericValue >= 10) return 80;
+                    return 70;
+                }
+                return 75;
+            }
 
         function getRating(score) {
             if (score >= 90) return { text: 'Excellent', class: 'rating-excellent' };

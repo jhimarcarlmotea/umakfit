@@ -306,32 +306,27 @@
         const VISIBLE_HISTORY_COUNT = 2;
 
             const testCategories = {
-                'Cardiorespiratory Endurance': {
-                    tests: ['3-Minute Step Test', '1-Mile Run', '1 Mile Run'],
-                    icon: 'https://c.animaapp.com/HN7hFbsr/img/image-148@2x.png',
-                    subtitle: 'Heart and lung fitness tests'
-                },
-                'Muscular Strength': {
-                    tests: ['Push-Up Test', 'Grip Strength'],
-                    icon: 'https://c.animaapp.com/HN7hFbsr/img/image-149@2x.png',
-                    subtitle: 'Maximum force tests'
-                },
-                'Muscular Endurance': {
-                    tests: ['Curl-Up Test', 'Push-up Test', 'Plank Hold'],
-                    icon: 'https://c.animaapp.com/HN7hFbsr/img/image-150@2x.png',
-                    subtitle: 'Repeated contractions tests'
-                },
-                'Flexibility': {
-                    tests: ['Sit-and-Reach', 'Shoulder Flexibility'],
-                    icon: 'https://c.animaapp.com/HN7hFbsr/img/image-48@2x.png',
-                    subtitle: 'Range of motion tests'
-                },
-                'Body Composition': {
-                    tests: ['BMI Assessment', 'Skinfold Caliper Measurements'],
-                    icon: 'https://c.animaapp.com/HN7hFbsr/img/image-151@2x.png',
-                    subtitle: 'Body fat and mass tests'
-                }
-            };
+    'Cardiorespiratory Endurance': {
+        tests: ['3-Minute Step Test'],
+        icon: 'https://c.animaapp.com/HN7hFbsr/img/image-148@2x.png',
+        subtitle: 'Heart and lung fitness tests'
+    },
+    'Muscular Strength and Endurance': {
+        tests: ['Curl-Up Test', 'Push-Up Test'],
+        icon: 'https://c.animaapp.com/HN7hFbsr/img/image-150@2x.png',
+        subtitle: 'Strength and endurance tests'
+    },
+    'Flexibility': {
+        tests: ['Sit-and-Reach'],
+        icon: 'https://c.animaapp.com/HN7hFbsr/img/image-48@2x.png',
+        subtitle: 'Range of motion tests'
+    },
+    'Body Composition': {
+        tests: ['Skinfold Caliper Measurements'],
+        icon: 'https://c.animaapp.com/HN7hFbsr/img/image-151@2x.png',
+        subtitle: 'Body fat and mass tests'
+    }
+};
 
         // Mobile menu toggle
         window.toggleMobileMenu = function() {
@@ -503,11 +498,15 @@ async function loadNotificationDropdown() {
 }
         function getCategoryForTest(testName) {
             for (const [category, data] of Object.entries(testCategories)) {
-                if (data.tests.some(t => testName.toLowerCase().includes(t.toLowerCase()) || t.toLowerCase().includes(testName.toLowerCase()))) {
+                if (data.tests.some(t => {
+                    const testLower = testName.toLowerCase();
+                    const categoryTestLower = t.toLowerCase();
+                    return testLower.includes(categoryTestLower) || categoryTestLower.includes(testLower);
+                })) {
                     return category;
                 }
             }
-            return 'Cardio Endurance';
+            return 'Cardiorespiratory Endurance'; // Default fallback
         }
 
         async function loadStudentData(user) {
@@ -629,7 +628,7 @@ async function loadNotificationDropdown() {
 
         console.log('📋 Loading tests for section:', studentData.section);
         
-        // Query for ALL tests in the student's section
+        // Simplified query - only filter by section, then filter visibility in memory
         const testsQuery = query(
             collection(db, 'scheduledTests'),
             where('section', '==', studentData.section)
@@ -639,9 +638,9 @@ async function loadNotificationDropdown() {
         availableTests = [];
         const now = new Date();
         
-        console.log(`📊 Found ${testsSnapshot.size} tests in database for section ${studentData.section}`);
+        console.log(`📊 Found ${testsSnapshot.size} total tests for section ${studentData.section}`);
         
-        // Get all completed tests
+        // Get all completed tests by this student
         const completedTestsQuery = query(
             collection(db, 'testResults'),
             where('studentEmail', '==', studentData.email)
@@ -654,17 +653,19 @@ async function loadNotificationDropdown() {
         completedTestsSnapshot.forEach(doc => {
             const result = doc.data();
             const testId = result.testId;
-            const score = calculateTestScore(result.testName, result.result, result.testTarget);
+            const score = calculateTestScore(result.testName, result.resultData || result.result, result.testTarget);
             
             if (!testStatus.has(testId)) {
                 testStatus.set(testId, {
                     attempts: 0,
-                    bestScore: 0
+                    bestScore: 0,
+                    scores: []
                 });
             }
             
             const status = testStatus.get(testId);
             status.attempts++;
+            status.scores.push(score);
             if (score > status.bestScore) {
                 status.bestScore = score;
             }
@@ -674,7 +675,17 @@ async function loadNotificationDropdown() {
             testsSnapshot.forEach((doc) => {
                 const test = { id: doc.id, ...doc.data() };
                 
-                console.log(`🔍 Processing test: ${test.testName}`, test);
+                // Filter visibility in code instead of query
+                if (test.isVisible !== true || test.isActive !== true) {
+                    console.log(`❌ Skipping test ${test.testName}: Not visible or not active`);
+                    return;
+                }
+                
+                console.log(`🔍 Processing test: ${test.testName}`, {
+                    isVisible: test.isVisible,
+                    isActive: test.isActive,
+                    section: test.section
+                });
                 
                 // Calculate deadline
                 let deadlineDateTime;
@@ -692,7 +703,7 @@ async function loadNotificationDropdown() {
                 
                 console.log(`⏰ Test deadline: ${deadlineDateTime}, Now: ${now}`);
             
-                // SIMPLIFIED LOGIC: Only check if deadline hasn't passed
+                // Check if deadline hasn't passed
                 if (deadlineDateTime >= now) {
                     const status = testStatus.get(test.id);
                     
@@ -718,10 +729,10 @@ async function loadNotificationDropdown() {
                 }
             });
         } else {
-            console.log('❌ No tests found for section:', studentData.section);
+            console.log('⚠️ No tests found for section:', studentData.section);
         }
         
-        console.log(`🎯 Available tests for student: ${availableTests.length}`);
+        console.log(`🎯 Total available tests for student: ${availableTests.length}`);
         await renderCategoryCards();
         
     } catch (error) {
@@ -730,13 +741,14 @@ async function loadNotificationDropdown() {
         renderEmptyState();
     }
 }
-                function setupTestUpdatesForStudent() {
+
+    function setupTestUpdatesForStudent() {
     try {
         if (!studentData || !studentData.section) return;
         
         console.log('👂 Setting up real-time test updates for student section:', studentData.section);
         
-        // Listen for ALL changes to tests in the student's section
+        // Simplified query - filter visibility in memory
         const testsQuery = query(
             collection(db, 'scheduledTests'),
             where('section', '==', studentData.section)
@@ -744,18 +756,31 @@ async function loadNotificationDropdown() {
         
         onSnapshot(testsQuery, (snapshot) => {
             console.log('🔄 Real-time test update detected!');
+            console.log('Total tests in snapshot:', snapshot.size);
             
             snapshot.docChanges().forEach((change) => {
-                if (change.type === 'added') {
-                    const testData = change.doc.data();
-                    console.log('🆕 NEW TEST ADDED:', testData.testName);
-                    console.log('📋 Test details:', testData);
+                const testData = change.doc.data();
+                
+                // Only log if test is visible and active
+                if (testData.isVisible === true && testData.isActive === true) {
+                    if (change.type === 'added') {
+                        console.log('🆕 NEW VISIBLE TEST ADDED:', testData.testName);
+                        console.log('📋 Test details:', {
+                            id: change.doc.id,
+                            testName: testData.testName,
+                            section: testData.section,
+                            deadline: testData.deadline,
+                            isVisible: testData.isVisible,
+                            isActive: testData.isActive
+                        });
+                    }
+                    if (change.type === 'modified') {
+                        console.log('✏️ TEST MODIFIED:', testData.testName);
+                    }
                 }
-                if (change.type === 'modified') {
-                    console.log('✏️ TEST MODIFIED:', change.doc.data().testName);
-                }
+                
                 if (change.type === 'removed') {
-                    console.log('🗑️ TEST REMOVED:', change.doc.data().testName);
+                    console.log('🗑️ TEST REMOVED:', testData.testName);
                 }
             });
             
@@ -791,13 +816,13 @@ async function loadNotificationDropdown() {
     console.log(`🔍 After deduplication: ${uniqueTests.length} unique tests`);
     
     // Categorize unique tests
-    const categorizedTests = {
-        'Cardiorespiratory Endurance': [],
-        'Muscular Strength': [],
-        'Muscular Endurance': [],
-        'Flexibility': [],
-        'Body Composition': []
-    };
+    // Categorize unique tests
+        const categorizedTests = {
+            'Cardiorespiratory Endurance': [],
+            'Muscular Strength and Endurance': [],
+            'Flexibility': [],
+            'Body Composition': []
+        };
     
     uniqueTests.forEach(test => {
         const category = getCategoryForTest(test.testName);
