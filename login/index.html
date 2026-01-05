@@ -596,31 +596,41 @@
     }
 
     // Check student status by email (like new code)
-    async function checkStudentStatus(user) {
-        try {
-            console.log('🔍 Checking student collection for:', user.email);
+    // Check student status by email (like new code)
+async function checkStudentStatus(user) {
+    try {
+        console.log('🔍 Checking student collection for:', user.email);
+        
+        const studentsQuery = window.query(
+            window.collection(window.db, 'students'),
+            window.where('email', '==', user.email.toLowerCase())
+        );
+        const studentsSnapshot = await window.getDocs(studentsQuery);
+        
+        if (!studentsSnapshot.empty) {
+            const studentDoc = studentsSnapshot.docs[0];
+            const studentData = studentDoc.data();
+            console.log('✅ STUDENT FOUND in students collection');
+            console.log('Student data:', studentData);
             
-            const studentsQuery = window.query(
-                window.collection(window.db, 'students'),
-                window.where('email', '==', user.email.toLowerCase())
-            );
-            const studentsSnapshot = await window.getDocs(studentsQuery);
-            
-            if (!studentsSnapshot.empty) {
-                const studentDoc = studentsSnapshot.docs[0];
-                const studentData = studentDoc.data();
-                console.log('✅ STUDENT FOUND in students collection');
-                return { id: studentDoc.id, ...studentData };
-            }
-            
-            console.log('✗ Student not found in students collection');
-            return null;
-            
-        } catch (error) {
-            console.error('Error checking student status:', error);
-            return null;
+            // Return student data with document ID
+            return { 
+                id: studentDoc.id, 
+                ...studentData,
+                // Set default values if not present
+                emailVerified: studentData.emailVerified || false,
+                privacyAccepted: studentData.privacyAccepted || false
+            };
         }
+        
+        console.log('✗ Student not found in students collection');
+        return null;
+        
+    } catch (error) {
+        console.error('Error checking student status:', error);
+        return null;
     }
+}
 
     // UPDATED: Check user status with combined logic
     async function checkUserStatus(user) {
@@ -778,85 +788,87 @@
             }
             
             // Check for STUDENT role (like new code)
-            const studentData = await checkStudentStatus(user);
-            if (studentData) {
-                console.log('🎯 STUDENT ACCOUNT DETECTED');
-                
-                await updatePresenceRole(user.uid, 'student');
-                
-                // Update last login in students collection
-                try {
-                    const studentRef = window.doc(window.db, 'students', studentData.id);
-                    await window.setDoc(studentRef, {
-                        lastLogin: currentTime,
-                        isActive: true,
-                        uid: user.uid
-                    }, { merge: true });
-                    console.log('✓ Updated student last login');
-                } catch (error) {
-                    console.error('Error updating student:', error);
-                }
-                
-                // Also update users collection for login tracking
-                try {
-                    const userRef = window.doc(window.db, 'users', user.uid);
-                    await window.setDoc(userRef, {
-                        role: 'student',
-                        lastLogin: currentTime,
-                        isActive: true,
-                        displayName: studentData.fullName || studentData.name || user.displayName,
-                        email: user.email,
-                        studentId: studentData.student_id,
-                        section: studentData.section,
-                        courseCode: studentData.course_code
-                    }, { merge: true });
-                    console.log('✓ Updated users collection for student');
-                } catch (error) {
-                    console.error('Error updating users for student:', error);
-                }
-                
-                // Check student verification status
-                console.log('=== STUDENT VERIFICATION STATUS ===');
-                console.log('Email Verified:', studentData.emailVerified);
-                console.log('Privacy Accepted:', studentData.privacyAccepted);
-                
-                // COMPLETE: Both steps done → DASHBOARD
-                if (studentData.emailVerified && studentData.privacyAccepted) {
-                    console.log('✅ ALL COMPLETE → studentDashboard.html');
-                    showLoading('Login successful! Loading your dashboard...');
-                    setTimeout(() => {
-                        window.location.href = '../student/studentDashboard.html';
-                    }, 1000);
-                    return;
-                }
-                
-                // STEP 1: Email NOT verified → OTP VERIFICATION
-                if (!studentData.emailVerified) {
-                    console.log('⚠️ EMAIL NOT VERIFIED → otp-verification.html');
+                const studentData = await checkStudentStatus(user);
+                if (studentData) {
+                    console.log('🎯 STUDENT ACCOUNT DETECTED');
+                    console.log('Student Data:', studentData);
+                    
+                    await updatePresenceRole(user.uid, 'student');
+                    
+                    // Update last login in students collection using the correct document ID
+                    try {
+                        const studentRef = window.doc(window.db, 'students', studentData.id);
+                        await window.setDoc(studentRef, {
+                            lastLogin: currentTime,
+                            isActive: true,
+                            uid: user.uid
+                        }, { merge: true });
+                        console.log('✓ Updated student last login');
+                    } catch (error) {
+                        console.error('Error updating student:', error);
+                    }
+                    
+                    // Also update users collection for login tracking
+                    try {
+                        const userRef = window.doc(window.db, 'users', user.uid);
+                        await window.setDoc(userRef, {
+                            role: 'student',
+                            lastLogin: currentTime,
+                            isActive: true,
+                            displayName: studentData.fullName || studentData.name || user.displayName,
+                            email: user.email,
+                            studentId: studentData.studentId || studentData.student_id,
+                            section: studentData.section,
+                            courseCode: studentData.courseCode || studentData.course_code
+                        }, { merge: true });
+                        console.log('✓ Updated users collection for student');
+                    } catch (error) {
+                        console.error('Error updating users for student:', error);
+                    }
+                    
+                    // Check student verification status
+                    console.log('=== STUDENT VERIFICATION STATUS ===');
+                    console.log('Email Verified:', studentData.emailVerified);
+                    console.log('Privacy Accepted:', studentData.privacyAccepted);
+                    
+                    // COMPLETE: Both steps done → DASHBOARD
+                    if (studentData.emailVerified && studentData.privacyAccepted) {
+                        console.log('✅ ALL COMPLETE → studentDashboard.html');
+                        showLoading('Login successful! Loading your dashboard...');
+                        setTimeout(() => {
+                            window.location.href = '../student/studentDashboard.html';
+                        }, 1000);
+                        return;
+                    }
+                    
+                    // STEP 1: Email NOT verified → OTP VERIFICATION
+                    if (!studentData.emailVerified) {
+                        console.log('⚠️ EMAIL NOT VERIFIED → otp-verification.html');
+                        showLoading('Please verify your email...');
+                        setTimeout(() => {
+                            window.location.href = 'otp-verification.html';
+                        }, 1000);
+                        return;
+                    }
+                    
+                    // STEP 2: Email verified but NO privacy → DATA PRIVACY
+                    if (studentData.emailVerified && !studentData.privacyAccepted) {
+                        console.log('⚠️ PRIVACY NOT ACCEPTED → dataprivacy.html');
+                        showLoading('Please accept Data Privacy Agreement...');
+                        setTimeout(() => {
+                            window.location.href = 'dataprivacy.html';
+                        }, 1000);
+                        return;
+                    }
+                    
+                    // Fallback: Default to OTP verification
+                    console.log('❓ UNKNOWN STUDENT STATE → otp-verification.html');
                     showLoading('Please verify your email...');
                     setTimeout(() => {
                         window.location.href = 'otp-verification.html';
                     }, 1000);
                     return;
                 }
-                
-                // STEP 2: Email verified but NO privacy → DATA PRIVACY
-                if (studentData.emailVerified && !studentData.privacyAccepted) {
-                    console.log('⚠️ PRIVACY NOT ACCEPTED → dataprivacy.html');
-                    showLoading('Please accept Data Privacy Agreement...');
-                    setTimeout(() => {
-                        window.location.href = 'dataprivacy.html';
-                    }, 1000);
-                    return;
-                }
-                
-                console.log('❓ UNKNOWN STUDENT STATE → otp-verification.html');
-                showLoading('Please verify your email...');
-                setTimeout(() => {
-                    window.location.href = 'otp-verification.html';
-                }, 1000);
-                return;
-            }
             
             // OLD CODE LOGIC: Check users collection as fallback (CRITICAL FIX)
             console.log('🔄 Checking users collection as fallback (old code logic)...');
