@@ -778,38 +778,38 @@
     </div>
 
     <!-- Schedule Test Modal -->
-   <!-- Schedule Test Modal -->
-   <div id="scheduleTestModal" class="modal-overlay" style="display: none;">
+<div id="scheduleTestModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
             <h3 class="modal-title">Schedule New Test</h3>
             <button class="close-modal" onclick="closeScheduleTestModal()">&times;</button>
         </div>
         <div class="modal-body">
-          <!-- REPLACE THIS in the modal (around line 280): -->
-<div class="form-group">
-    <label class="form-label" for="videoURL">
-        <i class="fab fa-youtube"></i> Instruction Video URL (Optional)
-    </label>
-    <input type="url" class="form-control" id="videoURL" placeholder="https://www.youtube.com/watch?v=...">
-    <small style="color: #64748b; font-size: 12px; margin-top: 5px; display: block;">
-        📺 Paste a YouTube video link for test instructions (optional)
-    </small>
-    <small style="color: #3b82f6; font-size: 12px; margin-top: 5px;">
-        💡 Tip: Upload your video to YouTube first, then copy the link here
-    </small>
-</div>
+            <div class="form-group">
+                <label class="form-label" for="videoURL">
+                    <i class="fab fa-youtube"></i> Instruction Video URL (Optional)
+                </label>
+                <input type="url" class="form-control" id="videoURL" placeholder="https://www.youtube.com/watch?v=...">
+                <small style="color: #64748b; font-size: 12px; margin-top: 5px; display: block;">
+                    📺 Paste a YouTube video link for test instructions (optional)
+                </small>
+                <small style="color: #3b82f6; font-size: 12px; margin-top: 5px;">
+                    💡 Tip: Upload your video to YouTube first, then copy the link here
+                </small>
+            </div>
             
-          <div class="form-group">
-    <label class="form-label" for="testType">Test Type <span style="color: #ef4444;">*</span></label>
-    <select class="form-select" id="testType" required>
-    <option value="">Select Test Type</option>
-    <option value="3-Minute Step Test">3-Minute Step Test</option>
-    <option value="Curl-Up Test">Curl-Up Test</option>
-    <option value="Push-Up Test">Push-Up Test</option>
-    <option value="Sit-and-Reach">Sit-and-Reach Test</option>
-    <option value="Skinfold Caliper">Skinfold Caliper Measurements</option>
-</select>
+            <div class="form-group">
+                <label class="form-label" for="testType">Test Type <span style="color: #ef4444;">*</span></label>
+                <select class="form-select" id="testType" required>
+                    <option value="">Select Test Type</option>
+                    <option value="3-Minute Step Test">3-Minute Step Test</option>
+                    <option value="Curl-Up Test">Curl-Up Test</option>
+                    <option value="Push-Up Test">Push-Up Test</option>
+                    <option value="Sit-and-Reach">Sit-and-Reach Test</option>
+                    <option value="Skinfold Caliper">Skinfold Caliper Measurements</option>
+                </select>
+            </div>
+            
             <div class="form-group">
                 <label class="form-label" for="testSection">Section</label>
                 <select class="form-select" id="testSection">
@@ -1135,61 +1135,61 @@ async function loadScheduledTests(userEmail, userId) {
                 const progress = totalStudents > 0 ? `${completedStudents}/${totalStudents}` : '0/0';
                 
                 html += `
-                    <tr>
-                    <td>${test.testName || 'Unnamed Test'}</td>
-                    <td>${test.section || 'N/A'}</td>
-                    <td>${test.date || 'N/A'}</td>
-                    <td>${test.deadline || 'N/A'} ${test.deadlineTime || ''}</td>
-                    <td class="progress-cell">${progress}</td>
-                    <td>${test.attemptsAllowed || '1'}</td>
-                    <td><span class="status-badge ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-action btn-edit" onclick="editTest('${docSnap.id}')">Edit</button>
-                            <button class="btn-action btn-cancel" onclick="deleteTest('${docSnap.id}')">Delete</button>
-                        </div>
-                    </td>
-                    </tr>
-                `;
+                <tr>
+                <td>${test.testName || 'Unnamed Test'}</td>
+                <td>${test.section || 'N/A'}</td>
+                <td>${test.date || 'N/A'}</td>
+                <td>${test.deadline || 'N/A'} ${test.deadlineTime || ''}</td>
+                <td class="progress-cell">${progress}</td>
+                <td>${test.attemptsAllowed || '1'}</td>
+                <td><span class="status-badge ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-edit" onclick="editTest('${docSnap.id}')">Edit</button>
+                        <button class="btn-action btn-cancel" onclick="deleteTest('${docSnap.id}')">Delete</button>
+                    </div>
+                </td>
+                </tr>
+            `;
             });
             
-            if (!hasVisibleTests) {
-                if (window.assignedSections.length > 0) {
-                    let sectionsInfo = window.assignedSections.map(s => `${s.section} (${s.students} students)`).join(', ');
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="8">
-                                <div class="empty-state">
-                                    <div class="empty-icon">📅</div>
-                                    <div class="empty-title">No Active Test Schedules</div>
-                                    <div class="empty-text">
-                                        You have been assigned: <strong>${sectionsInfo}</strong><br><br>
-                                        All scheduled tests have expired or you haven't created any tests yet.<br>
-                                        Click "Schedule New Test" to create a fitness test for your assigned section(s).
-                                    </div>
+           if (!hasVisibleTests) {
+            if (window.assignedSections.length > 0) {
+                let sectionsInfo = window.assignedSections.map(s => `${s.section} (${s.students} students)`).join(', ');
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-icon">📅</div>
+                                <div class="empty-title">No Active Test Schedules</div>
+                                <div class="empty-text">
+                                    You have been assigned: <strong>${sectionsInfo}</strong><br><br>
+                                    All scheduled tests have expired or you haven't created any tests yet.<br>
+                                    Click "Schedule New Test" to create a fitness test for your assigned section(s).
                                 </div>
-                            </td>
-                        </tr>
-                    `;
-                } else {
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="8">
-                                <div class="empty-state">
-                                    <div class="empty-icon">⚠️</div>
-                                    <div class="empty-title">No Sections Assigned</div>
-                                    <div class="empty-text">
-                                        You have not been assigned to any sections yet.<br><br>
-                                        Please contact the Secretary to assign you to a section.
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }
+                            </div>
+                        </td>
+                    </tr>
+                `;
             } else {
-                tableBody.innerHTML = html;
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-icon">⚠️</div>
+                                <div class="empty-title">No Sections Assigned</div>
+                                <div class="empty-text">
+                                    You have not been assigned to any sections yet.<br><br>
+                                    Please contact the Secretary to assign you to a section.
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
             }
+        } else {
+            tableBody.innerHTML = html;  
+        }
             
             console.log('✓ Loaded', testsSnapshot.size, 'scheduled tests');
         } else {
@@ -1807,15 +1807,15 @@ function calculateTestScore(testName, result, testTarget = null) {
     }
 }
                 async function scheduleTest() {
-    const testType = document.getElementById('testType').value;
-    const testSection = document.getElementById('testSection').value;
-    const testDate = document.getElementById('testDate').value;
-    const testDeadline = document.getElementById('testDeadline').value;
-    const testDeadlineTime = document.getElementById('testDeadlineTime').value;
-    const attemptsAllowed = document.getElementById('attemptsAllowed').value;
-    const testInstructions = document.getElementById('testInstructions').value;
-    const testTarget = document.getElementById('testTarget').value;
-    const videoURL = document.getElementById('videoURL').value;
+            const testType = document.getElementById('testType').value;
+            const testSection = document.getElementById('testSection').value;
+            const testDate = document.getElementById('testDate').value;
+            const testDeadline = document.getElementById('testDeadline').value;
+            const testDeadlineTime = document.getElementById('testDeadlineTime').value;
+            const attemptsAllowed = document.getElementById('attemptsAllowed').value;
+            const testInstructions = document.getElementById('testInstructions').value;
+            const testTarget = document.getElementById('testTarget').value;
+            const videoURL = document.getElementById('videoURL').value;
 
     if (!testType || !testSection || !testDate || !testDeadline || !testDeadlineTime) {
         alert('Please fill in all required fields.');
@@ -2004,10 +2004,25 @@ window.deleteTest = deleteTest;
                 }
             }
         }
+           
 
         async function editTest(testId) {
     try {
         console.log('🔧 Opening edit modal for test:', testId);
+
+        const scheduleModal = document.getElementById('scheduleTestModal');
+        if (scheduleModal) {
+            scheduleModal.style.display = 'none';
+        }
+        
+        const modal = document.getElementById('editTestModal');
+        if (!modal) {
+            console.error('Edit modal not found!');
+            alert('Error: Modal not found. Please refresh the page.');
+            return;
+        }
+        
+         modal.style.display = 'flex';
         
         const testDoc = await window.getDoc(window.doc(window.db, 'scheduledTests', testId));
         
@@ -2019,7 +2034,7 @@ window.deleteTest = deleteTest;
         const testData = testDoc.data();
         console.log('📋 Test data:', testData);
         
-        // Fill form fields
+        // Populate form fields
         document.getElementById('editTestName').value = testData.testName || '';
         document.getElementById('editTestSection').value = testData.section || '';
         document.getElementById('editTestDate').value = testData.date || '';
@@ -2028,7 +2043,6 @@ window.deleteTest = deleteTest;
         document.getElementById('editAttemptsAllowed').value = `${testData.attemptsAllowed || 1} Attempt(s)`;
         document.getElementById('editTestId').value = testId;
         
-        // Show target field based on test type
         const targetGroup = document.getElementById('editTestTargetGroup');
         const targetLabel = document.getElementById('editTestTargetLabel');
         const targetInput = document.getElementById('editTestTarget');
@@ -2093,7 +2107,9 @@ window.deleteTest = deleteTest;
         } else {
             targetGroup.style.display = 'none';
         }
-         const saveBtn = document.querySelector('#editTestModal .btn-success');
+        
+        // Enable buttons
+        const saveBtn = document.querySelector('#editTestModal .btn-success');
         const cancelBtn = document.querySelector('#editTestModal .btn-secondary');
         
         if (saveBtn) {
@@ -2103,89 +2119,86 @@ window.deleteTest = deleteTest;
         if (cancelBtn) {
             cancelBtn.disabled = false;
         }
-        document.getElementById('editTestModal').style.display = 'flex';
+        
+          console.log('✅ Edit modal opened successfully');
         
     } catch (error) {
         console.error('❌ Error loading test:', error);
         alert('Error loading test data: ' + error.message);
     }
 }
-    function closeEditTestModal() {
-    document.getElementById('editTestModal').style.display = 'none';
-}
 
-async function saveEditTest() {
-    const testId = document.getElementById('editTestId').value;
-    const newDate = document.getElementById('editTestDate').value;
-    const newDeadline = document.getElementById('editTestDeadline').value;
-    const newDeadlineTime = document.getElementById('editTestDeadlineTime').value;
-    const newTarget = document.getElementById('editTestTarget').value;
-    
-    if (!newDate || !newDeadline || !newDeadlineTime) {
-        alert('Please fill in all required fields');
-        return;
-    }
-    
-    const testDateObj = new Date(newDate);
-    const deadlineObj = new Date(`${newDeadline}T${newDeadlineTime}`);
-    
-    if (deadlineObj <= testDateObj) {
-        alert('Deadline must be after the test date');
-        return;
-    }
-    
-    // Get buttons BEFORE disabling
-    const saveBtn = document.querySelector('#editTestModal .btn-success');
-    const cancelBtn = document.querySelector('#editTestModal .btn-secondary');
-    
-    // Store original text
-    const originalText = saveBtn.textContent;
-    
-    try {
-        // Disable buttons
-        saveBtn.disabled = true;
-        cancelBtn.disabled = true;
-        saveBtn.textContent = 'Saving...';
-        
-        const updateData = {
-            date: newDate,
-            deadline: newDeadline,
-            deadlineTime: newDeadlineTime,
-            deadlineDateTime: deadlineObj.toISOString(),
-            testTarget: newTarget ? parseInt(newTarget) : null,
-            updatedAt: window.serverTimestamp()
-        };
-        
-        const now = new Date();
-        if (testDateObj <= now && deadlineObj >= now) {
-            updateData.status = 'active';
-        } else if (deadlineObj < now) {
-            updateData.status = 'completed';
-        } else {
-            updateData.status = 'scheduled';
+        function closeEditTestModal() {
+            document.getElementById('editTestModal').style.display = 'none';
         }
-        
-        await window.updateDoc(window.doc(window.db, 'scheduledTests', testId), updateData);
-        
-        // Close modal FIRST
-        closeEditTestModal();
-        
-        // THEN show alert
-        alert('✅ Test updated successfully!\n\nChanges are now live in:\n• Test list\n• Student test pages\n• Active test page');
-        
-        // Refresh list
-        await loadScheduledTests(window.currentUser.email, window.currentUser.uid);
-        
-    } catch (error) {
-        console.error('❌ Error:', error);
-        alert('Error updating test: ' + error.message);
-        
-        // Re-enable buttons with original text
-        saveBtn.disabled = false;
-        cancelBtn.disabled = false;
-        saveBtn.textContent = originalText;
-    }
-}
+
+        async function saveEditTest() {
+            const testId = document.getElementById('editTestId').value;
+            const newDate = document.getElementById('editTestDate').value;
+            const newDeadline = document.getElementById('editTestDeadline').value;
+            const newDeadlineTime = document.getElementById('editTestDeadlineTime').value;
+            const newTarget = document.getElementById('editTestTarget').value;
+            
+            if (!newDate || !newDeadline || !newDeadlineTime) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            const testDateObj = new Date(newDate);
+            const deadlineObj = new Date(`${newDeadline}T${newDeadlineTime}`);
+            
+            if (deadlineObj <= testDateObj) {
+                alert('Deadline must be after the test date');
+                return;
+            }
+            
+            const saveBtn = document.querySelector('#editTestModal .btn-success');
+            const cancelBtn = document.querySelector('#editTestModal .btn-secondary');
+            const originalText = saveBtn.textContent;
+            
+            try {
+                saveBtn.disabled = true;
+                cancelBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+                
+                const updateData = {
+                    date: newDate,
+                    deadline: newDeadline,
+                    deadlineTime: newDeadlineTime,
+                    deadlineDateTime: deadlineObj.toISOString(),
+                    testTarget: newTarget ? parseInt(newTarget) : null,
+                    updatedAt: window.serverTimestamp()
+                };
+                
+                const now = new Date();
+                if (testDateObj <= now && deadlineObj >= now) {
+                    updateData.status = 'active';
+                } else if (deadlineObj < now) {
+                    updateData.status = 'completed';
+                } else {
+                    updateData.status = 'scheduled';
+                }
+                
+                await window.updateDoc(window.doc(window.db, 'scheduledTests', testId), updateData);
+                
+                closeEditTestModal();
+                alert('✅ Test updated successfully!');
+                await window.loadScheduledTests(window.currentUser.email, window.currentUser.uid);
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('Error updating test: ' + error.message);
+                saveBtn.disabled = false;
+                cancelBtn.disabled = false;
+                saveBtn.textContent = originalText;
+            }
+        }
+
+      
+        window.editTest = editTest;
+        window.closeEditTestModal = closeEditTestModal;
+        window.saveEditTest = saveEditTest;
+
         function cancelTest(testId) {
             if (confirm('Are you sure you want to cancel this test?')) {
                 alert(`Test ${testId} cancellation will be implemented by head admin.\n\nThis will:\n- Mark the test as cancelled\n- Notify students\n- Update the schedule`);
@@ -2343,7 +2356,7 @@ function closeResultModal() {
         function closeScheduleTestModal() {
     document.getElementById('scheduleTestModal').style.display = 'none';
     
-    // Clear all form fields
+   
     document.getElementById('testType').value = '';
     document.getElementById('testSection').value = '';
     document.getElementById('testDate').value = '';
@@ -2352,10 +2365,13 @@ function closeResultModal() {
     document.getElementById('attemptsAllowed').value = '1';
     document.getElementById('testInstructions').value = '';
     document.getElementById('testTarget').value = '';
-    document.getElementById('videoURL').value = ''; // Clear video URL
+    document.getElementById('videoURL').value = '';
     
-    // Hide target group
     document.getElementById('testTargetGroup').style.display = 'none';
+    
+    if (window.currentUser) {
+        loadScheduledTests(window.currentUser.email, window.currentUser.uid);
+    }
 }
     </script>
 </body>
