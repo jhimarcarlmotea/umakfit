@@ -973,33 +973,38 @@
                     </div>
                     
                     <div class="table-responsive">
-                        <table class="custom-table" id="sectionsTable">
-                            <thead>
-                                <tr>
-                                    <th>Section Name</th>
-                                    <th>Year Level</th>
-                                    <th>Number of Students</th>
-                                    <th>Semester</th>
-                                    <th>Academic Year</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sectionsTableBody">
-                                <tr>
-                                    <td colspan="7">
-                                        <div class="empty-state">
-                                            <div class="empty-icon">🏫</div>
-                                            <div class="empty-title">No Sections Assigned</div>
-                                            <div class="empty-text">You haven't been assigned to any sections yet. Please contact the Dean or Head Admin.</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <table class="custom-table" id="sectionsTable">
+                        <thead>
+                            <tr>
+                                <th>Section Name</th>
+                                <th>Year Level</th>
+                                <th>Total Students</th>
+                                <th>Course Code</th>
+                                <th>Semester</th>
+                                <th>Academic Year</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sectionsTableBody">
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">🏫</div>
+                                        <div class="empty-title">No Sections Assigned</div>
+                                        <div class="empty-text">You haven't been assigned to any sections yet. Please contact the Dean or Head Admin.</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section count only -->
+                <div style="margin-top: 20px; padding: 0 10px;">
+                    <div style="font-size: 14px; color: #64748b;">
+                        Showing <span id="sectionCount">0</span> sections
                     </div>
                 </div>
-                
                 <!-- Student List -->
                 <div class="management-section">
                     <div class="section-header">
@@ -1037,17 +1042,16 @@
                     <div class="table-responsive">
                         <table class="custom-table" id="studentsTable">
                             <thead>
-                                <tr>
-                                    <th>UMaK ID</th>
-                                    <th>Student Name</th>
-                                    <th>Section</th>
-                                    <th>Total Attempts</th>
-                                    <th>Best Score</th>
-                                    <th>Average Score</th>
-                                    <th>Last Attempt</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
+                            <tr>
+                                <th>UMaK ID</th>
+                                <th>Student Name</th>
+                                <th>Section</th>
+                                <th>Best Score</th>
+                                <th>Average Score</th>
+                                <th>Last Attempt</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
                             <tbody id="studentsTableBody">
                                 <tr>
                                     <td colspan="8">
@@ -1231,6 +1235,7 @@
         window.currentStudentId = null;
         window.currentPage = 1;
         window.itemsPerPage = 10;
+        window.filteredSections = [];
 
         // Load professor's assigned sections
 async function loadSections() {
@@ -1292,16 +1297,18 @@ async function loadSections() {
                 const studentCount = Array.isArray(data.students) ? data.students.length : 0;
 
                 window.sections.push({
-                    id: sectionDoc.id,
-                    name: data.name,
-                    yearLevel: data.yearLevel || extractYearLevel(data.name),
-                    studentCount: studentCount,
-                    semester: data.semester || 'N/A',
-                    academicYear: data.academicYear || 'N/A',
-                    status: 'active',
-                    professorName: dbProfessor,
-                    students: data.students || []
-                });
+                id: sectionDoc.id,
+                name: data.name,
+                yearLevel: data.yearLevel || extractYearLevel(data.name),
+                studentCount: studentCount,
+                courseCode: data.courseCode || 'PE 3',
+                semester: data.semester || 'N/A',
+                academicYear: data.academicYear || 'N/A',
+                status: 'active',
+                professorName: dbProfessor,
+                description: data.description || '',
+                students: data.students || []
+            });
             }
         });
 
@@ -1328,7 +1335,7 @@ async function loadSections() {
             populateSectionsTable();
             populateSectionFilters();
         }
-
+            window.filteredSections = [...window.sections];
     } catch (error) {
         console.error('Error loading sections:', error);
         alert('Error loading sections: ' + error.message);
@@ -1381,9 +1388,9 @@ async function loadStudents() {
             }
 
             for (const rawStudent of section.students) {
-                const studentId = rawStudent.studentId || rawStudent.student_id || rawStudent.email || 'unknown';
-                if (seenStudentIds.has(studentId)) continue;
-                seenStudentIds.add(studentId);
+                const studentEmail = rawStudent.email || '';
+                if (!studentEmail || seenStudentIds.has(studentEmail)) continue;
+                seenStudentIds.add(studentEmail);
 
                 let firstName = '', lastName = '', fullName = rawStudent.name || 'Unknown Student';
                 if (fullName.includes(',')) {
@@ -1396,25 +1403,49 @@ async function loadStudents() {
                     lastName = nameParts.slice(1).join(' ') || '';
                 }
 
+                // Get test results using email
                 let bestScore = 0;
                 let totalScore = 0;
                 let lastAttempt = null;
+                let lastAttemptTest = '';
                 let totalAttempts = 0;
+                let testAttempts = {}; // Track attempts per test
 
-                if (studentId && studentId !== 'unknown') {
-                    const attemptsQuery = query(collection(db, 'testResults'), where('studentId', '==', studentId));
+                if (studentEmail) {
+                    const attemptsQuery = query(
+                        collection(db, 'testResults'), 
+                        where('studentEmail', '==', studentEmail)
+                    );
                     const snapshot = await getDocs(attemptsQuery);
                     totalAttempts = snapshot.size;
 
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        const score = data.score || 0;
+                        const testName = data.testName || 'Unknown Test';
+                        const score = calculateTestScore(data.testName, data.result, data.testTarget);
+                        
                         totalScore += score;
                         if (score > bestScore) bestScore = score;
 
-                        const attemptTime = data.submittedAt ? data.submittedAt.toDate() : null;
+                        // Track attempts per test
+                        if (!testAttempts[testName]) {
+                            testAttempts[testName] = 0;
+                        }
+                        testAttempts[testName]++;
+
+                        let attemptTime = null;
+                        if (data.submittedAt) {
+                            if (typeof data.submittedAt.toDate === 'function') {
+                                attemptTime = data.submittedAt.toDate();
+                            } else if (data.submittedAt instanceof Date) {  
+                                attemptTime = data.submittedAt;
+                            } else if (typeof data.submittedAt === 'string' || typeof data.submittedAt === 'number') {
+                                attemptTime = new Date(data.submittedAt);
+                            }
+                        }
                         if (attemptTime && (!lastAttempt || attemptTime > lastAttempt)) {
                             lastAttempt = attemptTime;
+                            lastAttemptTest = testName;
                         }
                     });
                 }
@@ -1422,31 +1453,32 @@ async function loadStudents() {
                 const averageScore = totalAttempts > 0 ? Math.round(totalScore / totalAttempts) : 0;
 
                 const student = {
-                    id: studentId,
+                    id: studentEmail, // Use email as unique ID
                     umakId: rawStudent.student_id || rawStudent.studentId || 'N/A',
                     firstName: firstName || 'Unknown',
                     lastName: lastName || '',
                     fullName: fullName,
-                    email: rawStudent.email || 'N/A',
+                    email: studentEmail,
                     section: section.name,
                     yearLevel: section.yearLevel || extractYearLevel(section.name),
                     totalAttempts: totalAttempts,
+                    testAttempts: testAttempts, // Store test-specific attempts
                     bestScore: bestScore,
                     averageScore: averageScore,
                     lastAttempt: lastAttempt,
+                    lastAttemptTest: lastAttemptTest,
                     status: 'active'
                 };
 
                 console.log(`Student loaded: ${student.fullName} (${student.umakId}) → ${student.totalAttempts} attempts`);
                 window.students.push(student);
-             // ← closing ng rawStudent loop
-        } // ← closing ng section loop
-    } // ← closing ng for (window.sections) loop AT ng try block
+            }
+        }
 
-    console.log(`Total students loaded: ${window.students.length}`);
-    window.filteredStudents = [...window.students];
-    window.currentPage = 1;
-    updateStudentsTable(window.filteredStudents);
+        console.log(`Total students loaded: ${window.students.length}`);
+        window.filteredStudents = [...window.students];
+        window.currentPage = 1;
+        updateStudentsTable(window.filteredStudents);
 
     } catch (error) {
         console.error('Error loading students:', error);
@@ -1454,114 +1486,251 @@ async function loadStudents() {
         updateStudentsTable([]);
     }
 }
-
+            // Calculate test score based on result and target
+function calculateTestScore(testName, result, testTarget = null) {
+    const normalized = testName.toLowerCase().trim();
+    
+    // Extract numeric value from result
+    let numericValue = 0;
+    
+    if (typeof result === 'object' && result !== null) {
+        numericValue = result.repetitions || result.time || result.distance || result.value || result.score || 0;
+    } else if (typeof result === 'string') {
+        const match = result.match(/(\d+\.?\d*)/);
+        if (match) {
+            numericValue = parseFloat(match[1]);
+        } else {
+            numericValue = parseFloat(result) || 0;
+        }
+    } else {
+        numericValue = parseFloat(result) || 0;
+    }
+    
+    // Use test target if available
+    if (testTarget && testTarget > 0) {
+        if (normalized.includes('push-up') || normalized.includes('pushup') || 
+            normalized.includes('sit-up') || normalized.includes('situp')) {
+            const reps = numericValue;
+            const percentage = (reps / testTarget) * 100;
+            let score = Math.min(100, Math.max(50, percentage));
+            
+            if (percentage >= 100) score = 100;
+            else if (percentage >= 90) score = 95;
+            else if (percentage >= 80) score = 90;
+            else if (percentage >= 70) score = 85;
+            else if (percentage >= 60) score = 80;
+            else if (percentage >= 50) score = 75;
+            
+            return Math.round(score);
+        } else if (normalized.includes('plank')) {
+            let seconds = numericValue;
+            const percentage = (seconds / testTarget) * 100;
+            let score = Math.min(100, Math.max(50, percentage));
+            
+            if (percentage >= 100) score = 100;
+            else if (percentage >= 90) score = 95;
+            else if (percentage >= 80) score = 90;
+            else if (percentage >= 70) score = 85;
+            else if (percentage >= 60) score = 80;
+            else if (percentage >= 50) score = 75;
+            
+            return Math.round(score);
+        } else if (normalized.includes('sit-and-reach')) {
+            const distance = numericValue;
+            const percentage = (distance / testTarget) * 100;
+            let score = Math.min(100, Math.max(50, percentage));
+            
+            if (percentage >= 100) score = 100;
+            else if (percentage >= 90) score = 95;
+            else if (percentage >= 80) score = 90;
+            else if (percentage >= 70) score = 85;
+            else if (percentage >= 60) score = 80;
+            else if (percentage >= 50) score = 75;
+            
+            return Math.round(score);
+        }
+    }
+    
+    // Fallback scoring
+    if (normalized.includes('push-up') || normalized.includes('pushup')) {
+        const reps = numericValue;
+        if (reps >= 40) return 100;
+        if (reps >= 35) return 95;
+        if (reps >= 30) return 90;
+        if (reps >= 25) return 85;
+        if (reps >= 20) return 80;
+        if (reps >= 15) return 75;
+        if (reps >= 10) return 70;
+        if (reps >= 5) return 65;
+        return 60;
+    } else if (normalized.includes('sit-up') || normalized.includes('situp')) {
+        const reps = numericValue;
+        if (reps >= 50) return 100;
+        if (reps >= 45) return 95;
+        if (reps >= 40) return 90;
+        if (reps >= 35) return 85;
+        if (reps >= 30) return 80;
+        if (reps >= 25) return 75;
+        if (reps >= 20) return 70;
+        if (reps >= 15) return 65;
+        return 60;
+    } else if (normalized.includes('plank')) {
+        let seconds = numericValue;
+        if (seconds >= 180) return 100;
+        if (seconds >= 150) return 95;
+        if (seconds >= 120) return 90;
+        if (seconds >= 100) return 85;
+        if (seconds >= 80) return 80;
+        if (seconds >= 60) return 75;
+        if (seconds >= 45) return 70;
+        if (seconds >= 30) return 65;
+        return 60;
+    } else if (normalized.includes('step test') || normalized.includes('3-minute')) {
+        const heartRate = numericValue;
+        if (heartRate <= 70) return 100;
+        if (heartRate <= 80) return 95;
+        if (heartRate <= 90) return 90;
+        if (heartRate <= 100) return 85;
+        if (heartRate <= 110) return 80;
+        if (heartRate <= 120) return 75;
+        if (heartRate <= 130) return 70;
+        return 65;
+    } else if (normalized.includes('sit-and-reach')) {
+        const distance = numericValue;
+        if (distance >= 25) return 100;
+        if (distance >= 20) return 95;
+        if (distance >= 15) return 90;
+        if (distance >= 10) return 85;
+        if (distance >= 5) return 80;
+        if (distance >= 0) return 75;
+        if (distance >= -5) return 70;
+        return 65;
+    }
+    
+    return 75; // Default score
+}
         function populateSectionsTable() {
-            const tableBody = document.getElementById('sectionsTableBody');
-            
-            if (window.sections.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7">
-                            <div class="empty-state">
-                                <div class="empty-icon">🏫</div>
-                                <div class="empty-title">No Sections Found</div>
-                                <div class="empty-text">
-                                    No sections found for your profile.
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            let html = '';
-            window.sections.forEach(section => {
-                const statusClass = section.status === 'active' ? 'status-active' : 'status-inactive';
-                const statusText = section.status === 'active' ? 'Active' : 'Inactive';
-                
-                html += `
-                    <tr>
-                        <td>
-                            <strong>${section.name}</strong>
-                            ${section.description ? `<br><small style="color: #64748b;">${section.description}</small>` : ''}
-                        </td>
-                        <td>${section.yearLevel || 'N/A'}</td>
-                        <td>${section.studentCount || 0}</td>
-                        <td>${section.semester || 'N/A'}</td>
-                        <td>${section.academicYear || 'N/A'}</td>
-                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-action btn-view" onclick="viewSectionDetails('${section.id}')">
-                                    <i class="fas fa-eye"></i> View
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tableBody.innerHTML = html;
+    const tableBody = document.getElementById('sectionsTableBody');
+    const sectionCount = document.getElementById('sectionCount');
+    
+    // Show ALL sections, no pagination
+    sectionCount.textContent = window.filteredSections.length;
+    
+    if (window.filteredSections.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7">
+                    <div class="empty-state">
+                        <div class="empty-icon">🏫</div>
+                        <div class="empty-title">No Sections Found</div>
+                        <div class="empty-text">
+                            ${window.sections.length === 0 ? 
+                                'No sections assigned to you yet.' : 
+                                'No sections match your search criteria.'}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    let html = '';
+    window.filteredSections.forEach(section => {
+        const statusClass = section.status === 'active' ? 'status-active' : 'status-inactive';
+        const statusText = section.status === 'active' ? 'Active' : 'Inactive';
+        
+        html += `
+            <tr>
+                <td>
+                    <strong style="color: #1e3a8a;">${section.name}</strong>
+                    ${section.description ? `<br><small style="color: #64748b;">${section.description}</small>` : ''}
+                </td>
+                <td><span style="font-weight: 600;">${section.yearLevel || 'N/A'}</span></td>
+                <td>
+                    <span style="font-weight: 700; color: #3b82f6;">${section.studentCount || 0}</span>
+                    <small style="color: #64748b;"> students</small>
+                </td>
+                <td><span style="font-family: monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">${section.courseCode || 'N/A'}</span></td>
+                <td>${section.semester || 'N/A'}</td>
+                <td>${section.academicYear || 'N/A'}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-view" onclick="viewSectionDetails('${section.id}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="btn-action btn-attempt" onclick="filterStudentsBySection('${section.name}')">
+                            <i class="fas fa-users"></i> Students
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tableBody.innerHTML = html;
+}
+
+        function updateStudentsTable(students) {
+    const tableBody = document.getElementById('studentsTableBody');
+    const studentCount = document.getElementById('studentCount');
+    const currentPageElement = document.getElementById('currentPage');
+    const totalPagesElement = document.getElementById('totalPages');
+
+    const totalPages = Math.ceil(students.length / window.itemsPerPage);
+    totalPagesElement.textContent = totalPages || 1;
+    currentPageElement.textContent = window.currentPage;
+
+    const startIndex = (window.currentPage - 1) * window.itemsPerPage;
+    const endIndex = startIndex + window.itemsPerPage;
+    const pageStudents = students.slice(startIndex, endIndex);
+
+    studentCount.textContent = students.length;
+
+    if (pageStudents.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No Students Found</div><div class="empty-text">Try adjusting your search or filters.</div></div></td></tr>`;
+        return;
+    }
+
+    let rowsHTML = '';
+    pageStudents.forEach(student => {
+        let scoreClass = '', scoreText = 'No attempts';
+        if (student.totalAttempts > 0) {
+            if (student.bestScore >= 90) { scoreClass = 'score-excellent'; scoreText = 'Excellent'; }
+            else if (student.bestScore >= 70) { scoreClass = 'score-good'; scoreText = 'Good'; }
+            else { scoreClass = 'score-poor'; scoreText = 'Needs Improvement'; }
         }
 
-        // Update students table with pagination
-  function updateStudentsTable(students) {
-            const tableBody = document.getElementById('studentsTableBody');
-            const studentCount = document.getElementById('studentCount');
-            const currentPageElement = document.getElementById('currentPage');
-            const totalPagesElement = document.getElementById('totalPages');
-
-            const totalPages = Math.ceil(students.length / window.itemsPerPage);
-            totalPagesElement.textContent = totalPages || 1;
-            currentPageElement.textContent = window.currentPage;
-
-            const startIndex = (window.currentPage - 1) * window.itemsPerPage;
-            const endIndex = startIndex + window.itemsPerPage;
-            const pageStudents = students.slice(startIndex, endIndex);
-
-            studentCount.textContent = students.length;
-
-            if (pageStudents.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No Students Found</div><div class="empty-text">Try adjusting your search or filters.</div></div></td></tr>`;
-                return;
-            }
-
-            let rowsHTML = '';
-            pageStudents.forEach(student => {
-                let scoreClass = '', scoreText = 'No attempts';
-                if (student.totalAttempts > 0) {
-                    if (student.bestScore >= 90) { scoreClass = 'score-excellent'; scoreText = 'Excellent'; }
-                    else if (student.bestScore >= 70) { scoreClass = 'score-good'; scoreText = 'Good'; }
-                    else { scoreClass = 'score-poor'; scoreText = 'Needs Improvement'; }
-                }
-
-                let lastAttemptFormatted = 'No attempts';
-                if (student.lastAttempt instanceof Date && !isNaN(student.lastAttempt)) {
-                    lastAttemptFormatted = student.lastAttempt.toLocaleDateString('en-US', {
-                        year: 'numeric', month: 'long', day: 'numeric'
-                    });
-                }
-
-                rowsHTML += `
-                    <tr>
-                        <td><strong>${student.umakId || 'N/A'}</strong></td>
-                        <td>${student.firstName} ${student.lastName}</td>
-                        <td>${student.section || 'N/A'}</td>
-                        <td><strong>${student.totalAttempts}</strong>${student.totalAttempts === 0 ? '<br><small style="color: #64748b;">No attempts yet</small>' : ''}</td>
-                        <td>${student.totalAttempts > 0 ? `<span class="score-badge ${scoreClass}">${student.bestScore}%</span><br><small style="color: #64748b;">${scoreText}</small>` : '—'}</td>
-                        <td>${student.totalAttempts > 0 ? `<strong>${student.averageScore}%</strong>` : '—'}</td>
-                        <td>${lastAttemptFormatted}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-action btn-view" onclick="viewStudentDetails('${student.id}')"><i class="fas fa-eye"></i> View</button>
-                            </div>
-                        </td>
-                    </tr>`;
-            });
-
-            tableBody.innerHTML = rowsHTML;
+        let lastAttemptFormatted = 'No attempts';
+        if (student.lastAttempt instanceof Date && !isNaN(student.lastAttempt)) {
+            lastAttemptFormatted = `
+                <strong>${student.lastAttemptTest || 'Unknown Test'}</strong><br>
+                <small style="color: #64748b;">
+                    ${student.lastAttempt.toLocaleDateString('en-US', {
+                        year: 'numeric', month: 'short', day: 'numeric'
+                    })}
+                </small>
+            `;
         }
+
+        rowsHTML += `
+            <tr>
+                <td><strong>${student.umakId || 'N/A'}</strong></td>
+                <td>${student.firstName} ${student.lastName}</td>
+                <td>${student.section || 'N/A'}</td>
+                <td>${student.totalAttempts > 0 ? `<span class="score-badge ${scoreClass}">${student.bestScore}%</span><br><small style="color: #64748b;">${scoreText}</small>` : '—'}</td>
+                <td>${student.totalAttempts > 0 ? `<strong>${student.averageScore}%</strong>` : '—'}</td>
+                <td>${lastAttemptFormatted}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-view" onclick="viewStudentDetails('${student.id}')"><i class="fas fa-eye"></i> View</button>
+                    </div>
+                </td>
+            </tr>`;
+    });
+
+    tableBody.innerHTML = rowsHTML;
+}
         // Populate section filters
         function populateSectionFilters() {
             const sectionFilter = document.getElementById('filterSection');
@@ -1699,95 +1868,124 @@ async function loadStudents() {
             document.getElementById('viewSectionModal').style.display = 'none';
         }
 
-        // View student details and attempts
- async function viewStudentDetails(studentId) {
-            try {
-                window.currentStudentId = studentId;
-                const student = window.students.find(s => s.id === studentId);
-                if (!student) {
-                    alert('Student not found!');
-                    return;
-                }
-
-                const attemptsQuery = query(collection(db, 'testResults'), where('studentId', '==', studentId));
-                const attemptsSnapshot = await getDocs(attemptsQuery);
-
-                const attempts = [];
-                let totalScore = 0, bestScore = 0;
-
-                attemptsSnapshot.forEach(docSnap => {
-                    const attempt = { id: docSnap.id, ...docSnap.data() };
-                    attempts.push(attempt);
-                    const score = attempt.score || 0;
-                    totalScore += score;
-                    if (score > bestScore) bestScore = score;
-                });
-
-                // Manual sort: newest first
-                attempts.sort((a, b) => {
-                    const timeA = a.submittedAt?.toMillis() || 0;
-                    const timeB = b.submittedAt?.toMillis() || 0;
-                    return timeB - timeA;
-                });
-
-                const totalAttempts = attempts.length;
-                const averageScore = totalAttempts > 0 ? Math.round(totalScore / totalAttempts) : 0;
-                const initials = (student.firstName.charAt(0) + student.lastName.charAt(0)).toUpperCase() || '??';
-
-                // Student info card
-                let html = `
-                    <div class="student-info-header">
-                        <div class="student-avatar">${initials}</div>
-                        <div class="student-basic-info">
-                            <div class="student-name">${student.firstName} ${student.lastName}</div>
-                            <div class="student-id">${student.umakId} • ${student.section}</div>
-                        </div>
-                    </div>
-                    <div class="student-info-grid">
-<div class="info-item">
-    <div class="info-label">Email</div>
-    <div class="info-value info-value-email">${student.email || 'N/A'}</div>
-</div>                        <div class="info-item"><div class="info-label">Year Level</div><div class="info-value">${student.yearLevel || 'N/A'}</div></div>
-                        <div class="info-item"><div class="info-label">Total Attempts</div><div class="info-value"><strong>${totalAttempts}</strong></div></div>
-                        <div class="info-item"><div class="info-label">Best Score</div><div class="info-value">${totalAttempts > 0 ? `<span class="score-badge ${bestScore >= 90 ? 'score-excellent' : bestScore >= 70 ? 'score-good' : 'score-poor'}">${bestScore}%</span>` : 'No attempts'}</div></div>
-                        <div class="info-item"><div class="info-label">Average Score</div><div class="info-value">${totalAttempts > 0 ? `<strong>${averageScore}%</strong>` : 'No attempts'}</div></div>
-                        <div class="info-item"><div class="info-label">Status</div><div class="info-value"><span class="status-badge status-active">Active</span></div></div>
-                    </div>`;
-
-                document.getElementById('studentDetailsContent').innerHTML = html;
-
-                // Attempts table
-                let attemptsHTML = '';
-                if (attempts.length > 0) {
-                    attempts.forEach(attempt => {
-                        const date = attempt.submittedAt?.toDate() || new Date();
-                        const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        const score = attempt.score || 0;
-                        let statusClass = score >= 90 ? 'score-excellent' : score >= 70 ? 'score-good' : 'score-poor';
-                        let statusText = score >= 90 ? 'Excellent' : score >= 70 ? 'Good' : 'Needs Improvement';
-
-                        attemptsHTML += `
-                            <tr>
-                                <td>${formattedDate}</td>
-                                <td>${formatActivityType(attempt.activityType || 'unknown')}</td>
-                                <td><span class="score-badge ${statusClass}">${score}%</span></td>
-                                <td>${statusText}</td>
-                                <td>${attempt.duration ? attempt.duration + ' mins' : 'N/A'}</td>
-                                <td><button class="btn-action btn-view" style="padding: 4px 8px; font-size: 11px;" onclick="viewAttemptDetails('${attempt.id}')"><i class="fas fa-info-circle"></i> Details</button></td>
-                            </tr>`;
-                    });
-                } else {
-                    attemptsHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-history" style="font-size: 24px; opacity: 0.5;"></i><br>No attempts recorded yet</td></tr>`;
-                }
-
-                document.getElementById('attemptsTableBody').innerHTML = attemptsHTML;
-                document.getElementById('viewStudentModal').style.display = 'flex';
-            } catch (error) {
-                console.error('Error viewing student details:', error);
-                alert('Error: ' + error.message);
-            }
+async function viewStudentDetails(studentId) {
+    try {
+        window.currentStudentId = studentId;
+        const student = window.students.find(s => s.id === studentId);
+        if (!student) {
+            alert('Student not found!');
+            return;
         }
 
+        // Get all test results for this student
+        const attemptsQuery = query(
+            collection(db, 'testResults'), 
+            where('studentEmail', '==', student.email)
+        );
+        const attemptsSnapshot = await getDocs(attemptsQuery);
+
+        const attempts = [];
+        let totalScore = 0, bestScore = 0;
+
+        attemptsSnapshot.forEach(docSnap => {
+            const attempt = { id: docSnap.id, ...docSnap.data() };
+            attempts.push(attempt);
+            const score = calculateTestScore(attempt.testName, attempt.result, attempt.testTarget);
+            totalScore += score;
+            if (score > bestScore) bestScore = score;
+        });
+
+        // Sort by date (newest first)
+        attempts.sort((a, b) => {
+            const timeA = a.submittedAt?.toMillis() || 0;
+            const timeB = b.submittedAt?.toMillis() || 0;
+            return timeB - timeA;
+        });
+
+        const totalAttempts = attempts.length;
+        const averageScore = totalAttempts > 0 ? Math.round(totalScore / totalAttempts) : 0;
+        const initials = (student.firstName.charAt(0) + student.lastName.charAt(0)).toUpperCase() || '??';
+
+        // Student info card
+        let html = `
+            <div class="student-info-header">
+                <div class="student-avatar">${initials}</div>
+                <div class="student-basic-info">
+                    <div class="student-name">${student.firstName} ${student.lastName}</div>
+                    <div class="student-id">${student.umakId} • ${student.section}</div>
+                </div>
+            </div>
+            <div class="student-info-grid">
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value info-value-email">${student.email || 'N/A'}</div>
+                </div>
+                <div class="info-item"><div class="info-label">Year Level</div><div class="info-value">${student.yearLevel || 'N/A'}</div></div>
+                <div class="info-item"><div class="info-label">Total Tests Taken</div><div class="info-value"><strong>${Object.keys(student.testAttempts).length}</strong></div></div>
+                <div class="info-item"><div class="info-label">Best Score</div><div class="info-value">${totalAttempts > 0 ? `<span class="score-badge ${bestScore >= 90 ? 'score-excellent' : bestScore >= 70 ? 'score-good' : 'score-poor'}">${bestScore}%</span>` : 'No attempts'}</div></div>
+                <div class="info-item"><div class="info-label">Average Score</div><div class="info-value">${totalAttempts > 0 ? `<strong>${averageScore}%</strong>` : 'No attempts'}</div></div>
+                <div class="info-item"><div class="info-label">Status</div><div class="info-value"><span class="status-badge status-active">Active</span></div></div>
+            </div>`;
+
+        document.getElementById('studentDetailsContent').innerHTML = html;
+
+        // Attempts table - grouped by test
+        let attemptsHTML = '';
+        if (attempts.length > 0) {
+            // Group attempts by test name
+            const testGroups = {};
+            attempts.forEach(attempt => {
+                const testName = attempt.testName || 'Unknown Test';
+                if (!testGroups[testName]) {
+                    testGroups[testName] = [];
+                }
+                testGroups[testName].push(attempt);
+            });
+
+            // Display each test group
+            Object.entries(testGroups).forEach(([testName, testAttempts]) => {
+                testAttempts.forEach((attempt, index) => {
+                    let date = new Date();
+                    if (attempt.submittedAt) {
+                        if (typeof attempt.submittedAt.toDate === 'function') {
+                            date = attempt.submittedAt.toDate();
+                        } else if (attempt.submittedAt instanceof Date) {
+                            date = attempt.submittedAt;
+                        } else if (typeof attempt.submittedAt === 'string' || typeof attempt.submittedAt === 'number') {
+                            date = new Date(attempt.submittedAt);
+                        }
+                    }
+                    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const score = calculateTestScore(attempt.testName, attempt.result, attempt.testTarget);
+                    let statusClass = score >= 90 ? 'score-excellent' : score >= 70 ? 'score-good' : 'score-poor';
+                    let statusText = score >= 90 ? 'Excellent' : score >= 70 ? 'Good' : 'Needs Improvement';
+
+                    attemptsHTML += `
+                        <tr>
+                            <td>${formattedDate}</td>
+                            <td><strong>${testName}</strong><br><small style="color: #64748b;">Attempt ${testAttempts.length - index} of ${testAttempts.length}</small></td>
+                            <td><span class="score-badge ${statusClass}">${score}%</span></td>
+                            <td>${statusText}</td>
+                            <td>${attempt.timerValue || 'N/A'}</td>
+                            <td>
+                                <button class="btn-action btn-view" style="padding: 4px 8px; font-size: 11px;" onclick="viewAttemptDetails('${attempt.id}')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                            </td>
+                        </tr>`;
+                });
+            });
+        } else {
+            attemptsHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-history" style="font-size: 24px; opacity: 0.5;"></i><br>No test results recorded yet</td></tr>`;
+        }
+
+        document.getElementById('attemptsTableBody').innerHTML = attemptsHTML;
+        document.getElementById('viewStudentModal').style.display = 'flex';
+    } catch (error) {
+        console.error('Error viewing student details:', error);
+        alert('Error: ' + error.message);
+    }
+}
         // Helper function to format activity type
         function formatActivityType(type) {
             const types = {
@@ -1914,12 +2112,18 @@ async function loadStudents() {
         // Filter sections
         function filterSections() {
             const searchTerm = document.getElementById('searchSections').value.toLowerCase();
-            const rows = document.querySelectorAll('#sectionsTableBody tr');
             
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            window.filteredSections = window.sections.filter(section => {
+                const matchesSearch = !searchTerm || 
+                    section.name.toLowerCase().includes(searchTerm) ||
+                    (section.courseCode && section.courseCode.toLowerCase().includes(searchTerm)) ||
+                    (section.yearLevel && section.yearLevel.toLowerCase().includes(searchTerm));
+                
+                return matchesSearch;
             });
+            
+            window.currentSectionPage = 1;
+            populateSectionsTable();
         }
 
         // Filter students
@@ -2080,6 +2284,17 @@ async function loadStudents() {
             }
         });
 
+            // Filter students by section
+            function filterStudentsBySection(sectionName) {
+                document.getElementById('filterSection').value = sectionName;
+                filterStudents();
+                
+                // Scroll to students section
+                document.querySelector('.management-section:last-of-type').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
         // Make functions globally available
         window.viewSectionDetails = viewSectionDetails;
         window.closeViewSectionModal = closeViewSectionModal;
@@ -2094,8 +2309,9 @@ async function loadStudents() {
         window.previousPage = previousPage;
         window.nextPage = nextPage;
         window.signOut = signOut;
+        window.filterStudentsBySection = filterStudentsBySection;
     </script>
-
+    
     <script>
         async function handleLogout() {
             if (confirm('Are you sure you want to logout?')) {
