@@ -350,20 +350,38 @@
         .custom-table tbody tr:last-child td {
             border-bottom: none;
         }
-        /* Fix for long email in student modal */
-.info-value-email {
-    word-break: break-all; /* Para mag-break ang mahabang word */
-    font-size: 13px;       /* Medyo paliitin para kasya */
-    color: #475569;
-}
+  
+        .info-value-email {
+            word-break: break-all; 
+            font-size: 13px;       
+            color: #475569;
+        }
 
-/* Optional: Kung gusto mo ellipsis (...) kapag sobrang haba */
-.info-value-email.truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+
+        .info-value-email.truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         
+        .scrollable-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .scrollable-table-container table {
+            margin-bottom: 0;
+        }
+
+        .scrollable-table-container thead {
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            z-index: 10;
+        }
         /* Status Badges */
         .status-badge {
             display: inline-block;
@@ -766,9 +784,23 @@
         .score-poor {
             background-color: #fee2e2;
             color: #991b1b;
-        }
-        
-        /* Attempt Form */
+        }   
+            /* Scrollable attempts table */
+            .scrollable-attempts-table {
+                max-height: 400px;
+                overflow-y: auto;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                margin-top: 10px;
+            }
+
+            .scrollable-attempts-table thead {
+                position: sticky;
+                top: 0;
+                background: #f8fafc;
+                z-index: 10;
+            }
+                    /* Attempt Form */
         .attempt-form {
             background: #f8fafc;
             border-radius: 8px;
@@ -1088,100 +1120,125 @@
     </div>
 
     <!-- View Section Details Modal -->
-    <div id="viewSectionModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-layer-group"></i> Section Details
-                </h3>
-                <button class="close-modal" onclick="closeViewSectionModal()">&times;</button>
+<div id="viewSectionModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                <i class="fas fa-layer-group"></i> Section Details
+            </h3>
+            <button class="close-modal" onclick="closeViewSectionModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="section-info-card" id="sectionDetailsContent">
+                <!-- Section details will be loaded here -->
             </div>
-            <div class="modal-body">
-                <div class="section-info-card" id="sectionDetailsContent">
-                    <!-- Section details will be loaded here -->
+            
+            <!-- Students Table Section -->
+            <div class="activities-table">
+                <h4 style="margin-bottom: 15px; color: #1e3a8a;">
+                    <i class="fas fa-user-graduate"></i> Students in this Section
+                </h4>
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="custom-table" id="sectionStudentsTable">
+                        <thead>
+                            <tr>
+                                <th>UMaK ID</th>
+                                <th>Student Name</th>
+                                <th>Email</th>
+                                <th>Total Attempts</th>
+                                <th>Best Score</th>
+                                <th>Average Score</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sectionStudentsTableBody">
+                            <!-- Students will be loaded here -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeViewSectionModal()">Close</button>
-            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeViewSectionModal()">Close</button>
         </div>
     </div>
+</div>
 
     <!-- View Student Details & Add Attempt Modal -->
-    <div id="viewStudentModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-user-circle"></i> Student Performance
-                </h3>
-                <button class="close-modal" onclick="closeViewStudentModal()">&times;</button>
+<div id="viewStudentModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                <i class="fas fa-user-circle"></i> Student Performance
+            </h3>
+            <button class="close-modal" onclick="closeViewStudentModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="student-info-card" id="studentDetailsContent">
+                <!-- Student details will be loaded here -->
             </div>
-            <div class="modal-body">
-                <div class="student-info-card" id="studentDetailsContent">
-                    <!-- Student details will be loaded here -->
+            
+            <!-- Activities/Actions Table - NOW SCROLLABLE -->
+            <div class="activities-table">
+                <h4 style="margin-bottom: 15px; color: #1e3a8a;">
+                    <i class="fas fa-history"></i> Activity Attempts
+                </h4>
+               <div class="table-responsive scrollable-attempts-table">
+            <table class="custom-table" id="attemptsTable">
+                        <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Activity Type</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                                <th>Duration</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attemptsTableBody">
+                            <!-- Attempts will be loaded here -->
+                        </tbody>
+                    </table>
                 </div>
-                
-                <!-- Activities/Actions Table -->
-                <div class="activities-table">
-                    <h4 style="margin-bottom: 15px; color: #1e3a8a;">
-                        <i class="fas fa-history"></i> Activity Attempts
-                    </h4>
-                    <div class="table-responsive">
-                        <table class="custom-table" id="attemptsTable">
-                            <thead>
-                                <tr>
-                                    <th>Date & Time</th>
-                                    <th>Activity Type</th>
-                                    <th>Score</th>
-                                    <th>Status</th>
-                                    <th>Duration</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="attemptsTableBody">
-                                <!-- Attempts will be loaded here -->
-                            </tbody>
-                        </table>
+            </div>
+            
+            <!-- Add New Attempt Form -->
+            <div class="attempt-form">
+                <h4 style="margin-bottom: 15px; color: #1e3a8a;">
+                    <i class="fas fa-plus-circle"></i> Add New Attempt
+                </h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label required" for="attemptType">Activity Type</label>
+                        <select class="form-select" id="attemptType" required>
+                            <option value="">Select Activity</option>
+                            <option value="push-up">Push-up Test</option>
+                            <option value="sit-up">Sit-up Test</option>
+                            <option value="running">Running Test</option>
+                            <option value="flexibility">Flexibility Test</option>
+                            <option value="endurance">Endurance Test</option>
+                            <option value="other">Other Activity</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="attemptScore">Score (%)</label>
+                        <input type="number" class="form-control" id="attemptScore" min="0" max="100" placeholder="Enter score (0-100)" required>
                     </div>
                 </div>
-                
-                <!-- Add New Attempt Form -->
-                <div class="attempt-form">
-                    <h4 style="margin-bottom: 15px; color: #1e3a8a;">
-                        <i class="fas fa-plus-circle"></i> Add New Attempt
-                    </h4>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label required" for="attemptType">Activity Type</label>
-                            <select class="form-select" id="attemptType" required>
-                                <option value="">Select Activity</option>
-                                <option value="push-up">Push-up Test</option>
-                                <option value="sit-up">Sit-up Test</option>
-                                <option value="running">Running Test</option>
-                                <option value="flexibility">Flexibility Test</option>
-                                <option value="endurance">Endurance Test</option>
-                                <option value="other">Other Activity</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label required" for="attemptScore">Score (%)</label>
-                            <input type="number" class="form-control" id="attemptScore" min="0" max="100" placeholder="Enter score (0-100)" required>
-                        </div>
-                    </div>
-                    <div class="form-group full-width">
-                        <label class="form-label" for="attemptNotes">Notes (Optional)</label>
-                        <textarea class="form-control" id="attemptNotes" rows="2" placeholder="Any notes about this attempt..."></textarea>
-                    </div>
-                    <div class="modal-footer" style="padding: 15px 0 0 0; border-top: none;">
-                        <button class="btn-cancel" onclick="closeViewStudentModal()">Cancel</button>
-                        <button class="btn-submit" onclick="addNewAttempt()">
-                            <i class="fas fa-save"></i> Save Attempt
-                        </button>
-                    </div>
+                <div class="form-group full-width">
+                    <label class="form-label" for="attemptNotes">Notes (Optional)</label>
+                    <textarea class="form-control" id="attemptNotes" rows="2" placeholder="Any notes about this attempt..."></textarea>
+                </div>
+                <div class="modal-footer" style="padding: 15px 0 0 0; border-top: none;">
+                    <button class="btn-cancel" onclick="closeViewStudentModal()">Cancel</button>
+                    <button class="btn-submit" onclick="addNewAttempt()">
+                        <i class="fas fa-save"></i> Save Attempt
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
    <script type="module">
@@ -1609,7 +1666,7 @@ function calculateTestScore(testName, result, testTarget = null) {
     
     return 75; // Default score
 }
-        function populateSectionsTable() {
+function populateSectionsTable() {
     const tableBody = document.getElementById('sectionsTableBody');
     const sectionCount = document.getElementById('sectionCount');
     
@@ -1659,9 +1716,7 @@ function calculateTestScore(testName, result, testTarget = null) {
                         <button class="btn-action btn-view" onclick="viewSectionDetails('${section.id}')">
                             <i class="fas fa-eye"></i> View
                         </button>
-                        <button class="btn-action btn-attempt" onclick="filterStudentsBySection('${section.name}')">
-                            <i class="fas fa-users"></i> Students
-                        </button>
+                        <!-- REMOVED THE STUDENTS BUTTON -->
                     </div>
                 </td>
             </tr>
@@ -1750,118 +1805,162 @@ function calculateTestScore(testName, result, testTarget = null) {
         }
 
         // View section details (READ ONLY)
-        async function viewSectionDetails(sectionId) {
-            try {
-                const sectionRef = doc(db, 'sections', sectionId);
-                const sectionDoc = await getDoc(sectionRef);
-                
-                if (!sectionDoc.exists()) {
-                    alert('Section not found!');
-                    return;
-                }
-                
-                const sectionData = { id: sectionDoc.id, ...sectionDoc.data() };
-                
-                // Get students in this section
-                const studentsQuery = query(
-                    collection(db, 'students'),
-                    where('section', '==', sectionData.name)
-                );
-                const studentsSnapshot = await getDocs(studentsQuery);
-                const studentCount = studentsSnapshot.size;
-                
-                // Get performance statistics
-                let totalAttempts = 0;
-                let totalScore = 0;
-                let studentsWithAttempts = 0;
-                
-                for (const studentDoc of studentsSnapshot.docs) {
-                    const attemptsQuery = query(
-                        collection(db, 'testResults'),
-                        where('studentId', '==', studentDoc.id)
-                    );
-                    const attemptsSnapshot = await getDocs(attemptsQuery);
-                    
-                    if (!attemptsSnapshot.empty) {
-                        studentsWithAttempts++;
-                        attemptsSnapshot.forEach(attempt => {
-                            totalAttempts++;
-                            totalScore += attempt.data().score || 0;
-                        });
-                    }
-                }
-                
-                const averageScore = totalAttempts > 0 ? Math.round(totalScore / totalAttempts) : 0;
-                const completionRate = studentCount > 0 ? Math.round((studentsWithAttempts / studentCount) * 100) : 0;
-                
-                // Prepare HTML
-                let html = `
-                    <div class="section-info-header">
-                        <div class="section-basic-info">
-                            <div class="section-name">${sectionData.name}</div>
-                            <div class="section-details">
-                                <span><i class="fas fa-user-graduate"></i> ${studentCount} Students</span>
-                                <span><i class="fas fa-calendar"></i> ${sectionData.academicYear || 'N/A'}</span>
-                                <span><i class="fas fa-clock"></i> ${sectionData.semester || 'N/A'}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Year Level</div>
-                            <div class="info-value">${sectionData.yearLevel || 'N/A'}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Status</div>
-                            <div class="info-value">
-                                <span class="status-badge ${sectionData.status === 'active' ? 'status-active' : 'status-inactive'}">
-                                    ${sectionData.status === 'active' ? 'Active' : 'Inactive'}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Total Attempts</div>
-                            <div class="info-value">${totalAttempts}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Average Score</div>
-                            <div class="info-value">
-                                ${totalAttempts > 0 ? `
-                                    <span class="score-badge ${averageScore >= 70 ? 'score-excellent' : 'score-poor'}">
-                                        ${averageScore}%
-                                    </span>
-                                ` : 'No data'}
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Completion Rate</div>
-                            <div class="info-value">${completionRate}%</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Professor</div>
-                            <div class="info-value">${sectionData.professor || window.currentUser.displayName || window.currentUser.email}</div>
-                        </div>
-                `;
-                
-                if (sectionData.description) {
-                    html += `
-                        <div class="info-item full-width">
-                            <div class="info-label">Description</div>
-                            <div class="info-value">${sectionData.description}</div>
-                        </div>
-                    `;
-                }
-                
-                html += `</div>`;
-                
-                document.getElementById('sectionDetailsContent').innerHTML = html;
-                document.getElementById('viewSectionModal').style.display = 'flex';
-                
-            } catch (error) {
-                console.error('Error viewing section details:', error);
-                alert('Error: ' + error.message);
-            }
+        // View section details (READ ONLY) with students list
+async function viewSectionDetails(sectionId) {
+    try {
+        const sectionRef = doc(db, 'sections', sectionId);
+        const sectionDoc = await getDoc(sectionRef);
+        
+        if (!sectionDoc.exists()) {
+            alert('Section not found!');
+            return;
         }
+        
+        const sectionData = { id: sectionDoc.id, ...sectionDoc.data() };
+        
+        // Get students in this section from our loaded data
+        const sectionStudents = window.students.filter(student => 
+            student.section === sectionData.name
+        );
+        
+        // Get performance statistics
+        let totalAttempts = 0;
+        let totalScore = 0;
+        let studentsWithAttempts = 0;
+        
+        sectionStudents.forEach(student => {
+            if (student.totalAttempts > 0) {
+                studentsWithAttempts++;
+                totalAttempts += student.totalAttempts;
+                totalScore += student.averageScore;
+            }
+        });
+        
+        const averageScore = studentsWithAttempts > 0 ? Math.round(totalScore / studentsWithAttempts) : 0;
+        const completionRate = sectionStudents.length > 0 ? Math.round((studentsWithAttempts / sectionStudents.length) * 100) : 0;
+        
+        // Prepare HTML for section details
+        let html = `
+            <div class="section-info-header">
+                <div class="section-basic-info">
+                    <div class="section-name">${sectionData.name}</div>
+                    <div class="section-details">
+                        <span><i class="fas fa-user-graduate"></i> ${sectionStudents.length} Students</span>
+                        <span><i class="fas fa-calendar"></i> ${sectionData.academicYear || 'N/A'}</span>
+                        <span><i class="fas fa-clock"></i> ${sectionData.semester || 'N/A'}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="section-info-grid">
+                <div class="info-item">
+                    <div class="info-label">Year Level</div>
+                    <div class="info-value">${sectionData.yearLevel || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Status</div>
+                    <div class="info-value">
+                        <span class="status-badge ${sectionData.status === 'active' ? 'status-active' : 'status-inactive'}">
+                            ${sectionData.status === 'active' ? 'Active' : 'Inactive'}
+                        </span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Total Attempts</div>
+                    <div class="info-value">${totalAttempts}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Average Score</div>
+                    <div class="info-value">
+                        ${studentsWithAttempts > 0 ? `
+                            <span class="score-badge ${averageScore >= 70 ? 'score-excellent' : 'score-poor'}">
+                                ${averageScore}%
+                            </span>
+                        ` : 'No data'}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Completion Rate</div>
+                    <div class="info-value">${completionRate}%</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Professor</div>
+                    <div class="info-value">${sectionData.professor || window.currentUser.displayName || window.currentUser.email}</div>
+                </div>
+        `;
+        
+        if (sectionData.description) {
+            html += `
+                <div class="info-item full-width">
+                    <div class="info-label">Description</div>
+                    <div class="info-value">${sectionData.description}</div>
+                </div>
+            `;
+        }
+        
+        html += `</div>`;
+        
+        document.getElementById('sectionDetailsContent').innerHTML = html;
+        
+        // Populate students table
+        let studentsHTML = '';
+        if (sectionStudents.length > 0) {
+            sectionStudents.forEach(student => {
+                let scoreClass = '', scoreText = 'No attempts';
+                if (student.totalAttempts > 0) {
+                    if (student.bestScore >= 90) { scoreClass = 'score-excellent'; scoreText = 'Excellent'; }
+                    else if (student.bestScore >= 70) { scoreClass = 'score-good'; scoreText = 'Good'; }
+                    else { scoreClass = 'score-poor'; scoreText = 'Needs Improvement'; }
+                }
+                
+                studentsHTML += `
+                    <tr>
+                        <td><strong>${student.umakId || 'N/A'}</strong></td>
+                        <td>${student.firstName} ${student.lastName}</td>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="${student.email}">
+                            ${student.email || 'N/A'}
+                        </td>
+                        <td>${student.totalAttempts || 0}</td>
+                        <td>
+                            ${student.totalAttempts > 0 ? 
+                                `<span class="score-badge ${scoreClass}">${student.bestScore}%</span>` : 
+                                '—'
+                            }
+                        </td>
+                        <td>
+                            ${student.totalAttempts > 0 ? 
+                                `<strong>${student.averageScore}%</strong>` : 
+                                '—'
+                            }
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" onclick="viewStudentDetails('${student.id}'); closeViewSectionModal();" style="padding: 4px 8px; font-size: 11px;">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        } else {
+            studentsHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px; color: #64748b;">
+                        <i class="fas fa-user-graduate" style="font-size: 24px; opacity: 0.5;"></i><br>
+                        No students found in this section
+                    </td>
+                </tr>
+            `;
+        }
+        
+        document.getElementById('sectionStudentsTableBody').innerHTML = studentsHTML;
+        document.getElementById('viewSectionModal').style.display = 'flex';
+        
+    } catch (error) {
+        console.error('Error viewing section details:', error);
+        alert('Error: ' + error.message);
+    }
+}
 
         // Close view section modal
         function closeViewSectionModal() {
@@ -1895,11 +1994,38 @@ async function viewStudentDetails(studentId) {
             if (score > bestScore) bestScore = score;
         });
 
-        // Sort by date (newest first)
+        // Sort by date (newest first) - FIXED VERSION
         attempts.sort((a, b) => {
-            const timeA = a.submittedAt?.toMillis() || 0;
-            const timeB = b.submittedAt?.toMillis() || 0;
-            return timeB - timeA;
+            // Helper function to safely get timestamp
+            const getTimestamp = (attempt) => {
+                if (!attempt.submittedAt) return 0;
+                
+                // If it's a Firestore Timestamp
+                if (attempt.submittedAt.toMillis && typeof attempt.submittedAt.toMillis === 'function') {
+                    return attempt.submittedAt.toMillis();
+                }
+                
+                // If it's already a Date object
+                if (attempt.submittedAt instanceof Date) {
+                    return attempt.submittedAt.getTime();
+                }
+                
+                // If it's a string or number
+                if (typeof attempt.submittedAt === 'string' || typeof attempt.submittedAt === 'number') {
+                    return new Date(attempt.submittedAt).getTime();
+                }
+                
+                // If it's a Firestore Timestamp with seconds/nanoseconds
+                if (attempt.submittedAt.seconds && attempt.submittedAt.nanoseconds) {
+                    return attempt.submittedAt.seconds * 1000 + attempt.submittedAt.nanoseconds / 1000000;
+                }
+                
+                return 0;
+            };
+            
+            const timeA = getTimestamp(a);
+            const timeB = getTimestamp(b);
+            return timeB - timeA; // Sort newest first
         });
 
         const totalAttempts = attempts.length;
@@ -1945,17 +2071,26 @@ async function viewStudentDetails(studentId) {
             // Display each test group
             Object.entries(testGroups).forEach(([testName, testAttempts]) => {
                 testAttempts.forEach((attempt, index) => {
-                    let date = new Date();
-                    if (attempt.submittedAt) {
-                        if (typeof attempt.submittedAt.toDate === 'function') {
-                            date = attempt.submittedAt.toDate();
-                        } else if (attempt.submittedAt instanceof Date) {
-                            date = attempt.submittedAt;
-                        } else if (typeof attempt.submittedAt === 'string' || typeof attempt.submittedAt === 'number') {
-                            date = new Date(attempt.submittedAt);
-                        }
-                    }
-                    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                   let date = new Date();
+            if (attempt.submittedAt) {
+                // If it's a Firestore Timestamp
+                if (typeof attempt.submittedAt.toDate === 'function') {
+                    date = attempt.submittedAt.toDate();
+                } 
+                // If it's already a Date object
+                else if (attempt.submittedAt instanceof Date) {
+                    date = attempt.submittedAt;
+                } 
+                // If it's a string or number
+                else if (typeof attempt.submittedAt === 'string' || typeof attempt.submittedAt === 'number') {
+                    date = new Date(attempt.submittedAt);
+                }
+                // If it's a Timestamp object (alternative)
+                else if (attempt.submittedAt.seconds && attempt.submittedAt.nanoseconds) {
+                    date = new Date(attempt.submittedAt.seconds * 1000 + attempt.submittedAt.nanoseconds / 1000000);
+                }
+            }
+            const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     const score = calculateTestScore(attempt.testName, attempt.result, attempt.testTarget);
                     let statusClass = score >= 90 ? 'score-excellent' : score >= 70 ? 'score-good' : 'score-poor';
                     let statusText = score >= 90 ? 'Excellent' : score >= 70 ? 'Good' : 'Needs Improvement';
@@ -2284,17 +2419,7 @@ async function viewStudentDetails(studentId) {
             }
         });
 
-            // Filter students by section
-            function filterStudentsBySection(sectionName) {
-                document.getElementById('filterSection').value = sectionName;
-                filterStudents();
-                
-                // Scroll to students section
-                document.querySelector('.management-section:last-of-type').scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            }
+            
         // Make functions globally available
         window.viewSectionDetails = viewSectionDetails;
         window.closeViewSectionModal = closeViewSectionModal;
@@ -2309,7 +2434,6 @@ async function viewStudentDetails(studentId) {
         window.previousPage = previousPage;
         window.nextPage = nextPage;
         window.signOut = signOut;
-        window.filterStudentsBySection = filterStudentsBySection;
     </script>
     
     <script>
