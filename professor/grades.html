@@ -181,6 +181,7 @@
         .filter-group {
             flex: 1;
             min-width: 200px;
+            position: relative;
         }
 
         .filter-label {
@@ -206,6 +207,34 @@
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-clear {
+            position: absolute;
+            right: 10px;
+            top: 32px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            display: none;
+            font-size: 18px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-clear:hover {
+            color: #64748b;
+            background-color: #f1f5f9;
+            border-radius: 50%;
+        }
+
+        .filter-select:not([value=""]) + .filter-clear,
+        .filter-input:not(:placeholder-shown) + .filter-clear {
+            display: flex;
         }
 
         .btn-primary {
@@ -319,6 +348,12 @@
             text-align: left;
             border-bottom: 2px solid #e2e8f0;
             letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .grades-table th:hover {
+            background-color: #e2e8f0;
         }
 
         .grades-table td {
@@ -548,6 +583,66 @@
             width: auto;
         }
 
+        .grade-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8fafc;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+
+        /* CSS for Final Grades Statistics */
+        .grades-footer {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-value {
+            font-family: "Inter", Helvetica;
+            font-weight: 700;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-family: "Inter", Helvetica;
+            font-weight: 500;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            color: #0369a1;
+        }
+
+        .text-muted {
+            color: #6b7280 !important;
+        }
+
         @media (max-width: 768px) {
             .filter-row {
                 flex-direction: column;
@@ -556,6 +651,10 @@
                 flex-direction: column;
                 gap: 15px;
                 align-items: flex-start;
+            }
+            .row {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
@@ -639,19 +738,23 @@
                     <div class="filter-row">
                         <div class="filter-group">
                             <label class="filter-label">Section</label>
-                            <select class="filter-select" id="filterSection">
+                            <select class="filter-select" id="filterSection" onchange="applyFilters()">
                                 <option value="">All Sections</option>
                             </select>
+                            <button class="filter-clear" onclick="clearFilter('section')">&times;</button>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Activity Type</label>
-                            <select class="filter-select" id="filterActivity">
+                            <select class="filter-select" id="filterActivity" onchange="applyFilters()">
                                 <option value="">All Activities</option>
                             </select>
+                            <button class="filter-clear" onclick="clearFilter('activity')">&times;</button>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Student Name</label>
-                            <input type="text" class="filter-input" id="filterStudent" placeholder="Search student...">
+                            <input type="text" class="filter-input" id="filterStudent" 
+                                   placeholder="Search student..." oninput="applyFilters()">
+                            <button class="filter-clear" onclick="clearFilter('student')">&times;</button>
                         </div>
                         <div style="display: flex; gap: 10px;">
                             <button class="btn-primary" onclick="applyFilters()">
@@ -682,10 +785,10 @@
                         <table class="grades-table" id="gradesTable">
                             <thead>
                                 <tr>
-                                    <th>Student Name</th>
+                                    <th onclick="sortGrades('studentName')">Student Name</th>
                                     <th>Section</th>
-                                    <th>Activity</th>
-                                    <th>Score</th>
+                                    <th onclick="sortGrades('testName')">Activity</th>
+                                    <th>Results</th>
                                     <th>Grade</th>
                                     <th>Date</th>
                                     <th>Actions</th>
@@ -705,13 +808,28 @@
                         </table>
                     </div>
                 </div>
-
-                <!-- Final Grades Summary -->
-                <div class="grades-container mt-4">
-                    <h3 class="grades-title">
-                        <i class="fas fa-chart-line"></i>
-                        Final Grades Summary
-                    </h3>
+                <div class="grades-container mt-4" id="finalGradesSection">
+                    <div class="grades-header">
+                        <h3 class="grades-title">
+                            <i class="fas fa-chart-line"></i>
+                            Final Grades Summary
+                            <span class="badge bg-success" style="font-size: 12px; margin-left: 10px;">Auto-calculated</span>
+                        </h3>
+                        <div>
+                            <button class="btn-success" onclick="saveFinalGradesToPDF()" id="savePdfBtn" style="display: none;">
+                                <i class="fas fa-file-pdf"></i> Save as PDF
+                            </button>
+                            <button class="btn-warning" onclick="calculateFinalGrades()" id="recalculateBtn">
+                                <i class="fas fa-sync-alt"></i> Recalculate
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mb-3" id="finalGradesInfo" style="display: none;">
+                        <i class="fas fa-info-circle"></i> 
+                        <span id="summaryInfoText">Final grades are automatically calculated from student activity scores.</span>
+                    </div>
+                    
                     <div class="table-responsive">
                         <table class="grades-table">
                             <thead>
@@ -722,27 +840,56 @@
                                     <th>Average Score</th>
                                     <th>Final Grade</th>
                                     <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="finalGradesBody">
                                 <tr>
-                                    <td colspan="6">
+                                    <td colspan="7">
                                         <div class="empty-state">
-                                            <div class="empty-icon">📈</div>
-                                            <div class="empty-title">No Final Grades Calculated</div>
-                                            <div class="empty-text">Click "Calculate Final Grades" to generate final grades</div>
+                                            <div class="empty-icon">⏳</div>
+                                            <div class="empty-title">Calculating Final Grades...</div>
+                                            <div class="empty-text">
+                                                <p>Please wait while we calculate final grades from student activity scores.</p>
+                                                <div class="spinner" style="width: 30px; height: 30px; margin: 20px auto;"></div>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+                    
+                    <div class="grades-footer mt-3" id="gradesStats" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="totalStudents">0</div>
+                                    <div class="stat-label">Total Students</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value text-success" id="passedStudents">0</div>
+                                    <div class="stat-label">Passed</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value text-warning" id="failedStudents">0</div>
+                                    <div class="stat-label">Failed</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="overallAverage">0.0</div>
+                                    <div class="stat-label">Overall Average</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Edit Grade Modal -->
     <div class="modal-overlay" id="editGradeModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -762,6 +909,9 @@
                     <div class="form-group">
                         <label class="form-label">Score (0-100)</label>
                         <input type="number" class="form-control" id="editScore" min="0" max="100" step="0.1" required>
+                        <div class="grade-preview" id="gradePreview">
+                            Preview will appear here
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Remarks</label>
@@ -777,7 +927,6 @@
         </div>
     </div>
 
-    <!-- Bulk Edit Modal -->
     <div class="modal-overlay" id="bulkEditModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -845,6 +994,12 @@
         let allGrades = [];
         let allActivities = [];
         let allStudents = [];
+        let currentFinalGrades = [];
+
+        let sortConfig = {
+            key: null,
+            direction: 'asc'
+        };
 
         onAuthStateChanged(auth, async (user) => {
             const loadingScreen = document.getElementById('loadingScreen');
@@ -894,73 +1049,139 @@
         async function loadAssignedSections() {
             try {
                 assignedSections = [];
+                const sectionSet = new Set();
                 
-                // Load from professorProfiles
-                const profileRef = doc(db, 'professorProfiles', currentProfessor.email);
-                const profileDoc = await getDoc(profileRef);
-                
-                if (profileDoc.exists()) {
-                    const profileData = profileDoc.data();
-                    if (profileData.assignedClass) {
-                        const studentsQuery = query(
-                            collection(db, 'students'),
-                            where('section', '==', profileData.assignedClass)
+                console.log('Loading sections for professor:', currentProfessor.email);
+
+                // Try multiple methods to get sections
+                const methods = [
+                    // Method 1: Check professorProfiles
+                    async () => {
+                        const professorQuery = query(
+                            collection(db, 'professorProfiles'),
+                            where('email', '==', currentProfessor.email)
                         );
-                        const studentsSnapshot = await getDocs(studentsQuery);
+                        const professorSnapshot = await getDocs(professorQuery);
                         
-                        assignedSections.push({
-                            section: profileData.assignedClass,
-                            students: studentsSnapshot.size
-                        });
-                    }
-                }
-                
-                // Load from sections collection
-                const sectionsQuery = query(
-                    collection(db, 'sections'),
-                    where('professorEmail', '==', currentProfessor.email)
-                );
-                const sectionsSnapshot = await getDocs(sectionsQuery);
-                
-                for (const docSnap of sectionsSnapshot.docs) {
-                    const sectionData = docSnap.data();
-                    const exists = assignedSections.find(s => s.section === sectionData.name);
+                        if (!professorSnapshot.empty) {
+                            const professorData = professorSnapshot.docs[0].data();
+                            const professorName = professorData.fullName || professorData.name || '';
+                            
+                            // Get sections by professor name
+                            const sectionsQuery = query(
+                                collection(db, 'sections'),
+                                where('professor', '==', professorName)
+                            );
+                            const sectionsSnapshot = await getDocs(sectionsQuery);
+                            
+                            sectionsSnapshot.forEach(doc => {
+                                const data = doc.data();
+                                if (data.name && !sectionSet.has(data.name)) {
+                                    sectionSet.add(data.name);
+                                    assignedSections.push({ 
+                                        section: data.name,
+                                        professorName: professorName 
+                                    });
+                                }
+                            });
+                        }
+                    },
                     
-                    if (!exists) {
-                        const studentsQuery = query(
-                            collection(db, 'students'),
-                            where('section', '==', sectionData.name)
+                    // Method 2: Check sections by professorEmail
+                    async () => {
+                        const sectionsQuery = query(
+                            collection(db, 'sections'),
+                            where('professorEmail', '==', currentProfessor.email)
                         );
-                        const studentsSnapshot = await getDocs(studentsQuery);
+                        const sectionsSnapshot = await getDocs(sectionsQuery);
                         
-                        assignedSections.push({
-                            section: sectionData.name,
-                            students: studentsSnapshot.size
+                        sectionsSnapshot.forEach(doc => {
+                            const data = doc.data();
+                            if (data.name && !sectionSet.has(data.name)) {
+                                sectionSet.add(data.name);
+                                assignedSections.push({ 
+                                    section: data.name,
+                                    professorName: data.professor || currentProfessor.email 
+                                });
+                            }
+                        });
+                    },
+                    
+                    // Method 3: Check testResults for sections
+                    async () => {
+                        const testResultsQuery = query(
+                            collection(db, 'testResults'),
+                            where('professorEmail', '==', currentProfessor.email)
+                        );
+                        const testResultsSnapshot = await getDocs(testResultsQuery);
+                        
+                        const uniqueSections = new Set();
+                        testResultsSnapshot.forEach(doc => {
+                            const data = doc.data();
+                            if (data.section) {
+                                uniqueSections.add(data.section);
+                            }
+                        });
+                        
+                        uniqueSections.forEach(sectionName => {
+                            if (!sectionSet.has(sectionName)) {
+                                sectionSet.add(sectionName);
+                                assignedSections.push({ 
+                                    section: sectionName,
+                                    professorName: currentProfessor.email 
+                                });
+                            }
                         });
                     }
+                ];
+
+                // Execute all methods
+                for (const method of methods) {
+                    try {
+                        await method();
+                    } catch (error) {
+                        console.warn('Method failed:', error.message);
+                    }
                 }
-                
-                // Populate section filter
+
+                // Populate dropdowns
                 const sectionSelect = document.getElementById('filterSection');
                 const bulkSectionSelect = document.getElementById('bulkSection');
                 
                 sectionSelect.innerHTML = '<option value="">All Sections</option>';
                 bulkSectionSelect.innerHTML = '<option value="">Select Section</option>';
-                
-                assignedSections.forEach(section => {
-                    const option = document.createElement('option');
-                    option.value = section.section;
-                    option.textContent = `${section.section} (${section.students} students)`;
-                    sectionSelect.appendChild(option);
+
+                if (assignedSections.length === 0) {
+                    console.log('No sections found. Loading all sections for debugging.');
+                    // Load all sections as fallback
+                    const allSectionsQuery = query(collection(db, 'sections'));
+                    const allSectionsSnapshot = await getDocs(allSectionsQuery);
                     
-                    const bulkOption = option.cloneNode(true);
-                    bulkSectionSelect.appendChild(bulkOption);
+                    allSectionsSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.name && !sectionSet.has(data.name)) {
+                            sectionSet.add(data.name);
+                            assignedSections.push({ 
+                                section: data.name,
+                                professorName: data.professor || 'Unknown' 
+                            });
+                        }
+                    });
+                }
+
+                // Add sections to dropdowns
+                assignedSections.forEach(sec => {
+                    const option = document.createElement('option');
+                    option.value = sec.section;
+                    option.textContent = sec.section;
+                    sectionSelect.appendChild(option.cloneNode(true));
+                    bulkSectionSelect.appendChild(option.cloneNode(true));
                 });
-                
+
                 console.log('Assigned sections:', assignedSections);
-                
+
             } catch (error) {
-                console.error('Error loading assigned sections:', error);
+                console.error('Error in loadAssignedSections:', error);
             }
         }
 
@@ -969,13 +1190,112 @@
             await loadStudents();
             await loadGrades();
             updateFilters();
+            setupEditModalListeners();
+        if (allGrades.length > 0) {
+                setTimeout(() => {
+                    calculateAndDisplayFinalGrades();
+                }, 500); // Small delay to ensure everything is loaded
+            }
+        }
+         function calculateAndDisplayFinalGrades() {
+            try {
+                if (allGrades.length === 0) {
+                    console.log('No grades available for final calculation');
+                    return;
+                }
+
+                console.log('Auto-calculating final grades from', allGrades.length, 'grade records');
+
+                // Group grades by student
+                const studentGradesMap = {};
+                
+                allGrades.forEach(grade => {
+                    // Use student email as unique identifier if available, otherwise use name + section
+                    const studentKey = grade.studentEmail || 
+                                      `${grade.studentName}_${grade.section}`.toLowerCase();
+                    
+                    if (!studentGradesMap[studentKey]) {
+                        studentGradesMap[studentKey] = {
+                            name: grade.studentName,
+                            section: grade.section,
+                            email: grade.studentEmail || '',
+                            studentId: grade.studentId || '',
+                            scores: [],
+                            totalScore: 0,
+                            activityCount: 0,
+                            activityNames: []
+                        };
+                    }
+                    
+                    // Add score to student's record
+                    if (grade.score !== undefined && grade.score !== null) {
+                        studentGradesMap[studentKey].scores.push(grade.score);
+                        studentGradesMap[studentKey].totalScore += grade.score;
+                        studentGradesMap[studentKey].activityCount++;
+                        
+                        if (grade.testName && !studentGradesMap[studentKey].activityNames.includes(grade.testName)) {
+                            studentGradesMap[studentKey].activityNames.push(grade.testName);
+                        }
+                    }
+                });
+
+                console.log('Found', Object.keys(studentGradesMap).length, 'unique students');
+
+                // Calculate final grades for each student
+                const finalGrades = [];
+                Object.keys(studentGradesMap).forEach(studentKey => {
+                    const student = studentGradesMap[studentKey];
+                    
+                    // Calculate average score
+                    const averageScore = student.scores.length > 0 ? 
+                        student.totalScore / student.scores.length : 0;
+                    
+                    // Calculate final grade
+                    const finalGrade = calculateGradeLetter(averageScore);
+                    const gradeStatus = getGradeStatus(averageScore);
+                    const statusText = averageScore >= 70 ? 'Passed' : 'Failed';
+                    
+                    finalGrades.push({
+                        studentKey: studentKey,
+                        name: student.name,
+                        section: student.section,
+                        totalActivities: student.activityCount,
+                        activityNames: student.activityNames,
+                        scores: student.scores,
+                        totalScore: student.totalScore,
+                        averageScore: parseFloat(averageScore.toFixed(2)),
+                        finalGrade: finalGrade,
+                        status: gradeStatus,
+                        statusText: statusText,
+                        email: student.email,
+                        studentId: student.studentId
+                    });
+                });
+
+                // Sort by average score (highest first)
+                finalGrades.sort((a, b) => b.averageScore - a.averageScore);
+
+                console.log('Auto-calculated final grades:', finalGrades.length);
+                
+                // Store the current final grades
+                currentFinalGrades = finalGrades;
+                
+                // Display the final grades
+                displayFinalGrades(finalGrades);
+                
+                // Calculate and display statistics
+                updateFinalGradesStats(finalGrades);
+                
+            } catch (error) {
+                console.error('Error auto-calculating final grades:', error);
+                // Don't show alert for auto-calculation
+            }
         }
 
         async function loadActivities() {
             try {
                 allActivities = [];
                 
-                // Load from scheduledTests (activities)
                 const activitiesQuery = query(
                     collection(db, 'scheduledTests'),
                     where('professorEmail', '==', currentProfessor.email)
@@ -992,8 +1312,6 @@
                         });
                     }
                 });
-                
-                console.log('Loaded activities:', allActivities);
                 
             } catch (error) {
                 console.error('Error loading activities:', error);
@@ -1027,8 +1345,6 @@
                     });
                 }
                 
-                console.log('Loaded students:', allStudents.length);
-                
             } catch (error) {
                 console.error('Error loading students:', error);
             }
@@ -1037,50 +1353,105 @@
         async function loadGrades() {
             try {
                 allGrades = [];
-                
-                // Load from testResults (activity results)
-                const gradesQuery = query(
-                    collection(db, 'testResults'),
-                    where('professorEmail', '==', currentProfessor.email),
-                    orderBy('submittedAt', 'desc')
-                );
-                
-                const gradesSnapshot = await getDocs(gradesQuery);
-                
-                gradesSnapshot.forEach(docSnap => {
-                    const gradeData = docSnap.data();
-                    
-                    // Calculate score if not present
-                    let score = gradeData.score;
-                    if (!score && gradeData.result) {
-                        score = calculateActivityScore(
-                            gradeData.testName, 
-                            gradeData.result, 
-                            gradeData.testTarget
+                console.log('Loading grades for', assignedSections.length, 'sections');
+
+                if (assignedSections.length === 0) {
+                    displayGrades([]);
+                    return;
+                }
+
+                // Get grades for all assigned sections
+                for (const section of assignedSections) {
+                    try {
+                        const gradesQuery = query(
+                            collection(db, 'testResults'),
+                            where('section', '==', section.section)
                         );
+                        
+                        const gradesSnapshot = await getDocs(gradesQuery);
+                        
+                        gradesSnapshot.forEach(docSnap => {
+                            const data = docSnap.data();
+                            
+                            // Calculate score
+                            let score = data.score || 0;
+                            if (!score && (data.result || data.resultData)) {
+                                score = calculateActivityScore(
+                                    data.testName || 'Unknown Activity',
+                                    data.result || data.resultData
+                                );
+                            }
+
+                            const gradeLetter = calculateGradeLetter(score);
+                            const gradeStatus = getGradeStatus(score);
+
+                            // Handle date
+                            let submittedDate = new Date();
+                            if (data.submittedAt) {
+                                if (data.submittedAt.toDate) {
+                                    submittedDate = data.submittedAt.toDate();
+                                } else if (typeof data.submittedAt === 'string') {
+                                    submittedDate = new Date(data.submittedAt);
+                                } else if (data.submittedAt.seconds) {
+                                    submittedDate = new Date(data.submittedAt.seconds * 1000);
+                                }
+                            }
+
+                            allGrades.push({
+                                id: docSnap.id,
+                                studentName: data.studentName || 'Unknown Student',
+                                section: data.section || section.section,
+                                testName: data.testName || 'Unknown Activity',
+                                result: data.result || data.resultData || '-',
+                                score: score,
+                                grade: gradeLetter,
+                                gradeStatus: gradeStatus,
+                                date: submittedDate.toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric' 
+                                }),
+                                remarks: data.remarks || '',
+                                studentEmail: data.studentEmail || '',
+                                studentId: data.studentId || '',
+                                professorEmail: data.professorEmail || '',
+                                submittedAt: data.submittedAt || ''
+                            });
+                        });
+                        
+                    } catch (error) {
+                        console.error(`Error loading grades for ${section.section}:`, error);
                     }
-                    
-                    // Calculate grade letter
-                    const gradeLetter = calculateGradeLetter(score);
-                    const gradeStatus = getGradeStatus(score);
-                    
-                    allGrades.push({
-                        id: docSnap.id,
-                        ...gradeData,
-                        score: score || 0,
-                        grade: gradeLetter,
-                        gradeStatus: gradeStatus,
-                        date: gradeData.submittedAt ? 
-                            gradeData.submittedAt.toDate().toLocaleDateString() : 
-                            'N/A'
-                    });
+                }
+
+                // Sort by date (newest first)
+                allGrades.sort((a, b) => {
+                    try {
+                        const dateA = a.submittedAt ? 
+                            (a.submittedAt.toDate ? a.submittedAt.toDate() : 
+                             (typeof a.submittedAt === 'object' && a.submittedAt.seconds ? 
+                              new Date(a.submittedAt.seconds * 1000) : new Date(a.submittedAt))) : 
+                            new Date(a.date);
+                        const dateB = b.submittedAt ? 
+                            (b.submittedAt.toDate ? b.submittedAt.toDate() : 
+                             (typeof b.submittedAt === 'object' && b.submittedAt.seconds ? 
+                              new Date(b.submittedAt.seconds * 1000) : new Date(b.submittedAt))) : 
+                            new Date(b.date);
+                        return dateB - dateA;
+                    } catch (e) {
+                        return 0;
+                    }
                 });
+
+                console.log(`Total grades loaded: ${allGrades.length}`);
                 
-                console.log('Loaded grades:', allGrades.length);
+                // Initial display
                 displayGrades(allGrades);
-                
+                applyFilters();
+
             } catch (error) {
-                console.error('Error loading grades:', error);
+                console.error('Error in loadGrades:', error);
+                displayGrades([]);
             }
         }
 
@@ -1097,31 +1468,7 @@
                 numericValue = parseFloat(result) || 0;
             }
 
-            // Target-based scoring
-            if (target && target > 0) {
-                if (normalized.includes('push-up') || normalized.includes('pushup') || 
-                    normalized.includes('sit-up') || normalized.includes('situp')) {
-                    const reps = parseInt(result);
-                    if (reps >= target) return 100;
-                    if (reps >= target * 0.9) return 95;
-                    if (reps >= target * 0.8) return 90;
-                    if (reps >= target * 0.7) return 85;
-                    if (reps >= target * 0.6) return 80;
-                    if (reps >= target * 0.5) return 75;
-                    return Math.max(50, Math.round((reps / target) * 100));
-                } else if (normalized.includes('plank')) {
-                    const seconds = parseInt(result.split(':')[1] || result);
-                    if (seconds >= target) return 100;
-                    if (seconds >= target * 0.9) return 95;
-                    if (seconds >= target * 0.8) return 90;
-                    if (seconds >= target * 0.7) return 85;
-                    if (seconds >= target * 0.6) return 80;
-                    if (seconds >= target * 0.5) return 75;
-                    return Math.max(50, Math.round((seconds / target) * 100));
-                }
-            }
-
-            // Default scoring
+            // Calculate based on activity type
             if (normalized.includes('push-up') || normalized.includes('pushup')) {
                 const reps = numericValue;
                 if (reps >= 40) return 100;
@@ -1148,7 +1495,7 @@
                 return 50;
             }
 
-            return numericValue > 0 ? 75 : 0;
+            return numericValue > 0 ? Math.min(100, numericValue) : 0;
         }
 
         function calculateGradeLetter(score) {
@@ -1182,9 +1529,12 @@
                     <tr>
                         <td colspan="7">
                             <div class="empty-state">
-                                <div class="empty-icon">📊</div>
+                                <div class="empty-icon">🔍</div>
                                 <div class="empty-title">No Grades Found</div>
-                                <div class="empty-text">No grades have been recorded yet. Grades will appear here once students complete activities.</div>
+                                <div class="empty-text">
+                                    No grades found for the current filters.<br>
+                                    Try adjusting your filters or check if data exists.
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -1193,14 +1543,19 @@
             }
             
             let html = '';
-            grades.forEach(grade => {
+            grades.forEach((grade, index) => {
+                const displayResult = grade.result || grade.resultData || grade.score.toFixed(1);
+                
                 html += `
                     <tr>
                         <td>${grade.studentName || 'Unknown Student'}</td>
                         <td>${grade.section || 'N/A'}</td>
                         <td>${grade.testName || 'Unknown Activity'}</td>
                         <td>
-                            <span class="grade-value ${grade.gradeStatus}">${grade.score.toFixed(1)}</span>
+                            <span class="grade-value ${grade.gradeStatus}">${displayResult}</span>
+                            <small style="color: #94a3b8; display: block; font-size: 11px; margin-top: 2px;">
+                                (Score: ${grade.score.toFixed(1)})
+                            </small>
                         </td>
                         <td>
                             <span class="grade-value ${grade.gradeStatus}">${grade.grade}</span>
@@ -1227,7 +1582,18 @@
             activitySelect.innerHTML = '<option value="">All Activities</option>';
             bulkActivitySelect.innerHTML = '<option value="">Select Activity</option>';
             
-            const uniqueActivities = [...new Set(allActivities.map(a => a.name))];
+            // Get unique activities
+            const uniqueActivities = [];
+            allGrades.forEach(grade => {
+                if (grade.testName && !uniqueActivities.includes(grade.testName)) {
+                    uniqueActivities.push(grade.testName);
+                }
+            });
+            
+            // Sort alphabetically
+            uniqueActivities.sort((a, b) => a.localeCompare(b));
+            
+            // Add options
             uniqueActivities.forEach(activityName => {
                 const option = document.createElement('option');
                 option.value = activityName;
@@ -1239,33 +1605,114 @@
             });
         }
 
+        function sortGrades(key) {
+            if (sortConfig.key === key) {
+                sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortConfig.key = key;
+                sortConfig.direction = 'asc';
+            }
+
+            applyFilters();
+        }
+
         function applyFilters() {
             const sectionFilter = document.getElementById('filterSection').value;
             const activityFilter = document.getElementById('filterActivity').value;
-            const studentFilter = document.getElementById('filterStudent').value.toLowerCase();
+            const studentFilter = document.getElementById('filterStudent').value.toLowerCase().trim();
             
-            let filteredGrades = allGrades;
+            console.log('Applying filters:', { sectionFilter, activityFilter, studentFilter });
             
+            let filteredGrades = [...allGrades];
+            
+            // Apply section filter
             if (sectionFilter) {
                 filteredGrades = filteredGrades.filter(grade => grade.section === sectionFilter);
             }
             
+            // Apply activity filter
             if (activityFilter) {
                 filteredGrades = filteredGrades.filter(grade => grade.testName === activityFilter);
             }
             
+            // Apply student name filter
             if (studentFilter) {
                 filteredGrades = filteredGrades.filter(grade => 
                     grade.studentName.toLowerCase().includes(studentFilter)
                 );
             }
+
+            // Apply sorting if active
+            if (sortConfig.key) {
+                const multiplier = sortConfig.direction === 'asc' ? 1 : -1;
+                filteredGrades.sort((a, b) => {
+                    let aVal = a[sortConfig.key] || '';
+                    let bVal = b[sortConfig.key] || '';
+                    aVal = typeof aVal === 'string' ? aVal.toLowerCase() : aVal;
+                    bVal = typeof bVal === 'string' ? bVal.toLowerCase() : bVal;
+
+                    if (aVal < bVal) return -1 * multiplier;
+                    if (aVal > bVal) return 1 * multiplier;
+                    return 0;
+                });
+            }
             
             displayGrades(filteredGrades);
         }
 
+        function clearFilter(type) {
+            if (type === 'section') {
+                document.getElementById('filterSection').value = '';
+            } else if (type === 'activity') {
+                document.getElementById('filterActivity').value = '';
+            } else if (type === 'student') {
+                document.getElementById('filterStudent').value = '';
+            }
+            applyFilters();
+        }
+
+        function setupEditModalListeners() {
+            const scoreInput = document.getElementById('editScore');
+            if (scoreInput) {
+                scoreInput.addEventListener('input', function() {
+                    updateGradePreview();
+                });
+            }
+        }
+
+        function updateGradePreview() {
+            const score = parseFloat(document.getElementById('editScore').value);
+            const preview = document.getElementById('gradePreview');
+            
+            if (!isNaN(score) && score >= 0 && score <= 100) {
+                const gradeLetter = calculateGradeLetter(score);
+                const gradeStatus = getGradeStatus(score);
+                
+                preview.innerHTML = `
+                    <strong>Preview:</strong> 
+                    <span class="grade-value ${gradeStatus}">${gradeLetter}</span> 
+                    (${score.toFixed(1)}%)<br>
+                    <small>${getGradeDescription(score)}</small>
+                `;
+            } else {
+                preview.innerHTML = 'Enter a valid score between 0-100';
+            }
+        }
+
+        function getGradeDescription(score) {
+            if (score >= 90) return 'Excellent performance';
+            if (score >= 80) return 'Good performance';
+            if (score >= 70) return 'Fair performance';
+            if (score >= 60) return 'Needs improvement';
+            return 'Failed - needs retake';
+        }
+
         function editGrade(gradeId) {
             const grade = allGrades.find(g => g.id === gradeId);
-            if (!grade) return;
+            if (!grade) {
+                alert('Grade not found');
+                return;
+            }
             
             document.getElementById('editStudentName').value = grade.studentName || '';
             document.getElementById('editActivityName').value = grade.testName || '';
@@ -1273,6 +1720,7 @@
             document.getElementById('editRemarks').value = grade.remarks || '';
             document.getElementById('editGradeId').value = gradeId;
             
+            updateGradePreview();
             document.getElementById('editGradeModal').style.display = 'flex';
         }
 
@@ -1301,7 +1749,7 @@
                 
                 alert('Grade updated successfully!');
                 closeEditModal();
-                await loadGrades(); // Reload grades
+                await loadGrades(); // Reload data
                 
             } catch (error) {
                 console.error('Error updating grade:', error);
@@ -1333,15 +1781,20 @@
                 return;
             }
             
-            if (!confirm(`This will update grades for ALL students in ${section} for activity ${activity}. Continue?`)) {
+            if (!confirm(`This will update grades for ALL students in "${section}" for activity "${activity}".\n\nAdjustment: ${adjustment}\nValue: ${value}\n\nContinue?`)) {
                 return;
             }
             
+            // Show loading
+            const applyBtn = document.querySelector('#bulkEditModal .btn-warning');
+            const originalText = applyBtn.innerHTML;
+            applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            applyBtn.disabled = true;
+            
             try {
-                // Get all grades for this section and activity
+                // Get all testResults for this section and activity
                 const gradesQuery = query(
                     collection(db, 'testResults'),
-                    where('professorEmail', '==', currentProfessor.email),
                     where('section', '==', section),
                     where('testName', '==', activity)
                 );
@@ -1354,98 +1807,81 @@
                     const gradeData = docSnap.data();
                     let newScore = gradeData.score || 0;
                     
-                    // Apply adjustment
                     switch (adjustment) {
-                        case 'add':
-                            newScore += value;
-                            break;
-                        case 'subtract':
-                            newScore -= value;
-                            break;
-                        case 'multiply':
-                            newScore *= (value / 100);
-                            break;
-                        case 'set':
-                            newScore = value;
-                            break;
+                        case 'add': newScore += value; break;
+                        case 'subtract': newScore -= value; break;
+                        case 'multiply': newScore *= (value / 100); break;
+                        case 'set': newScore = value; break;
                     }
                     
-                    // Clamp between 0-100
+                    // Ensure score is within bounds
                     newScore = Math.max(0, Math.min(100, newScore));
                     
                     batch.update(docSnap.ref, {
                         score: newScore,
                         grade: calculateGradeLetter(newScore),
-                        updatedAt: new Date()
+                        updatedAt: new Date(),
+                        lastUpdatedBy: currentProfessor.email,
+                        bulkUpdated: true
                     });
                     
                     updatedCount++;
                 });
                 
+                if (updatedCount === 0) {
+                    alert(`No grades found for section "${section}" and activity "${activity}"`);
+                    return;
+                }
+                
                 await batch.commit();
-                alert(`Updated ${updatedCount} grades successfully!`);
-                closeBulkEditModal();
+                
+                // Reload data
                 await loadGrades();
+                
+                alert(`Successfully updated ${updatedCount} grades!`);
+                closeBulkEditModal();
                 
             } catch (error) {
                 console.error('Error bulk updating grades:', error);
                 alert('Error updating grades: ' + error.message);
+            } finally {
+                applyBtn.innerHTML = originalText;
+                applyBtn.disabled = false;
             }
         }
 
+        // MODIFIED: Update calculateFinalGrades function to use the same logic
         async function calculateFinalGrades() {
             try {
-                // Group grades by student
-                const studentGrades = {};
+                if (allGrades.length === 0) {
+                    alert('No grades available to calculate final grades.');
+                    return;
+                }
+
+                // Show loading
+                const calculateBtn = document.querySelector('.btn-warning');
+                const originalText = calculateBtn.innerHTML;
+                calculateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
+                calculateBtn.disabled = true;
+
+                // Recalculate and display
+                calculateAndDisplayFinalGrades();
                 
-                allGrades.forEach(grade => {
-                    const studentId = grade.studentEmail || grade.studentId || grade.studentName;
-                    if (!studentId) return;
-                    
-                    if (!studentGrades[studentId]) {
-                        studentGrades[studentId] = {
-                            name: grade.studentName,
-                            section: grade.section,
-                            scores: [],
-                            totalScore: 0
-                        };
-                    }
-                    
-                    studentGrades[studentId].scores.push(grade.score);
-                    studentGrades[studentId].totalScore += grade.score;
-                });
+                // Show success message
+                alert(`Successfully calculated final grades for ${currentFinalGrades.length} students!`);
                 
-                // Calculate final grades
-                const finalGrades = [];
-                Object.keys(studentGrades).forEach(studentId => {
-                    const student = studentGrades[studentId];
-                    const averageScore = student.scores.length > 0 ? 
-                        student.totalScore / student.scores.length : 0;
-                    const finalGrade = calculateGradeLetter(averageScore);
-                    const status = getGradeStatus(averageScore);
-                    
-                    finalGrades.push({
-                        name: student.name,
-                        section: student.section,
-                        totalActivities: student.scores.length,
-                        averageScore: averageScore.toFixed(1),
-                        finalGrade: finalGrade,
-                        status: status
-                    });
-                });
-                
-                // Sort by average score (descending)
-                finalGrades.sort((a, b) => b.averageScore - a.averageScore);
-                
-                // Display final grades
-                displayFinalGrades(finalGrades);
-                
-                // Save final grades to database
-                await saveFinalGrades(finalGrades);
-                
+                // Enable the Calculate button again
+                calculateBtn.innerHTML = originalText;
+                calculateBtn.disabled = false;
+
             } catch (error) {
                 console.error('Error calculating final grades:', error);
                 alert('Error calculating final grades: ' + error.message);
+                
+                // Re-enable button on error
+                const calculateBtn = document.querySelector('.btn-warning');
+                calculateBtn.innerHTML = '<i class="fas fa-calculator"></i> Calculate Final Grades';
+                calculateBtn.disabled = false;
             }
         }
 
@@ -1455,41 +1891,193 @@
             if (finalGrades.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="6">
+                        <td colspan="7">
                             <div class="empty-state">
                                 <div class="empty-icon">📈</div>
-                                <div class="empty-title">No Final Grades Available</div>
-                                <div class="empty-text">No student data available for final grade calculation.</div>
+                                <div class="empty-title">No Student Grades Found</div>
+                                <div class="empty-text">
+                                    No student grades available in the database.<br>
+                                    Add activities and have students submit their results first.
+                                </div>
                             </div>
                         </td>
                     </tr>
                 `;
+                
+                // Hide statistics section
+                document.getElementById('gradesStats').style.display = 'none';
+                document.getElementById('savePdfBtn').style.display = 'none';
+                document.getElementById('finalGradesInfo').style.display = 'none';
+                
                 return;
             }
             
             let html = '';
-            finalGrades.forEach(grade => {
+            finalGrades.forEach((grade, index) => {
+                // Determine badge color based on status
+                let badgeClass = 'grade-excellent';
+                if (grade.averageScore < 70) badgeClass = 'grade-poor';
+                else if (grade.averageScore < 80) badgeClass = 'grade-fair';
+                else if (grade.averageScore < 90) badgeClass = 'grade-good';
+                
                 html += `
                     <tr>
-                        <td>${grade.name}</td>
-                        <td>${grade.section}</td>
-                        <td>${grade.totalActivities}</td>
                         <td>
-                            <span class="grade-value ${grade.status}">${grade.averageScore}</span>
+                            <strong>${grade.name || 'Unknown Student'}</strong>
+                            ${grade.email ? `<br><small class="text-muted">${grade.email}</small>` : ''}
                         </td>
+                        <td>${grade.section || 'N/A'}</td>
                         <td>
-                            <span class="grade-value ${grade.status}">${grade.finalGrade}</span>
+                            ${grade.totalActivities}
+                            ${grade.activityNames.length > 0 ? 
+                                `<br><small class="text-muted" title="${grade.activityNames.join(', ')}">
+                                    <i class="fas fa-info-circle"></i> ${grade.activityNames.length} activities
+                                </small>` : ''
+                            }
                         </td>
                         <td>
                             <span class="grade-value ${grade.status}">
-                                ${grade.averageScore >= 70 ? 'Passed' : 'Failed'}
+                                ${grade.averageScore.toFixed(1)}%
                             </span>
+                            <br>
+                            <small class="text-muted">
+                                ${grade.scores.length > 0 ? 
+                                    `Range: ${Math.min(...grade.scores).toFixed(1)}-${Math.max(...grade.scores).toFixed(1)}%` : 
+                                    'No scores'
+                                }
+                            </small>
+                        </td>
+                        <td>
+                            <span class="grade-value ${grade.status}" style="font-size: 18px;">
+                                <strong>${grade.finalGrade}</strong>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${badgeClass}" style="padding: 5px 10px; border-radius: 20px;">
+                                ${grade.statusText}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn-small btn-edit" onclick="viewStudentDetails('${grade.studentKey}')" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-small btn-success" onclick="exportStudentReport('${grade.studentKey}')" title="Export Report">
+                                <i class="fas fa-download"></i>
+                            </button>
                         </td>
                     </tr>
                 `;
             });
             
             tableBody.innerHTML = html;
+            
+            // Show the statistics section
+            document.getElementById('gradesStats').style.display = 'block';
+            
+            // Show the PDF button
+            document.getElementById('savePdfBtn').style.display = 'inline-block';
+            
+            // Show info text
+            document.getElementById('finalGradesInfo').style.display = 'block';
+            
+            // Update the button text to show it's calculated
+            const calculateBtn = document.querySelector('.btn-warning');
+            if (calculateBtn) {
+                calculateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Recalculate Final Grades';
+            }
+            
+            const passedCount = finalGrades.filter(g => g.averageScore >= 70).length;
+            const failedCount = finalGrades.filter(g => g.averageScore < 70).length;
+            document.getElementById('summaryInfoText').textContent = 
+                `Automatically calculated ${finalGrades.length} students. ${passedCount} passed (${((passedCount/finalGrades.length)*100).toFixed(1)}%), ${failedCount} failed (${((failedCount/finalGrades.length)*100).toFixed(1)}%).`;
+        }
+
+    
+        function updateFinalGradesStats(finalGrades) {
+            if (finalGrades.length === 0) return;
+            
+            const totalStudents = finalGrades.length;
+            const passedStudents = finalGrades.filter(g => g.averageScore >= 70).length;
+            const failedStudents = totalStudents - passedStudents;
+            
+            // Calculate overall average
+            const totalAverage = finalGrades.reduce((sum, grade) => sum + grade.averageScore, 0);
+            const overallAverage = (totalAverage / totalStudents).toFixed(1);
+            
+            // Update DOM elements
+            document.getElementById('totalStudents').textContent = totalStudents;
+            document.getElementById('passedStudents').textContent = passedStudents;
+            document.getElementById('failedStudents').textContent = failedStudents;
+            document.getElementById('overallAverage').textContent = overallAverage + '%';
+            
+            // Add percentage for passed/failed
+            const passedPercentage = ((passedStudents / totalStudents) * 100).toFixed(1);
+            const failedPercentage = ((failedStudents / totalStudents) * 100).toFixed(1);
+            
+            document.getElementById('passedStudents').innerHTML = 
+                `${passedStudents}<br><small>(${passedPercentage}%)</small>`;
+            document.getElementById('failedStudents').innerHTML = 
+                `${failedStudents}<br><small>(${failedPercentage}%)</small>`;
+        }
+
+        function viewStudentDetails(studentKey) {
+            const student = currentFinalGrades.find(g => g.studentKey === studentKey);
+            
+            if (student) {
+                let details = `
+                    Student: ${student.name}
+                    Section: ${student.section}
+                    Email: ${student.email || 'N/A'}
+                    Total Activities: ${student.totalActivities}
+                    Average Score: ${student.averageScore}%
+                    Final Grade: ${student.finalGrade}
+                    Status: ${student.statusText}
+                    
+                    Activities Completed:
+                `;
+                
+                student.activityNames.forEach((activity, index) => {
+                    const score = student.scores[index] || 'N/A';
+                    details += `\n${index + 1}. ${activity}: ${score}%`;
+                });
+                
+                alert(details);
+            }
+        }
+
+        function exportStudentReport(studentKey) {
+            const student = currentFinalGrades.find(g => g.studentKey === studentKey);
+            
+            if (student) {
+                let csv = `Student Name,Section,Total Activities,Average Score,Final Grade,Status\n`;
+                csv += `"${student.name}","${student.section}",${student.totalActivities},${student.averageScore},"${student.finalGrade}","${student.statusText}"\n\n`;
+                csv += `Activity,Score\n`;
+                
+                student.activityNames.forEach((activity, index) => {
+                    const score = student.scores[index] || 'N/A';
+                    csv += `"${activity}",${score}\n`;
+                });
+                
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${student.name.replace(/\s+/g, '_')}_Final_Grade_Report.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                alert(`Report exported for ${student.name}!`);
+            }
+        }
+
+        function refreshFinalGrades() {
+            calculateFinalGrades();
+        }
+
+        function saveFinalGradesToPDF() {
+            alert('PDF export feature would be implemented here.\nFor now, you can use the browser\'s Print function (Ctrl+P) and save as PDF.');
         }
 
         async function saveFinalGrades(finalGrades) {
@@ -1497,7 +2085,6 @@
                 const timestamp = new Date();
                 
                 for (const grade of finalGrades) {
-                    // Save to finalGrades collection
                     await addDoc(collection(db, 'finalGrades'), {
                         professorEmail: currentProfessor.email,
                         professorId: currentProfessor.id,
@@ -1511,7 +2098,6 @@
                         semester: getCurrentSemester()
                     });
                     
-                    // Update student record with final grade
                     const studentsQuery = query(
                         collection(db, 'students'),
                         where('name', '==', grade.name),
@@ -1529,8 +2115,6 @@
                     }
                 }
                 
-                console.log('Final grades saved successfully');
-                
             } catch (error) {
                 console.error('Error saving final grades:', error);
             }
@@ -1541,13 +2125,9 @@
             const month = now.getMonth() + 1;
             const year = now.getFullYear();
             
-            if (month >= 8 && month <= 12) {
-                return `1st Semester ${year}`;
-            } else if (month >= 1 && month <= 5) {
-                return `2nd Semester ${year}`;
-            } else {
-                return `Summer ${year}`;
-            }
+            if (month >= 8 && month <= 12) return `1st Semester ${year}`;
+            else if (month >= 1 && month <= 5) return `2nd Semester ${year}`;
+            else return `Summer ${year}`;
         }
 
         function exportGrades() {
@@ -1556,14 +2136,12 @@
                 return;
             }
             
-            // Create CSV content
             let csv = 'Student Name,Section,Activity,Score,Grade,Date\n';
             
             allGrades.forEach(grade => {
                 csv += `"${grade.studentName || ''}","${grade.section || ''}","${grade.testName || ''}",${grade.score || 0},"${grade.grade || ''}","${grade.date || ''}"\n`;
             });
             
-            // Create download link
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
