@@ -550,47 +550,65 @@ async function loadNotificationDropdown() {
         }
 
         async function calculateAndUpdateStats() {
-            try {
-                const resultsQuery = query(
-                    collection(db, 'testResults'),
-                    where('studentEmail', '==', studentData.email)
-                );
-                
-                const resultsSnapshot = await getDocs(resultsQuery);
-                
-                let totalTests = 0;
-                let totalScore = 0;
-                let bestScore = 0;
-                const testDates = [];
-                
-                resultsSnapshot.forEach((doc) => {
-                    const result = doc.data();
-                    const score = calculateTestScore(result.testName, result.result, result.testTarget);
-                    
-                    totalTests++;
-                    totalScore += score;
-                    if (score > bestScore) bestScore = score;
-                    
-                    const testDate = result.submittedAt?.toDate?.() || new Date(result.date);
-                    testDates.push(testDate);
-                });
-                
-                const avgScore = totalTests > 0 ? Math.round(totalScore / totalTests) : 0;
-                const dayStreak = calculateDayStreak(testDates);
-                
-                document.getElementById('testsDone').textContent = totalTests;
-                document.getElementById('avgScore').textContent = avgScore;
-                document.getElementById('bestScore').textContent = bestScore;
-                document.getElementById('dayStreak').textContent = dayStreak;
-                
-            } catch (error) {
-                console.error('Error calculating stats:', error);
-                document.getElementById('testsDone').textContent = '0';
-                document.getElementById('avgScore').textContent = '0';
-                document.getElementById('bestScore').textContent = '0';
-                document.getElementById('dayStreak').textContent = '0';
+    try {
+        const resultsQuery = query(
+            collection(db, 'testResults'),
+            where('studentEmail', '==', studentData.email)
+        );
+        
+        const resultsSnapshot = await getDocs(resultsQuery);
+        
+        // Use a Map to track best scores per test
+        const testBestScores = new Map();
+        let overallBestScore = 0;
+        const testDates = [];
+        const uniqueTests = new Set();
+        
+        resultsSnapshot.forEach((doc) => {
+            const result = doc.data();
+            const score = calculateTestScore(result.testName, result.result, result.testTarget);
+            const testId = result.testId;
+            
+            // Track unique tests completed
+            uniqueTests.add(testId);
+            
+            // Keep only the BEST score for each test
+            if (!testBestScores.has(testId) || score > testBestScores.get(testId)) {
+                testBestScores.set(testId, score);
             }
-        }
+            
+            // Track overall best score
+            if (score > overallBestScore) overallBestScore = score;
+            
+            // Collect all test dates for streak calculation
+            const testDate = result.submittedAt?.toDate?.() || new Date(result.date);
+            testDates.push(testDate);
+        });
+        
+        // Calculate average from BEST scores only
+        let totalScore = 0;
+        testBestScores.forEach(score => {
+            totalScore += score;
+        });
+        
+        const totalUniqueTests = testBestScores.size;
+        const avgScore = totalUniqueTests > 0 ? Math.round(totalScore / totalUniqueTests) : 0;
+        const dayStreak = calculateDayStreak(testDates);
+        
+        // Update UI - show unique tests completed
+        document.getElementById('testsDone').textContent = totalUniqueTests;
+        document.getElementById('avgScore').textContent = avgScore;
+        document.getElementById('bestScore').textContent = overallBestScore;
+        document.getElementById('dayStreak').textContent = dayStreak;
+        
+    } catch (error) {
+        console.error('Error calculating stats:', error);
+        document.getElementById('testsDone').textContent = '0';
+        document.getElementById('avgScore').textContent = '0';
+        document.getElementById('bestScore').textContent = '0';
+        document.getElementById('dayStreak').textContent = '0';
+    }
+}
 
         function calculateDayStreak(testDates) {
             if (testDates.length === 0) return 0;
@@ -1013,11 +1031,25 @@ async function loadNotificationDropdown() {
         onSnapshot(historyQuery, (snapshot) => {
             console.log('🔄 Real-time test results update detected!');
             
-            allTestHistory = [];
+            // Group results by testId to get best scores only
+            const testGroups = {};
             
             snapshot.forEach((doc) => {
-                allTestHistory.push({ id: doc.id, ...doc.data() });
+                const result = { id: doc.id, ...doc.data() };
+                const score = calculateTestScore(result.testName, result.result, result.testTarget);
+                const testId = result.testId || doc.id;
+                
+                // Keep only the BEST score for each test
+                if (!testGroups[testId] || score > testGroups[testId].score) {
+                    testGroups[testId] = {
+                        ...result,
+                        score: score
+                    };
+                }
             });
+            
+            // Convert grouped results to array
+            allTestHistory = Object.values(testGroups);
             
             // Sort by date (NEWEST FIRST - most recent at top)
             allTestHistory.sort((a, b) => {
@@ -1084,11 +1116,11 @@ async function loadNotificationDropdown() {
             `;
 
             visibleHistory.forEach((result) => {
-                const score = calculateTestScore(result.testName, result.result, result.testTarget);
-                const rating = getRating(score);
-                const date = result.submittedAt?.toDate 
-                    ? result.submittedAt.toDate().toLocaleDateString() 
-                    : new Date().toLocaleDateString();
+            const score = result.score || calculateTestScore(result.testName, result.result, result.testTarget);
+            const rating = getRating(score);
+            const date = result.submittedAt?.toDate 
+                ? result.submittedAt.toDate().toLocaleDateString() 
+                : new Date().toLocaleDateString();
                 
                 html += `
                     <div class="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:bg-gray-100 transition-colors">

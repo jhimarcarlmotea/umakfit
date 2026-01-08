@@ -717,24 +717,36 @@
             let totalScore = 0;
             let testCount = 0;
             
-            resultsSnapshot.forEach((doc) => {
-                const result = doc.data();
-                const score = calculateScore(result.testName, result.result, result.testTarget);
-                const category = getCategoryForTest(result.testName);
-                
-                testResults.push({
+            const testGroups = {};
+
+        resultsSnapshot.forEach((doc) => {
+            const result = doc.data();
+            const score = calculateScore(result.testName, result.result, result.testTarget);
+            const category = getCategoryForTest(result.testName);
+            
+            const testId = result.testId || doc.id;
+            
+            // Keep only the highest score for each test
+            if (!testGroups[testId] || score > testGroups[testId].score) {
+                testGroups[testId] = {
                     ...result,
                     score,
                     category,
                     id: doc.id
-                });
-                
-                categoryScores[category].scores.push(score);
-                categoryScores[category].tests.push(result.testName);
-                
-                totalScore += score;
-                testCount++;
-            });
+                };
+            }
+        });
+
+        // Convert grouped results to array and calculate totals
+        Object.values(testGroups).forEach(result => {
+            testResults.push(result);
+            
+            categoryScores[result.category].scores.push(result.score);
+            categoryScores[result.category].tests.push(result.testName);
+            
+            totalScore += result.score;
+            testCount++;
+        });
             
             // Update overall summary
             const avgScore = testCount > 0 ? (totalScore / testCount).toFixed(1) : '0.0';

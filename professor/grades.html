@@ -757,16 +757,13 @@
                             <button class="filter-clear" onclick="clearFilter('student')">&times;</button>
                         </div>
                         <div style="display: flex; gap: 10px;">
-                            <button class="btn-primary" onclick="applyFilters()">
-                                <i class="fas fa-filter"></i> Apply Filters
-                            </button>
-                            <button class="btn-success" onclick="exportGrades()">
-                                <i class="fas fa-download"></i> Export Grades
-                            </button>
-                            <button class="btn-warning" onclick="calculateFinalGrades()">
-                                <i class="fas fa-calculator"></i> Calculate Final Grades
-                            </button>
-                        </div>
+                        <button class="btn-success" onclick="exportGrades()">
+                            <i class="fas fa-download"></i> Export Grades
+                        </button>
+                        <button class="btn-warning" onclick="calculateFinalGrades()">
+                            <i class="fas fa-calculator"></i> Calculate Final Grades
+                        </button>
+                    </div>
                     </div>
                 </div>
 
@@ -789,9 +786,8 @@
                                     <th>Section</th>
                                     <th onclick="sortGrades('testName')">Activity</th>
                                     <th>Results</th>
-                                    <th>Grade</th>
+                                    <th>Score (%)</th> 
                                     <th>Date</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="gradesTableBody">
@@ -1198,125 +1194,158 @@
             }
         }
          function calculateAndDisplayFinalGrades() {
-            try {
-                if (allGrades.length === 0) {
-                    console.log('No grades available for final calculation');
-                    return;
-                }
-
-                console.log('Auto-calculating final grades from', allGrades.length, 'grade records');
-
-                // Group grades by student
-                const studentGradesMap = {};
-                
-                allGrades.forEach(grade => {
-                    // Use student email as unique identifier if available, otherwise use name + section
-                    const studentKey = grade.studentEmail || 
-                                      `${grade.studentName}_${grade.section}`.toLowerCase();
-                    
-                    if (!studentGradesMap[studentKey]) {
-                        studentGradesMap[studentKey] = {
-                            name: grade.studentName,
-                            section: grade.section,
-                            email: grade.studentEmail || '',
-                            studentId: grade.studentId || '',
-                            scores: [],
-                            totalScore: 0,
-                            activityCount: 0,
-                            activityNames: []
-                        };
-                    }
-                    
-                    // Add score to student's record
-                    if (grade.score !== undefined && grade.score !== null) {
-                        studentGradesMap[studentKey].scores.push(grade.score);
-                        studentGradesMap[studentKey].totalScore += grade.score;
-                        studentGradesMap[studentKey].activityCount++;
-                        
-                        if (grade.testName && !studentGradesMap[studentKey].activityNames.includes(grade.testName)) {
-                            studentGradesMap[studentKey].activityNames.push(grade.testName);
-                        }
-                    }
-                });
-
-                console.log('Found', Object.keys(studentGradesMap).length, 'unique students');
-
-                // Calculate final grades for each student
-                const finalGrades = [];
-                Object.keys(studentGradesMap).forEach(studentKey => {
-                    const student = studentGradesMap[studentKey];
-                    
-                    // Calculate average score
-                    const averageScore = student.scores.length > 0 ? 
-                        student.totalScore / student.scores.length : 0;
-                    
-                    // Calculate final grade
-                    const finalGrade = calculateGradeLetter(averageScore);
-                    const gradeStatus = getGradeStatus(averageScore);
-                    const statusText = averageScore >= 70 ? 'Passed' : 'Failed';
-                    
-                    finalGrades.push({
-                        studentKey: studentKey,
-                        name: student.name,
-                        section: student.section,
-                        totalActivities: student.activityCount,
-                        activityNames: student.activityNames,
-                        scores: student.scores,
-                        totalScore: student.totalScore,
-                        averageScore: parseFloat(averageScore.toFixed(2)),
-                        finalGrade: finalGrade,
-                        status: gradeStatus,
-                        statusText: statusText,
-                        email: student.email,
-                        studentId: student.studentId
-                    });
-                });
-
-                // Sort by average score (highest first)
-                finalGrades.sort((a, b) => b.averageScore - a.averageScore);
-
-                console.log('Auto-calculated final grades:', finalGrades.length);
-                
-                // Store the current final grades
-                currentFinalGrades = finalGrades;
-                
-                // Display the final grades
-                displayFinalGrades(finalGrades);
-                
-                // Calculate and display statistics
-                updateFinalGradesStats(finalGrades);
-                
-            } catch (error) {
-                console.error('Error auto-calculating final grades:', error);
-                // Don't show alert for auto-calculation
-            }
+    try {
+        if (allGrades.length === 0) {
+            console.log('No grades available for final calculation');
+            return;
         }
 
+        console.log('Auto-calculating final grades from', allGrades.length, 'grade records');
+
+        // Group grades by student
+        const studentGradesMap = {};
+        
+        allGrades.forEach(grade => {
+            // Use student email as unique identifier if available, otherwise use name + section
+            const studentKey = grade.studentEmail || 
+                              `${grade.studentName}_${grade.section}`.toLowerCase();
+            
+            if (!studentGradesMap[studentKey]) {
+                studentGradesMap[studentKey] = {
+                    name: grade.studentName,
+                    section: grade.section,
+                    email: grade.studentEmail || '',
+                    studentId: grade.studentId || '',
+                    scores: [],
+                    totalScore: 0,
+                    activityCount: 0,
+                    activityNames: [],
+                    activityInstances: [] // Store all activity instances
+                };
+            }
+            
+            // Add score to student's record - INCLUDE ALL ACTIVITY INSTANCES
+            if (grade.score !== undefined && grade.score !== null) {
+                studentGradesMap[studentKey].scores.push(grade.score);
+                studentGradesMap[studentKey].totalScore += grade.score;
+                studentGradesMap[studentKey].activityCount++;
+                
+                // Store activity instance with date
+                const activityInstance = {
+                    name: grade.testName,
+                    date: grade.date,
+                    score: grade.score,
+                    formattedDate: grade.formattedDate
+                };
+                
+                studentGradesMap[studentKey].activityInstances.push(activityInstance);
+                
+                // For activity names list, include date to differentiate
+                const activityWithDate = `${grade.testName} (${grade.date})`;
+                if (!studentGradesMap[studentKey].activityNames.includes(activityWithDate)) {
+                    studentGradesMap[studentKey].activityNames.push(activityWithDate);
+                }
+            }
+        });
+
+        console.log('Found', Object.keys(studentGradesMap).length, 'unique students');
+
+        // Calculate final grades for each student
+        const finalGrades = [];
+        Object.keys(studentGradesMap).forEach(studentKey => {
+            const student = studentGradesMap[studentKey];
+            
+            // Calculate average score from ALL activity instances
+            const averageScore = student.scores.length > 0 ? 
+                student.totalScore / student.scores.length : 0;
+            
+            // Calculate final grade
+            const finalGrade = calculateGradeLetter(averageScore);
+            const gradeStatus = getGradeStatus(averageScore);
+            const statusText = averageScore >= 70 ? 'Passed' : 'Failed';
+            
+            finalGrades.push({
+                studentKey: studentKey,
+                name: student.name,
+                section: student.section,
+                totalActivities: student.activityCount,
+                activityNames: student.activityNames,
+                activityInstances: student.activityInstances,
+                scores: student.scores,
+                totalScore: student.totalScore,
+                averageScore: parseFloat(averageScore.toFixed(2)),
+                finalGrade: finalGrade,
+                status: gradeStatus,
+                statusText: statusText,
+                email: student.email,
+                studentId: student.studentId
+            });
+        });
+
+        // Sort by average score (highest first)
+        finalGrades.sort((a, b) => b.averageScore - a.averageScore);
+
+        console.log('Auto-calculated final grades:', finalGrades.length);
+        
+        // Store the current final grades
+        currentFinalGrades = finalGrades;
+        
+        // Display the final grades
+        displayFinalGrades(finalGrades);
+        
+        // Calculate and display statistics
+        updateFinalGradesStats(finalGrades);
+        
+    } catch (error) {
+        console.error('Error auto-calculating final grades:', error);
+    }
+}
+
         async function loadActivities() {
-            try {
-                allActivities = [];
-                
-                const activitiesQuery = query(
-                    collection(db, 'scheduledTests'),
-                    where('professorEmail', '==', currentProfessor.email)
-                );
-                const activitiesSnapshot = await getDocs(activitiesQuery);
-                
-                activitiesSnapshot.forEach(docSnap => {
-                    const activity = docSnap.data();
-                    if (!allActivities.find(a => a.testName === activity.testName)) {
+        try {
+            allActivities = [];
+            
+            // Load from scheduledTests (assigned by professor)
+            const scheduledQuery = query(
+                collection(db, 'scheduledTests'),
+                where('professorEmail', '==', currentProfessor.email)
+            );
+            const scheduledSnapshot = await getDocs(scheduledQuery);
+            
+            scheduledSnapshot.forEach(docSnap => {
+                const activity = docSnap.data();
+                if (!allActivities.find(a => a.testName === activity.testName)) {
+                    allActivities.push({
+                        id: docSnap.id,
+                        name: activity.testName,
+                        section: activity.section,
+                        type: 'scheduled'
+                    });
+                }
+            });
+            
+            // Also load activities from testResults that students have completed
+            if (allGrades.length > 0) {
+                const uniqueActivities = new Set();
+                allGrades.forEach(grade => {
+                    if (grade.testName && !uniqueActivities.has(grade.testName)) {
+                        uniqueActivities.add(grade.testName);
                         allActivities.push({
-                            id: docSnap.id,
-                            name: activity.testName,
-                            section: activity.section
+                            id: `result_${grade.id}`,
+                            name: grade.testName,
+                            section: grade.section,
+                            type: 'completed'
                         });
                     }
                 });
-                
-            } catch (error) {
-                console.error('Error loading activities:', error);
             }
+            
+            console.log('Loaded activities:', allActivities.length);
+            
+        } catch (error) {
+            console.error('Error loading activities:', error);
         }
+    }
 
         async function loadStudents() {
             try {
@@ -1350,169 +1379,387 @@
             }
         }
 
-        async function loadGrades() {
+       async function loadGrades() {
+    try {
+        allGrades = [];
+        console.log('Loading grades for', assignedSections.length, 'sections');
+
+        if (assignedSections.length === 0) {
+            displayGrades([]);
+            return;
+        }
+
+        const activityInstances = {}; // Track activity instances by date
+
+        // Get all test results for assigned sections
+        for (const section of assignedSections) {
             try {
-                allGrades = [];
-                console.log('Loading grades for', assignedSections.length, 'sections');
-
-                if (assignedSections.length === 0) {
-                    displayGrades([]);
-                    return;
-                }
-
-                // Get grades for all assigned sections
-                for (const section of assignedSections) {
-                    try {
-                        const gradesQuery = query(
-                            collection(db, 'testResults'),
-                            where('section', '==', section.section)
-                        );
-                        
-                        const gradesSnapshot = await getDocs(gradesQuery);
-                        
-                        gradesSnapshot.forEach(docSnap => {
-                            const data = docSnap.data();
-                            
-                            // Calculate score
-                            let score = data.score || 0;
-                            if (!score && (data.result || data.resultData)) {
-                                score = calculateActivityScore(
-                                    data.testName || 'Unknown Activity',
-                                    data.result || data.resultData
-                                );
-                            }
-
-                            const gradeLetter = calculateGradeLetter(score);
-                            const gradeStatus = getGradeStatus(score);
-
-                            // Handle date
-                            let submittedDate = new Date();
-                            if (data.submittedAt) {
-                                if (data.submittedAt.toDate) {
-                                    submittedDate = data.submittedAt.toDate();
-                                } else if (typeof data.submittedAt === 'string') {
-                                    submittedDate = new Date(data.submittedAt);
-                                } else if (data.submittedAt.seconds) {
-                                    submittedDate = new Date(data.submittedAt.seconds * 1000);
-                                }
-                            }
-
-                            allGrades.push({
-                                id: docSnap.id,
-                                studentName: data.studentName || 'Unknown Student',
-                                section: data.section || section.section,
-                                testName: data.testName || 'Unknown Activity',
-                                result: data.result || data.resultData || '-',
-                                score: score,
-                                grade: gradeLetter,
-                                gradeStatus: gradeStatus,
-                                date: submittedDate.toLocaleDateString('en-US', { 
-                                    year: 'numeric', 
-                                    month: 'long', 
-                                    day: 'numeric' 
-                                }),
-                                remarks: data.remarks || '',
-                                studentEmail: data.studentEmail || '',
-                                studentId: data.studentId || '',
-                                professorEmail: data.professorEmail || '',
-                                submittedAt: data.submittedAt || ''
-                            });
-                        });
-                        
-                    } catch (error) {
-                        console.error(`Error loading grades for ${section.section}:`, error);
+                // Get ALL test results for this section
+                const gradesQuery = query(
+                    collection(db, 'testResults'),
+                    where('section', '==', section.section)
+                );
+                
+                const gradesSnapshot = await getDocs(gradesQuery);
+                
+                gradesSnapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    
+                    // Skip if not completed
+                    if (data.status !== 'completed') return;
+                    
+                    // Calculate score
+                    let score = 0;
+                    
+                    // Method 1: Check if score already exists
+                    if (data.score && data.score > 0) {
+                        score = data.score;
                     }
-                }
+                    // Method 2: Calculate from result/resultData
+                    else if (data.result || data.resultData) {
+                        score = calculateActivityScore(
+                            data.testName || 'Unknown Activity',
+                            data.result || data.resultData,
+                            data.testTarget || null
+                        );
+                    }
+                    // Method 3: Try to extract from any numeric fields
+                    else if (data.repetitions) {
+                        score = calculateActivityScore(
+                            data.testName || 'Unknown Activity',
+                            data.repetitions,
+                            data.testTarget || null
+                        );
+                    }
+                    
+                    // If score is 0, try to get it from other fields
+                    if (score === 0 && data.result) {
+                        // Try to parse result as number
+                        const numResult = parseFloat(data.result);
+                        if (!isNaN(numResult)) {
+                            score = numResult;
+                        }
+                    }
 
-                // Sort by date (newest first)
-                allGrades.sort((a, b) => {
-                    try {
-                        const dateA = a.submittedAt ? 
-                            (a.submittedAt.toDate ? a.submittedAt.toDate() : 
-                             (typeof a.submittedAt === 'object' && a.submittedAt.seconds ? 
-                              new Date(a.submittedAt.seconds * 1000) : new Date(a.submittedAt))) : 
-                            new Date(a.date);
-                        const dateB = b.submittedAt ? 
-                            (b.submittedAt.toDate ? b.submittedAt.toDate() : 
-                             (typeof b.submittedAt === 'object' && b.submittedAt.seconds ? 
-                              new Date(b.submittedAt.seconds * 1000) : new Date(b.submittedAt))) : 
-                            new Date(b.date);
-                        return dateB - dateA;
-                    } catch (e) {
-                        return 0;
+                    // Handle date
+                    let submittedDate = new Date();
+                    if (data.submittedAt) {
+                        if (data.submittedAt.toDate) {
+                            submittedDate = data.submittedAt.toDate();
+                        } else if (typeof data.submittedAt === 'string') {
+                            submittedDate = new Date(data.submittedAt);
+                        } else if (data.submittedAt.seconds) {
+                            submittedDate = new Date(data.submittedAt.seconds * 1000);
+                        }
+                    }
+                    
+                    // Format date to YYYY-MM-DD for grouping
+                    const dateKey = submittedDate.toISOString().split('T')[0];
+                    
+                    // Create unique key: student + activity + date
+                    const studentKey = data.studentEmail || data.studentName || '';
+                    const activityKey = data.testName || '';
+                    const uniqueKey = `${studentKey}_${activityKey}_${dateKey}`.toLowerCase();
+                    
+                    // Check if this is a higher score than previously recorded for this date
+                    if (!activityInstances[uniqueKey] || score > activityInstances[uniqueKey].score) {
+                        const gradeStatus = getGradeStatus(score);
+
+                        // Format result for display
+                        let displayResult = '-';
+                        if (data.result) {
+                            if (typeof data.result === 'object') {
+                                displayResult = JSON.stringify(data.result);
+                            } else {
+                                displayResult = data.result.toString();
+                            }
+                        } else if (data.resultData) {
+                            if (typeof data.resultData === 'object') {
+                                displayResult = JSON.stringify(data.resultData);
+                            } else {
+                                displayResult = data.resultData.toString();
+                            }
+                        } else if (data.repetitions) {
+                            displayResult = data.repetitions.toString();
+                        }
+
+                        // Store the highest score for this activity on this date
+                        activityInstances[uniqueKey] = {
+                            id: docSnap.id,
+                            studentName: data.studentName || 'Unknown Student',
+                            section: data.section || section.section,
+                            testName: data.testName || 'Unknown Activity',
+                            result: displayResult,
+                            score: score,
+                            gradeStatus: gradeStatus,
+                            date: submittedDate.toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                            }),
+                            dateObject: submittedDate, // Store date object for sorting
+                            formattedDate: dateKey, // Store formatted date
+                            remarks: data.remarks || '',
+                            studentEmail: data.studentEmail || '',
+                            studentId: data.studentId || '',
+                            professorEmail: data.professorEmail || '',
+                            submittedAt: data.submittedAt || ''
+                        };
                     }
                 });
-
-                console.log(`Total grades loaded: ${allGrades.length}`);
                 
-                // Initial display
-                displayGrades(allGrades);
-                applyFilters();
-
             } catch (error) {
-                console.error('Error in loadGrades:', error);
-                displayGrades([]);
+                console.error(`Error loading grades for ${section.section}:`, error);
             }
         }
 
-        function calculateActivityScore(activityName, result, target = null) {
-            if (!activityName || !result) return 0;
+        // Convert activity instances object to array
+        allGrades = Object.values(activityInstances);
+
+        // Sort by date (newest first), then by student name
+        allGrades.sort((a, b) => {
+            try {
+                // First sort by date (newest first)
+                const dateA = a.dateObject;
+                const dateB = b.dateObject;
+                
+                if (dateB.getTime() !== dateA.getTime()) {
+                    return dateB - dateA;
+                }
+                
+                // If same date, sort by student name
+                const nameA = a.studentName.toLowerCase();
+                const nameB = b.studentName.toLowerCase();
+                return nameA.localeCompare(nameB);
+            } catch (e) {
+                return 0;
+            }
+        });
+
+        console.log(`Total activities loaded: ${allGrades.length}`);
+        
+        // Debug: Group by date to show activities per day
+        const groupedByDate = {};
+        allGrades.forEach(grade => {
+            if (!groupedByDate[grade.formattedDate]) {
+                groupedByDate[grade.formattedDate] = [];
+            }
+            groupedByDate[grade.formattedDate].push({
+                student: grade.studentName,
+                activity: grade.testName,
+                score: grade.score
+            });
+        });
+        
+        console.log('Activities grouped by date:', groupedByDate);
+        
+        // Initial display
+        displayGrades(allGrades);
+        applyFilters();
+
+    } catch (error) {
+        console.error('Error in loadGrades:', error);
+        displayGrades([]);
+    }
+}
+
+        function calculateActivityScore(testName, result, testTarget = null) {
+    const normalized = testName.toLowerCase().trim();
+    
+    // Extract numeric value from result
+    let numericValue = 0;
+    
+    if (typeof result === 'object' && result !== null) {
+        numericValue = result.repetitions || result.time || result.distance || result.value || result.score || 0;
+    } else if (typeof result === 'string') {
+        const match = result.match(/(\d+\.?\d*)/);
+        if (match) {
+            numericValue = parseFloat(match[1]);
+        } else {
+            numericValue = parseFloat(result) || 0;
+        }
+    } else {
+        numericValue = parseFloat(result) || 0;
+    }
+    
+    // Use test target if available for more accurate scoring
+    if (testTarget && testTarget > 0) {
+        if (normalized.includes('push-up') || normalized.includes('pushup') || 
+            normalized.includes('sit-up') || normalized.includes('situp') ||
+            normalized.includes('curl-up')) {
+            const reps = numericValue;
+            const percentage = (reps / testTarget) * 100;
+            let score = Math.min(100, Math.max(50, percentage));
             
-            const normalized = activityName.toLowerCase();
-            let numericValue = 0;
-
-            if (typeof result === 'string') {
-                const match = result.match(/(\d+\.?\d*)/);
-                if (match) numericValue = parseFloat(match[1]);
+            // Apply grading curve for better distribution
+            if (percentage >= 100) score = 100;
+            else if (percentage >= 90) score = 95;
+            else if (percentage >= 80) score = 90;
+            else if (percentage >= 70) score = 85;
+            else if (percentage >= 60) score = 80;
+            else if (percentage >= 50) score = 75;
+            
+            return Math.round(score);
+            
+        } else if (normalized.includes('plank')) {
+            let seconds = 0;
+            if (typeof result === 'string' && result.includes(':')) {
+                const [mins, secs] = result.split(':').map(Number);
+                seconds = (mins * 60) + (secs || 0);
             } else {
-                numericValue = parseFloat(result) || 0;
+                seconds = numericValue;
             }
-
-            // Calculate based on activity type
-            if (normalized.includes('push-up') || normalized.includes('pushup')) {
-                const reps = numericValue;
-                if (reps >= 40) return 100;
-                if (reps >= 30) return 90;
-                if (reps >= 20) return 80;
-                if (reps >= 15) return 70;
-                if (reps >= 10) return 60;
-                return 50;
-            } else if (normalized.includes('sit-up') || normalized.includes('situp')) {
-                const reps = numericValue;
-                if (reps >= 50) return 100;
-                if (reps >= 40) return 90;
-                if (reps >= 30) return 80;
-                if (reps >= 20) return 70;
-                if (reps >= 15) return 60;
-                return 50;
-            } else if (normalized.includes('plank')) {
-                const seconds = numericValue;
-                if (seconds >= 120) return 100;
-                if (seconds >= 90) return 90;
-                if (seconds >= 60) return 80;
-                if (seconds >= 45) return 70;
-                if (seconds >= 30) return 60;
-                return 50;
-            }
-
-            return numericValue > 0 ? Math.min(100, numericValue) : 0;
+            
+            const percentage = (seconds / testTarget) * 100;
+            let score = Math.min(100, Math.max(50, percentage));
+            
+            if (percentage >= 100) score = 100;
+            else if (percentage >= 90) score = 95;
+            else if (percentage >= 80) score = 90;
+            else if (percentage >= 70) score = 85;
+            else if (percentage >= 60) score = 80;
+            else if (percentage >= 50) score = 75;
+            
+            return Math.round(score);
+            
+        } else if (normalized.includes('sit-and-reach')) {
+            const distance = numericValue;
+            const percentage = (distance / testTarget) * 100;
+            let score = Math.min(100, Math.max(50, percentage));
+            
+            if (percentage >= 100) score = 100;
+            else if (percentage >= 90) score = 95;
+            else if (percentage >= 80) score = 90;
+            else if (percentage >= 70) score = 85;
+            else if (percentage >= 60) score = 80;
+            else if (percentage >= 50) score = 75;
+            
+            return Math.round(score);
         }
-
+    }
+    
+    // Fallback to standard scoring if no target available
+    if (normalized.includes('push-up') || normalized.includes('pushup')) {
+        const reps = numericValue;
+        if (reps >= 40) return 100;
+        if (reps >= 35) return 95;
+        if (reps >= 30) return 90;
+        if (reps >= 25) return 85;
+        if (reps >= 20) return 80;
+        if (reps >= 15) return 75;
+        if (reps >= 10) return 70;
+        if (reps >= 5) return 65;
+        return 60;
+        
+    } else if (normalized.includes('sit-up') || normalized.includes('situp')) {
+        const reps = numericValue;
+        if (reps >= 50) return 100;
+        if (reps >= 45) return 95;
+        if (reps >= 40) return 90;
+        if (reps >= 35) return 85;
+        if (reps >= 30) return 80;
+        if (reps >= 25) return 75;
+        if (reps >= 20) return 70;
+        if (reps >= 15) return 65;
+        return 60;
+        
+    } else if (normalized.includes('curl-up')) {
+        const reps = numericValue;
+        if (reps >= 75) return 100;
+        if (reps >= 60) return 95;
+        if (reps >= 50) return 90;
+        if (reps >= 40) return 85;
+        if (reps >= 30) return 80;
+        if (reps >= 25) return 75;
+        if (reps >= 20) return 70;
+        return 65;
+        
+    } else if (normalized.includes('plank')) {
+        let seconds = 0;
+        if (typeof result === 'string' && result.includes(':')) {
+            const [mins, secs] = result.split(':').map(Number);
+            seconds = (mins * 60) + (secs || 0);
+        } else {
+            seconds = numericValue;
+        }
+        
+        if (seconds >= 180) return 100;
+        if (seconds >= 150) return 95;
+        if (seconds >= 120) return 90;
+        if (seconds >= 100) return 85;
+        if (seconds >= 80) return 80;
+        if (seconds >= 60) return 75;
+        if (seconds >= 45) return 70;
+        if (seconds >= 30) return 65;
+        return 60;
+        
+    } else if (normalized.includes('step test') || normalized.includes('3-minute')) {
+        const heartRate = numericValue;
+        if (heartRate <= 70) return 100;
+        if (heartRate <= 80) return 95;
+        if (heartRate <= 90) return 90;
+        if (heartRate <= 100) return 85;
+        if (heartRate <= 110) return 80;
+        if (heartRate <= 120) return 75;
+        if (heartRate <= 130) return 70;
+        return 65;
+        
+    } else if (normalized.includes('mile') || normalized.includes('run')) {
+        let totalSeconds = 0;
+        if (typeof result === 'string' && result.includes(':')) {
+            const [minutes, seconds] = result.split(':').map(Number);
+            totalSeconds = (minutes * 60) + (seconds || 0);
+        } else {
+            totalSeconds = numericValue;
+        }
+        
+        if (totalSeconds <= 360) return 100;
+        if (totalSeconds <= 420) return 95;
+        if (totalSeconds <= 480) return 90;
+        if (totalSeconds <= 540) return 85;
+        if (totalSeconds <= 600) return 80;
+        if (totalSeconds <= 660) return 75;
+        if (totalSeconds <= 720) return 70;
+        if (totalSeconds <= 780) return 65;
+        return 60;
+        
+    } else if (normalized.includes('sit-and-reach')) {
+        const distance = numericValue;
+        if (distance >= 25) return 100;
+        if (distance >= 20) return 95;
+        if (distance >= 15) return 90;
+        if (distance >= 10) return 85;
+        if (distance >= 5) return 80;
+        if (distance >= 0) return 75;
+        if (distance >= -5) return 70;
+        return 65;
+        
+    } else if (normalized.includes('grip')) {
+        const strength = numericValue;
+        if (strength >= 60) return 100;
+        if (strength >= 55) return 95;
+        if (strength >= 50) return 90;
+        if (strength >= 45) return 85;
+        if (strength >= 40) return 80;
+        if (strength >= 35) return 75;
+        if (strength >= 30) return 70;
+        return 65;
+    } else if (normalized.includes('bmi')) {
+        const bmi = numericValue;
+        // Healthy BMI range is 18.5-24.9
+        if (bmi >= 18.5 && bmi <= 24.9) return 100;
+        if (bmi >= 17.5 && bmi < 18.5) return 85;
+        if (bmi >= 25 && bmi <= 27) return 85;
+        if (bmi >= 15 && bmi < 17.5) return 70;
+        if (bmi > 27 && bmi <= 30) return 70;
+        return 60;
+    }
+    
+    return 75;
+}
         function calculateGradeLetter(score) {
-            if (score >= 97) return 'A+';
-            if (score >= 93) return 'A';
-            if (score >= 90) return 'A-';
-            if (score >= 87) return 'B+';
-            if (score >= 83) return 'B';
-            if (score >= 80) return 'B-';
-            if (score >= 77) return 'C+';
-            if (score >= 73) return 'C';
-            if (score >= 70) return 'C-';
-            if (score >= 67) return 'D+';
-            if (score >= 63) return 'D';
-            if (score >= 60) return 'D-';
-            return 'F';
-        }
+        return score.toFixed(1); // Returns score with 1 decimal place
+    }
 
         function getGradeStatus(score) {
             if (score >= 90) return 'grade-excellent';
@@ -1521,13 +1768,13 @@
             return 'grade-poor';
         }
 
-        function displayGrades(grades) {
+            function displayGrades(grades) {
             const tableBody = document.getElementById('gradesTableBody');
             
             if (grades.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="7">
+                        <td colspan="6">
                             <div class="empty-state">
                                 <div class="empty-icon">🔍</div>
                                 <div class="empty-title">No Grades Found</div>
@@ -1544,7 +1791,12 @@
             
             let html = '';
             grades.forEach((grade, index) => {
-                const displayResult = grade.result || grade.resultData || grade.score.toFixed(1);
+                // Format result display
+                let displayResult = grade.result || '-';
+                // Shorten long results
+                if (displayResult.length > 50) {
+                    displayResult = displayResult.substring(0, 50) + '...';
+                }
                 
                 html += `
                     <tr>
@@ -1553,57 +1805,50 @@
                         <td>${grade.testName || 'Unknown Activity'}</td>
                         <td>
                             <span class="grade-value ${grade.gradeStatus}">${displayResult}</span>
-                            <small style="color: #94a3b8; display: block; font-size: 11px; margin-top: 2px;">
-                                (Score: ${grade.score.toFixed(1)})
-                            </small>
                         </td>
                         <td>
-                            <span class="grade-value ${grade.gradeStatus}">${grade.grade}</span>
+                            <span class="grade-value ${grade.gradeStatus}">
+                                ${grade.score.toFixed(1)}%
+                            </span>
                         </td>
                         <td>${grade.date}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-small btn-edit" onclick="editGrade('${grade.id}')">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
-                            </div>
-                        </td>
                     </tr>
                 `;
             });
             
             tableBody.innerHTML = html;
         }
-
         function updateFilters() {
-            const activitySelect = document.getElementById('filterActivity');
-            const bulkActivitySelect = document.getElementById('bulkActivity');
+        const activitySelect = document.getElementById('filterActivity');
+        const bulkActivitySelect = document.getElementById('bulkActivity');
+        
+        activitySelect.innerHTML = '<option value="">All Activities</option>';
+        bulkActivitySelect.innerHTML = '<option value="">Select Activity</option>';
+        
+        // Get unique activities from ALL grades (not just uniqueActivities array)
+        const uniqueActivities = [];
+        allGrades.forEach(grade => {
+            if (grade.testName && !uniqueActivities.includes(grade.testName)) {
+                uniqueActivities.push(grade.testName);
+            }
+        });
+        
+        // Sort alphabetically
+        uniqueActivities.sort((a, b) => a.localeCompare(b));
+        
+        // Add options
+        uniqueActivities.forEach(activityName => {
+            const option = document.createElement('option');
+            option.value = activityName;
+            option.textContent = activityName;
+            activitySelect.appendChild(option);
             
-            activitySelect.innerHTML = '<option value="">All Activities</option>';
-            bulkActivitySelect.innerHTML = '<option value="">Select Activity</option>';
-            
-            // Get unique activities
-            const uniqueActivities = [];
-            allGrades.forEach(grade => {
-                if (grade.testName && !uniqueActivities.includes(grade.testName)) {
-                    uniqueActivities.push(grade.testName);
-                }
-            });
-            
-            // Sort alphabetically
-            uniqueActivities.sort((a, b) => a.localeCompare(b));
-            
-            // Add options
-            uniqueActivities.forEach(activityName => {
-                const option = document.createElement('option');
-                option.value = activityName;
-                option.textContent = activityName;
-                activitySelect.appendChild(option);
-                
-                const bulkOption = option.cloneNode(true);
-                bulkActivitySelect.appendChild(bulkOption);
-            });
-        }
+            const bulkOption = option.cloneNode(true);
+            bulkActivitySelect.appendChild(bulkOption);
+        });
+        
+        console.log('Filter activities updated:', uniqueActivities.length);
+    }
 
         function sortGrades(key) {
             if (sortConfig.key === key) {
@@ -1685,13 +1930,11 @@
             const preview = document.getElementById('gradePreview');
             
             if (!isNaN(score) && score >= 0 && score <= 100) {
-                const gradeLetter = calculateGradeLetter(score);
                 const gradeStatus = getGradeStatus(score);
                 
                 preview.innerHTML = `
                     <strong>Preview:</strong> 
-                    <span class="grade-value ${gradeStatus}">${gradeLetter}</span> 
-                    (${score.toFixed(1)}%)<br>
+                    <span class="grade-value ${gradeStatus}">${score.toFixed(1)}%</span><br>
                     <small>${getGradeDescription(score)}</small>
                 `;
             } else {
@@ -1744,7 +1987,8 @@
                     score: newScore,
                     remarks: remarks,
                     updatedAt: new Date(),
-                    grade: calculateGradeLetter(newScore)
+                    // REMOVED: Don't store letter grade, just numeric score
+                    // grade: calculateGradeLetter(newScore)
                 });
                 
                 alert('Grade updated successfully!');
@@ -1818,12 +2062,11 @@
                     newScore = Math.max(0, Math.min(100, newScore));
                     
                     batch.update(docSnap.ref, {
-                        score: newScore,
-                        grade: calculateGradeLetter(newScore),
-                        updatedAt: new Date(),
-                        lastUpdatedBy: currentProfessor.email,
-                        bulkUpdated: true
-                    });
+                    score: newScore,
+                    updatedAt: new Date(),
+                    lastUpdatedBy: currentProfessor.email,
+                    bulkUpdated: true
+                });
                     
                     updatedCount++;
                 });
@@ -1886,111 +2129,110 @@
         }
 
         function displayFinalGrades(finalGrades) {
-            const tableBody = document.getElementById('finalGradesBody');
-            
-            if (finalGrades.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7">
-                            <div class="empty-state">
-                                <div class="empty-icon">📈</div>
-                                <div class="empty-title">No Student Grades Found</div>
-                                <div class="empty-text">
-                                    No student grades available in the database.<br>
-                                    Add activities and have students submit their results first.
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                
-                // Hide statistics section
-                document.getElementById('gradesStats').style.display = 'none';
-                document.getElementById('savePdfBtn').style.display = 'none';
-                document.getElementById('finalGradesInfo').style.display = 'none';
-                
-                return;
-            }
-            
-            let html = '';
-            finalGrades.forEach((grade, index) => {
-                // Determine badge color based on status
-                let badgeClass = 'grade-excellent';
-                if (grade.averageScore < 70) badgeClass = 'grade-poor';
-                else if (grade.averageScore < 80) badgeClass = 'grade-fair';
-                else if (grade.averageScore < 90) badgeClass = 'grade-good';
-                
-                html += `
-                    <tr>
-                        <td>
-                            <strong>${grade.name || 'Unknown Student'}</strong>
-                            ${grade.email ? `<br><small class="text-muted">${grade.email}</small>` : ''}
-                        </td>
-                        <td>${grade.section || 'N/A'}</td>
-                        <td>
-                            ${grade.totalActivities}
-                            ${grade.activityNames.length > 0 ? 
-                                `<br><small class="text-muted" title="${grade.activityNames.join(', ')}">
-                                    <i class="fas fa-info-circle"></i> ${grade.activityNames.length} activities
-                                </small>` : ''
-                            }
-                        </td>
-                        <td>
-                            <span class="grade-value ${grade.status}">
-                                ${grade.averageScore.toFixed(1)}%
-                            </span>
-                            <br>
-                            <small class="text-muted">
-                                ${grade.scores.length > 0 ? 
-                                    `Range: ${Math.min(...grade.scores).toFixed(1)}-${Math.max(...grade.scores).toFixed(1)}%` : 
-                                    'No scores'
-                                }
-                            </small>
-                        </td>
-                        <td>
-                            <span class="grade-value ${grade.status}" style="font-size: 18px;">
-                                <strong>${grade.finalGrade}</strong>
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge ${badgeClass}" style="padding: 5px 10px; border-radius: 20px;">
-                                ${grade.statusText}
-                            </span>
-                        </td>
-                        <td>
-                            <button class="btn-small btn-edit" onclick="viewStudentDetails('${grade.studentKey}')" title="View Details">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn-small btn-success" onclick="exportStudentReport('${grade.studentKey}')" title="Export Report">
-                                <i class="fas fa-download"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tableBody.innerHTML = html;
-            
-            // Show the statistics section
-            document.getElementById('gradesStats').style.display = 'block';
-            
-            // Show the PDF button
-            document.getElementById('savePdfBtn').style.display = 'inline-block';
-            
-            // Show info text
-            document.getElementById('finalGradesInfo').style.display = 'block';
-            
-            // Update the button text to show it's calculated
-            const calculateBtn = document.querySelector('.btn-warning');
-            if (calculateBtn) {
-                calculateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Recalculate Final Grades';
-            }
-            
-            const passedCount = finalGrades.filter(g => g.averageScore >= 70).length;
-            const failedCount = finalGrades.filter(g => g.averageScore < 70).length;
-            document.getElementById('summaryInfoText').textContent = 
-                `Automatically calculated ${finalGrades.length} students. ${passedCount} passed (${((passedCount/finalGrades.length)*100).toFixed(1)}%), ${failedCount} failed (${((failedCount/finalGrades.length)*100).toFixed(1)}%).`;
-        }
+    const tableBody = document.getElementById('finalGradesBody');
+    
+    if (finalGrades.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7">
+                    <div class="empty-state">
+                        <div class="empty-icon">📈</div>
+                        <div class="empty-title">No Student Grades Found</div>
+                        <div class="empty-text">
+                            No student grades available in the database.<br>
+                            Add activities and have students submit their results first.
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+        
+        document.getElementById('gradesStats').style.display = 'none';
+        document.getElementById('savePdfBtn').style.display = 'none';
+        document.getElementById('finalGradesInfo').style.display = 'none';
+        
+        return;
+    }
+    
+    let html = '';
+    finalGrades.forEach((grade, index) => {
+        // Determine badge color based on status
+        let badgeClass = 'grade-excellent';
+        if (grade.averageScore < 70) badgeClass = 'grade-poor';
+        else if (grade.averageScore < 80) badgeClass = 'grade-fair';
+        else if (grade.averageScore < 90) badgeClass = 'grade-good';
+        
+        // Calculate final grade using the same logic as studentgrades.html
+        const finalGrade = calculateGradeLetter(grade.averageScore);
+        
+        html += `
+            <tr>
+                <td>
+                    <strong>${grade.name || 'Unknown Student'}</strong>
+                    ${grade.email ? `<br><small class="text-muted">${grade.email}</small>` : ''}
+                </td>
+                <td>${grade.section || 'N/A'}</td>
+                <td>
+                    ${grade.totalActivities}
+                    ${grade.activityNames.length > 0 ? 
+                        `<br><small class="text-muted" title="${grade.activityNames.join(', ')}">
+                            <i class="fas fa-info-circle"></i> ${grade.activityNames.length} activities
+                        </small>` : ''
+                    }
+                </td>
+                <td>
+                    <span class="grade-value ${grade.status}">
+                        ${grade.averageScore.toFixed(1)}%
+                    </span>
+                    <br>
+                    <small class="text-muted">
+                        ${grade.scores.length > 0 ? 
+                            `Range: ${Math.min(...grade.scores).toFixed(1)}-${Math.max(...grade.scores).toFixed(1)}%` : 
+                            'No scores'
+                        }
+                    </small>
+                </td>
+                <td>
+                    <!-- CHANGED: Show numeric average score instead of letter grade -->
+                    <span class="grade-value ${grade.status}" style="font-size: 18px;">
+                        <strong>${grade.averageScore.toFixed(1)}%</strong>
+                    </span>
+                </td>
+                <td>
+                    <span class="badge ${badgeClass}" style="padding: 5px 10px; border-radius: 20px;">
+                        ${grade.statusText}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn-small btn-edit" onclick="viewStudentDetails('${grade.studentKey}')" title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-small btn-success" onclick="exportStudentReport('${grade.studentKey}')" title="Export Report">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tableBody.innerHTML = html;
+    
+    // Show the statistics section
+    document.getElementById('gradesStats').style.display = 'block';
+    document.getElementById('savePdfBtn').style.display = 'inline-block';
+    document.getElementById('finalGradesInfo').style.display = 'block';
+    
+    // Update the button text
+    const calculateBtn = document.querySelector('.btn-warning');
+    if (calculateBtn) {
+        calculateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Recalculate Final Grades';
+    }
+    
+    const passedCount = finalGrades.filter(g => g.averageScore >= 70).length;
+    const failedCount = finalGrades.filter(g => g.averageScore < 70).length;
+    document.getElementById('summaryInfoText').textContent = 
+        `Automatically calculated ${finalGrades.length} students. ${passedCount} passed (${((passedCount/finalGrades.length)*100).toFixed(1)}%), ${failedCount} failed (${((failedCount/finalGrades.length)*100).toFixed(1)}%).`;
+}
 
     
         function updateFinalGradesStats(finalGrades) {
@@ -2021,29 +2263,27 @@
         }
 
         function viewStudentDetails(studentKey) {
-            const student = currentFinalGrades.find(g => g.studentKey === studentKey);
+        const student = currentFinalGrades.find(g => g.studentKey === studentKey);
+        
+        if (student) {
+            let details = `
+                Student: ${student.name}
+                Section: ${student.section}
+                Email: ${student.email || 'N/A'}
+                Total Activities: ${student.activityCount}
+                Average Score: ${student.averageScore.toFixed(1)}%
+                Status: ${student.statusText}
+                
+                Activities Completed:
+            `;
             
-            if (student) {
-                let details = `
-                    Student: ${student.name}
-                    Section: ${student.section}
-                    Email: ${student.email || 'N/A'}
-                    Total Activities: ${student.totalActivities}
-                    Average Score: ${student.averageScore}%
-                    Final Grade: ${student.finalGrade}
-                    Status: ${student.statusText}
-                    
-                    Activities Completed:
-                `;
-                
-                student.activityNames.forEach((activity, index) => {
-                    const score = student.scores[index] || 'N/A';
-                    details += `\n${index + 1}. ${activity}: ${score}%`;
-                });
-                
-                alert(details);
-            }
+            student.activityInstances.forEach((activity, index) => {
+                details += `\n${index + 1}. ${activity.name} - ${activity.date}: ${activity.score}%`;
+            });
+            
+            alert(details);
         }
+    }
 
         function exportStudentReport(studentKey) {
             const student = currentFinalGrades.find(g => g.studentKey === studentKey);
@@ -2166,6 +2406,21 @@
                 }
             }
         };
+        // Make functions available globally
+        window.editGrade = editGrade;
+        window.closeEditModal = closeEditModal;
+        window.saveGrade = saveGrade;
+        window.showBulkEditModal = showBulkEditModal;
+        window.closeBulkEditModal = closeBulkEditModal;
+        window.applyBulkEdit = applyBulkEdit;
+        window.calculateFinalGrades = calculateFinalGrades;
+        window.exportGrades = exportGrades;
+        window.saveFinalGradesToPDF = saveFinalGradesToPDF;
+        window.viewStudentDetails = viewStudentDetails;
+        window.exportStudentReport = exportStudentReport;
+        window.sortGrades = sortGrades;
+        window.applyFilters = applyFilters;
+        window.clearFilter = clearFilter;
     </script>
 </body>
 </html>

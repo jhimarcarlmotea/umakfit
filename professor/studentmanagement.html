@@ -1017,17 +1017,9 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="sectionsTableBody">
-                            <tr>
-                                <td colspan="7">
-                                    <div class="empty-state">
-                                        <div class="empty-icon">🏫</div>
-                                        <div class="empty-title">No Sections Assigned</div>
-                                        <div class="empty-text">You haven't been assigned to any sections yet. Please contact the Dean or Head Admin.</div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
+                       <tbody id="sectionsTableBody">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
                     </table>
                 </div>
 
@@ -1085,16 +1077,8 @@
                             </tr>
                         </thead>
                             <tbody id="studentsTableBody">
-                                <tr>
-                                    <td colspan="8">
-                                        <div class="empty-state">
-                                            <div class="empty-icon">👥</div>
-                                            <div class="empty-title">No Students Found</div>
-                                            <div class="empty-text">No students are currently assigned to your sections.</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
                         </table>
                     </div>
                     
@@ -1370,7 +1354,7 @@ async function loadSections() {
         });
 
         console.log(`Total sections loaded for this professor: ${window.sections.length}`);
-
+        window.filteredSections = [...window.sections];
         // Update table
         if (window.sections.length === 0) {
             document.getElementById('sectionsTableBody').innerHTML = `
@@ -1392,7 +1376,7 @@ async function loadSections() {
             populateSectionsTable();
             populateSectionFilters();
         }
-            window.filteredSections = [...window.sections];
+           
     } catch (error) {
         console.error('Error loading sections:', error);
         alert('Error loading sections: ' + error.message);
@@ -1426,123 +1410,141 @@ function extractYearLevel(sectionName) {
 }
 
         // Load students for current professor's sections
-async function loadStudents() {
-    try {
-        console.log('=== LOADING STUDENTS FOR THIS PROFESSOR ===');
+        async function loadStudents() {
+            try {
+                console.log('=== LOADING STUDENTS FOR THIS PROFESSOR ===');
 
-        if (window.sections.length === 0) {
-            console.log('No sections assigned. Skipping student load.');
-            updateStudentsTable([]);
-            return;
-        }
-
-        window.students = [];
-        const seenStudentIds = new Set();
-
-        for (const section of window.sections) {
-            if (!section.students || !Array.isArray(section.students) || section.students.length === 0) {
-                continue;
-            }
-
-            for (const rawStudent of section.students) {
-                const studentEmail = rawStudent.email || '';
-                if (!studentEmail || seenStudentIds.has(studentEmail)) continue;
-                seenStudentIds.add(studentEmail);
-
-                let firstName = '', lastName = '', fullName = rawStudent.name || 'Unknown Student';
-                if (fullName.includes(',')) {
-                    const parts = fullName.split(',').map(p => p.trim());
-                    lastName = parts[0];
-                    firstName = parts.slice(1).join(' ');
-                } else {
-                    const nameParts = fullName.split(' ');
-                    firstName = nameParts[0] || '';
-                    lastName = nameParts.slice(1).join(' ') || '';
+                if (window.sections.length === 0) {
+                    console.log('No sections assigned. Skipping student load.');
+                    updateStudentsTable([]);
+                    return;
                 }
 
-                // Get test results using email
-                let bestScore = 0;
-                let totalScore = 0;
-                let lastAttempt = null;
-                let lastAttemptTest = '';
-                let totalAttempts = 0;
-                let testAttempts = {}; // Track attempts per test
+                window.students = [];
+                const seenStudentIds = new Set();
 
-                if (studentEmail) {
-                    const attemptsQuery = query(
-                        collection(db, 'testResults'), 
-                        where('studentEmail', '==', studentEmail)
-                    );
-                    const snapshot = await getDocs(attemptsQuery);
-                    totalAttempts = snapshot.size;
+                for (const section of window.sections) {
+                    if (!section.students || !Array.isArray(section.students) || section.students.length === 0) {
+                        continue;
+                    }
 
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        const testName = data.testName || 'Unknown Test';
-                        const score = calculateTestScore(data.testName, data.result, data.testTarget);
-                        
-                        totalScore += score;
-                        if (score > bestScore) bestScore = score;
+                    for (const rawStudent of section.students) {
+                        const studentEmail = rawStudent.email || '';
+                        if (!studentEmail || seenStudentIds.has(studentEmail)) continue;
+                        seenStudentIds.add(studentEmail);
 
-                        // Track attempts per test
-                        if (!testAttempts[testName]) {
-                            testAttempts[testName] = 0;
+                        let firstName = '', lastName = '', fullName = rawStudent.name || 'Unknown Student';
+                        if (fullName.includes(',')) {
+                            const parts = fullName.split(',').map(p => p.trim());
+                            lastName = parts[0];
+                            firstName = parts.slice(1).join(' ');
+                        } else {
+                            const nameParts = fullName.split(' ');
+                            firstName = nameParts[0] || '';
+                            lastName = nameParts.slice(1).join(' ') || '';
                         }
-                        testAttempts[testName]++;
 
-                        let attemptTime = null;
-                        if (data.submittedAt) {
-                            if (typeof data.submittedAt.toDate === 'function') {
-                                attemptTime = data.submittedAt.toDate();
-                            } else if (data.submittedAt instanceof Date) {  
-                                attemptTime = data.submittedAt;
-                            } else if (typeof data.submittedAt === 'string' || typeof data.submittedAt === 'number') {
-                                attemptTime = new Date(data.submittedAt);
-                            }
+                        // Get test results using email
+                        let bestScore = 0;
+                        let lastAttempt = null;
+                        let lastAttemptTest = '';
+                        let totalAttempts = 0;
+                        let testAttempts = {}; // Track attempts per test
+
+                        if (studentEmail) {
+                            const attemptsQuery = query(
+                                collection(db, 'testResults'), 
+                                where('studentEmail', '==', studentEmail)
+                            );
+                            const snapshot = await getDocs(attemptsQuery);
+                            totalAttempts = snapshot.size;
+
+                            // Group by testId to get BEST score per test (same as test.html)
+                            const testBestScores = new Map();
+                            
+                            snapshot.forEach(doc => {
+                                const data = doc.data();
+                                const testId = data.testId;
+                                const testName = data.testName || 'Unknown Test';
+                                const score = calculateTestScore(data.testName, data.result, data.testTarget);
+                                
+                                // Track best score per test
+                                if (!testBestScores.has(testId) || score > testBestScores.get(testId)) {
+                                    testBestScores.set(testId, score);
+                                }
+                                
+                                // Track overall best score
+                                if (score > bestScore) bestScore = score;
+
+                                // Track attempts per test name (for display)
+                                if (!testAttempts[testName]) {
+                                    testAttempts[testName] = 0;
+                                }
+                                testAttempts[testName]++;
+
+                                // Track last attempt
+                                let attemptTime = null;
+                                if (data.submittedAt) {
+                                    if (typeof data.submittedAt.toDate === 'function') {
+                                        attemptTime = data.submittedAt.toDate();
+                                    } else if (data.submittedAt instanceof Date) {  
+                                        attemptTime = data.submittedAt;
+                                    } else if (typeof data.submittedAt === 'string' || typeof data.submittedAt === 'number') {
+                                        attemptTime = new Date(data.submittedAt);
+                                    }
+                                }
+                                if (attemptTime && (!lastAttempt || attemptTime > lastAttempt)) {
+                                    lastAttempt = attemptTime;
+                                    lastAttemptTest = testName;
+                                }
+                            });
+                            
+                            // Calculate average from BEST scores only (same as test.html)
+                            let totalScore = 0;
+                            testBestScores.forEach(score => {
+                                totalScore += score;
+                            });
+                            
+                            const totalUniqueTests = testBestScores.size;
+                            var averageScore = totalUniqueTests > 0 ? Math.round(totalScore / totalUniqueTests) : 0;
+                            
+                            console.log(`📊 ${fullName}: ${totalUniqueTests} unique tests, Best: ${bestScore}, Avg: ${averageScore}`);
                         }
-                        if (attemptTime && (!lastAttempt || attemptTime > lastAttempt)) {
-                            lastAttempt = attemptTime;
-                            lastAttemptTest = testName;
-                        }
-                    });
+
+                        const student = {
+                            id: studentEmail,
+                            umakId: rawStudent.student_id || rawStudent.studentId || 'N/A',
+                            firstName: firstName || 'Unknown',
+                            lastName: lastName || '',
+                            fullName: fullName,
+                            email: studentEmail,
+                            section: section.name,
+                            yearLevel: section.yearLevel || extractYearLevel(section.name),
+                            totalAttempts: totalAttempts,
+                            testAttempts: testAttempts,
+                            bestScore: bestScore,
+                            averageScore: averageScore, // Now uses best-score-only average
+                            lastAttempt: lastAttempt,
+                            lastAttemptTest: lastAttemptTest,
+                            status: 'active'
+                        };
+
+                        console.log(`Student loaded: ${student.fullName} (${student.umakId}) → Avg: ${student.averageScore}%`);
+                        window.students.push(student);
+                    }
                 }
 
-                const averageScore = totalAttempts > 0 ? Math.round(totalScore / totalAttempts) : 0;
+                console.log(`Total students loaded: ${window.students.length}`);
+                window.filteredStudents = [...window.students];
+                window.currentPage = 1;
+                updateStudentsTable(window.filteredStudents);
 
-                const student = {
-                    id: studentEmail, // Use email as unique ID
-                    umakId: rawStudent.student_id || rawStudent.studentId || 'N/A',
-                    firstName: firstName || 'Unknown',
-                    lastName: lastName || '',
-                    fullName: fullName,
-                    email: studentEmail,
-                    section: section.name,
-                    yearLevel: section.yearLevel || extractYearLevel(section.name),
-                    totalAttempts: totalAttempts,
-                    testAttempts: testAttempts, // Store test-specific attempts
-                    bestScore: bestScore,
-                    averageScore: averageScore,
-                    lastAttempt: lastAttempt,
-                    lastAttemptTest: lastAttemptTest,
-                    status: 'active'
-                };
-
-                console.log(`Student loaded: ${student.fullName} (${student.umakId}) → ${student.totalAttempts} attempts`);
-                window.students.push(student);
+            } catch (error) {
+                console.error('Error loading students:', error);
+                alert('Error loading students: ' + error.message);
+                updateStudentsTable([]);
             }
         }
-
-        console.log(`Total students loaded: ${window.students.length}`);
-        window.filteredStudents = [...window.students];
-        window.currentPage = 1;
-        updateStudentsTable(window.filteredStudents);
-
-    } catch (error) {
-        console.error('Error loading students:', error);
-        alert('Error loading students: ' + error.message);
-        updateStudentsTable([]);
-    }
-}
             // Calculate test score based on result and target
 function calculateTestScore(testName, result, testTarget = null) {
     const normalized = testName.toLowerCase().trim();
@@ -1666,66 +1668,76 @@ function calculateTestScore(testName, result, testTarget = null) {
     
     return 75; // Default score
 }
-function populateSectionsTable() {
-    const tableBody = document.getElementById('sectionsTableBody');
-    const sectionCount = document.getElementById('sectionCount');
-    
-    // Show ALL sections, no pagination
-    sectionCount.textContent = window.filteredSections.length;
-    
-    if (window.filteredSections.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7">
-                    <div class="empty-state">
-                        <div class="empty-icon">🏫</div>
-                        <div class="empty-title">No Sections Found</div>
-                        <div class="empty-text">
-                            ${window.sections.length === 0 ? 
-                                'No sections assigned to you yet.' : 
-                                'No sections match your search criteria.'}
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    let html = '';
-    window.filteredSections.forEach(section => {
-        const statusClass = section.status === 'active' ? 'status-active' : 'status-inactive';
-        const statusText = section.status === 'active' ? 'Active' : 'Inactive';
-        
-        html += `
-            <tr>
-                <td>
-                    <strong style="color: #1e3a8a;">${section.name}</strong>
-                    ${section.description ? `<br><small style="color: #64748b;">${section.description}</small>` : ''}
-                </td>
-                <td><span style="font-weight: 600;">${section.yearLevel || 'N/A'}</span></td>
-                <td>
-                    <span style="font-weight: 700; color: #3b82f6;">${section.studentCount || 0}</span>
-                    <small style="color: #64748b;"> students</small>
-                </td>
-                <td><span style="font-family: monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">${section.courseCode || 'N/A'}</span></td>
-                <td>${section.semester || 'N/A'}</td>
-                <td>${section.academicYear || 'N/A'}</td>
-                <td>
-                    <div class="action-buttons">
-                        <button class="btn-action btn-view" onclick="viewSectionDetails('${section.id}')">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                        <!-- REMOVED THE STUDENTS BUTTON -->
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
-    
-    tableBody.innerHTML = html;
-}
-
+            function populateSectionsTable() {
+                const tableBody = document.getElementById('sectionsTableBody');
+                const sectionCount = document.getElementById('sectionCount');
+                
+                // Show ALL sections, no pagination
+                sectionCount.textContent = window.filteredSections.length;
+                
+                if (window.filteredSections.length === 0) {
+                    // Check if sections were actually loaded (not just filtered to empty)
+                    if (window.sections.length === 0) {
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">🏫</div>
+                                        <div class="empty-title">No Sections Assigned</div>
+                                        <div class="empty-text">You haven't been assigned to any sections yet. Please contact the Dean or Head Admin.</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        // Filtered to empty but sections exist
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">🔍</div>
+                                        <div class="empty-title">No Sections Found</div>
+                                        <div class="empty-text">No sections match your search criteria.</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                    return;
+                }
+                
+                let html = '';
+                window.filteredSections.forEach(section => {
+                    const statusClass = section.status === 'active' ? 'status-active' : 'status-inactive';
+                    const statusText = section.status === 'active' ? 'Active' : 'Inactive';
+                    
+                    html += `
+                        <tr>
+                            <td>
+                                <strong style="color: #1e3a8a;">${section.name}</strong>
+                                ${section.description ? `<br><small style="color: #64748b;">${section.description}</small>` : ''}
+                            </td>
+                            <td><span style="font-weight: 600;">${section.yearLevel || 'N/A'}</span></td>
+                            <td>
+                                <span style="font-weight: 700; color: #3b82f6;">${section.studentCount || 0}</span>
+                                <small style="color: #64748b;"> students</small>
+                            </td>
+                            <td><span style="font-family: monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">${section.courseCode || 'N/A'}</span></td>
+                            <td>${section.semester || 'N/A'}</td>
+                            <td>${section.academicYear || 'N/A'}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-action btn-view" onclick="viewSectionDetails('${section.id}')">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tableBody.innerHTML = html;
+            }
         function updateStudentsTable(students) {
     const tableBody = document.getElementById('studentsTableBody');
     const studentCount = document.getElementById('studentCount');
@@ -1967,7 +1979,8 @@ async function viewSectionDetails(sectionId) {
             document.getElementById('viewSectionModal').style.display = 'none';
         }
 
-async function viewStudentDetails(studentId) {
+
+    async function viewStudentDetails(studentId) {
     try {
         window.currentStudentId = studentId;
         const student = window.students.find(s => s.id === studentId);
@@ -1983,52 +1996,34 @@ async function viewStudentDetails(studentId) {
         );
         const attemptsSnapshot = await getDocs(attemptsQuery);
 
-        const attempts = [];
-        let totalScore = 0, bestScore = 0;
-
+        // Group attempts by testId (NOT testName) to track attempts correctly
+        const testGroups = {};
+        
         attemptsSnapshot.forEach(docSnap => {
             const attempt = { id: docSnap.id, ...docSnap.data() };
-            attempts.push(attempt);
-            const score = calculateTestScore(attempt.testName, attempt.result, attempt.testTarget);
-            totalScore += score;
-            if (score > bestScore) bestScore = score;
-        });
-
-        // Sort by date (newest first) - FIXED VERSION
-        attempts.sort((a, b) => {
-            // Helper function to safely get timestamp
-            const getTimestamp = (attempt) => {
-                if (!attempt.submittedAt) return 0;
-                
-                // If it's a Firestore Timestamp
-                if (attempt.submittedAt.toMillis && typeof attempt.submittedAt.toMillis === 'function') {
-                    return attempt.submittedAt.toMillis();
-                }
-                
-                // If it's already a Date object
-                if (attempt.submittedAt instanceof Date) {
-                    return attempt.submittedAt.getTime();
-                }
-                
-                // If it's a string or number
-                if (typeof attempt.submittedAt === 'string' || typeof attempt.submittedAt === 'number') {
-                    return new Date(attempt.submittedAt).getTime();
-                }
-                
-                // If it's a Firestore Timestamp with seconds/nanoseconds
-                if (attempt.submittedAt.seconds && attempt.submittedAt.nanoseconds) {
-                    return attempt.submittedAt.seconds * 1000 + attempt.submittedAt.nanoseconds / 1000000;
-                }
-                
-                return 0;
-            };
+            const testId = attempt.testId || attempt.testName; // Use testId as primary key
             
-            const timeA = getTimestamp(a);
-            const timeB = getTimestamp(b);
-            return timeB - timeA; // Sort newest first
+            if (!testGroups[testId]) {
+                testGroups[testId] = {
+                    testName: attempt.testName || 'Unknown Test',
+                    attempts: []
+                };
+            }
+            testGroups[testId].attempts.push(attempt);
         });
 
-        const totalAttempts = attempts.length;
+        // Calculate overall stats
+        let totalScore = 0, bestScore = 0, totalAttempts = 0;
+        
+        Object.values(testGroups).forEach(group => {
+            group.attempts.forEach(attempt => {
+                const score = calculateTestScore(attempt.testName, attempt.result, attempt.testTarget);
+                totalScore += score;
+                totalAttempts++;
+                if (score > bestScore) bestScore = score;
+            });
+        });
+
         const averageScore = totalAttempts > 0 ? Math.round(totalScore / totalAttempts) : 0;
         const initials = (student.firstName.charAt(0) + student.lastName.charAt(0)).toUpperCase() || '??';
 
@@ -2047,7 +2042,7 @@ async function viewStudentDetails(studentId) {
                     <div class="info-value info-value-email">${student.email || 'N/A'}</div>
                 </div>
                 <div class="info-item"><div class="info-label">Year Level</div><div class="info-value">${student.yearLevel || 'N/A'}</div></div>
-                <div class="info-item"><div class="info-label">Total Tests Taken</div><div class="info-value"><strong>${Object.keys(student.testAttempts).length}</strong></div></div>
+                <div class="info-item"><div class="info-label">Total Tests Taken</div><div class="info-value"><strong>${Object.keys(testGroups).length}</strong></div></div>
                 <div class="info-item"><div class="info-label">Best Score</div><div class="info-value">${totalAttempts > 0 ? `<span class="score-badge ${bestScore >= 90 ? 'score-excellent' : bestScore >= 70 ? 'score-good' : 'score-poor'}">${bestScore}%</span>` : 'No attempts'}</div></div>
                 <div class="info-item"><div class="info-label">Average Score</div><div class="info-value">${totalAttempts > 0 ? `<strong>${averageScore}%</strong>` : 'No attempts'}</div></div>
                 <div class="info-item"><div class="info-label">Status</div><div class="info-value"><span class="status-badge status-active">Active</span></div></div>
@@ -2055,51 +2050,88 @@ async function viewStudentDetails(studentId) {
 
         document.getElementById('studentDetailsContent').innerHTML = html;
 
-        // Attempts table - grouped by test
+        // Attempts table - Show ALL attempts
         let attemptsHTML = '';
-        if (attempts.length > 0) {
-            // Group attempts by test name
-            const testGroups = {};
-            attempts.forEach(attempt => {
-                const testName = attempt.testName || 'Unknown Test';
-                if (!testGroups[testName]) {
-                    testGroups[testName] = [];
-                }
-                testGroups[testName].push(attempt);
+        if (Object.keys(testGroups).length > 0) {
+            // Sort tests by most recent attempt
+            const sortedTests = Object.entries(testGroups).sort((a, b) => {
+                const getLatestTime = (attempts) => {
+                    const timestamps = attempts.map(att => {
+                        if (!att.submittedAt) return 0;
+                        if (typeof att.submittedAt.toMillis === 'function') return att.submittedAt.toMillis();
+                        if (att.submittedAt instanceof Date) return att.submittedAt.getTime();
+                        if (typeof att.submittedAt === 'string' || typeof att.submittedAt === 'number') return new Date(att.submittedAt).getTime();
+                        if (att.submittedAt.seconds && att.submittedAt.nanoseconds) return att.submittedAt.seconds * 1000;
+                        return 0;
+                    });
+                    return Math.max(...timestamps);
+                };
+                
+                return getLatestTime(b[1].attempts) - getLatestTime(a[1].attempts);
             });
 
-            // Display each test group
-            Object.entries(testGroups).forEach(([testName, testAttempts]) => {
+            sortedTests.forEach(([testId, group]) => {
+                const testName = group.testName;
+                const testAttempts = group.attempts;
+                
+                // Sort attempts by date (oldest first for correct numbering)
+                testAttempts.sort((a, b) => {
+                    const getTimestamp = (attempt) => {
+                        if (!attempt.submittedAt) return 0;
+                        if (typeof attempt.submittedAt.toMillis === 'function') return attempt.submittedAt.toMillis();
+                        if (attempt.submittedAt instanceof Date) return attempt.submittedAt.getTime();
+                        if (typeof attempt.submittedAt === 'string' || typeof attempt.submittedAt === 'number') return new Date(attempt.submittedAt).getTime();
+                        if (attempt.submittedAt.seconds && attempt.submittedAt.nanoseconds) return attempt.submittedAt.seconds * 1000;
+                        return 0;
+                    };
+                    
+                    return getTimestamp(a) - getTimestamp(b); // oldest first
+                });
+
+                const totalAttempts = testAttempts.length;
+                
+                // Find best score among all attempts
+                const bestScoreInTest = Math.max(...testAttempts.map(a => calculateTestScore(a.testName, a.result, a.testTarget)));
+                
+                // Show ALL attempts for this test
                 testAttempts.forEach((attempt, index) => {
-                   let date = new Date();
-            if (attempt.submittedAt) {
-                // If it's a Firestore Timestamp
-                if (typeof attempt.submittedAt.toDate === 'function') {
-                    date = attempt.submittedAt.toDate();
-                } 
-                // If it's already a Date object
-                else if (attempt.submittedAt instanceof Date) {
-                    date = attempt.submittedAt;
-                } 
-                // If it's a string or number
-                else if (typeof attempt.submittedAt === 'string' || typeof attempt.submittedAt === 'number') {
-                    date = new Date(attempt.submittedAt);
-                }
-                // If it's a Timestamp object (alternative)
-                else if (attempt.submittedAt.seconds && attempt.submittedAt.nanoseconds) {
-                    date = new Date(attempt.submittedAt.seconds * 1000 + attempt.submittedAt.nanoseconds / 1000000);
-                }
-            }
-            const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const attemptNumber = index + 1; // 1, 2, 3, etc.
+                    
+                    let date = new Date();
+                    if (attempt.submittedAt) {
+                        if (typeof attempt.submittedAt.toDate === 'function') {
+                            date = attempt.submittedAt.toDate();
+                        } else if (attempt.submittedAt instanceof Date) {
+                            date = attempt.submittedAt;
+                        } else if (typeof attempt.submittedAt === 'string' || typeof attempt.submittedAt === 'number') {
+                            date = new Date(attempt.submittedAt);
+                        } else if (attempt.submittedAt.seconds && attempt.submittedAt.nanoseconds) {
+                            date = new Date(attempt.submittedAt.seconds * 1000);
+                        }
+                    }
+                    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    
                     const score = calculateTestScore(attempt.testName, attempt.result, attempt.testTarget);
                     let statusClass = score >= 90 ? 'score-excellent' : score >= 70 ? 'score-good' : 'score-poor';
                     let statusText = score >= 90 ? 'Excellent' : score >= 70 ? 'Good' : 'Needs Improvement';
+                    
+                    const isBestScore = score === bestScoreInTest;
+                    
+                    const bestScoreIndicator = isBestScore && totalAttempts > 1 ? 
+                        '<span style="color: #10b981; font-weight: bold; margin-left: 5px;">🏆 Best</span>' : '';
 
                     attemptsHTML += `
-                        <tr>
+                        <tr style="${isBestScore && totalAttempts > 1 ? 'background-color: #f0fdf4;' : ''}">
                             <td>${formattedDate}</td>
-                            <td><strong>${testName}</strong><br><small style="color: #64748b;">Attempt ${testAttempts.length - index} of ${testAttempts.length}</small></td>
-                            <td><span class="score-badge ${statusClass}">${score}%</span></td>
+                            <td>
+                                <strong>${testName}</strong><br>
+                                <small style="color: #64748b;">
+                                    Attempt ${attemptNumber} of ${totalAttempts}
+                                </small>
+                            </td>
+                            <td>
+                                <span class="score-badge ${statusClass}">${score}%</span>${bestScoreIndicator}
+                            </td>
                             <td>${statusText}</td>
                             <td>${attempt.timerValue || 'N/A'}</td>
                             <td>
@@ -2357,11 +2389,35 @@ async function viewStudentDetails(studentId) {
         }
 
         // Refresh data
-        function refreshData() {
+       async function refreshData() {
+        try {
+            // Show a subtle loading indicator (optional)
+            const refreshBtn = event?.target?.closest('.btn-secondary-custom');
+            if (refreshBtn) {
+                const originalHTML = refreshBtn.innerHTML;
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Refreshing...';
+                refreshBtn.disabled = true;
+            }
+            
             window.currentPage = 1;
-            loadSections();
-            loadStudents();
+            
+            // Reload data
+            await loadSections();
+            await loadStudents();
+            
+            // Restore button
+            if (refreshBtn) {
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                refreshBtn.disabled = false;
+            }
+            
+            console.log('✓ Data refreshed successfully');
+            
+        } catch (error) {
+            console.error('Error refreshing data:', error);
+            alert('Error refreshing data. Please try again.');
         }
+    }
 
         // Setup real-time updates
      function setupRealtimeUpdates() {
