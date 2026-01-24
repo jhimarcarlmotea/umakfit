@@ -104,29 +104,128 @@
             align-items: center; 
             gap: 15px; 
         }
-        .logout-btn { 
-            padding: 8px 20px; 
-            background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%); 
-            border: none; 
-            border-radius: 8px; 
-            color: #000; 
-            font-weight: 600; 
-            font-size: 14px; 
-            cursor: pointer; 
-            transition: all 0.3s; 
-            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+        
+        /* Profile Dropdown Styles */
+        .profile-container {
+            position: relative;
         }
-        .logout-btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4); 
-        }
-        .account-circle { 
-            width: 44px; 
-            height: 44px; 
-            cursor: pointer; 
+        .profile-circle {
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
             border: 2px solid #e2e8f0;
             transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .profile-circle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .profile-dropdown {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            min-width: 280px;
+            display: none;
+            z-index: 1001;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        .profile-dropdown.show {
+            display: block;
+            animation: dropdownSlide 0.3s ease-out;
+        }
+        .profile-dropdown-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .profile-dropdown-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            border: 3px solid rgba(255,255,255,0.3);
+            overflow: hidden;
+        }
+        .profile-dropdown-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .profile-dropdown-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .profile-dropdown-email {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .profile-dropdown-menu {
+            padding: 8px 0;
+        }
+        .profile-dropdown-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #374151;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .profile-dropdown-item:hover {
+            background: #f8fafc;
+            color: #3b82f6;
+        }
+        .profile-dropdown-item i {
+            width: 20px;
+            font-size: 16px;
+        }
+        .profile-dropdown-divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 8px 0;
+        }
+        .profile-dropdown-item.logout {
+            color: #dc2626;
+        }
+        .profile-dropdown-item.logout:hover {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         /* Navigation Styles */
@@ -829,10 +928,32 @@
                     University of Makati
                 </div>
                 <div class="header-actions">
-                    <button class="logout-btn" onclick="handleLogout()">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                    <img class="account-circle" src="https://c.animaapp.com/kboeAmgh/img/icon.svg" alt="Account">
+                    <!-- Profile Dropdown -->
+                    <div class="profile-container" style="position: relative;">
+                        <div class="profile-circle" id="profileCircle" onclick="toggleProfileDropdown()">
+                            <!-- Profile picture will be loaded here -->
+                        </div>
+                        <div class="profile-dropdown" id="profileDropdown">
+                            <div class="profile-dropdown-header">
+                                <div class="profile-dropdown-avatar" id="profileDropdownAvatar">
+                                    <!-- Profile picture will be loaded here -->
+                                </div>
+                                <div class="profile-dropdown-name" id="dropdownName">Professor</div>
+                                <div class="profile-dropdown-email" id="dropdownEmail">professor@umak.edu.ph</div>
+                            </div>
+                            <div class="profile-dropdown-menu">
+                                <a href="#" class="profile-dropdown-item" onclick="showViewProfile(event)">
+                                    <i class="fas fa-user"></i>
+                                    <span>View Profile</span>
+                                </a>
+                                <div class="profile-dropdown-divider"></div>
+                                <a href="#" class="profile-dropdown-item logout" onclick="handleLogout(event)">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1227,6 +1348,127 @@ window.clearResultFilters = clearResultFilters;
 window.currentUser = null;
 window.assignedSections = [];
 
+// Function to update profile picture with Google photo
+function updateProfilePicture(photoURL, userName) {
+    const profileCircle = document.getElementById('profileCircle');
+    const profileDropdownAvatar = document.getElementById('profileDropdownAvatar');
+    const initial = userName ? userName.charAt(0).toUpperCase() : 'P';
+    
+    if (photoURL) {
+        // Create image element for profile circle
+        const circleImg = document.createElement('img');
+        circleImg.src = photoURL;
+        circleImg.alt = userName || 'Profile';
+        circleImg.onerror = function() {
+            // If image fails to load, show initial
+            profileCircle.innerHTML = initial;
+            profileCircle.style.background = 'linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%)';
+            profileCircle.style.color = 'white';
+        };
+        
+        // Update profile circle
+        profileCircle.innerHTML = '';
+        profileCircle.appendChild(circleImg);
+        
+        // Create image element for dropdown avatar
+        const dropdownImg = document.createElement('img');
+        dropdownImg.src = photoURL;
+        dropdownImg.alt = userName || 'Profile';
+        dropdownImg.onerror = function() {
+            // If image fails to load, show initial
+            profileDropdownAvatar.innerHTML = initial;
+            profileDropdownAvatar.style.background = 'rgba(255,255,255,0.2)';
+            profileDropdownAvatar.style.color = 'white';
+        };
+        
+        // Update dropdown avatar
+        profileDropdownAvatar.innerHTML = '';
+        profileDropdownAvatar.appendChild(dropdownImg);
+    } else {
+        // No photo URL, use initial
+        profileCircle.innerHTML = initial;
+        profileCircle.style.background = 'linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%)';
+        profileCircle.style.color = 'white';
+        
+        profileDropdownAvatar.innerHTML = initial;
+        profileDropdownAvatar.style.background = 'rgba(255,255,255,0.2)';
+        profileDropdownAvatar.style.color = 'white';
+    }
+}
+
+onAuthStateChanged(auth, async (user) => {
+    const loadingScreen = document.getElementById('loadingScreen');
+    const mainContent = document.getElementById('mainContent');
+
+    if (user) {
+        try {
+            console.log('User authenticated:', user.email);
+            
+            // Update profile picture with Google photo
+            updateProfilePicture(user.photoURL, user.displayName);
+            
+            // Update profile dropdown information
+            document.getElementById('dropdownName').textContent = user.displayName || 'Professor';
+            document.getElementById('dropdownEmail').textContent = user.email;
+            
+            window.currentUser = user;
+            
+            await loadScheduledTests(user.email, user.uid);
+            await loadTestResults(user.email, user.uid);
+            setupRealTimeUpdates(user.email, user.uid);
+            setupRealTimeResultUpdates(user.email, user.uid);
+            setupTestVisibilityUpdates();
+            
+            loadingScreen.style.display = 'none';
+            mainContent.style.display = 'block';
+        } catch (error) {
+            console.error('Error loading data:', error);
+            loadingScreen.style.display = 'none';
+            mainContent.style.display = 'block';
+        }
+    } else {
+        window.location.href = '/login/index.html';
+    }
+});
+
+// Profile dropdown toggle
+window.toggleProfileDropdown = function(event) {
+    if (event) event.preventDefault();
+    document.getElementById('profileDropdown').classList.toggle('show');
+};
+
+// View profile function
+window.showViewProfile = function(event) { 
+    if (event) event.preventDefault();
+    alert('Profile view would open here');
+    document.getElementById('profileDropdown').classList.remove('show');
+};
+
+// Updated Logout function
+window.handleLogout = async function(event) {
+    if (event) event.preventDefault();
+    document.getElementById('profileDropdown').classList.remove('show');
+    
+    if (confirm('Are you sure you want to logout?')) {
+        try {
+            await window.signOut(window.auth);
+            window.location.href = '/login/index.html';
+        } catch (error) {
+            console.error('Error logging out:', error);
+            window.location.href = '/login/index.html';
+        }
+    }
+};
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const profileContainer = document.querySelector('.profile-container');
+    const profileDropdown = document.getElementById('profileDropdown');
+    if (profileContainer && !profileContainer.contains(event.target)) {
+        profileDropdown.classList.remove('show');
+    }
+});
+
 // Add this right after Firebase initialization
 console.log('Storage initialized:', storage ? 'YES' : 'NO');
 console.log('Storage bucket:', firebaseConfig.storageBucket);
@@ -1444,8 +1686,7 @@ async function loadScheduledTests(userEmail, userId) {
                                     All scheduled tests have expired or you haven't created any tests yet.<br>
                                     Click "Schedule New Test" to create a fitness test for your assigned section(s).
                                 </div>
-                            </div>
-                        </td>
+                            </td>
                     </tr>
                 `;
             } else {
@@ -1459,8 +1700,7 @@ async function loadScheduledTests(userEmail, userId) {
                                     You have not been assigned to any sections yet.<br><br>
                                     Please contact the Secretary to assign you to a section.
                                 </div>
-                            </div>
-                        </td>
+                            </td>
                     </tr>
                 `;
             }
@@ -1484,7 +1724,7 @@ async function loadScheduledTests(userEmail, userId) {
                                     Click "Schedule New Test" to create a fitness test for your assigned section(s).
                                 </div>
                             </td>
-                        </tr>
+                    </tr>
                 `;
             } else {
                 tableBody.innerHTML = `
@@ -1498,7 +1738,7 @@ async function loadScheduledTests(userEmail, userId) {
                                     Please contact the Secretary to assign you to a section.
                                 </div>
                             </td>
-                        </tr>
+                    </tr>
                 `;
             }
         }
@@ -2233,33 +2473,6 @@ async function deleteTest(testId) {
     }
 }
 
-            onAuthStateChanged(auth, async (user) => {
-                const loadingScreen = document.getElementById('loadingScreen');
-                const mainContent = document.getElementById('mainContent');
-
-                if (user) {
-                    try {
-                        console.log('User authenticated:', user.email);
-                        window.currentUser = user;
-                        
-                        await loadScheduledTests(user.email, user.uid);
-                        await loadTestResults(user.email, user.uid);
-                        setupRealTimeUpdates(user.email, user.uid);
-                        setupRealTimeResultUpdates(user.email, user.uid);
-                        setupTestVisibilityUpdates(); // Add this line
-                        
-                        loadingScreen.style.display = 'none';
-                        mainContent.style.display = 'block';
-                    } catch (error) {
-                        console.error('Error loading data:', error);
-                        loadingScreen.style.display = 'none';
-                        mainContent.style.display = 'block';
-                    }
-                } else {
-                    window.location.href = '/login/index.html';
-                }
-            });
-
 window.loadScheduledTests = loadScheduledTests;
 window.loadTestResults = loadTestResults;
 window.scheduleTest = scheduleTest;
@@ -2269,20 +2482,6 @@ window.deleteTest = deleteTest;
 </script>
 
     <script>
-        async function handleLogout() {
-            if (confirm('Are you sure you want to logout?')) {
-                try {
-                    await window.signOut(window.auth);
-                    const baseUrl = window.location.origin;
-                    window.location.href = baseUrl + '/login/index.html';
-                } catch (error) {
-                    console.error('Error logging out:', error);
-                    alert('Error logging out. Please try again.');
-                }
-            }
-        }
-           
-
         async function editTest(testId) {
     try {
         console.log('🔧 Opening edit modal for test:', testId);
