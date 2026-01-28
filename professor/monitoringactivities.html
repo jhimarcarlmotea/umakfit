@@ -590,12 +590,12 @@
                 <div class="header-actions">
                     <div class="profile-container">
                         <div class="profile-circle" id="profileCircle" onclick="toggleProfileDropdown()">
-                            P
+                            <!-- Profile picture will be loaded here -->
                         </div>
                         <div class="profile-dropdown" id="profileDropdown">
                             <div class="profile-dropdown-header">
                                 <div class="profile-dropdown-avatar" id="profileDropdownAvatar">
-                                    P
+                                    <!-- Profile picture will be loaded here -->
                                 </div>
                                 <div class="profile-dropdown-name" id="dropdownName">Professor</div>
                                 <div class="profile-dropdown-email" id="dropdownEmail">professor@umak.edu.ph</div>
@@ -799,6 +799,54 @@
         let assignedSections = [];
         let allStudents = [];
 
+        // Function to update profile picture with Google photo
+        function updateProfilePicture(photoURL, userName) {
+            const profileCircle = document.getElementById('profileCircle');
+            const profileDropdownAvatar = document.getElementById('profileDropdownAvatar');
+            const initial = userName ? userName.charAt(0).toUpperCase() : 'P';
+            
+            if (photoURL) {
+                // Create image element for profile circle
+                const circleImg = document.createElement('img');
+                circleImg.src = photoURL;
+                circleImg.alt = userName || 'Profile';
+                circleImg.onerror = function() {
+                    // If image fails to load, show initial
+                    profileCircle.innerHTML = initial;
+                    profileCircle.style.background = 'linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%)';
+                    profileCircle.style.color = 'white';
+                };
+                
+                // Update profile circle
+                profileCircle.innerHTML = '';
+                profileCircle.appendChild(circleImg);
+                
+                // Create image element for dropdown avatar
+                const dropdownImg = document.createElement('img');
+                dropdownImg.src = photoURL;
+                dropdownImg.alt = userName || 'Profile';
+                dropdownImg.onerror = function() {
+                    // If image fails to load, show initial
+                    profileDropdownAvatar.innerHTML = initial;
+                    profileDropdownAvatar.style.background = 'rgba(255,255,255,0.2)';
+                    profileDropdownAvatar.style.color = 'white';
+                };
+                
+                // Update dropdown avatar
+                profileDropdownAvatar.innerHTML = '';
+                profileDropdownAvatar.appendChild(dropdownImg);
+            } else {
+                // No photo URL, use initial
+                profileCircle.innerHTML = initial;
+                profileCircle.style.background = 'linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%)';
+                profileCircle.style.color = 'white';
+                
+                profileDropdownAvatar.innerHTML = initial;
+                profileDropdownAvatar.style.background = 'rgba(255,255,255,0.2)';
+                profileDropdownAvatar.style.color = 'white';
+            }
+        }
+
         // Format time relative to now
         function formatTimeAgo(date) {
             const now = new Date();
@@ -814,492 +862,492 @@
             
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         }
-            // Calculate test score based on result and target
-function calculateTestScore(testName, result, testTarget = null) {
-    const normalized = testName.toLowerCase().trim();
-    
-    // Extract numeric value from result
-    let numericValue = 0;
-    
-    if (typeof result === 'object' && result !== null) {
-        numericValue = result.repetitions || result.time || result.distance || result.value || result.score || 0;
-    } else if (typeof result === 'string') {
-        const match = result.match(/(\d+\.?\d*)/);
-        if (match) {
-            numericValue = parseFloat(match[1]);
-        } else {
-            numericValue = parseFloat(result) || 0;
-        }
-    } else {
-        numericValue = parseFloat(result) || 0;
-    }
-    
-    // Use test target if available
-    if (testTarget && testTarget > 0) {
-        const percentage = (numericValue / testTarget) * 100;
-        let score = Math.min(100, Math.max(50, percentage));
-        
-        if (percentage >= 100) score = 100;
-        else if (percentage >= 90) score = 95;
-        else if (percentage >= 80) score = 90;
-        else if (percentage >= 70) score = 85;
-        else if (percentage >= 60) score = 80;
-        else if (percentage >= 50) score = 75;
-        
-        return Math.round(score);
-    }
-    
-    // Default scoring based on test type
-    if (normalized.includes('push-up') || normalized.includes('pushup')) {
-        const reps = numericValue;
-        if (reps >= 40) return 100;
-        if (reps >= 30) return 90;
-        if (reps >= 20) return 80;
-        if (reps >= 10) return 70;
-        return 60;
-    } else if (normalized.includes('sit-up') || normalized.includes('situp')) {
-        const reps = numericValue;
-        if (reps >= 50) return 100;
-        if (reps >= 40) return 90;
-        if (reps >= 30) return 80;
-        if (reps >= 20) return 70;
-        return 60;
-    } else if (normalized.includes('plank')) {
-        const seconds = numericValue;
-        if (seconds >= 180) return 100;
-        if (seconds >= 120) return 90;
-        if (seconds >= 80) return 80;
-        if (seconds >= 60) return 75;
-        return 60;
-    }
-    
-    return 75; // Default score
-}
-        // Load professor's assigned sections
-async function loadAssignedSections(professorId, professorEmail) {
-    try {
-        assignedSections = [];
-        console.log('Loading sections for professor:', professorEmail);
-        
-        // Get professor's full name for matching
-        let professorFullName = null;
-        
-        // Try professors collection
-        const profQuery = query(collection(db, 'professors'), where('email', '==', professorEmail));
-        const profSnap = await getDocs(profQuery);
-        if (!profSnap.empty) {
-            professorFullName = profSnap.docs[0].data().fullName || profSnap.docs[0].data().name;
-        }
-        
-        // Try users collection
-        if (!professorFullName) {
-            const userQuery = query(collection(db, 'users'), where('email', '==', professorEmail));
-            const userSnap = await getDocs(userQuery);
-            if (!userSnap.empty) {
-                const userData = userSnap.docs[0].data();
-                professorFullName = userData.fullName || userData.name;
-            }
-        }
-        
-        // Fallback to display name
-        if (!professorFullName && currentUser) {
-            professorFullName = currentUser.displayName || professorEmail.split('@')[0].toUpperCase();
-        }
-        
-        console.log('Professor name for matching:', professorFullName);
-        
-        // Load all sections and match by professor name/email
-        const sectionsSnapshot = await getDocs(collection(db, 'sections'));
-        
-        sectionsSnapshot.forEach((doc) => {
-            const sectionData = doc.data();
-            const dbProfessor = (sectionData.professor || '').toString().trim();
-            
-            // Flexible matching
-            const matches = 
-                dbProfessor === professorFullName ||
-                sectionData.professorEmail === professorEmail ||
-                sectionData.professorId === professorId ||
-                dbProfessor.toUpperCase().includes(professorFullName?.toUpperCase() || '') ||
-                (professorFullName && professorFullName.toUpperCase().includes(dbProfessor.toUpperCase()));
-            
-            if (matches) {
-                console.log(`✓ Matched section: ${sectionData.name}`);
-                assignedSections.push({
-                    id: doc.id,
-                    name: sectionData.name,
-                    professorEmail: professorEmail,
-                    students: sectionData.students || [],
-                    ...sectionData
-                });
-            }
-        });
-        
-        console.log('✅ Total sections loaded:', assignedSections.length);
-        
-    } catch (error) {
-        console.error('Error loading assigned sections:', error);
-    }
-}
 
-        // Load all students in assigned sections
-        // Load all students in assigned sections
-async function loadAllStudents() {
-    try {
-        allStudents = [];
-        const studentIds = new Set();
-        
-        console.log('Loading students from sections:', assignedSections.map(s => s.name));
-        
-        // Load students from all assigned sections
-        for (const section of assignedSections) {
-            // Method 1: Check if section has students array
-            if (section.students && Array.isArray(section.students)) {
-                section.students.forEach(student => {
-                    const uniqueId = student.email || student.student_id || student.studentId;
-                    if (uniqueId && !studentIds.has(uniqueId)) {
-                        studentIds.add(uniqueId);
-                        allStudents.push({
-                            id: uniqueId,
-                            email: student.email,
-                            name: student.name,
-                            umakId: student.student_id || student.studentId,
-                            section: section.name,
-                            uniqueId: uniqueId
-                        });
-                    }
-                });
-            }
+        // Calculate test score based on result and target
+        function calculateTestScore(testName, result, testTarget = null) {
+            const normalized = testName.toLowerCase().trim();
             
-            // Method 2: Query students collection by section name
-            try {
-                const studentsQuery = query(
-                    collection(db, 'students'),
-                    where('section', '==', section.name)
-                );
-                const studentsSnapshot = await getDocs(studentsQuery);
-                
-                studentsSnapshot.forEach((doc) => {
-                    const studentData = doc.data();
-                    const uniqueId = studentData.email || studentData.umakId || doc.id;
-                    
-                    if (!studentIds.has(uniqueId)) {
-                        studentIds.add(uniqueId);
-                        allStudents.push({
-                            id: doc.id,
-                            ...studentData,
-                            section: section.name,
-                            uniqueId: uniqueId
-                        });
-                    }
-                });
-                
-                console.log(`✓ Found ${studentsSnapshot.size} students in section ${section.name}`);
-            } catch (error) {
-                console.log(`No students collection data for section ${section.name}`);
-            }
-        }
-        
-        console.log('✅ Total unique students loaded:', allStudents.length);
-        
-        // Update total students count
-        document.getElementById('totalStudentsCount').textContent = allStudents.length;
-        
-    } catch (error) {
-        console.error('Error loading students:', error);
-        document.getElementById('totalStudentsCount').textContent = '0';
-    }
-}
-
-       
-async function loadRecentActivity(professorEmail) {
-    try {
-        console.log('🕒 Loading recent activities from database...');
-        const activityTimeline = document.getElementById('activityTimeline');
-        
-        allActivities = [];
-        let totalTestsCount = 0;
-
-        // 1. Get test submissions from testResults for professor's sections
-        try {
-            const testResultsRef = collection(db, 'testResults');
-            const testResultsSnapshot = await getDocs(testResultsRef);
+            // Extract numeric value from result
+            let numericValue = 0;
             
-            console.log(`📊 Total testResults documents found: ${testResultsSnapshot.size}`);
-            
-            // Group by testName + section to count completions per section
-            const groupedCompletions = {}; // Format: "testName_section" => { count, students: [], latestTime }
-            const uniqueCompletions = new Set(); // Track unique student+test combinations
-            
-            testResultsSnapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                
-                // Check if this test belongs to professor's students
-                const studentEmail = data.studentEmail || data.email;
-                const isProfessorsStudent = allStudents.some(student => 
-                    student.email === studentEmail || student.uniqueId === studentEmail
-                );
-                
-                const isProfessorsSection = assignedSections.some(section => 
-                    section.name === data.section
-                );
-                
-                if (isProfessorsStudent || isProfessorsSection || data.professorEmail === professorEmail) {
-                    console.log('📄 Test Result Document:', docSnap.id, data);
-                    
-                    // Create unique key for student + test
-                    const uniqueKey = `${studentEmail}_${data.testName}`;
-                    
-                    // Only count if this is a new completion (avoid counting multiple attempts)
-                    if (!uniqueCompletions.has(uniqueKey)) {
-                        uniqueCompletions.add(uniqueKey);
-                        totalTestsCount++;
-                        
-                        // Group by test + section
-                        const groupKey = `${data.testName}_${data.section}`;
-                        
-                        let time = null;
-                        if (data.submittedAt) {
-                            time = data.submittedAt.toDate();
-                        } else if (data.completedAt) {
-                            time = data.completedAt.toDate();
-                        } else if (data.timestamp) {
-                            time = data.timestamp.toDate();
-                        } else if (data.createdAt) {
-                            time = data.createdAt.toDate();
-                        } else {
-                            time = new Date();
-                        }
-                        
-                        if (!groupedCompletions[groupKey]) {
-                            groupedCompletions[groupKey] = {
-                                testName: data.testName || 'Fitness Assessment',
-                                section: data.section || 'Unknown Section',
-                                count: 0,
-                                students: [],
-                                latestTime: time,
-                                timestamp: time.getTime()
-                            };
-                        }
-                        
-                        groupedCompletions[groupKey].count++;
-                        groupedCompletions[groupKey].students.push(data.studentName || 'Student');
-                        
-                        // Update latest time if this completion is more recent
-                        if (time > groupedCompletions[groupKey].latestTime) {
-                            groupedCompletions[groupKey].latestTime = time;
-                            groupedCompletions[groupKey].timestamp = time.getTime();
-                        }
-                    }
-                }
-            });
-            
-            // Convert grouped completions to activities with student count from section
-            for (const [groupKey, group] of Object.entries(groupedCompletions)) {
-                const completedCount = group.count;
-                const testName = group.testName;
-                const sectionName = group.section;
-                
-                // Get total students in this section
-                const sectionInfo = assignedSections.find(s => s.name === sectionName);
-                const totalStudentsInSection = sectionInfo ? sectionInfo.students.length : 0;
-                
-                let title = '';
-                let details = '';
-                
-                if (completedCount === 1) {
-                    title = `${group.students[0]} completed ${testName}`;
-                    details = `${sectionName} • 1/${totalStudentsInSection} student completed`;
-                } else if (completedCount <= 3) {
-                    title = `${group.students.join(', ')} completed ${testName}`;
-                    details = `${sectionName} • ${completedCount}/${totalStudentsInSection} students completed`;
+            if (typeof result === 'object' && result !== null) {
+                numericValue = result.repetitions || result.time || result.distance || result.value || result.score || 0;
+            } else if (typeof result === 'string') {
+                const match = result.match(/(\d+\.?\d*)/);
+                if (match) {
+                    numericValue = parseFloat(match[1]);
                 } else {
-                    title = `${completedCount} students completed ${testName}`;
-                    details = `${sectionName} • ${completedCount}/${totalStudentsInSection} students completed`;
+                    numericValue = parseFloat(result) || 0;
+                }
+            } else {
+                numericValue = parseFloat(result) || 0;
+            }
+            
+            // Use test target if available
+            if (testTarget && testTarget > 0) {
+                const percentage = (numericValue / testTarget) * 100;
+                let score = Math.min(100, Math.max(50, percentage));
+                
+                if (percentage >= 100) score = 100;
+                else if (percentage >= 90) score = 95;
+                else if (percentage >= 80) score = 90;
+                else if (percentage >= 70) score = 85;
+                else if (percentage >= 60) score = 80;
+                else if (percentage >= 50) score = 75;
+                
+                return Math.round(score);
+            }
+            
+            // Default scoring based on test type
+            if (normalized.includes('push-up') || normalized.includes('pushup')) {
+                const reps = numericValue;
+                if (reps >= 40) return 100;
+                if (reps >= 30) return 90;
+                if (reps >= 20) return 80;
+                if (reps >= 10) return 70;
+                return 60;
+            } else if (normalized.includes('sit-up') || normalized.includes('situp')) {
+                const reps = numericValue;
+                if (reps >= 50) return 100;
+                if (reps >= 40) return 90;
+                if (reps >= 30) return 80;
+                if (reps >= 20) return 70;
+                return 60;
+            } else if (normalized.includes('plank')) {
+                const seconds = numericValue;
+                if (seconds >= 180) return 100;
+                if (seconds >= 120) return 90;
+                if (seconds >= 80) return 80;
+                if (seconds >= 60) return 75;
+                return 60;
+            }
+            
+            return 75; // Default score
+        }
+
+        // Load professor's assigned sections
+        async function loadAssignedSections(professorId, professorEmail) {
+            try {
+                assignedSections = [];
+                console.log('Loading sections for professor:', professorEmail);
+                
+                // Get professor's full name for matching
+                let professorFullName = null;
+                
+                // Try professors collection
+                const profQuery = query(collection(db, 'professors'), where('email', '==', professorEmail));
+                const profSnap = await getDocs(profQuery);
+                if (!profSnap.empty) {
+                    professorFullName = profSnap.docs[0].data().fullName || profSnap.docs[0].data().name;
                 }
                 
-                console.log('✅ Adding grouped test activity:', title, details);
+                // Try users collection
+                if (!professorFullName) {
+                    const userQuery = query(collection(db, 'users'), where('email', '==', professorEmail));
+                    const userSnap = await getDocs(userQuery);
+                    if (!userSnap.empty) {
+                        const userData = userSnap.docs[0].data();
+                        professorFullName = userData.fullName || userData.name;
+                    }
+                }
                 
-                allActivities.push({
-                    type: 'test',
-                    title: title,
-                    details: details,
-                    time: group.latestTime,
-                    displayTime: formatTimeAgo(group.latestTime),
-                    timestamp: group.timestamp,
-                    priority: 1,
-                    studentCount: completedCount,
-                    totalStudents: totalStudentsInSection
+                // Fallback to display name
+                if (!professorFullName && currentUser) {
+                    professorFullName = currentUser.displayName || professorEmail.split('@')[0].toUpperCase();
+                }
+                
+                console.log('Professor name for matching:', professorFullName);
+                
+                // Load all sections and match by professor name/email
+                const sectionsSnapshot = await getDocs(collection(db, 'sections'));
+                
+                sectionsSnapshot.forEach((doc) => {
+                    const sectionData = doc.data();
+                    const dbProfessor = (sectionData.professor || '').toString().trim();
+                    
+                    // Flexible matching
+                    const matches = 
+                        dbProfessor === professorFullName ||
+                        sectionData.professorEmail === professorEmail ||
+                        sectionData.professorId === professorId ||
+                        dbProfessor.toUpperCase().includes(professorFullName?.toUpperCase() || '') ||
+                        (professorFullName && professorFullName.toUpperCase().includes(dbProfessor.toUpperCase()));
+                    
+                    if (matches) {
+                        console.log(`✓ Matched section: ${sectionData.name}`);
+                        assignedSections.push({
+                            id: doc.id,
+                            name: sectionData.name,
+                            professorEmail: professorEmail,
+                            students: sectionData.students || [],
+                            ...sectionData
+                        });
+                    }
                 });
+                
+                console.log('✅ Total sections loaded:', assignedSections.length);
+                
+            } catch (error) {
+                console.error('Error loading assigned sections:', error);
             }
-            
-            console.log(`✅ Counted ${totalTestsCount} unique test completions for professor`);
-            console.log(`📊 Created ${Object.keys(groupedCompletions).length} grouped activities`);
-        } catch (error) {
-            console.error('❌ Error loading test results:', error);
         }
 
-        // Update total tests count
-        document.getElementById('totalTestsCount').textContent = totalTestsCount;
-
-        // 2. Get scheduled tests from professors
-        try {
-            const scheduledTestsSnapshot = await getDocs(collection(db, 'scheduledTests'));
-            
-            scheduledTestsSnapshot.forEach(docSnap => {
-                const data = docSnap.data();
+        // Load all students in assigned sections
+        async function loadAllStudents() {
+            try {
+                allStudents = [];
+                const studentIds = new Set();
                 
-                if (data.professorEmail === professorEmail || 
-                    assignedSections.some(section => section.name === data.section)) {
-                    
-                    let time = null;
-                    
-                    if (data.createdAt) {
-                        time = data.createdAt.toDate();
-                    } else if (data.scheduledAt) {
-                        time = data.scheduledAt.toDate();
-                    } else if (data.timestamp) {
-                        time = data.timestamp.toDate();
-                    } else {
-                        time = new Date();
+                console.log('Loading students from sections:', assignedSections.map(s => s.name));
+                
+                // Load students from all assigned sections
+                for (const section of assignedSections) {
+                    // Method 1: Check if section has students array
+                    if (section.students && Array.isArray(section.students)) {
+                        section.students.forEach(student => {
+                            const uniqueId = student.email || student.student_id || student.studentId;
+                            if (uniqueId && !studentIds.has(uniqueId)) {
+                                studentIds.add(uniqueId);
+                                allStudents.push({
+                                    id: uniqueId,
+                                    email: student.email,
+                                    name: student.name,
+                                    umakId: student.student_id || student.studentId,
+                                    section: section.name,
+                                    uniqueId: uniqueId
+                                });
+                            }
+                        });
                     }
                     
-                    const professorName = data.professorName || data.professor || 'Professor';
-                    const testName = data.testName || data.name || 'new assessment';
-                    const section = data.section || data.sectionName;
+                    // Method 2: Query students collection by section name
+                    try {
+                        const studentsQuery = query(
+                            collection(db, 'students'),
+                            where('section', '==', section.name)
+                        );
+                        const studentsSnapshot = await getDocs(studentsQuery);
+                        
+                        studentsSnapshot.forEach((doc) => {
+                            const studentData = doc.data();
+                            const uniqueId = studentData.email || studentData.umakId || doc.id;
+                            
+                            if (!studentIds.has(uniqueId)) {
+                                studentIds.add(uniqueId);
+                                allStudents.push({
+                                    id: doc.id,
+                                    ...studentData,
+                                    section: section.name,
+                                    uniqueId: uniqueId
+                                });
+                            }
+                        });
+                        
+                        console.log(`✓ Found ${studentsSnapshot.size} students in section ${section.name}`);
+                    } catch (error) {
+                        console.log(`No students collection data for section ${section.name}`);
+                    }
+                }
+                
+                console.log('✅ Total unique students loaded:', allStudents.length);
+                
+                // Update total students count
+                document.getElementById('totalStudentsCount').textContent = allStudents.length;
+                
+            } catch (error) {
+                console.error('Error loading students:', error);
+                document.getElementById('totalStudentsCount').textContent = '0';
+            }
+        }
+
+        async function loadRecentActivity(professorEmail) {
+            try {
+                console.log('🕒 Loading recent activities from database...');
+                const activityTimeline = document.getElementById('activityTimeline');
+                
+                allActivities = [];
+                let totalTestsCount = 0;
+
+                // 1. Get test submissions from testResults for professor's sections
+                try {
+                    const testResultsRef = collection(db, 'testResults');
+                    const testResultsSnapshot = await getDocs(testResultsRef);
                     
-                    allActivities.push({
-                        type: 'test',
-                        title: `${professorName} scheduled ${testName}`,
-                        details: section ? `Assigned to ${section} section` : 'New assessment created',
-                        time: time,
-                        displayTime: formatTimeAgo(time),
-                        timestamp: time.getTime(),
-                        priority: 2
+                    console.log(`📊 Total testResults documents found: ${testResultsSnapshot.size}`);
+                    
+                    // Group by testName + section to count completions per section
+                    const groupedCompletions = {}; // Format: "testName_section" => { count, students: [], latestTime }
+                    const uniqueCompletions = new Set(); // Track unique student+test combinations
+                    
+                    testResultsSnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        
+                        // Check if this test belongs to professor's students
+                        const studentEmail = data.studentEmail || data.email;
+                        const isProfessorsStudent = allStudents.some(student => 
+                            student.email === studentEmail || student.uniqueId === studentEmail
+                        );
+                        
+                        const isProfessorsSection = assignedSections.some(section => 
+                            section.name === data.section
+                        );
+                        
+                        if (isProfessorsStudent || isProfessorsSection || data.professorEmail === professorEmail) {
+                            console.log('📄 Test Result Document:', docSnap.id, data);
+                            
+                            // Create unique key for student + test
+                            const uniqueKey = `${studentEmail}_${data.testName}`;
+                            
+                            // Only count if this is a new completion (avoid counting multiple attempts)
+                            if (!uniqueCompletions.has(uniqueKey)) {
+                                uniqueCompletions.add(uniqueKey);
+                                totalTestsCount++;
+                                
+                                // Group by test + section
+                                const groupKey = `${data.testName}_${data.section}`;
+                                
+                                let time = null;
+                                if (data.submittedAt) {
+                                    time = data.submittedAt.toDate();
+                                } else if (data.completedAt) {
+                                    time = data.completedAt.toDate();
+                                } else if (data.timestamp) {
+                                    time = data.timestamp.toDate();
+                                } else if (data.createdAt) {
+                                    time = data.createdAt.toDate();
+                                } else {
+                                    time = new Date();
+                                }
+                                
+                                if (!groupedCompletions[groupKey]) {
+                                    groupedCompletions[groupKey] = {
+                                        testName: data.testName || 'Fitness Assessment',
+                                        section: data.section || 'Unknown Section',
+                                        count: 0,
+                                        students: [],
+                                        latestTime: time,
+                                        timestamp: time.getTime()
+                                    };
+                                }
+                                
+                                groupedCompletions[groupKey].count++;
+                                groupedCompletions[groupKey].students.push(data.studentName || 'Student');
+                                
+                                // Update latest time if this completion is more recent
+                                if (time > groupedCompletions[groupKey].latestTime) {
+                                    groupedCompletions[groupKey].latestTime = time;
+                                    groupedCompletions[groupKey].timestamp = time.getTime();
+                                }
+                            }
+                        }
                     });
-                }
-            });
-            console.log(`✅ Found scheduled tests for professor`);
-        } catch (error) {
-            console.log('ℹ️ No scheduled tests found:', error.message);
-        }
-
-        // 3. Get student enrollments and logins
-        try {
-            const studentsSnapshot = await getDocs(collection(db, 'students'));
-            
-            studentsSnapshot.forEach(docSnap => {
-                const data = docSnap.data();
-                const studentName = data.name || data.studentName || 'Student';
-                const section = data.section || data.sectionName || 'Unknown Section';
-                
-                if (assignedSections.some(s => s.name === section)) {
-                    // Student enrollment activity
-                    if (data.createdAt) {
-                        const time = data.createdAt.toDate();
+                    
+                    // Convert grouped completions to activities with student count from section
+                    for (const [groupKey, group] of Object.entries(groupedCompletions)) {
+                        const completedCount = group.count;
+                        const testName = group.testName;
+                        const sectionName = group.section;
+                        
+                        // Get total students in this section
+                        const sectionInfo = assignedSections.find(s => s.name === sectionName);
+                        const totalStudentsInSection = sectionInfo ? sectionInfo.students.length : 0;
+                        
+                        let title = '';
+                        let details = '';
+                        
+                        if (completedCount === 1) {
+                            title = `${group.students[0]} completed ${testName}`;
+                            details = `${sectionName} • 1/${totalStudentsInSection} student completed`;
+                        } else if (completedCount <= 3) {
+                            title = `${group.students.join(', ')} completed ${testName}`;
+                            details = `${sectionName} • ${completedCount}/${totalStudentsInSection} students completed`;
+                        } else {
+                            title = `${completedCount} students completed ${testName}`;
+                            details = `${sectionName} • ${completedCount}/${totalStudentsInSection} students completed`;
+                        }
+                        
+                        console.log('✅ Adding grouped test activity:', title, details);
+                        
                         allActivities.push({
-                            type: 'student',
-                            title: `${studentName} enrolled in UMakFit`,
-                            details: `${section} • Account activated and ready`,
-                            time: time,
-                            displayTime: formatTimeAgo(time),
-                            timestamp: time.getTime(),
-                            priority: 3
+                            type: 'test',
+                            title: title,
+                            details: details,
+                            time: group.latestTime,
+                            displayTime: formatTimeAgo(group.latestTime),
+                            timestamp: group.timestamp,
+                            priority: 1,
+                            studentCount: completedCount,
+                            totalStudents: totalStudentsInSection
                         });
                     }
+                    
+                    console.log(`✅ Counted ${totalTestsCount} unique test completions for professor`);
+                    console.log(`📊 Created ${Object.keys(groupedCompletions).length} grouped activities`);
+                } catch (error) {
+                    console.error('❌ Error loading test results:', error);
+                }
 
-                    // Student login activity
-                    if (data.lastLogin) {
-                        const time = data.lastLogin.toDate();
-                        allActivities.push({
-                            type: 'student',
-                            title: `${studentName} logged into the platform`,
-                            details: `${section} • Accessed student dashboard`,
-                            time: time,
-                            displayTime: formatTimeAgo(time),
-                            timestamp: time.getTime(),
-                            priority: 4
-                        });
+                // Update total tests count
+                document.getElementById('totalTestsCount').textContent = totalTestsCount;
+
+                // 2. Get scheduled tests from professors
+                try {
+                    const scheduledTestsSnapshot = await getDocs(collection(db, 'scheduledTests'));
+                    
+                    scheduledTestsSnapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        
+                        if (data.professorEmail === professorEmail || 
+                            assignedSections.some(section => section.name === data.section)) {
+                            
+                            let time = null;
+                            
+                            if (data.createdAt) {
+                                time = data.createdAt.toDate();
+                            } else if (data.scheduledAt) {
+                                time = data.scheduledAt.toDate();
+                            } else if (data.timestamp) {
+                                time = data.timestamp.toDate();
+                            } else {
+                                time = new Date();
+                            }
+                            
+                            const professorName = data.professorName || data.professor || 'Professor';
+                            const testName = data.testName || data.name || 'new assessment';
+                            const section = data.section || data.sectionName;
+                            
+                            allActivities.push({
+                                type: 'test',
+                                title: `${professorName} scheduled ${testName}`,
+                                details: section ? `Assigned to ${section} section` : 'New assessment created',
+                                time: time,
+                                displayTime: formatTimeAgo(time),
+                                timestamp: time.getTime(),
+                                priority: 2
+                            });
+                        }
+                    });
+                    console.log(`✅ Found scheduled tests for professor`);
+                } catch (error) {
+                    console.log('ℹ️ No scheduled tests found:', error.message);
+                }
+
+                // 3. Get student enrollments and logins
+                try {
+                    const studentsSnapshot = await getDocs(collection(db, 'students'));
+                    
+                    studentsSnapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        const studentName = data.name || data.studentName || 'Student';
+                        const section = data.section || data.sectionName || 'Unknown Section';
+                        
+                        if (assignedSections.some(s => s.name === section)) {
+                            // Student enrollment activity
+                            if (data.createdAt) {
+                                const time = data.createdAt.toDate();
+                                allActivities.push({
+                                    type: 'student',
+                                    title: `${studentName} enrolled in UMakFit`,
+                                    details: `${section} • Account activated and ready`,
+                                    time: time,
+                                    displayTime: formatTimeAgo(time),
+                                    timestamp: time.getTime(),
+                                    priority: 3
+                                });
+                            }
+
+                            // Student login activity
+                            if (data.lastLogin) {
+                                const time = data.lastLogin.toDate();
+                                allActivities.push({
+                                    type: 'student',
+                                    title: `${studentName} logged into the platform`,
+                                    details: `${section} • Accessed student dashboard`,
+                                    time: time,
+                                    displayTime: formatTimeAgo(time),
+                                    timestamp: time.getTime(),
+                                    priority: 4
+                                });
+                            }
+                        }
+                    });
+                    console.log(`✅ Processed student records for professor`);
+                } catch (error) {
+                    console.log('ℹ️ No student records found:', error.message);
+                }
+
+                // 4. Get active tests for professor
+                try {
+                    let activeTestsCount = 0;
+                    
+                    const scheduledTestsQuery = query(
+                        collection(db, 'scheduledTests'),
+                        where('professorEmail', '==', professorEmail)
+                    );
+                    const scheduledTestsSnapshot = await getDocs(scheduledTestsQuery);
+                    
+                    const now = new Date();
+                    
+                    scheduledTestsSnapshot.forEach((docSnap) => {
+                        const test = docSnap.data();
+                        const testDate = new Date(test.date);
+                        const deadlineDateTime = new Date(test.deadlineDateTime);
+                        
+                        if (testDate <= now && deadlineDateTime >= now && 
+                            (test.status === 'active' || test.status === 'scheduled')) {
+                            activeTestsCount++;
+                            console.log(`✅ Active test: ${test.testName} for ${test.section}`);
+                        }
+                    });
+                    
+                    document.getElementById('activeTestsCount').textContent = activeTestsCount;
+                    console.log(`📊 Total active tests: ${activeTestsCount}`);
+                    
+                } catch (error) {
+                    console.error('❌ Error loading active tests:', error);
+                    document.getElementById('activeTestsCount').textContent = '0';
+                }
+
+                // Sort all activities - TEST ACTIVITIES ALWAYS FIRST
+                allActivities.sort((a, b) => {
+                    if (a.priority !== b.priority) {
+                        return a.priority - b.priority;
                     }
+                    return b.timestamp - a.timestamp;
+                });
+
+                console.log('📊 Total activities collected:', allActivities.length);
+
+                // Display activities
+                displayActivities(allActivities);
+
+                // Show empty state if no activities
+                if (allActivities.length === 0) {
+                    activityTimeline.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <div class="empty-title">No Recent Activity</div>
+                            <div class="empty-text">There are no recent activities to display. Activities will appear here as students interact with the system.</div>
+                        </div>
+                    `;
                 }
-            });
-            console.log(`✅ Processed student records for professor`);
-        } catch (error) {
-            console.log('ℹ️ No student records found:', error.message);
-        }
 
-        // 4. Get active tests for professor
-        try {
-            let activeTestsCount = 0;
-            
-            const scheduledTestsQuery = query(
-                collection(db, 'scheduledTests'),
-                where('professorEmail', '==', professorEmail)
-            );
-            const scheduledTestsSnapshot = await getDocs(scheduledTestsQuery);
-            
-            const now = new Date();
-            
-            scheduledTestsSnapshot.forEach((docSnap) => {
-                const test = docSnap.data();
-                const testDate = new Date(test.date);
-                const deadlineDateTime = new Date(test.deadlineDateTime);
-                
-                if (testDate <= now && deadlineDateTime >= now && 
-                    (test.status === 'active' || test.status === 'scheduled')) {
-                    activeTestsCount++;
-                    console.log(`✅ Active test: ${test.testName} for ${test.section}`);
-                }
-            });
-            
-            document.getElementById('activeTestsCount').textContent = activeTestsCount;
-            console.log(`📊 Total active tests: ${activeTestsCount}`);
-            
-        } catch (error) {
-            console.error('❌ Error loading active tests:', error);
-            document.getElementById('activeTestsCount').textContent = '0';
-        }
-
-        // Sort all activities - TEST ACTIVITIES ALWAYS FIRST
-        allActivities.sort((a, b) => {
-            if (a.priority !== b.priority) {
-                return a.priority - b.priority;
-            }
-            return b.timestamp - a.timestamp;
-        });
-
-        console.log('📊 Total activities collected:', allActivities.length);
-
-        // Display activities
-        displayActivities(allActivities);
-
-        // Show empty state if no activities
-        if (allActivities.length === 0) {
-            activityTimeline.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-inbox"></i>
+            } catch (error) {
+                console.error('❌ Error loading recent activity:', error);
+                const activityTimeline = document.getElementById('activityTimeline');
+                activityTimeline.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="empty-title">Error Loading Activities</div>
+                        <div class="empty-text">Unable to fetch activity data. Please refresh the page to try again.</div>
                     </div>
-                    <div class="empty-title">No Recent Activity</div>
-                    <div class="empty-text">There are no recent activities to display. Activities will appear here as students interact with the system.</div>
-                </div>
-            `;
+                `;
+            }
         }
-
-    } catch (error) {
-        console.error('❌ Error loading recent activity:', error);
-        const activityTimeline = document.getElementById('activityTimeline');
-        activityTimeline.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="empty-title">Error Loading Activities</div>
-                <div class="empty-text">Unable to fetch activity data. Please refresh the page to try again.</div>
-            </div>
-        `;
-    }
-}
 
         // Display activities in the timeline
         function displayActivities(activities) {
@@ -1332,48 +1380,48 @@ async function loadRecentActivity(professorEmail) {
         }
 
         function createActivityItem(activity) {
-        const activityItem = document.createElement('div');
-        activityItem.className = 'activity-item';
-        activityItem.setAttribute('data-type', activity.type);
-        
-        let iconClass = 'system';
-        let icon = 'fas fa-info-circle';
-        
-        if (activity.type === 'test') {
-            iconClass = 'test';
-            icon = 'fas fa-clipboard-check';
-        } else if (activity.type === 'professor') {
-            iconClass = 'professor';
-            icon = 'fas fa-user-tie';
-        } else if (activity.type === 'student') {
-            iconClass = 'student';
-            icon = 'fas fa-user-graduate';
-        } else if (activity.type === 'system') {
-            iconClass = 'system';
-            icon = 'fas fa-cog';
+            const activityItem = document.createElement('div');
+            activityItem.className = 'activity-item';
+            activityItem.setAttribute('data-type', activity.type);
+            
+            let iconClass = 'system';
+            let icon = 'fas fa-info-circle';
+            
+            if (activity.type === 'test') {
+                iconClass = 'test';
+                icon = 'fas fa-clipboard-check';
+            } else if (activity.type === 'professor') {
+                iconClass = 'professor';
+                icon = 'fas fa-user-tie';
+            } else if (activity.type === 'student') {
+                iconClass = 'student';
+                icon = 'fas fa-user-graduate';
+            } else if (activity.type === 'system') {
+                iconClass = 'system';
+                icon = 'fas fa-cog';
+            }
+            
+            // Add completion badge showing X/Y students
+            let titleWithBadge = activity.title;
+            if (activity.totalStudents && activity.studentCount) {
+                titleWithBadge += ` <span class="activity-count-badge">${activity.studentCount}/${activity.totalStudents}</span>`;
+            } else if (activity.studentCount && activity.studentCount > 1) {
+                titleWithBadge += ` <span class="activity-count-badge">${activity.studentCount} students</span>`;
+            }
+            
+            activityItem.innerHTML = `
+                <div class="activity-icon ${iconClass}">
+                    <i class="${icon}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">${titleWithBadge}</div>
+                    <div class="activity-details">${activity.details}</div>
+                    <div class="activity-time">${activity.displayTime}</div>
+                </div>
+            `;
+            
+            return activityItem;
         }
-        
-        // Add completion badge showing X/Y students
-        let titleWithBadge = activity.title;
-        if (activity.totalStudents && activity.studentCount) {
-            titleWithBadge += ` <span class="activity-count-badge">${activity.studentCount}/${activity.totalStudents}</span>`;
-        } else if (activity.studentCount && activity.studentCount > 1) {
-            titleWithBadge += ` <span class="activity-count-badge">${activity.studentCount} students</span>`;
-        }
-        
-        activityItem.innerHTML = `
-            <div class="activity-icon ${iconClass}">
-                <i class="${icon}"></i>
-            </div>
-            <div class="activity-content">
-                <div class="activity-title">${titleWithBadge}</div>
-                <div class="activity-details">${activity.details}</div>
-                <div class="activity-time">${activity.displayTime}</div>
-            </div>
-        `;
-        
-        return activityItem;
-    }
 
         // Filter activities by type
         window.filterActivities = function() {
@@ -1403,40 +1451,41 @@ async function loadRecentActivity(professorEmail) {
         }
 
         // Setup realtime presence monitoring
-            function setupRealtimePresence() {
-                try {
-                    const presenceRef = ref(database, 'presence');
-                    onValue(presenceRef, (snapshot) => {
-                        let onlineStudents = 0;
-                        
-                        const presenceData = snapshot.val();
-                        if (presenceData) {
-                            Object.keys(presenceData).forEach(userId => {
-                                const userPresence = presenceData[userId];
-                                if (userPresence.status === 'online' && userPresence.role === 'student') {
-                                    // Check if this student is in professor's sections by email
-                                    const studentEmail = userPresence.email;
-                                    const isProfessorsStudent = allStudents.some(student => 
-                                        student.email === studentEmail || student.uniqueId === studentEmail
-                                    );
-                                    
-                                    if (isProfessorsStudent) {
-                                        onlineStudents++;
-                                    }
+        function setupRealtimePresence() {
+            try {
+                const presenceRef = ref(database, 'presence');
+                onValue(presenceRef, (snapshot) => {
+                    let onlineStudents = 0;
+                    
+                    const presenceData = snapshot.val();
+                    if (presenceData) {
+                        Object.keys(presenceData).forEach(userId => {
+                            const userPresence = presenceData[userId];
+                            if (userPresence.status === 'online' && userPresence.role === 'student') {
+                                // Check if this student is in professor's sections by email
+                                const studentEmail = userPresence.email;
+                                const isProfessorsStudent = allStudents.some(student => 
+                                    student.email === studentEmail || student.uniqueId === studentEmail
+                                );
+                                
+                                if (isProfessorsStudent) {
+                                    onlineStudents++;
                                 }
-                            });
-                        }
-                        
-                        document.getElementById('onlineStudentsCount').textContent = onlineStudents;
-                        
-                        console.log(`👥 Online Students in Professor's Sections: ${onlineStudents}`);
-                    });
-                } catch (error) {
-                    console.error('❌ Error setting up presence:', error);
-                    // Set to 0 if error
-                    document.getElementById('onlineStudentsCount').textContent = '0';
-                }
+                            }
+                        });
+                    }
+                    
+                    document.getElementById('onlineStudentsCount').textContent = onlineStudents;
+                    
+                    console.log(`👥 Online Students in Professor's Sections: ${onlineStudents}`);
+                });
+            } catch (error) {
+                console.error('❌ Error setting up presence:', error);
+                // Set to 0 if error
+                document.getElementById('onlineStudentsCount').textContent = '0';
             }
+        }
+
         // Setup real-time updates for active tests
         function setupActiveTestsListener(professorEmail) {
             try {
@@ -1540,6 +1589,9 @@ async function loadRecentActivity(professorEmail) {
                     console.log('User authenticated:', user.email);
                     console.log('User UID:', user.uid);
                     
+                    // UPDATE: Add profile picture update with Google photo
+                    updateProfilePicture(user.photoURL, user.displayName);
+                    
                     // Normalize email
                     const userEmail = user.email.toLowerCase();
                     
@@ -1633,11 +1685,9 @@ async function loadRecentActivity(professorEmail) {
                     };
                     console.log('✓ Current professor set:', currentUser);
                     
-                    // Update profile display
-                    const initial = professorData.name ? professorData.name.charAt(0).toUpperCase() : 'P';
-                    document.getElementById('profileCircle').textContent = initial;
-                    document.getElementById('profileDropdownAvatar').textContent = initial;
-                    document.getElementById('dropdownName').textContent = professorData.name || professorData.displayName || 'Professor';
+                    // Update profile display names (profile picture already updated above)
+                    const professorName = professorData.name || professorData.displayName || user.displayName || 'Professor';
+                    document.getElementById('dropdownName').textContent = professorName;
                     document.getElementById('dropdownEmail').textContent = userEmail;
                     
                     // Load professor's assigned sections

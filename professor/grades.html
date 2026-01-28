@@ -4,211 +4,262 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UmakFit - Student Grades</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css?family=Manrope:600,800|Inter:300,500,400,700" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
-        body { font-family: 'Inter', Helvetica, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
+        body { font-family: 'Inter', Helvetica, sans-serif; }
         
-        .header-top { 
-            background-color: #ffffff; 
-            padding: 15px 0; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08); 
-            position: fixed; 
-            top: 0; 
-            width: 100%; 
-            z-index: 1000; 
-            border-bottom: 1px solid #e2e8f0;
+        /* Custom animations */
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0.5; } 
         }
-        .header-top .container { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
         }
-        .logo-text { 
-            font-family: "Inter", Helvetica; 
-            font-weight: 700; 
-            color: #1e3a8a; 
-            font-size: 24px; 
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .logo-text i {
-            color: #f59e0b;
-            font-size: 26px;
-        }
-        .header-actions { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-        }
-        .logout-btn { 
-            padding: 8px 20px; 
-            background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%); 
-            border: none; 
-            border-radius: 8px; 
-            color: #000; 
-            font-weight: 600; 
-            font-size: 14px; 
-            cursor: pointer; 
-            transition: all 0.3s; 
-            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
-        }
-        .logout-btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4); 
-        }
-        .account-circle { 
-            width: 44px; 
-            height: 44px; 
-            cursor: pointer; 
-            border-radius: 50%;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s;
-        }
-        .account-circle:hover {
-            border-color: #f59e0b;
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        .nav-section { 
-            background: linear-gradient(180deg, rgba(30, 58, 138, 1) 0%, rgba(59, 130, 246, 1) 100%); 
-            padding: 20px 0; 
-            margin-top: 74px; 
+        /* Custom styles not covered by Tailwind */
+        .gradient-text {
+            background: linear-gradient(90deg, rgba(245, 158, 11, 1) 0%, rgba(255, 229, 0, 1) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .custom-shadow {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .nav-shadow {
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .nav-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .nav-brand { 
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-family: "Manrope", Helvetica; 
-            font-weight: 800; 
-            font-size: 28px; 
-            background: linear-gradient(90deg, rgba(245, 158, 11, 1) 0%, rgba(255, 229, 0, 1) 100%); 
-            -webkit-background-clip: text; 
-            background-clip: text; 
-            -webkit-text-fill-color: transparent;
-            margin: 0;
-        }
-        .nav-brand-logo {
-            height: 60px;
-            width: auto;
-        }
-        .nav-pills-custom { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 8px; 
-            padding: 0; 
-            margin: 0;
-        }
-        .nav-pills-custom .nav-link { 
-            font-family: "Manrope", Helvetica; 
-            font-weight: 600; 
-            color: #000000; 
-            font-size: 14px; 
-            padding: 12px 18px;
-            border-radius: 8px; 
-            background-color: #ffffff; 
-            transition: all 0.3s; 
-            border: none; 
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .nav-pills-custom .nav-link.active { 
-            background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%); 
-            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
-        }
-        .nav-pills-custom .nav-link:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15); 
+        
+        .card-shadow {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
         
-        .main-content { 
-            padding: 40px 0 80px 0; 
-            min-height: calc(100vh - 200px); 
+        .btn-shadow {
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
         }
-
-        .page-header {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: 1px solid #e2e8f0;
+        
+        .btn-shadow:hover {
+            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4);
         }
-
-        .page-title {
-            font-family: "Inter", Helvetica;
-            font-weight: 700;
-            color: #1e3a8a;
-            font-size: 32px;
-            margin-bottom: 10px;
+        
+        .live-dot {
+            animation: pulse 2s infinite;
         }
-
-        .page-subtitle {
-            font-family: "Inter", Helvetica;
-            font-weight: 500;
-            color: #64748b;
-            font-size: 16px;
+        
+        .spinner {
+            animation: spin 1s linear infinite;
         }
-
-        .filter-section {
-            background: white;
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: 1px solid #e2e8f0;
-        }
-
-        .filter-row {
-            display: flex;
-            gap: 15px;
-            align-items: end;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
-            flex: 1;
-            min-width: 200px;
+        
+        /* Profile Dropdown Styles */
+        .profile-container {
             position: relative;
         }
-
-        .filter-label {
-            font-family: "Inter", Helvetica;
+        .profile-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .profile-circle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .profile-dropdown {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            min-width: 280px;
+            display: none;
+            z-index: 1001;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        .profile-dropdown.show {
+            display: block;
+            animation: dropdownSlide 0.3s ease-out;
+        }
+        .profile-dropdown-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .profile-dropdown-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            border: 3px solid rgba(255,255,255,0.3);
+            overflow: hidden;
+        }
+        .profile-dropdown-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .profile-dropdown-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .profile-dropdown-email {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .profile-dropdown-menu {
+            padding: 8px 0;
+        }
+        .profile-dropdown-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #374151;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .profile-dropdown-item:hover {
+            background: #f8fafc;
+            color: #3b82f6;
+        }
+        .profile-dropdown-item i {
+            width: 20px;
+            font-size: 16px;
+        }
+        .profile-dropdown-divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 8px 0;
+        }
+        .profile-dropdown-item.logout {
+            color: #dc2626;
+        }
+        .profile-dropdown-item.logout:hover {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* Custom table styles */
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .grades-table thead {
+            background-color: #f8fafc;
+        }
+        
+        .grades-table th {
             font-weight: 600;
+            color: #64748b;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .grades-table th:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .grades-table td {
+            font-weight: 500;
             color: #475569;
             font-size: 14px;
-            margin-bottom: 8px;
-            display: block;
+            padding: 16px 12px;
+            border-bottom: 1px solid #f1f5f9;
         }
-
-        .filter-select, .filter-input {
+        
+        .grades-table tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .grade-excellent { color: #10b981; }
+        .grade-good { color: #3b82f6; }
+        .grade-fair { color: #f59e0b; }
+        .grade-poor { color: #ef4444; }
+        
+        .badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 10px 14px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-family: "Inter", Helvetica;
-            font-size: 14px;
-            transition: all 0.3s;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
         }
-
-        .filter-select:focus, .filter-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-
+        
+        /* Filter clear button */
         .filter-clear {
             position: absolute;
             right: 10px;
@@ -225,578 +276,203 @@
             align-items: center;
             justify-content: center;
         }
-
+        
         .filter-clear:hover {
             color: #64748b;
             background-color: #f1f5f9;
             border-radius: 50%;
         }
-
-        .filter-select:not([value=""]) + .filter-clear,
-        .filter-input:not(:placeholder-shown) + .filter-clear {
-            display: flex;
-        }
-
-        .btn-primary {
-            padding: 10px 24px;
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-family: "Inter", Helvetica;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-        }
-
-        .btn-success {
-            padding: 10px 24px;
+        
+        /* Activity count badge */
+        .activity-count-badge {
+            display: inline-block;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border: none;
-            border-radius: 8px;
             color: white;
-            font-family: "Inter", Helvetica;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-warning {
-            padding: 10px 24px;
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-family: "Inter", Helvetica;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-warning:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-        }
-
-        .grades-container {
-            background: white;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: 1px solid #e2e8f0;
-        }
-
-        .grades-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .grades-title {
-            font-family: "Inter", Helvetica;
-            font-weight: 700;
-            color: #1f2937;
-            font-size: 22px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        .grades-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .grades-table thead {
-            background: #f8fafc;
-        }
-
-        .grades-table th {
-            font-family: "Inter", Helvetica;
-            font-weight: 600;
-            color: #64748b;
-            font-size: 12px;
-            text-transform: uppercase;
-            padding: 14px 12px;
-            text-align: left;
-            border-bottom: 2px solid #e2e8f0;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .grades-table th:hover {
-            background-color: #e2e8f0;
-        }
-
-        .grades-table td {
-            font-family: "Inter", Helvetica;
-            font-weight: 500;
-            color: #475569;
-            font-size: 14px;
-            padding: 16px 12px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .grades-table tr:hover {
-            background-color: #f8fafc;
-        }
-
-        .grade-input {
-            width: 70px;
-            padding: 6px 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            font-family: "Inter", Helvetica;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .grade-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-        }
-
-        .grade-value {
-            font-weight: 600;
-        }
-
-        .grade-excellent { color: #10b981; }
-        .grade-good { color: #3b82f6; }
-        .grade-fair { color: #f59e0b; }
-        .grade-poor { color: #ef4444; }
-
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-        }
-
-        .btn-small {
-            padding: 4px 8px;
-            border: none;
-            border-radius: 4px;
-            font-family: "Inter", Helvetica;
-            font-weight: 500;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-edit {
-            background-color: #3b82f6;
-            color: white;
-        }
-
-        .btn-edit:hover {
-            background-color: #2563eb;
-        }
-
-        .btn-save {
-            background-color: #10b981;
-            color: white;
-        }
-
-        .btn-save:hover {
-            background-color: #059669;
-        }
-
-        .btn-cancel {
-            background-color: #6b7280;
-            color: white;
-        }
-
-        .btn-cancel:hover {
-            background-color: #4b5563;
-        }
-
-        .loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .spinner {
-            border: 4px solid #f1f5f9;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            font-family: "Inter", Helvetica;
-            font-weight: 500;
-            color: #475569;
-            font-size: 16px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 40px;
-        }
-
-        .empty-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.4;
-        }
-
-        .empty-title {
-            font-family: "Inter", Helvetica;
-            font-weight: 700;
-            color: #1f2937;
-            font-size: 20px;
-            margin-bottom: 12px;
-        }
-
-        .empty-text {
-            font-family: "Inter", Helvetica;
-            font-weight: 400;
-            color: #64748b;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: white;
+            padding: 3px 10px;
             border-radius: 12px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            padding: 20px 25px;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-family: "Inter", Helvetica;
-            font-weight: 600;
-            color: #1e3a8a;
-            font-size: 20px;
-            margin: 0;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #64748b;
-        }
-
-        .modal-body {
-            padding: 25px;
-        }
-
-        .modal-footer {
-            padding: 20px 25px;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #374151;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .umak-logo {
-            height: 40px;
-            width: auto;
-        }
-
-        .grade-preview {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #f8fafc;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            font-size: 14px;
-        }
-
-        /* CSS for Final Grades Statistics */
-        .grades-footer {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-            margin-top: 20px;
-        }
-
-        .stat-card {
-            background: #f8fafc;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-        }
-
-        .stat-value {
-            font-family: "Inter", Helvetica;
+            font-size: 11px;
             font-weight: 700;
-            font-size: 28px;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-family: "Inter", Helvetica;
-            font-weight: 500;
-            color: #64748b;
-            font-size: 13px;
-        }
-
-        .badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            background-color: #f0f9ff;
-            border: 1px solid #bae6fd;
-            color: #0369a1;
-        }
-
-        .text-muted {
-            color: #6b7280 !important;
-        }
-
-        @media (max-width: 768px) {
-            .filter-row {
-                flex-direction: column;
-            }
-            .grades-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-            .row {
-                flex-direction: column;
-                gap: 10px;
-            }
+            margin-left: 8px;
         }
     </style>
 </head>
-<body>
-    <div id="loadingScreen" class="loading">
-        <div class="spinner"></div>
-        <div class="loading-text">Loading Grades Management...</div>
+<body class="bg-gray-50">
+    <div id="loadingScreen" class="fixed inset-0 bg-white bg-opacity-95 flex flex-col justify-center items-center z-50">
+        <div class="w-12 h-12 border-4 border-gray-100 border-t-blue-500 rounded-full spinner"></div>
+        <div class="mt-5 text-gray-600 font-medium">Loading Grades Management...</div>
     </div>
-
-    <div id="mainContent" style="display: none;">
-        <div class="header-top">
-            <div class="container">
-                <div class="logo-text">
-                    <img class="umak-logo" src="umaklogo.png" alt="University of Makati">
-                    University of Makati
-                </div>
-                <div class="header-actions">
-                    <button class="logout-btn" onclick="handleLogout()">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                    <img class="account-circle" src="https://c.animaapp.com/tzMzyNnw/img/icon.svg" alt="Account">
+    
+    <div id="mainContent" class="hidden">
+        <!-- Header -->
+        <div class="bg-white custom-shadow border-b border-gray-200 fixed top-0 w-full z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center space-x-2">
+                        <img class="h-10 w-auto" src="umaklogo.png" alt="University of Makati">
+                        <span class="text-blue-900 font-bold text-xl">University of Makati</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <!-- Profile Dropdown -->
+                        <div class="profile-container">
+                            <div class="profile-circle" id="profileCircle" onclick="toggleProfileDropdown()">
+                                <!-- Profile picture will be loaded here -->
+                            </div>
+                            <div class="profile-dropdown" id="profileDropdown">
+                                <div class="profile-dropdown-header">
+                                    <div class="profile-dropdown-avatar" id="profileDropdownAvatar">
+                                        <!-- Profile picture will be loaded here -->
+                                    </div>
+                                    <div class="profile-dropdown-name" id="dropdownName">Professor</div>
+                                    <div class="profile-dropdown-email" id="dropdownEmail">professor@umak.edu.ph</div>
+                                </div>
+                                <div class="profile-dropdown-menu">
+                                    <a href="#" class="profile-dropdown-item" onclick="showViewProfile(event)">
+                                        <i class="fas fa-user"></i>
+                                        <span>View Profile</span>
+                                    </a>
+                                    <div class="profile-dropdown-divider"></div>
+                                    <a href="#" class="profile-dropdown-item logout" onclick="handleLogout(event)">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Logout</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="nav-section">
-            <div class="container">
-                <div class="nav-container">
-                    <div class="nav-brand">
-                        <img class="nav-brand-logo" src="logo.png" alt="UMakFit">
-                        UMakFit
+        
+        <!-- Navigation -->
+        <div class="bg-gradient-to-b from-blue-900 to-blue-500 nav-shadow mt-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                    <div class="flex items-center space-x-3">
+                        <img class="h-14 w-auto" src="logo.png" alt="UMakFit">
+                        <h1 class="font-manrope font-extrabold text-3xl gradient-text">UMakFit</h1>
                     </div>
-                    <ul class="nav nav-pills-custom">
-                        <li class="nav-item">
-                            <a class="nav-link" href="professor.html">
-                                <i class="fas fa-tachometer-alt"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="studentmanagement.html">
-                                <i class="fas fa-users"></i> Student Management
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="addactivities.html">
-                                <i class="fas fa-dumbbell"></i> Add Activities
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="addlesson.html">
-                                <i class="fas fa-book-open"></i> Add Lesson
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="monitoringactivities.html">
-                                <i class="fas fa-chart-bar"></i> Monitoring Activities
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#">
-                                <i class="fas fa-graduation-cap"></i> Grades
-                            </a>
-                        </li>
-                    </ul>
+                    <div class="flex flex-wrap gap-2 overflow-x-auto pb-1">
+                        <a href="professor.html" class="bg-white text-black font-manrope font-semibold text-sm py-3 px-5 rounded-lg flex items-center space-x-2 shadow-sm hover:-translate-y-0.5 transition-all duration-300 hover:shadow-md">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="studentmanagement.html" class="bg-white text-black font-manrope font-semibold text-sm py-3 px-5 rounded-lg flex items-center space-x-2 shadow-sm hover:-translate-y-0.5 transition-all duration-300 hover:shadow-md">
+                            <i class="fas fa-users"></i>
+                            <span>Student Management</span>
+                        </a>
+                        <a href="addactivities.html" class="bg-white text-black font-manrope font-semibold text-sm py-3 px-5 rounded-lg flex items-center space-x-2 shadow-sm hover:-translate-y-0.5 transition-all duration-300 hover:shadow-md">
+                            <i class="fas fa-dumbbell"></i>
+                            <span>Add Activities</span>
+                        </a>
+                        <a href="addlesson.html" class="bg-white text-black font-manrope font-semibold text-sm py-3 px-5 rounded-lg flex items-center space-x-2 shadow-sm hover:-translate-y-0.5 transition-all duration-300 hover:shadow-md">
+                            <i class="fas fa-book-open"></i>
+                            <span>Add Lesson</span>
+                        </a>
+                        <a href="monitoringactivities.html" class="bg-white text-black font-manrope font-semibold text-sm py-3 px-5 rounded-lg flex items-center space-x-2 shadow-sm hover:-translate-y-0.5 transition-all duration-300 hover:shadow-md">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Monitoring Activities</span>
+                        </a>
+                        <a href="grades.html" class="bg-white text-black font-manrope font-semibold text-sm py-3 px-5 rounded-lg flex items-center space-x-2 shadow-sm hover:-translate-y-0.5 transition-all duration-300 hover:shadow-md bg-gradient-to-r from-yellow-400 to-yellow-500 shadow-yellow-500/30">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>Grades</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="main-content">
-            <div class="container">
-                <div class="page-header">
-                    <h1 class="page-title">
-                        <i class="fas fa-graduation-cap" style="color: #3b82f6;"></i>
-                        Student Grades Management
-                    </h1>
-                    <p class="page-subtitle">View, edit, and manage student grades and performance</p>
-                </div>
-
-                <div class="filter-section">
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <label class="filter-label">Section</label>
-                            <select class="filter-select" id="filterSection" onchange="applyFilters()">
-                                <option value="">All Sections</option>
-                            </select>
-                            <button class="filter-clear" onclick="clearFilter('section')">&times;</button>
+        
+        <!-- Main Content -->
+        <div class="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen pt-10 pb-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Page Header -->
+                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-8 mb-10">
+                    <div class="flex items-center mb-5">
+                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mr-4">
+                            <i class="fas fa-graduation-cap text-white text-2xl"></i>
                         </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Activity Type</label>
-                            <select class="filter-select" id="filterActivity" onchange="applyFilters()">
-                                <option value="">All Activities</option>
-                            </select>
-                            <button class="filter-clear" onclick="clearFilter('activity')">&times;</button>
+                        <div>
+                            <h1 class="text-blue-900 font-bold text-3xl">Student Grades Management</h1>
+                            <p class="text-gray-600 font-medium text-base mt-2">View, edit, and manage student grades and performance</p>
                         </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Student Name</label>
-                            <input type="text" class="filter-input" id="filterStudent" 
-                                   placeholder="Search student..." oninput="applyFilters()">
-                            <button class="filter-clear" onclick="clearFilter('student')">&times;</button>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                        <button class="btn-success" onclick="exportGrades()">
-                            <i class="fas fa-download"></i> Export Grades
-                        </button>
-                        <button class="btn-warning" onclick="calculateFinalGrades()">
-                            <i class="fas fa-calculator"></i> Calculate Final Grades
-                        </button>
-                    </div>
                     </div>
                 </div>
 
-                <div class="grades-container">
-                    <div class="grades-header">
-                        <h3 class="grades-title">
+                <!-- Filter Section -->
+                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Section</label>
+                            <div class="relative">
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="filterSection" onchange="applyFilters()">
+                                    <option value="">All Sections</option>
+                                </select>
+                                <button class="filter-clear" onclick="clearFilter('section')">&times;</button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Activity Type</label>
+                            <div class="relative">
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="filterActivity" onchange="applyFilters()">
+                                    <option value="">All Activities</option>
+                                </select>
+                                <button class="filter-clear" onclick="clearFilter('activity')">&times;</button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Student Name</label>
+                            <div class="relative">
+                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="filterStudent" placeholder="Search student..." oninput="applyFilters()">
+                                <button class="filter-clear" onclick="clearFilter('student')">&times;</button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-end gap-2">
+                            <button class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="exportGrades()">
+                                <i class="fas fa-download"></i>
+                                <span>Export Grades</span>
+                            </button>
+                            <button class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="calculateFinalGrades()">
+                                <i class="fas fa-calculator"></i>
+                                <span>Calculate Final Grades</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Grades Table -->
+                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 mb-8">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+                        <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
                             <i class="fas fa-list-ol"></i>
                             Student Grades
                         </h3>
-                        <button class="btn-primary" onclick="showBulkEditModal()">
-                            <i class="fas fa-edit"></i> Bulk Edit Grades
+                        <button class="mt-2 sm:mt-0 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="showBulkEditModal()">
+                            <i class="fas fa-edit"></i>
+                            <span>Bulk Edit Grades</span>
                         </button>
                     </div>
                     
-                    <div class="table-responsive">
-                        <table class="grades-table" id="gradesTable">
+                    <div class="table-container">
+                        <table class="grades-table">
                             <thead>
                                 <tr>
                                     <th onclick="sortGrades('studentName')">Student Name</th>
                                     <th>Section</th>
                                     <th onclick="sortGrades('testName')">Activity</th>
                                     <th>Results</th>
-                                    <th>Score (%)</th> 
+                                    <th>Score (%)</th>
                                     <th>Date</th>
                                 </tr>
                             </thead>
                             <tbody id="gradesTableBody">
                                 <tr>
-                                    <td colspan="7">
-                                        <div class="empty-state">
-                                            <div class="empty-icon">📊</div>
-                                            <div class="empty-title">Loading Grades Data</div>
-                                            <div class="empty-text">Fetching student grades from the database...</div>
+                                    <td colspan="6" class="py-8">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <div class="text-4xl mb-3 opacity-40">📊</div>
+                                            <div class="text-gray-700 font-semibold mb-1">Loading Grades Data</div>
+                                            <div class="text-gray-500 text-sm">Fetching student grades from the database...</div>
                                         </div>
                                     </td>
                                 </tr>
@@ -804,29 +480,35 @@
                         </table>
                     </div>
                 </div>
-                <div class="grades-container mt-4" id="finalGradesSection">
-                    <div class="grades-header">
-                        <h3 class="grades-title">
+
+                <!-- Final Grades Summary -->
+                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+                        <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
                             <i class="fas fa-chart-line"></i>
                             Final Grades Summary
-                            <span class="badge bg-success" style="font-size: 12px; margin-left: 10px;">Auto-calculated</span>
+                            <span class="badge bg-green-500">Auto-calculated</span>
                         </h3>
-                        <div>
-                            <button class="btn-success" onclick="saveFinalGradesToPDF()" id="savePdfBtn" style="display: none;">
-                                <i class="fas fa-file-pdf"></i> Save as PDF
+                        <div class="flex gap-2 mt-2 sm:mt-0">
+                            <button class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="saveFinalGradesToPDF()" id="savePdfBtn" style="display: none;">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Save as PDF</span>
                             </button>
-                            <button class="btn-warning" onclick="calculateFinalGrades()" id="recalculateBtn">
-                                <i class="fas fa-sync-alt"></i> Recalculate
+                            <button class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="calculateFinalGrades()" id="recalculateBtn">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>Recalculate</span>
                             </button>
                         </div>
                     </div>
                     
-                    <div class="alert alert-info mb-3" id="finalGradesInfo" style="display: none;">
-                        <i class="fas fa-info-circle"></i> 
-                        <span id="summaryInfoText">Final grades are automatically calculated from student activity scores.</span>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6" id="finalGradesInfo" style="display: none;">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle text-blue-500 mt-1 mr-2"></i>
+                            <span id="summaryInfoText" class="text-blue-700 text-sm">Final grades are automatically calculated from student activity scores.</span>
+                        </div>
                     </div>
                     
-                    <div class="table-responsive">
+                    <div class="table-container">
                         <table class="grades-table">
                             <thead>
                                 <tr>
@@ -841,13 +523,13 @@
                             </thead>
                             <tbody id="finalGradesBody">
                                 <tr>
-                                    <td colspan="7">
-                                        <div class="empty-state">
-                                            <div class="empty-icon">⏳</div>
-                                            <div class="empty-title">Calculating Final Grades...</div>
-                                            <div class="empty-text">
-                                                <p>Please wait while we calculate final grades from student activity scores.</p>
-                                                <div class="spinner" style="width: 30px; height: 30px; margin: 20px auto;"></div>
+                                    <td colspan="7" class="py-8">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <div class="text-4xl mb-3 opacity-40">⏳</div>
+                                            <div class="text-gray-700 font-semibold mb-1">Calculating Final Grades...</div>
+                                            <div class="text-gray-500 text-sm text-center max-w-md">
+                                                Please wait while we calculate final grades from student activity scores.
+                                                <div class="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full spinner mt-3"></div>
                                             </div>
                                         </div>
                                     </td>
@@ -856,118 +538,145 @@
                         </table>
                     </div>
                     
-                    <div class="grades-footer mt-3" id="gradesStats" style="display: none;">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <div class="stat-value" id="totalStudents">0</div>
-                                    <div class="stat-label">Total Students</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <div class="stat-value text-success" id="passedStudents">0</div>
-                                    <div class="stat-label">Passed</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <div class="stat-value text-warning" id="failedStudents">0</div>
-                                    <div class="stat-label">Failed</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <div class="stat-value" id="overallAverage">0.0</div>
-                                    <div class="stat-label">Overall Average</div>
-                                </div>
-                            </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-6" id="gradesStats" style="display: none;">
+                        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
+                            <div class="text-3xl font-bold text-gray-900" id="totalStudents">0</div>
+                            <div class="text-gray-600 text-sm mt-1">Total Students</div>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
+                            <div class="text-3xl font-bold text-green-600" id="passedStudents">0</div>
+                            <div class="text-gray-600 text-sm mt-1">Passed</div>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
+                            <div class="text-3xl font-bold text-yellow-500" id="failedStudents">0</div>
+                            <div class="text-gray-600 text-sm mt-1">Failed</div>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
+                            <div class="text-3xl font-bold text-blue-600" id="overallAverage">0.0</div>
+                            <div class="text-gray-600 text-sm mt-1">Overall Average</div>
                         </div>
                     </div>
                 </div>
-
-    <div class="modal-overlay" id="editGradeModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Edit Grade</h3>
-                <button class="close-modal" onclick="closeEditModal()">&times;</button>
             </div>
-            <div class="modal-body">
-                <form id="editGradeForm">
-                    <div class="form-group">
-                        <label class="form-label">Student</label>
-                        <input type="text" class="form-control" id="editStudentName" readonly>
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-gradient-to-b from-gray-900 to-gray-950 mt-10 py-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h4 class="text-yellow-500 font-bold text-lg text-center mb-5">About CTBL</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-gray-300 text-sm leading-relaxed">
+                        The Center for Technology Based Learning serves as the learning management system operating hub, 
+                        reporting to the university MANCOM officials, with a director on duty who manages and handles the 
+                        center's daily operations.
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Activity</label>
-                        <input type="text" class="form-control" id="editActivityName" readonly>
+                    <div class="text-gray-300 text-sm leading-relaxed">
+                        Working closely with the Office of the President, the Center for Information Technology, and the 
+                        Deans and Directors to support the LMS end-users' day-to-day activity.
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Score (0-100)</label>
-                        <input type="number" class="form-control" id="editScore" min="0" max="100" step="0.1" required>
-                        <div class="grade-preview" id="gradePreview">
-                            Preview will appear here
-                        </div>
+                    <div class="text-gray-300 text-sm leading-relaxed">
+                        The center focuses on implementing new forms of training and determining the validity of data to 
+                        support the university's educational objectives.
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Remarks</label>
-                        <textarea class="form-control" id="editRemarks" rows="3" placeholder="Add remarks about this grade..."></textarea>
-                    </div>
-                    <input type="hidden" id="editGradeId">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
-                <button class="btn btn-success" onclick="saveGrade()">Save Grade</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Edit Grade Modal -->
+    <div class="modal-overlay" id="editGradeModal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900">Edit Grade</h3>
+                <button class="text-gray-500 hover:text-gray-700" onclick="closeEditModal()">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="editGradeForm">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-semibold mb-2">Student</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50" id="editStudentName" readonly>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-semibold mb-2">Activity</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50" id="editActivityName" readonly>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-semibold mb-2">Score (0-100)</label>
+                        <input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="editScore" min="0" max="100" step="0.1" required>
+                        <div class="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm" id="gradePreview">
+                            Preview will appear here
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-semibold mb-2">Remarks</label>
+                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="editRemarks" rows="3" placeholder="Add remarks about this grade..."></textarea>
+                    </div>
+                    <input type="hidden" id="editGradeId">
+                </form>
+            </div>
+            <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
+                <button class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" onclick="closeEditModal()">Cancel</button>
+                <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700" onclick="saveGrade()">Save Grade</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Edit Modal -->
     <div class="modal-overlay" id="bulkEditModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Bulk Edit Grades</h3>
-                <button class="close-modal" onclick="closeBulkEditModal()">&times;</button>
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900">Bulk Edit Grades</h3>
+                <button class="text-gray-500 hover:text-gray-700" onclick="closeBulkEditModal()">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Select Section</label>
-                    <select class="form-control" id="bulkSection">
+            <div class="p-6">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">Select Section</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="bulkSection">
                         <option value="">Select Section</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Select Activity</label>
-                    <select class="form-control" id="bulkActivity">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">Select Activity</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="bulkActivity">
                         <option value="">Select Activity</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Grade Adjustment</label>
-                    <select class="form-control" id="bulkAdjustment">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">Grade Adjustment</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="bulkAdjustment">
                         <option value="add">Add Points</option>
                         <option value="subtract">Subtract Points</option>
                         <option value="multiply">Multiply by Percentage</option>
                         <option value="set">Set to Specific Value</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Value</label>
-                    <input type="number" class="form-control" id="bulkValue" min="0" step="0.1">
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">Value</label>
+                    <input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="bulkValue" min="0" step="0.1">
                 </div>
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> This will update grades for all students in the selected section and activity.
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-info-circle text-blue-500 mt-1 mr-2"></i>
+                        <span class="text-blue-700 text-sm">This will update grades for all students in the selected section and activity.</span>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeBulkEditModal()">Cancel</button>
-                <button class="btn btn-warning" onclick="applyBulkEdit()">Apply to All</button>
+            <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
+                <button class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" onclick="closeBulkEditModal()">Cancel</button>
+                <button class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600" onclick="applyBulkEdit()">Apply to All</button>
             </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script type="module">
+        // Import Firebase modules
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, collection, getDocs, query, where, doc, getDoc, updateDoc, addDoc, orderBy, writeBatch } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -997,6 +706,54 @@
             direction: 'asc'
         };
 
+        // Function to update profile picture with Google photo
+        function updateProfilePicture(photoURL, userName) {
+            const profileCircle = document.getElementById('profileCircle');
+            const profileDropdownAvatar = document.getElementById('profileDropdownAvatar');
+            const initial = userName ? userName.charAt(0).toUpperCase() : 'P';
+            
+            if (photoURL) {
+                // Create image element for profile circle
+                const circleImg = document.createElement('img');
+                circleImg.src = photoURL;
+                circleImg.alt = userName || 'Profile';
+                circleImg.onerror = function() {
+                    // If image fails to load, show initial
+                    profileCircle.innerHTML = initial;
+                    profileCircle.style.background = 'linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%)';
+                    profileCircle.style.color = 'white';
+                };
+                
+                // Update profile circle
+                profileCircle.innerHTML = '';
+                profileCircle.appendChild(circleImg);
+                
+                // Create image element for dropdown avatar
+                const dropdownImg = document.createElement('img');
+                dropdownImg.src = photoURL;
+                dropdownImg.alt = userName || 'Profile';
+                dropdownImg.onerror = function() {
+                    // If image fails to load, show initial
+                    profileDropdownAvatar.innerHTML = initial;
+                    profileDropdownAvatar.style.background = 'rgba(255,255,255,0.2)';
+                    profileDropdownAvatar.style.color = 'white';
+                };
+                
+                // Update dropdown avatar
+                profileDropdownAvatar.innerHTML = '';
+                profileDropdownAvatar.appendChild(dropdownImg);
+            } else {
+                // No photo URL, use initial
+                profileCircle.innerHTML = initial;
+                profileCircle.style.background = 'linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%)';
+                profileCircle.style.color = 'white';
+                
+                profileDropdownAvatar.innerHTML = initial;
+                profileDropdownAvatar.style.background = 'rgba(255,255,255,0.2)';
+                profileDropdownAvatar.style.color = 'white';
+            }
+        }
+
         onAuthStateChanged(auth, async (user) => {
             const loadingScreen = document.getElementById('loadingScreen');
             const mainContent = document.getElementById('mainContent');
@@ -1004,7 +761,15 @@
             if (user) {
                 try {
                     console.log('User authenticated:', user.email);
+                    
+                    // Update profile picture with Google photo
+                    updateProfilePicture(user.photoURL, user.displayName);
+                    
                     currentProfessor = { id: user.uid, email: user.email };
+                    
+                    // Update profile dropdown information
+                    document.getElementById('dropdownName').textContent = user.displayName || 'Professor';
+                    document.getElementById('dropdownEmail').textContent = user.email;
                     
                     await loadProfessorData();
                     await loadAssignedSections();
@@ -1023,6 +788,47 @@
                 window.location.href = '/login/index.html';
             }
         });
+
+        // Profile dropdown toggle
+        window.toggleProfileDropdown = function(event) {
+            if (event) event.preventDefault();
+            document.getElementById('profileDropdown').classList.toggle('show');
+        };
+
+        // View profile function
+        window.showViewProfile = function(event) { 
+            if (event) event.preventDefault();
+            alert('Profile view would open here');
+            document.getElementById('profileDropdown').classList.remove('show');
+        };
+
+        // Logout function
+        window.handleLogout = async function(event) {
+            if (event) event.preventDefault();
+            document.getElementById('profileDropdown').classList.remove('show');
+            
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    await signOut(auth);
+                    window.location.href = '/login/index.html';
+                } catch (error) {
+                    console.error('Error logging out:', error);
+                    window.location.href = '/login/index.html';
+                }
+            }
+        };
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileContainer = document.querySelector('.profile-container');
+            const profileDropdown = document.getElementById('profileDropdown');
+            if (profileContainer && !profileContainer.contains(event.target)) {
+                profileDropdown.classList.remove('show');
+            }
+        });
+
+        // Rest of the JavaScript code remains the same as in the previous version...
+        // (Only the authentication and profile picture functions were added above)
 
         async function loadProfessorData() {
             try {
@@ -1187,165 +993,158 @@
             await loadGrades();
             updateFilters();
             setupEditModalListeners();
-        if (allGrades.length > 0) {
+            if (allGrades.length > 0) {
                 setTimeout(() => {
                     calculateAndDisplayFinalGrades();
-                }, 500); // Small delay to ensure everything is loaded
+                }, 500);
             }
         }
-         function calculateAndDisplayFinalGrades() {
-    try {
-        if (allGrades.length === 0) {
-            console.log('No grades available for final calculation');
-            return;
-        }
 
-        console.log('Auto-calculating final grades from', allGrades.length, 'grade records');
-
-        // Group grades by student
-        const studentGradesMap = {};
-        
-        allGrades.forEach(grade => {
-            // Use student email as unique identifier if available, otherwise use name + section
-            const studentKey = grade.studentEmail || 
-                              `${grade.studentName}_${grade.section}`.toLowerCase();
-            
-            if (!studentGradesMap[studentKey]) {
-                studentGradesMap[studentKey] = {
-                    name: grade.studentName,
-                    section: grade.section,
-                    email: grade.studentEmail || '',
-                    studentId: grade.studentId || '',
-                    scores: [],
-                    totalScore: 0,
-                    activityCount: 0,
-                    activityNames: [],
-                    activityInstances: [] // Store all activity instances
-                };
-            }
-            
-            // Add score to student's record - INCLUDE ALL ACTIVITY INSTANCES
-            if (grade.score !== undefined && grade.score !== null) {
-                studentGradesMap[studentKey].scores.push(grade.score);
-                studentGradesMap[studentKey].totalScore += grade.score;
-                studentGradesMap[studentKey].activityCount++;
-                
-                // Store activity instance with date
-                const activityInstance = {
-                    name: grade.testName,
-                    date: grade.date,
-                    score: grade.score,
-                    formattedDate: grade.formattedDate
-                };
-                
-                studentGradesMap[studentKey].activityInstances.push(activityInstance);
-                
-                // For activity names list, include date to differentiate
-                const activityWithDate = `${grade.testName} (${grade.date})`;
-                if (!studentGradesMap[studentKey].activityNames.includes(activityWithDate)) {
-                    studentGradesMap[studentKey].activityNames.push(activityWithDate);
+        function calculateAndDisplayFinalGrades() {
+            try {
+                if (allGrades.length === 0) {
+                    console.log('No grades available for final calculation');
+                    return;
                 }
+
+                console.log('Auto-calculating final grades from', allGrades.length, 'grade records');
+
+                // Group grades by student
+                const studentGradesMap = {};
+                
+                allGrades.forEach(grade => {
+                    const studentKey = grade.studentEmail || 
+                                    `${grade.studentName}_${grade.section}`.toLowerCase();
+                    
+                    if (!studentGradesMap[studentKey]) {
+                        studentGradesMap[studentKey] = {
+                            name: grade.studentName,
+                            section: grade.section,
+                            email: grade.studentEmail || '',
+                            studentId: grade.studentId || '',
+                            scores: [],
+                            totalScore: 0,
+                            activityCount: 0,
+                            activityNames: [],
+                            activityInstances: []
+                        };
+                    }
+                    
+                    if (grade.score !== undefined && grade.score !== null) {
+                        studentGradesMap[studentKey].scores.push(grade.score);
+                        studentGradesMap[studentKey].totalScore += grade.score;
+                        studentGradesMap[studentKey].activityCount++;
+                        
+                        const activityInstance = {
+                            name: grade.testName,
+                            date: grade.date,
+                            score: grade.score,
+                            formattedDate: grade.formattedDate
+                        };
+                        
+                        studentGradesMap[studentKey].activityInstances.push(activityInstance);
+                        
+                        const activityWithDate = `${grade.testName} (${grade.date})`;
+                        if (!studentGradesMap[studentKey].activityNames.includes(activityWithDate)) {
+                            studentGradesMap[studentKey].activityNames.push(activityWithDate);
+                        }
+                    }
+                });
+
+                console.log('Found', Object.keys(studentGradesMap).length, 'unique students');
+
+                // Calculate final grades for each student
+                const finalGrades = [];
+                Object.keys(studentGradesMap).forEach(studentKey => {
+                    const student = studentGradesMap[studentKey];
+                    
+                    const averageScore = student.scores.length > 0 ? 
+                        student.totalScore / student.scores.length : 0;
+                    
+                    const finalGrade = calculateGradeLetter(averageScore);
+                    const gradeStatus = getGradeStatus(averageScore);
+                    const statusText = averageScore >= 70 ? 'Passed' : 'Failed';
+                    
+                    finalGrades.push({
+                        studentKey: studentKey,
+                        name: student.name,
+                        section: student.section,
+                        totalActivities: student.activityCount,
+                        activityNames: student.activityNames,
+                        activityInstances: student.activityInstances,
+                        scores: student.scores,
+                        totalScore: student.totalScore,
+                        averageScore: parseFloat(averageScore.toFixed(2)),
+                        finalGrade: finalGrade,
+                        status: gradeStatus,
+                        statusText: statusText,
+                        email: student.email,
+                        studentId: student.studentId
+                    });
+                });
+
+                // Sort by average score (highest first)
+                finalGrades.sort((a, b) => b.averageScore - a.averageScore);
+
+                console.log('Auto-calculated final grades:', finalGrades.length);
+                
+                // Store the current final grades
+                currentFinalGrades = finalGrades;
+                
+                // Display the final grades
+                displayFinalGrades(finalGrades);
+                
+                // Calculate and display statistics
+                updateFinalGradesStats(finalGrades);
+                
+            } catch (error) {
+                console.error('Error auto-calculating final grades:', error);
             }
-        });
-
-        console.log('Found', Object.keys(studentGradesMap).length, 'unique students');
-
-        // Calculate final grades for each student
-        const finalGrades = [];
-        Object.keys(studentGradesMap).forEach(studentKey => {
-            const student = studentGradesMap[studentKey];
-            
-            // Calculate average score from ALL activity instances
-            const averageScore = student.scores.length > 0 ? 
-                student.totalScore / student.scores.length : 0;
-            
-            // Calculate final grade
-            const finalGrade = calculateGradeLetter(averageScore);
-            const gradeStatus = getGradeStatus(averageScore);
-            const statusText = averageScore >= 70 ? 'Passed' : 'Failed';
-            
-            finalGrades.push({
-                studentKey: studentKey,
-                name: student.name,
-                section: student.section,
-                totalActivities: student.activityCount,
-                activityNames: student.activityNames,
-                activityInstances: student.activityInstances,
-                scores: student.scores,
-                totalScore: student.totalScore,
-                averageScore: parseFloat(averageScore.toFixed(2)),
-                finalGrade: finalGrade,
-                status: gradeStatus,
-                statusText: statusText,
-                email: student.email,
-                studentId: student.studentId
-            });
-        });
-
-        // Sort by average score (highest first)
-        finalGrades.sort((a, b) => b.averageScore - a.averageScore);
-
-        console.log('Auto-calculated final grades:', finalGrades.length);
-        
-        // Store the current final grades
-        currentFinalGrades = finalGrades;
-        
-        // Display the final grades
-        displayFinalGrades(finalGrades);
-        
-        // Calculate and display statistics
-        updateFinalGradesStats(finalGrades);
-        
-    } catch (error) {
-        console.error('Error auto-calculating final grades:', error);
-    }
-}
+        }
 
         async function loadActivities() {
-        try {
-            allActivities = [];
-            
-            // Load from scheduledTests (assigned by professor)
-            const scheduledQuery = query(
-                collection(db, 'scheduledTests'),
-                where('professorEmail', '==', currentProfessor.email)
-            );
-            const scheduledSnapshot = await getDocs(scheduledQuery);
-            
-            scheduledSnapshot.forEach(docSnap => {
-                const activity = docSnap.data();
-                if (!allActivities.find(a => a.testName === activity.testName)) {
-                    allActivities.push({
-                        id: docSnap.id,
-                        name: activity.testName,
-                        section: activity.section,
-                        type: 'scheduled'
-                    });
-                }
-            });
-            
-            // Also load activities from testResults that students have completed
-            if (allGrades.length > 0) {
-                const uniqueActivities = new Set();
-                allGrades.forEach(grade => {
-                    if (grade.testName && !uniqueActivities.has(grade.testName)) {
-                        uniqueActivities.add(grade.testName);
+            try {
+                allActivities = [];
+                
+                const scheduledQuery = query(
+                    collection(db, 'scheduledTests'),
+                    where('professorEmail', '==', currentProfessor.email)
+                );
+                const scheduledSnapshot = await getDocs(scheduledQuery);
+                
+                scheduledSnapshot.forEach(docSnap => {
+                    const activity = docSnap.data();
+                    if (!allActivities.find(a => a.testName === activity.testName)) {
                         allActivities.push({
-                            id: `result_${grade.id}`,
-                            name: grade.testName,
-                            section: grade.section,
-                            type: 'completed'
+                            id: docSnap.id,
+                            name: activity.testName,
+                            section: activity.section,
+                            type: 'scheduled'
                         });
                     }
                 });
+                
+                if (allGrades.length > 0) {
+                    const uniqueActivities = new Set();
+                    allGrades.forEach(grade => {
+                        if (grade.testName && !uniqueActivities.has(grade.testName)) {
+                            uniqueActivities.add(grade.testName);
+                            allActivities.push({
+                                id: `result_${grade.id}`,
+                                name: grade.testName,
+                                section: grade.section,
+                                type: 'completed'
+                            });
+                        }
+                    });
+                }
+                
+                console.log('Loaded activities:', allActivities.length);
+                
+            } catch (error) {
+                console.error('Error loading activities:', error);
             }
-            
-            console.log('Loaded activities:', allActivities.length);
-            
-        } catch (error) {
-            console.error('Error loading activities:', error);
         }
-    }
 
         async function loadStudents() {
             try {
@@ -1379,461 +1178,428 @@
             }
         }
 
-       async function loadGrades() {
-    try {
-        allGrades = [];
-        console.log('Loading grades for', assignedSections.length, 'sections');
-
-        if (assignedSections.length === 0) {
-            displayGrades([]);
-            return;
-        }
-
-        const activityInstances = {}; // Track activity instances by date
-
-        // Get all test results for assigned sections
-        for (const section of assignedSections) {
+        async function loadGrades() {
             try {
-                // Get ALL test results for this section
-                const gradesQuery = query(
-                    collection(db, 'testResults'),
-                    where('section', '==', section.section)
-                );
-                
-                const gradesSnapshot = await getDocs(gradesQuery);
-                
-                gradesSnapshot.forEach(docSnap => {
-                const data = docSnap.data();
-                
-                // Skip if not completed
-                if (data.status !== 'completed') return;
-                
-                // ⭐ ADD THIS: Check for professor override
-                const isProfessorOverride = data.isProfessorOverride === true;
-                
-                // Calculate score
-                let score = 0;
-                
-                // ⭐ UPDATED: Check professor override first
-                if (isProfessorOverride && data.score && data.score > 0) {
-                    score = data.score;
-                    console.log(`✅ Using professor override score: ${score} for ${data.testName}`);
+                allGrades = [];
+                console.log('Loading grades for', assignedSections.length, 'sections');
+
+                if (assignedSections.length === 0) {
+                    displayGrades([]);
+                    return;
                 }
-                // Method 1: Check if score already exists
-                else if (data.score && data.score > 0) {
-                    score = data.score;
-                }
-                // Method 2: Calculate from result/resultData
-                else if (data.result || data.resultData) {
-                    score = calculateActivityScore(
-                        data.testName || 'Unknown Activity',
-                        data.result || data.resultData,
-                        data.testTarget || null
-                    );
-                }
-                // Method 3: Try to extract from any numeric fields
-                else if (data.repetitions) {
-                    score = calculateActivityScore(
-                        data.testName || 'Unknown Activity',
-                        data.repetitions,
-                        data.testTarget || null
-                    );
-                }
-                
-                // If score is 0, try to get it from other fields
-                if (score === 0 && data.result) {
-                    // Try to parse result as number
-                    const numResult = parseFloat(data.result);
-                    if (!isNaN(numResult)) {
-                        score = numResult;
+
+                const activityInstances = {};
+
+                // Get all test results for assigned sections
+                for (const section of assignedSections) {
+                    try {
+                        const gradesQuery = query(
+                            collection(db, 'testResults'),
+                            where('section', '==', section.section)
+                        );
+                        
+                        const gradesSnapshot = await getDocs(gradesQuery);
+                        
+                        gradesSnapshot.forEach(docSnap => {
+                            const data = docSnap.data();
+                            
+                            if (data.status !== 'completed') return;
+                            
+                            const isProfessorOverride = data.isProfessorOverride === true;
+                            
+                            let score = 0;
+                            
+                            if (isProfessorOverride && data.score && data.score > 0) {
+                                score = data.score;
+                                console.log(`✅ Using professor override score: ${score} for ${data.testName}`);
+                            }
+                            else if (data.score && data.score > 0) {
+                                score = data.score;
+                            }
+                            else if (data.result || data.resultData) {
+                                score = calculateActivityScore(
+                                    data.testName || 'Unknown Activity',
+                                    data.result || data.resultData,
+                                    data.testTarget || null
+                                );
+                            }
+                            else if (data.repetitions) {
+                                score = calculateActivityScore(
+                                    data.testName || 'Unknown Activity',
+                                    data.repetitions,
+                                    data.testTarget || null
+                                );
+                            }
+                            
+                            if (score === 0 && data.result) {
+                                const numResult = parseFloat(data.result);
+                                if (!isNaN(numResult)) {
+                                    score = numResult;
+                                }
+                            }
+
+                            let submittedDate = new Date();
+                            if (data.submittedAt) {
+                                if (data.submittedAt.toDate) {
+                                    submittedDate = data.submittedAt.toDate();
+                                } else if (typeof data.submittedAt === 'string') {
+                                    submittedDate = new Date(data.submittedAt);
+                                } else if (data.submittedAt.seconds) {
+                                    submittedDate = new Date(data.submittedAt.seconds * 1000);
+                                }
+                            }
+                            
+                            const dateKey = submittedDate.toISOString().split('T')[0];
+                            
+                            const studentKey = data.studentEmail || data.studentName || '';
+                            const activityKey = data.testName || '';
+                            const uniqueKey = `${studentKey}_${activityKey}_${dateKey}`.toLowerCase();
+                            
+                            if (!activityInstances[uniqueKey] || score > activityInstances[uniqueKey].score) {
+                                const gradeStatus = getGradeStatus(score);
+
+                                let displayResult = '-';
+                                if (data.result) {
+                                    if (typeof data.result === 'object') {
+                                        displayResult = JSON.stringify(data.result);
+                                    } else {
+                                        displayResult = data.result.toString();
+                                    }
+                                } else if (data.resultData) {
+                                    if (typeof data.resultData === 'object') {
+                                        displayResult = JSON.stringify(data.resultData);
+                                    } else {
+                                        displayResult = data.resultData.toString();
+                                    }
+                                } else if (data.repetitions) {
+                                    displayResult = data.repetitions.toString();
+                                }
+
+                                activityInstances[uniqueKey] = {
+                                    id: docSnap.id,
+                                    studentName: data.studentName || 'Unknown Student',
+                                    section: data.section || section.section,
+                                    testName: data.testName || 'Unknown Activity',
+                                    result: displayResult,
+                                    score: score,
+                                    gradeStatus: gradeStatus,
+                                    date: submittedDate.toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric' 
+                                    }),
+                                    dateObject: submittedDate,
+                                    formattedDate: dateKey,
+                                    remarks: data.remarks || '',
+                                    studentEmail: data.studentEmail || '',
+                                    studentId: data.studentId || '',
+                                    professorEmail: data.professorEmail || '',
+                                    submittedAt: data.submittedAt || '',
+                                    isProfessorOverride: isProfessorOverride || false
+                                };
+                            }
+                        });
+                        
+                    } catch (error) {
+                        console.error(`Error loading grades for ${section.section}:`, error);
                     }
                 }
 
-                    // Handle date
-                    let submittedDate = new Date();
-                    if (data.submittedAt) {
-                        if (data.submittedAt.toDate) {
-                            submittedDate = data.submittedAt.toDate();
-                        } else if (typeof data.submittedAt === 'string') {
-                            submittedDate = new Date(data.submittedAt);
-                        } else if (data.submittedAt.seconds) {
-                            submittedDate = new Date(data.submittedAt.seconds * 1000);
-                        }
-                    }
-                    
-                    // Format date to YYYY-MM-DD for grouping
-                    const dateKey = submittedDate.toISOString().split('T')[0];
-                    
-                    // Create unique key: student + activity + date
-                    const studentKey = data.studentEmail || data.studentName || '';
-                    const activityKey = data.testName || '';
-                    const uniqueKey = `${studentKey}_${activityKey}_${dateKey}`.toLowerCase();
-                    
-                    // Check if this is a higher score than previously recorded for this date
-                    if (!activityInstances[uniqueKey] || score > activityInstances[uniqueKey].score) {
-                        const gradeStatus = getGradeStatus(score);
+                allGrades = Object.values(activityInstances);
 
-                        // Format result for display
-                        let displayResult = '-';
-                        if (data.result) {
-                            if (typeof data.result === 'object') {
-                                displayResult = JSON.stringify(data.result);
-                            } else {
-                                displayResult = data.result.toString();
-                            }
-                        } else if (data.resultData) {
-                            if (typeof data.resultData === 'object') {
-                                displayResult = JSON.stringify(data.resultData);
-                            } else {
-                                displayResult = data.resultData.toString();
-                            }
-                        } else if (data.repetitions) {
-                            displayResult = data.repetitions.toString();
+                allGrades.sort((a, b) => {
+                    try {
+                        const dateA = a.dateObject;
+                        const dateB = b.dateObject;
+                        
+                        if (dateB.getTime() !== dateA.getTime()) {
+                            return dateB - dateA;
                         }
-
-                        // Store the highest score for this activity on this date
-                        activityInstances[uniqueKey] = {
-                        id: docSnap.id,
-                        studentName: data.studentName || 'Unknown Student',
-                        section: data.section || section.section,
-                        testName: data.testName || 'Unknown Activity',
-                        result: displayResult,
-                        score: score,
-                        gradeStatus: gradeStatus,
-                        date: submittedDate.toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
-                        }),
-                        dateObject: submittedDate,
-                        formattedDate: dateKey,
-                        remarks: data.remarks || '',
-                        studentEmail: data.studentEmail || '',
-                        studentId: data.studentId || '',
-                        professorEmail: data.professorEmail || '',
-                        submittedAt: data.submittedAt || '',
-                        isProfessorOverride: isProfessorOverride || false  // ⭐ ADD THIS
-                    };
+                        
+                        const nameA = a.studentName.toLowerCase();
+                        const nameB = b.studentName.toLowerCase();
+                        return nameA.localeCompare(nameB);
+                    } catch (e) {
+                        return 0;
                     }
                 });
+
+                console.log(`Total activities loaded: ${allGrades.length}`);
                 
+                const groupedByDate = {};
+                allGrades.forEach(grade => {
+                    if (!groupedByDate[grade.formattedDate]) {
+                        groupedByDate[grade.formattedDate] = [];
+                    }
+                    groupedByDate[grade.formattedDate].push({
+                        student: grade.studentName,
+                        activity: grade.testName,
+                        score: grade.score
+                    });
+                });
+                
+                console.log('Activities grouped by date:', groupedByDate);
+                
+                displayGrades(allGrades);
+                applyFilters();
+
             } catch (error) {
-                console.error(`Error loading grades for ${section.section}:`, error);
+                console.error('Error in loadGrades:', error);
+                displayGrades([]);
             }
         }
-
-        // Convert activity instances object to array
-        allGrades = Object.values(activityInstances);
-
-        // Sort by date (newest first), then by student name
-        allGrades.sort((a, b) => {
-            try {
-                // First sort by date (newest first)
-                const dateA = a.dateObject;
-                const dateB = b.dateObject;
-                
-                if (dateB.getTime() !== dateA.getTime()) {
-                    return dateB - dateA;
-                }
-                
-                // If same date, sort by student name
-                const nameA = a.studentName.toLowerCase();
-                const nameB = b.studentName.toLowerCase();
-                return nameA.localeCompare(nameB);
-            } catch (e) {
-                return 0;
-            }
-        });
-
-        console.log(`Total activities loaded: ${allGrades.length}`);
-        
-        // Debug: Group by date to show activities per day
-        const groupedByDate = {};
-        allGrades.forEach(grade => {
-            if (!groupedByDate[grade.formattedDate]) {
-                groupedByDate[grade.formattedDate] = [];
-            }
-            groupedByDate[grade.formattedDate].push({
-                student: grade.studentName,
-                activity: grade.testName,
-                score: grade.score
-            });
-        });
-        
-        console.log('Activities grouped by date:', groupedByDate);
-        
-        // Initial display
-        displayGrades(allGrades);
-        applyFilters();
-
-    } catch (error) {
-        console.error('Error in loadGrades:', error);
-        displayGrades([]);
-    }
-}
 
         function calculateActivityScore(testName, result, testTarget = null) {
-    const normalized = testName.toLowerCase().trim();
-    
-    // ⭐ CRITICAL: Check if this is a professor override with pre-calculated score
-    if (result && typeof result === 'object' && result !== null) {
-        // If professor already set a final score, use it directly
-        if (result.score !== undefined && result.score !== null) {
-            const score = parseFloat(result.score);
-            if (!isNaN(score) && score >= 0 && score <= 100) {
-                console.log(`✅ Using stored professor score: ${score} for ${testName}`);
-                return score;
+            const normalized = testName.toLowerCase().trim();
+            
+            if (result && typeof result === 'object' && result !== null) {
+                if (result.score !== undefined && result.score !== null) {
+                    const score = parseFloat(result.score);
+                    if (!isNaN(score) && score >= 0 && score <= 100) {
+                        console.log(`✅ Using stored professor score: ${score} for ${testName}`);
+                        return score;
+                    }
+                }
             }
+            
+            let numericValue = 0;
+            
+            if (typeof result === 'object' && result !== null) {
+                numericValue = result.repetitions || result.time || result.distance || 
+                              result.value || result.result || result.count || 
+                              result.score || 0;
+            } else if (typeof result === 'string') {
+                const match = result.match(/(\d+\.?\d*)/);
+                if (match) {
+                    numericValue = parseFloat(match[1]);
+                } else {
+                    numericValue = parseFloat(result) || 0;
+                }
+            } else {
+                numericValue = parseFloat(result) || 0;
+            }
+            
+            console.log(`🎯 Calculating: ${testName} | Value: ${numericValue} | Target: ${testTarget}`);
+            
+            if (testTarget && testTarget > 0) {
+                if (normalized.includes('push-up') || normalized.includes('pushup') || 
+                    normalized.includes('sit-up') || normalized.includes('situp') ||
+                    normalized.includes('curl-up')) {
+                    
+                    const reps = numericValue;
+                    if (reps >= testTarget) return 100;
+                    
+                    const percentage = (reps / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 100) score = 100;
+                    else if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('plank')) {
+                    let seconds = numericValue;
+                    if (seconds >= testTarget) return 100;
+                    
+                    const percentage = (seconds / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 100) score = 100;
+                    else if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('sit-and-reach')) {
+                    const distance = numericValue;
+                    if (distance >= testTarget) return 100;
+                    
+                    const percentage = (distance / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 100) score = 100;
+                    else if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('grip')) {
+                    if (numericValue >= testTarget) return 100;
+                    
+                    const percentage = (numericValue / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('mile') || normalized.includes('run')) {
+                    if (numericValue <= testTarget) return 100;
+                    
+                    const percentage = (testTarget / numericValue) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('step test') || normalized.includes('3-minute')) {
+                    if (numericValue <= testTarget) return 100;
+                    
+                    const percentage = (testTarget / numericValue) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+            }
+            
+            return calculateDefaultScore(normalized, numericValue);
         }
-    }
-    
-    // Extract numeric value from result
-    let numericValue = 0;
-    
-    if (typeof result === 'object' && result !== null) {
-        numericValue = result.repetitions || result.time || result.distance || 
-                      result.value || result.result || result.count || 
-                      result.score || 0;
-    } else if (typeof result === 'string') {
-        const match = result.match(/(\d+\.?\d*)/);
-        if (match) {
-            numericValue = parseFloat(match[1]);
-        } else {
-            numericValue = parseFloat(result) || 0;
+
+        function calculateDefaultScore(normalized, numericValue) {
+            if (normalized.includes('push-up') || normalized.includes('pushup')) {
+                const reps = numericValue;
+                if (reps >= 40) return 100;
+                if (reps >= 35) return 95;
+                if (reps >= 30) return 90;
+                if (reps >= 25) return 85;
+                if (reps >= 20) return 80;
+                if (reps >= 15) return 75;
+                if (reps >= 10) return 70;
+                if (reps >= 5) return 65;
+                return 60;
+            } else if (normalized.includes('sit-up') || normalized.includes('situp')) {
+                const reps = numericValue;
+                if (reps >= 50) return 100;
+                if (reps >= 45) return 95;
+                if (reps >= 40) return 90;
+                if (reps >= 35) return 85;
+                if (reps >= 30) return 80;
+                if (reps >= 25) return 75;
+                if (reps >= 20) return 70;
+                if (reps >= 15) return 65;
+                return 60;
+            } else if (normalized.includes('curl-up')) {
+                const reps = numericValue;
+                if (reps >= 75) return 100;
+                if (reps >= 60) return 95;
+                if (reps >= 50) return 90;
+                if (reps >= 40) return 85;
+                if (reps >= 30) return 80;
+                if (reps >= 25) return 75;
+                if (reps >= 20) return 70;
+                return 65;
+            } else if (normalized.includes('plank')) {
+                let seconds = 0;
+                if (typeof numericValue === 'string' && numericValue.includes(':')) {
+                    const [mins, secs] = numericValue.split(':').map(Number);
+                    seconds = (mins * 60) + (secs || 0);
+                } else {
+                    seconds = numericValue;
+                }
+                
+                if (seconds >= 180) return 100;
+                if (seconds >= 150) return 95;
+                if (seconds >= 120) return 90;
+                if (seconds >= 100) return 85;
+                if (seconds >= 80) return 80;
+                if (seconds >= 60) return 75;
+                if (seconds >= 45) return 70;
+                if (seconds >= 30) return 65;
+                return 60;
+            } else if (normalized.includes('step test') || normalized.includes('3-minute')) {
+                const heartRate = numericValue;
+                if (heartRate <= 70) return 100;
+                if (heartRate <= 80) return 95;
+                if (heartRate <= 90) return 90;
+                if (heartRate <= 100) return 85;
+                if (heartRate <= 110) return 80;
+                if (heartRate <= 120) return 75;
+                if (heartRate <= 130) return 70;
+                return 65;
+            } else if (normalized.includes('mile') || normalized.includes('run')) {
+                let totalSeconds = 0;
+                if (typeof numericValue === 'string' && numericValue.includes(':')) {
+                    const [minutes, seconds] = numericValue.split(':').map(Number);
+                    totalSeconds = (minutes * 60) + (seconds || 0);
+                } else {
+                    totalSeconds = numericValue;
+                }
+                
+                if (totalSeconds <= 360) return 100;
+                if (totalSeconds <= 420) return 95;
+                if (totalSeconds <= 480) return 90;
+                if (totalSeconds <= 540) return 85;
+                if (totalSeconds <= 600) return 80;
+                if (totalSeconds <= 660) return 75;
+                if (totalSeconds <= 720) return 70;
+                if (totalSeconds <= 780) return 65;
+                return 60;
+            } else if (normalized.includes('sit-and-reach')) {
+                const distance = numericValue;
+                if (distance >= 25) return 100;
+                if (distance >= 20) return 95;
+                if (distance >= 15) return 90;
+                if (distance >= 10) return 85;
+                if (distance >= 5) return 80;
+                if (distance >= 0) return 75;
+                if (distance >= -5) return 70;
+                return 65;
+            } else if (normalized.includes('grip')) {
+                const strength = numericValue;
+                if (strength >= 60) return 100;
+                if (strength >= 55) return 95;
+                if (strength >= 50) return 90;
+                if (strength >= 45) return 85;
+                if (strength >= 40) return 80;
+                if (strength >= 35) return 75;
+                if (strength >= 30) return 70;
+                return 65;
+            } else if (normalized.includes('bmi')) {
+                const bmi = numericValue;
+                if (bmi >= 18.5 && bmi <= 24.9) return 100;
+                if (bmi >= 17.5 && bmi < 18.5) return 85;
+                if (bmi >= 25 && bmi <= 27) return 85;
+                if (bmi >= 15 && bmi < 17.5) return 70;
+                if (bmi > 27 && bmi <= 30) return 70;
+                return 60;
+            }
+            
+            return 75;
         }
-    } else {
-        numericValue = parseFloat(result) || 0;
-    }
-    
-    console.log(`🎯 Calculating: ${testName} | Value: ${numericValue} | Target: ${testTarget}`);
-    
-    // Use test target if available - THIS IS THE KEY SECTION
-    if (testTarget && testTarget > 0) {
-        // REPETITION TESTS (push-ups, sit-ups, curl-ups)
-        if (normalized.includes('push-up') || normalized.includes('pushup') || 
-            normalized.includes('sit-up') || normalized.includes('situp') ||
-            normalized.includes('curl-up')) {
-            
-            const reps = numericValue;
-            if (reps >= testTarget) return 100;
-            
-            const percentage = (reps / testTarget) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            // Apply grading scale
-            if (percentage >= 100) score = 100;
-            else if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-        }
-        
-        // PLANK (time-based in seconds)
-        if (normalized.includes('plank')) {
-            let seconds = numericValue;
-            if (seconds >= testTarget) return 100;
-            
-            const percentage = (seconds / testTarget) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            if (percentage >= 100) score = 100;
-            else if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-        }
-        
-        // SIT-AND-REACH (flexibility in cm)
-        if (normalized.includes('sit-and-reach')) {
-            const distance = numericValue;
-            if (distance >= testTarget) return 100;
-            
-            const percentage = (distance / testTarget) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            if (percentage >= 100) score = 100;
-            else if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-        }
-        
-        // GRIP STRENGTH (kg)
-        if (normalized.includes('grip')) {
-            if (numericValue >= testTarget) return 100;
-            
-            const percentage = (numericValue / testTarget) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-        }
-        
-        // 1-MILE RUN (seconds - LOWER IS BETTER)
-        if (normalized.includes('mile') || normalized.includes('run')) {
-            if (numericValue <= testTarget) return 100;
-            
-            const percentage = (testTarget / numericValue) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-        }
-        
-        // STEP TEST (heart rate - LOWER IS BETTER)
-        if (normalized.includes('step test') || normalized.includes('3-minute')) {
-            if (numericValue <= testTarget) return 100;
-            
-            const percentage = (testTarget / numericValue) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-        }
-    }
-    
-    // Fallback to default scoring if no target set
-    return calculateDefaultScore(normalized, numericValue);
-}
-    function calculateDefaultScore(normalized, numericValue) {
-    // Fallback scoring when no test target is available
-    if (normalized.includes('push-up') || normalized.includes('pushup')) {
-        const reps = numericValue;
-        if (reps >= 40) return 100;
-        if (reps >= 35) return 95;
-        if (reps >= 30) return 90;
-        if (reps >= 25) return 85;
-        if (reps >= 20) return 80;
-        if (reps >= 15) return 75;
-        if (reps >= 10) return 70;
-        if (reps >= 5) return 65;
-        return 60;
-    } else if (normalized.includes('sit-up') || normalized.includes('situp')) {
-        const reps = numericValue;
-        if (reps >= 50) return 100;
-        if (reps >= 45) return 95;
-        if (reps >= 40) return 90;
-        if (reps >= 35) return 85;
-        if (reps >= 30) return 80;
-        if (reps >= 25) return 75;
-        if (reps >= 20) return 70;
-        if (reps >= 15) return 65;
-        return 60;
-    } else if (normalized.includes('curl-up')) {
-        const reps = numericValue;
-        if (reps >= 75) return 100;
-        if (reps >= 60) return 95;
-        if (reps >= 50) return 90;
-        if (reps >= 40) return 85;
-        if (reps >= 30) return 80;
-        if (reps >= 25) return 75;
-        if (reps >= 20) return 70;
-        return 65;
-    } else if (normalized.includes('plank')) {
-        let seconds = 0;
-        if (typeof numericValue === 'string' && numericValue.includes(':')) {
-            const [mins, secs] = numericValue.split(':').map(Number);
-            seconds = (mins * 60) + (secs || 0);
-        } else {
-            seconds = numericValue;
-        }
-        
-        if (seconds >= 180) return 100;
-        if (seconds >= 150) return 95;
-        if (seconds >= 120) return 90;
-        if (seconds >= 100) return 85;
-        if (seconds >= 80) return 80;
-        if (seconds >= 60) return 75;
-        if (seconds >= 45) return 70;
-        if (seconds >= 30) return 65;
-        return 60;
-    } else if (normalized.includes('step test') || normalized.includes('3-minute')) {
-        const heartRate = numericValue;
-        if (heartRate <= 70) return 100;
-        if (heartRate <= 80) return 95;
-        if (heartRate <= 90) return 90;
-        if (heartRate <= 100) return 85;
-        if (heartRate <= 110) return 80;
-        if (heartRate <= 120) return 75;
-        if (heartRate <= 130) return 70;
-        return 65;
-    } else if (normalized.includes('mile') || normalized.includes('run')) {
-        let totalSeconds = 0;
-        if (typeof numericValue === 'string' && numericValue.includes(':')) {
-            const [minutes, seconds] = numericValue.split(':').map(Number);
-            totalSeconds = (minutes * 60) + (seconds || 0);
-        } else {
-            totalSeconds = numericValue;
-        }
-        
-        if (totalSeconds <= 360) return 100;
-        if (totalSeconds <= 420) return 95;
-        if (totalSeconds <= 480) return 90;
-        if (totalSeconds <= 540) return 85;
-        if (totalSeconds <= 600) return 80;
-        if (totalSeconds <= 660) return 75;
-        if (totalSeconds <= 720) return 70;
-        if (totalSeconds <= 780) return 65;
-        return 60;
-    } else if (normalized.includes('sit-and-reach')) {
-        const distance = numericValue;
-        if (distance >= 25) return 100;
-        if (distance >= 20) return 95;
-        if (distance >= 15) return 90;
-        if (distance >= 10) return 85;
-        if (distance >= 5) return 80;
-        if (distance >= 0) return 75;
-        if (distance >= -5) return 70;
-        return 65;
-    } else if (normalized.includes('grip')) {
-        const strength = numericValue;
-        if (strength >= 60) return 100;
-        if (strength >= 55) return 95;
-        if (strength >= 50) return 90;
-        if (strength >= 45) return 85;
-        if (strength >= 40) return 80;
-        if (strength >= 35) return 75;
-        if (strength >= 30) return 70;
-        return 65;
-    } else if (normalized.includes('bmi')) {
-        const bmi = numericValue;
-        if (bmi >= 18.5 && bmi <= 24.9) return 100;
-        if (bmi >= 17.5 && bmi < 18.5) return 85;
-        if (bmi >= 25 && bmi <= 27) return 85;
-        if (bmi >= 15 && bmi < 17.5) return 70;
-        if (bmi > 27 && bmi <= 30) return 70;
-        return 60;
-    }
-    
-    return 75; // Default fallback
-}
+
         function calculateGradeLetter(score) {
-        return score.toFixed(1); // Returns score with 1 decimal place
-    }
+            return score.toFixed(1);
+        }
 
         function getGradeStatus(score) {
             if (score >= 90) return 'grade-excellent';
@@ -1842,17 +1608,17 @@
             return 'grade-poor';
         }
 
-            function displayGrades(grades) {
+        function displayGrades(grades) {
             const tableBody = document.getElementById('gradesTableBody');
             
             if (grades.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="6">
-                            <div class="empty-state">
-                                <div class="empty-icon">🔍</div>
-                                <div class="empty-title">No Grades Found</div>
-                                <div class="empty-text">
+                        <td colspan="6" class="py-8">
+                            <div class="flex flex-col items-center justify-center">
+                                <div class="text-4xl mb-3 opacity-40">🔍</div>
+                                <div class="text-gray-700 font-semibold mb-1">No Grades Found</div>
+                                <div class="text-gray-500 text-sm text-center max-w-md">
                                     No grades found for the current filters.<br>
                                     Try adjusting your filters or check if data exists.
                                 </div>
@@ -1865,9 +1631,7 @@
             
             let html = '';
             grades.forEach((grade, index) => {
-                // Format result display
                 let displayResult = grade.result || '-';
-                // Shorten long results
                 if (displayResult.length > 50) {
                     displayResult = displayResult.substring(0, 50) + '...';
                 }
@@ -1892,37 +1656,35 @@
             
             tableBody.innerHTML = html;
         }
+
         function updateFilters() {
-        const activitySelect = document.getElementById('filterActivity');
-        const bulkActivitySelect = document.getElementById('bulkActivity');
-        
-        activitySelect.innerHTML = '<option value="">All Activities</option>';
-        bulkActivitySelect.innerHTML = '<option value="">Select Activity</option>';
-        
-        // Get unique activities from ALL grades (not just uniqueActivities array)
-        const uniqueActivities = [];
-        allGrades.forEach(grade => {
-            if (grade.testName && !uniqueActivities.includes(grade.testName)) {
-                uniqueActivities.push(grade.testName);
-            }
-        });
-        
-        // Sort alphabetically
-        uniqueActivities.sort((a, b) => a.localeCompare(b));
-        
-        // Add options
-        uniqueActivities.forEach(activityName => {
-            const option = document.createElement('option');
-            option.value = activityName;
-            option.textContent = activityName;
-            activitySelect.appendChild(option);
+            const activitySelect = document.getElementById('filterActivity');
+            const bulkActivitySelect = document.getElementById('bulkActivity');
             
-            const bulkOption = option.cloneNode(true);
-            bulkActivitySelect.appendChild(bulkOption);
-        });
-        
-        console.log('Filter activities updated:', uniqueActivities.length);
-    }
+            activitySelect.innerHTML = '<option value="">All Activities</option>';
+            bulkActivitySelect.innerHTML = '<option value="">Select Activity</option>';
+            
+            const uniqueActivities = [];
+            allGrades.forEach(grade => {
+                if (grade.testName && !uniqueActivities.includes(grade.testName)) {
+                    uniqueActivities.push(grade.testName);
+                }
+            });
+            
+            uniqueActivities.sort((a, b) => a.localeCompare(b));
+            
+            uniqueActivities.forEach(activityName => {
+                const option = document.createElement('option');
+                option.value = activityName;
+                option.textContent = activityName;
+                activitySelect.appendChild(option);
+                
+                const bulkOption = option.cloneNode(true);
+                bulkActivitySelect.appendChild(bulkOption);
+            });
+            
+            console.log('Filter activities updated:', uniqueActivities.length);
+        }
 
         function sortGrades(key) {
             if (sortConfig.key === key) {
@@ -1944,24 +1706,20 @@
             
             let filteredGrades = [...allGrades];
             
-            // Apply section filter
             if (sectionFilter) {
                 filteredGrades = filteredGrades.filter(grade => grade.section === sectionFilter);
             }
             
-            // Apply activity filter
             if (activityFilter) {
                 filteredGrades = filteredGrades.filter(grade => grade.testName === activityFilter);
             }
             
-            // Apply student name filter
             if (studentFilter) {
                 filteredGrades = filteredGrades.filter(grade => 
                     grade.studentName.toLowerCase().includes(studentFilter)
                 );
             }
 
-            // Apply sorting if active
             if (sortConfig.key) {
                 const multiplier = sortConfig.direction === 'asc' ? 1 : -1;
                 filteredGrades.sort((a, b) => {
@@ -2060,14 +1818,12 @@
                 await updateDoc(gradeRef, {
                     score: newScore,
                     remarks: remarks,
-                    updatedAt: new Date(),
-                    // REMOVED: Don't store letter grade, just numeric score
-                    // grade: calculateGradeLetter(newScore)
+                    updatedAt: new Date()
                 });
                 
                 alert('Grade updated successfully!');
                 closeEditModal();
-                await loadGrades(); // Reload data
+                await loadGrades();
                 
             } catch (error) {
                 console.error('Error updating grade:', error);
@@ -2103,14 +1859,12 @@
                 return;
             }
             
-            // Show loading
-            const applyBtn = document.querySelector('#bulkEditModal .btn-warning');
+            const applyBtn = document.querySelector('#bulkEditModal .bg-yellow-500');
             const originalText = applyBtn.innerHTML;
             applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
             applyBtn.disabled = true;
             
             try {
-                // Get all testResults for this section and activity
                 const gradesQuery = query(
                     collection(db, 'testResults'),
                     where('section', '==', section),
@@ -2132,15 +1886,14 @@
                         case 'set': newScore = value; break;
                     }
                     
-                    // Ensure score is within bounds
                     newScore = Math.max(0, Math.min(100, newScore));
                     
                     batch.update(docSnap.ref, {
-                    score: newScore,
-                    updatedAt: new Date(),
-                    lastUpdatedBy: currentProfessor.email,
-                    bulkUpdated: true
-                });
+                        score: newScore,
+                        updatedAt: new Date(),
+                        lastUpdatedBy: currentProfessor.email,
+                        bulkUpdated: true
+                    });
                     
                     updatedCount++;
                 });
@@ -2152,7 +1905,6 @@
                 
                 await batch.commit();
                 
-                // Reload data
                 await loadGrades();
                 
                 alert(`Successfully updated ${updatedCount} grades!`);
@@ -2167,7 +1919,6 @@
             }
         }
 
-        // MODIFIED: Update calculateFinalGrades function to use the same logic
         async function calculateFinalGrades() {
             try {
                 if (allGrades.length === 0) {
@@ -2175,19 +1926,15 @@
                     return;
                 }
 
-                // Show loading
-                const calculateBtn = document.querySelector('.btn-warning');
+                const calculateBtn = document.querySelector('.bg-yellow-500');
                 const originalText = calculateBtn.innerHTML;
                 calculateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
                 calculateBtn.disabled = true;
 
-                // Recalculate and display
                 calculateAndDisplayFinalGrades();
                 
-                // Show success message
                 alert(`Successfully calculated final grades for ${currentFinalGrades.length} students!`);
                 
-                // Enable the Calculate button again
                 calculateBtn.innerHTML = originalText;
                 calculateBtn.disabled = false;
 
@@ -2195,120 +1942,113 @@
                 console.error('Error calculating final grades:', error);
                 alert('Error calculating final grades: ' + error.message);
                 
-                // Re-enable button on error
-                const calculateBtn = document.querySelector('.btn-warning');
+                const calculateBtn = document.querySelector('.bg-yellow-500');
                 calculateBtn.innerHTML = '<i class="fas fa-calculator"></i> Calculate Final Grades';
                 calculateBtn.disabled = false;
             }
         }
 
         function displayFinalGrades(finalGrades) {
-    const tableBody = document.getElementById('finalGradesBody');
-    
-    if (finalGrades.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7">
-                    <div class="empty-state">
-                        <div class="empty-icon">📈</div>
-                        <div class="empty-title">No Student Grades Found</div>
-                        <div class="empty-text">
-                            No student grades available in the database.<br>
-                            Add activities and have students submit their results first.
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        `;
-        
-        document.getElementById('gradesStats').style.display = 'none';
-        document.getElementById('savePdfBtn').style.display = 'none';
-        document.getElementById('finalGradesInfo').style.display = 'none';
-        
-        return;
-    }
-    
-    let html = '';
-    finalGrades.forEach((grade, index) => {
-        // Determine badge color based on status
-        let badgeClass = 'grade-excellent';
-        if (grade.averageScore < 70) badgeClass = 'grade-poor';
-        else if (grade.averageScore < 80) badgeClass = 'grade-fair';
-        else if (grade.averageScore < 90) badgeClass = 'grade-good';
-        
-        // Calculate final grade using the same logic as studentgrades.html
-        const finalGrade = calculateGradeLetter(grade.averageScore);
-        
-        html += `
-            <tr>
-                <td>
-                    <strong>${grade.name || 'Unknown Student'}</strong>
-                    ${grade.email ? `<br><small class="text-muted">${grade.email}</small>` : ''}
-                </td>
-                <td>${grade.section || 'N/A'}</td>
-                <td>
-                    ${grade.totalActivities}
-                    ${grade.activityNames.length > 0 ? 
-                        `<br><small class="text-muted" title="${grade.activityNames.join(', ')}">
-                            <i class="fas fa-info-circle"></i> ${grade.activityNames.length} activities
-                        </small>` : ''
-                    }
-                </td>
-                <td>
-                    <span class="grade-value ${grade.status}">
-                        ${grade.averageScore.toFixed(1)}%
-                    </span>
-                    <br>
-                    <small class="text-muted">
-                        ${grade.scores.length > 0 ? 
-                            `Range: ${Math.min(...grade.scores).toFixed(1)}-${Math.max(...grade.scores).toFixed(1)}%` : 
-                            'No scores'
-                        }
-                    </small>
-                </td>
-                <td>
-                    <!-- CHANGED: Show numeric average score instead of letter grade -->
-                    <span class="grade-value ${grade.status}" style="font-size: 18px;">
-                        <strong>${grade.averageScore.toFixed(1)}%</strong>
-                    </span>
-                </td>
-                <td>
-                    <span class="badge ${badgeClass}" style="padding: 5px 10px; border-radius: 20px;">
-                        ${grade.statusText}
-                    </span>
-                </td>
-                <td>
-                    <button class="btn-small btn-edit" onclick="viewStudentDetails('${grade.studentKey}')" title="View Details">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn-small btn-success" onclick="exportStudentReport('${grade.studentKey}')" title="Export Report">
-                        <i class="fas fa-download"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
-    
-    tableBody.innerHTML = html;
-    
-    // Show the statistics section
-    document.getElementById('gradesStats').style.display = 'block';
-    document.getElementById('savePdfBtn').style.display = 'inline-block';
-    document.getElementById('finalGradesInfo').style.display = 'block';
-    
-    // Update the button text
-    const calculateBtn = document.querySelector('.btn-warning');
-    if (calculateBtn) {
-        calculateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Recalculate Final Grades';
-    }
-    
-    const passedCount = finalGrades.filter(g => g.averageScore >= 70).length;
-    const failedCount = finalGrades.filter(g => g.averageScore < 70).length;
-    document.getElementById('summaryInfoText').textContent = 
-        `Automatically calculated ${finalGrades.length} students. ${passedCount} passed (${((passedCount/finalGrades.length)*100).toFixed(1)}%), ${failedCount} failed (${((failedCount/finalGrades.length)*100).toFixed(1)}%).`;
-}
+            const tableBody = document.getElementById('finalGradesBody');
+            
+            if (finalGrades.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="py-8">
+                            <div class="flex flex-col items-center justify-center">
+                                <div class="text-4xl mb-3 opacity-40">📈</div>
+                                <div class="text-gray-700 font-semibold mb-1">No Student Grades Found</div>
+                                <div class="text-gray-500 text-sm text-center max-w-md">
+                                    No student grades available in the database.<br>
+                                    Add activities and have students submit their results first.
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                
+                document.getElementById('gradesStats').style.display = 'none';
+                document.getElementById('savePdfBtn').style.display = 'none';
+                document.getElementById('finalGradesInfo').style.display = 'none';
+                
+                return;
+            }
+            
+            let html = '';
+            finalGrades.forEach((grade, index) => {
+                let badgeClass = 'grade-excellent';
+                if (grade.averageScore < 70) badgeClass = 'grade-poor';
+                else if (grade.averageScore < 80) badgeClass = 'grade-fair';
+                else if (grade.averageScore < 90) badgeClass = 'grade-good';
+                
+                const finalGrade = calculateGradeLetter(grade.averageScore);
+                
+                html += `
+                    <tr>
+                        <td>
+                            <strong>${grade.name || 'Unknown Student'}</strong>
+                            ${grade.email ? `<br><small class="text-gray-500">${grade.email}</small>` : ''}
+                        </td>
+                        <td>${grade.section || 'N/A'}</td>
+                        <td>
+                            ${grade.totalActivities}
+                            ${grade.activityNames.length > 0 ? 
+                                `<br><small class="text-gray-500" title="${grade.activityNames.join(', ')}">
+                                    <i class="fas fa-info-circle"></i> ${grade.activityNames.length} activities
+                                </small>` : ''
+                            }
+                        </td>
+                        <td>
+                            <span class="grade-value ${grade.status}">
+                                ${grade.averageScore.toFixed(1)}%
+                            </span>
+                            <br>
+                            <small class="text-gray-500">
+                                ${grade.scores.length > 0 ? 
+                                    `Range: ${Math.min(...grade.scores).toFixed(1)}-${Math.max(...grade.scores).toFixed(1)}%` : 
+                                    'No scores'
+                                }
+                            </small>
+                        </td>
+                        <td>
+                            <span class="grade-value ${grade.status}" style="font-size: 18px;">
+                                <strong>${grade.averageScore.toFixed(1)}%</strong>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${badgeClass}" style="padding: 5px 10px; border-radius: 20px;">
+                                ${grade.statusText}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="px-2 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700" onclick="viewStudentDetails('${grade.studentKey}')" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="px-2 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700" onclick="exportStudentReport('${grade.studentKey}')" title="Export Report">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = html;
+            
+            document.getElementById('gradesStats').style.display = 'grid';
+            document.getElementById('savePdfBtn').style.display = 'inline-flex';
+            document.getElementById('finalGradesInfo').style.display = 'block';
+            
+            const calculateBtn = document.querySelector('.bg-yellow-500');
+            if (calculateBtn) {
+                calculateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Recalculate Final Grades';
+            }
+            
+            const passedCount = finalGrades.filter(g => g.averageScore >= 70).length;
+            const failedCount = finalGrades.filter(g => g.averageScore < 70).length;
+            document.getElementById('summaryInfoText').textContent = 
+                `Automatically calculated ${finalGrades.length} students. ${passedCount} passed (${((passedCount/finalGrades.length)*100).toFixed(1)}%), ${failedCount} failed (${((failedCount/finalGrades.length)*100).toFixed(1)}%).`;
+        }
 
-    
         function updateFinalGradesStats(finalGrades) {
             if (finalGrades.length === 0) return;
             
@@ -2316,48 +2056,45 @@
             const passedStudents = finalGrades.filter(g => g.averageScore >= 70).length;
             const failedStudents = totalStudents - passedStudents;
             
-            // Calculate overall average
             const totalAverage = finalGrades.reduce((sum, grade) => sum + grade.averageScore, 0);
             const overallAverage = (totalAverage / totalStudents).toFixed(1);
             
-            // Update DOM elements
             document.getElementById('totalStudents').textContent = totalStudents;
             document.getElementById('passedStudents').textContent = passedStudents;
             document.getElementById('failedStudents').textContent = failedStudents;
             document.getElementById('overallAverage').textContent = overallAverage + '%';
             
-            // Add percentage for passed/failed
             const passedPercentage = ((passedStudents / totalStudents) * 100).toFixed(1);
             const failedPercentage = ((failedStudents / totalStudents) * 100).toFixed(1);
             
             document.getElementById('passedStudents').innerHTML = 
-                `${passedStudents}<br><small>(${passedPercentage}%)</small>`;
+                `${passedStudents}<br><small class="text-gray-500">(${passedPercentage}%)</small>`;
             document.getElementById('failedStudents').innerHTML = 
-                `${failedStudents}<br><small>(${failedPercentage}%)</small>`;
+                `${failedStudents}<br><small class="text-gray-500">(${failedPercentage}%)</small>`;
         }
 
         function viewStudentDetails(studentKey) {
-        const student = currentFinalGrades.find(g => g.studentKey === studentKey);
-        
-        if (student) {
-            let details = `
-                Student: ${student.name}
-                Section: ${student.section}
-                Email: ${student.email || 'N/A'}
-                Total Activities: ${student.activityCount}
-                Average Score: ${student.averageScore.toFixed(1)}%
-                Status: ${student.statusText}
+            const student = currentFinalGrades.find(g => g.studentKey === studentKey);
+            
+            if (student) {
+                let details = `
+                    Student: ${student.name}
+                    Section: ${student.section}
+                    Email: ${student.email || 'N/A'}
+                    Total Activities: ${student.activityCount}
+                    Average Score: ${student.averageScore.toFixed(1)}%
+                    Status: ${student.statusText}
+                    
+                    Activities Completed:
+                `;
                 
-                Activities Completed:
-            `;
-            
-            student.activityInstances.forEach((activity, index) => {
-                details += `\n${index + 1}. ${activity.name} - ${activity.date}: ${activity.score}%`;
-            });
-            
-            alert(details);
+                student.activityInstances.forEach((activity, index) => {
+                    details += `\n${index + 1}. ${activity.name} - ${activity.date}: ${activity.score}%`;
+                });
+                
+                alert(details);
+            }
         }
-    }
 
         function exportStudentReport(studentKey) {
             const student = currentFinalGrades.find(g => g.studentKey === studentKey);
@@ -2386,52 +2123,8 @@
             }
         }
 
-        function refreshFinalGrades() {
-            calculateFinalGrades();
-        }
-
         function saveFinalGradesToPDF() {
             alert('PDF export feature would be implemented here.\nFor now, you can use the browser\'s Print function (Ctrl+P) and save as PDF.');
-        }
-
-        async function saveFinalGrades(finalGrades) {
-            try {
-                const timestamp = new Date();
-                
-                for (const grade of finalGrades) {
-                    await addDoc(collection(db, 'finalGrades'), {
-                        professorEmail: currentProfessor.email,
-                        professorId: currentProfessor.id,
-                        studentName: grade.name,
-                        section: grade.section,
-                        totalActivities: grade.totalActivities,
-                        averageScore: parseFloat(grade.averageScore),
-                        finalGrade: grade.finalGrade,
-                        status: grade.averageScore >= 70 ? 'Passed' : 'Failed',
-                        calculatedAt: timestamp,
-                        semester: getCurrentSemester()
-                    });
-                    
-                    const studentsQuery = query(
-                        collection(db, 'students'),
-                        where('name', '==', grade.name),
-                        where('section', '==', grade.section)
-                    );
-                    
-                    const studentsSnapshot = await getDocs(studentsQuery);
-                    if (!studentsSnapshot.empty) {
-                        const studentDoc = studentsSnapshot.docs[0];
-                        await updateDoc(studentDoc.ref, {
-                            finalGrade: grade.finalGrade,
-                            averageScore: parseFloat(grade.averageScore),
-                            gradeUpdatedAt: timestamp
-                        });
-                    }
-                }
-                
-            } catch (error) {
-                console.error('Error saving final grades:', error);
-            }
         }
 
         function getCurrentSemester() {
@@ -2469,17 +2162,6 @@
             alert('Grades exported successfully!');
         }
 
-        window.handleLogout = async function() {
-            if (confirm('Are you sure you want to logout?')) {
-                try {
-                    await signOut(auth);
-                    window.location.href = '/login/index.html';
-                } catch (error) {
-                    console.error('Error logging out:', error);
-                    alert('Error logging out. Please try again.');
-                }
-            }
-        };
         // Make functions available globally
         window.editGrade = editGrade;
         window.closeEditModal = closeEditModal;
