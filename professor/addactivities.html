@@ -813,6 +813,67 @@
             font-size: 24px;
             color: #1e3a8a;
         }
+        /* Student Management Styles */
+        .student-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .student-checkbox-item:hover {
+            background: #f3f4f6;
+            border-color: #3b82f6;
+        }
+
+        .student-checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .student-details {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .selection-summary {
+            background: #eff6ff;
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .selection-summary-text {
+            font-size: 14px;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 8px;
+        }
     </style>
 </head>
 <body>
@@ -1155,6 +1216,59 @@
         </div>
     </div>
 </div>
+    <!-- Manage Students Modal -->
+<div id="manageStudentsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+            <div>
+                <h3 class="modal-title">Manage Test Access</h3>
+                <p style="font-size: 12px; color: #64748b; margin-top: 5px;" id="testInfoHeader">Select students who can take this test</p>
+            </div>
+            <button class="close-modal" onclick="closeManageStudentsModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Selection Summary -->
+            <div class="selection-summary">
+                <span class="selection-summary-text">
+                    <i class="fas fa-users"></i> <span id="selectedCount">0</span> of <span id="totalCount">0</span> students selected
+                </span>
+                <div class="bulk-actions">
+                    <button type="button" onclick="selectAllStudentsInModal()" class="btn-generate">
+                        <i class="fas fa-check-double"></i> Select All
+                    </button>
+                    <button type="button" onclick="deselectAllStudentsInModal()" class="btn-generate" style="background: #6b7280;">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Box -->
+            <div class="form-group">
+                <input type="text" 
+                       class="form-control" 
+                       id="studentSearchBox" 
+                       placeholder="🔍 Search students by name or student number..."
+                       onkeyup="filterStudentList()">
+            </div>
+
+            <!-- Students List -->
+            <div id="studentsListContainer" 
+                 style="max-height: 400px; overflow-y: auto; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px; background: #f9fafb;">
+                <p style="text-align: center; color: #64748b; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin"></i> Loading students...
+                </p>
+            </div>
+
+            <input type="hidden" id="currentTestId">
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeManageStudentsModal()">Cancel</button>
+            <button class="btn-success" onclick="saveStudentSelection()">
+                <i class="fas fa-save"></i> Save Selection
+            </button>
+        </div>
+    </div>
+</div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
    <script type="module">
@@ -1223,6 +1337,274 @@ window.deleteDoc = deleteDoc;
 window.updateDoc = updateDoc;
 window.clearResultFilters = clearResultFilters;
 
+window.currentTestStudents = [];
+window.selectedStudentEmails = new Set();
+window.currentManagingTestId = null;
+
+// Open Manage Students Modal
+window.manageStudents = async function(testId, testName, section) {
+    try {
+        console.log('📋 Opening student management for test:', testId);
+        
+        // Store current test ID
+        window.currentManagingTestId = testId;
+        document.getElementById('currentTestId').value = testId;
+        
+        // Update header
+        document.getElementById('testInfoHeader').textContent = `${testName} - ${section}`;
+        
+        // Show modal
+        document.getElementById('manageStudentsModal').style.display = 'flex';
+        
+        // Load test data to get currently selected students
+        const testDoc = await getDoc(doc(db, 'scheduledTests', testId));
+        const testData = testDoc.data();
+        
+        // Initialize selected students from saved data
+        window.selectedStudentEmails = new Set(testData.selectedStudents || []);
+        
+        // Load students from this section
+        await loadStudentsForTest(section);
+        
+    } catch (error) {
+        console.error('Error opening student management:', error);
+        alert('Error loading students: ' + error.message);
+    }
+};
+
+// Load students for the test's section
+async function loadStudentsForTest(section) {
+    const container = document.getElementById('studentsListContainer');
+    
+    try {
+        container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading students...</p>';
+        
+        // Query students in this section
+        const studentsQuery = query(
+            collection(db, 'students'),
+            where('section', '==', section)
+        );
+        
+        const studentsSnapshot = await getDocs(studentsQuery);
+        
+        if (studentsSnapshot.empty) {
+            container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 20px;">No students found in this section</p>';
+            window.currentTestStudents = [];
+            updateStudentSelectionCount();
+            return;
+        }
+        
+        // Store students
+        window.currentTestStudents = [];
+        studentsSnapshot.forEach((doc) => {
+            const student = { id: doc.id, ...doc.data() };
+            window.currentTestStudents.push(student);
+        });
+        
+        // Sort by name
+        window.currentTestStudents.sort((a, b) => {
+            const nameA = a.displayName || a.name || a.email;
+            const nameB = b.displayName || b.name || b.email;
+            return nameA.localeCompare(nameB);
+        });
+        
+        console.log(`✅ Loaded ${window.currentTestStudents.length} students`);
+        console.log(`📊 ${window.selectedStudentEmails.size} students currently selected`);
+        
+        renderStudentListForTest();
+        
+    } catch (error) {
+        console.error('Error loading students:', error);
+        container.innerHTML = '<p style="text-align: center; color: #ef4444; padding: 20px;">Error loading students</p>';
+    }
+}
+
+// Render student list with checkboxes
+function renderStudentListForTest(filterText = '') {
+    const container = document.getElementById('studentsListContainer');
+    
+    // Filter students if search text provided
+    let studentsToShow = window.currentTestStudents;
+    if (filterText) {
+        const searchLower = filterText.toLowerCase();
+        studentsToShow = window.currentTestStudents.filter(student => {
+            const name = (student.displayName || student.name || '').toLowerCase();
+            const number = (student.studentNumber || '').toLowerCase();
+            const email = (student.email || '').toLowerCase();
+            return name.includes(searchLower) || number.includes(searchLower) || email.includes(searchLower);
+        });
+    }
+    
+    if (studentsToShow.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 20px;">No students found</p>';
+        return;
+    }
+    
+    let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+    
+    studentsToShow.forEach((student) => {
+        const displayName = student.displayName || student.name || student.email;
+        const studentNumber = student.studentNumber || 'N/A';
+        const isChecked = window.selectedStudentEmails.has(student.email);
+        
+        html += `
+            <label class="student-checkbox-item">
+                <input type="checkbox" 
+                       value="${student.email}"
+                       ${isChecked ? 'checked' : ''}
+                       onchange="toggleStudentInTest('${student.email}')">
+                <div class="student-info">
+                    <div class="student-name">${displayName}</div>
+                    <div class="student-details">${studentNumber} • ${student.email}</div>
+                </div>
+            </label>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+    
+    updateStudentSelectionCount();
+}
+
+// Toggle individual student selection
+window.toggleStudentInTest = function(studentEmail) {
+    if (window.selectedStudentEmails.has(studentEmail)) {
+        window.selectedStudentEmails.delete(studentEmail);
+    } else {
+        window.selectedStudentEmails.add(studentEmail);
+    }
+    updateStudentSelectionCount();
+};
+
+// Select all students
+window.selectAllStudentsInModal = function() {
+    window.currentTestStudents.forEach(student => {
+        window.selectedStudentEmails.add(student.email);
+    });
+    renderStudentListForTest();
+};
+
+// Deselect all students
+window.deselectAllStudentsInModal = function() {
+    window.selectedStudentEmails.clear();
+    renderStudentListForTest();
+};
+
+// Update selection count display
+function updateStudentSelectionCount() {
+    document.getElementById('selectedCount').textContent = window.selectedStudentEmails.size;
+    document.getElementById('totalCount').textContent = window.currentTestStudents.length;
+}
+
+// Filter student list based on search
+window.filterStudentList = function() {
+    const searchBox = document.getElementById('studentSearchBox');
+    const filterText = searchBox.value;
+    renderStudentListForTest(filterText);
+};
+
+// Save student selection
+window.saveStudentSelection = async function() {
+    const testId = document.getElementById('currentTestId').value;
+    
+    if (window.selectedStudentEmails.size === 0) {
+        if (!confirm('No students selected. This means no one will be able to take this test. Continue?')) {
+            return;
+        }
+    }
+    
+    const saveBtn = document.querySelector('#manageStudentsModal .btn-success');
+    const cancelBtn = document.querySelector('#manageStudentsModal .btn-secondary');
+    const originalText = saveBtn.innerHTML;
+    
+    try {
+        saveBtn.disabled = true;
+        cancelBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        
+        // Convert Set to Array
+        const selectedStudentsArray = Array.from(window.selectedStudentEmails);
+        
+        // Update test document
+        await updateDoc(doc(db, 'scheduledTests', testId), {
+            selectedStudents: selectedStudentsArray,
+            totalStudents: selectedStudentsArray.length,
+            updatedAt: serverTimestamp()
+        });
+        
+        console.log('✅ Updated test with', selectedStudentsArray.length, 'selected students');
+        
+        // Create/update notifications for selected students
+        const testDoc = await getDoc(doc(db, 'scheduledTests', testId));
+        const testData = testDoc.data();
+        
+        // Delete old notifications for this test
+        const oldNotificationsQuery = query(
+            collection(db, 'notifications'),
+            where('testId', '==', testId)
+        );
+        const oldNotifications = await getDocs(oldNotificationsQuery);
+        const deletePromises = [];
+        oldNotifications.forEach(doc => {
+            deletePromises.push(deleteDoc(doc.ref));
+        });
+        await Promise.all(deletePromises);
+        
+        // Create new notifications for selected students
+        const notificationPromises = [];
+        for (const studentEmail of selectedStudentsArray) {
+            const student = window.currentTestStudents.find(s => s.email === studentEmail);
+            if (student) {
+                const notificationData = {
+                    type: 'new_test',
+                    title: 'Fitness Test Available',
+                    message: `${testData.testName} has been assigned to you. Deadline: ${testData.deadline} at ${testData.deadlineTime}`,
+                    section: testData.section,
+                    testName: testData.testName,
+                    testId: testId,
+                    testDate: testData.date,
+                    deadline: testData.deadline,
+                    deadlineTime: testData.deadlineTime,
+                    studentEmail: studentEmail,
+                    studentId: student.id,
+                    isRead: false,
+                    createdAt: serverTimestamp(),
+                    timestamp: new Date().toISOString()
+                };
+                notificationPromises.push(
+                    addDoc(collection(db, 'notifications'), notificationData)
+                );
+            }
+        }
+        
+        await Promise.all(notificationPromises);
+        console.log(`✅ Created ${notificationPromises.length} notifications`);
+        
+        closeManageStudentsModal();
+        alert(`✅ Successfully assigned test to ${selectedStudentsArray.length} student(s)!`);
+        
+        // Reload the schedule
+        await loadScheduledTests(window.currentUser.email, window.currentUser.uid);
+        
+    } catch (error) {
+        console.error('❌ Error saving student selection:', error);
+        alert('Error saving: ' + error.message);
+        
+        saveBtn.disabled = false;
+        cancelBtn.disabled = false;
+        saveBtn.innerHTML = originalText;
+    }
+};
+
+// Close modal
+window.closeManageStudentsModal = function() {
+    document.getElementById('manageStudentsModal').style.display = 'none';
+    document.getElementById('studentSearchBox').value = '';
+    window.selectedStudentEmails.clear();
+    window.currentTestStudents = [];
+    window.currentManagingTestId = null;
+};
 // Global variables - STORE IN WINDOW OBJECT
 window.currentUser = null;
 window.assignedSections = [];
@@ -1422,12 +1804,13 @@ async function loadScheduledTests(userEmail, userId) {
                         <td data-label="Actions">
                             <div class="action-buttons">
                                 <button class="btn-action btn-edit" onclick="editTest('${docSnap.id}')">Edit</button>
+                                <button class="btn-action btn-view" onclick="manageStudents('${docSnap.id}', '${test.testName}', '${test.section}')">Students</button>
                                 <button class="btn-action btn-cancel" onclick="deleteTest('${docSnap.id}')">Delete</button>
                             </div>
                         </td>
                     </tr>
                 `;
-                }
+                 }
             });
             
            if (!hasVisibleTests) {
@@ -2083,16 +2466,16 @@ function calculateTestScore(testName, result, testTarget = null) {
         targetGroup.style.display = 'none';
     }
 }
-                async function scheduleTest() {
-            const testType = document.getElementById('testType').value;
-            const testSection = document.getElementById('testSection').value;
-            const testDate = document.getElementById('testDate').value;
-            const testDeadline = document.getElementById('testDeadline').value;
-            const testDeadlineTime = document.getElementById('testDeadlineTime').value;
-            const attemptsAllowed = document.getElementById('attemptsAllowed').value;
-            const testInstructions = document.getElementById('testInstructions').value;
-            const testTarget = document.getElementById('testTarget').value;
-            const videoURL = document.getElementById('videoURL').value;
+               async function scheduleTest() {
+    const testType = document.getElementById('testType').value;
+    const testSection = document.getElementById('testSection').value;
+    const testDate = document.getElementById('testDate').value;
+    const testDeadline = document.getElementById('testDeadline').value;
+    const testDeadlineTime = document.getElementById('testDeadlineTime').value;
+    const attemptsAllowed = document.getElementById('attemptsAllowed').value;
+    const testInstructions = document.getElementById('testInstructions').value;
+    const testTarget = document.getElementById('testTarget').value;
+    const videoURL = document.getElementById('videoURL').value;
 
     if (!testType || !testSection || !testDate || !testDeadline || !testDeadlineTime) {
         alert('Please fill in all required fields.');
@@ -2109,13 +2492,11 @@ function calculateTestScore(testName, result, testTarget = null) {
         return;
     }
 
-    // Get buttons BEFORE disabling
     const submitBtn = document.querySelector('#scheduleTestModal .btn-success');
     const cancelBtn = document.querySelector('#scheduleTestModal .btn-secondary');
     const originalText = submitBtn.textContent;
 
     try {
-        // Disable buttons
         submitBtn.disabled = true;
         cancelBtn.disabled = true;
         submitBtn.textContent = 'Scheduling...';
@@ -2151,6 +2532,7 @@ function calculateTestScore(testName, result, testTarget = null) {
             status: status,
             totalStudents: totalStudents,
             completedStudents: 0,
+            selectedStudents: [], // Initially empty - professor will select later
             createdAt: window.serverTimestamp(),
             isVisible: true,
             isActive: true,
@@ -2162,59 +2544,17 @@ function calculateTestScore(testName, result, testTarget = null) {
         const docRef = await window.addDoc(window.collection(window.db, 'scheduledTests'), testData);
         console.log('✅ Test added with ID:', docRef.id);
         
-        // Create notifications for students
-        try {
-            const studentsQuery = query(
-                collection(db, 'students'),
-                where('section', '==', testSection)
-            );
-            const studentsSnapshot = await getDocs(studentsQuery);
-            
-            const notificationPromises = [];
-            studentsSnapshot.forEach((studentDoc) => {
-                const studentData = studentDoc.data();
-                const notificationData = {
-                    type: 'new_test',
-                    title: 'New Fitness Test Scheduled',
-                    message: `${testType} has been scheduled for ${testSection}. Deadline: ${testDeadline} at ${testDeadlineTime}`,
-                    section: testSection,
-                    testName: testType,
-                    testId: docRef.id,
-                    testDate: testDate,
-                    deadline: testDeadline,
-                    deadlineTime: testDeadlineTime,
-                    studentEmail: studentData.email,
-                    studentId: studentDoc.id,
-                    isRead: false,
-                    createdAt: window.serverTimestamp(),
-                    timestamp: new Date().toISOString()
-                };
-                
-                notificationPromises.push(
-                    addDoc(collection(db, 'notifications'), notificationData)
-                );
-            });
-            
-            await Promise.all(notificationPromises);
-            console.log(`✅ ${notificationPromises.length} notifications created`);
-        } catch (notifError) {
-            console.error('Error creating notifications:', notifError);
-        }
-
-        // Close modal FIRST
+        // Don't create notifications yet - will be created when students are selected
+        
         closeScheduleTestModal();
+        alert('✅ Test scheduled successfully! Click "Students" button to assign students.');
         
-        // THEN show alert
-        alert('Test scheduled successfully' + (videoURL ? ' with video URL!' : '!'));
-        
-        // Refresh list
         await loadScheduledTests(window.currentUser.email, window.currentUser.uid);
         
     } catch (error) {
         console.error('❌ Error scheduling test:', error);
         alert('Error scheduling test: ' + error.message);
         
-        // Re-enable buttons with original text
         submitBtn.disabled = false;
         cancelBtn.disabled = false;
         submitBtn.textContent = originalText;

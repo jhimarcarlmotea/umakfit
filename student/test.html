@@ -66,6 +66,20 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #2563eb;
         }
+        @keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.3s ease-out;
+    }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -420,7 +434,7 @@
                         });
                     }
                 });
-
+                    
         function closeProfileOnClickOutside(event) {
             const isMobile = window.innerWidth < 1024;
             const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
@@ -698,6 +712,7 @@ async function loadNotificationDropdown() {
         }
 
         console.log('📋 Loading tests for section:', studentData.section);
+        console.log('📧 Student email:', studentData.email);
         
         const testsQuery = query(
             collection(db, 'scheduledTests'),
@@ -708,7 +723,7 @@ async function loadNotificationDropdown() {
         availableTests = [];
         overdueTests = [];
         const now = new Date();
-        const seenTestIds = new Set(); // NEW: Track seen test IDs to prevent duplicates
+        const seenTestIds = new Set();
         
         console.log(`📊 Found ${testsSnapshot.size} total tests for section ${studentData.section}`);
         
@@ -719,7 +734,6 @@ async function loadNotificationDropdown() {
         );
         const completedTestsSnapshot = await getDocs(completedTestsQuery);
         
-        // Map to store test completion status
         const testStatus = new Map();
         
         completedTestsSnapshot.forEach(doc => {
@@ -761,12 +775,21 @@ async function loadNotificationDropdown() {
             for (const doc of testsSnapshot.docs) {
                 const test = { id: doc.id, ...doc.data() };
                 
-                // Skip if we've already processed this test ID (prevent duplicates)
                 if (seenTestIds.has(test.id)) {
                     console.log(`🔄 Skipping duplicate test: ${test.testName} (ID: ${test.id})`);
                     continue;
                 }
                 seenTestIds.add(test.id);
+                
+                // NEW: Check if this student is in the selected students list
+                if (test.selectedStudents && Array.isArray(test.selectedStudents)) {
+                    if (!test.selectedStudents.includes(studentData.email)) {
+                        console.log(`❌ Student ${studentData.email} not selected for test: ${test.testName}`);
+                        continue;
+                    } else {
+                        console.log(`✅ Student ${studentData.email} IS selected for test: ${test.testName}`);
+                    }
+                }
                 
                 if (test.isVisible !== true || test.isActive !== true) {
                     console.log(`❌ Skipping test ${test.testName}: Not visible or not active`);
@@ -776,10 +799,10 @@ async function loadNotificationDropdown() {
                 console.log(`🔍 Processing test: ${test.testName}`, {
                     isVisible: test.isVisible,
                     isActive: test.isActive,
-                    section: test.section
+                    section: test.section,
+                    selectedForStudent: test.selectedStudents ? test.selectedStudents.includes(studentData.email) : 'No filter'
                 });
                 
-                // Calculate deadline
                 let deadlineDateTime;
                 if (test.deadlineDateTime) {
                     deadlineDateTime = new Date(test.deadlineDateTime);
@@ -800,16 +823,12 @@ async function loadNotificationDropdown() {
                 const isPerfect = status ? status.bestScore === 100 : false;
                 const hasAttemptsLeft = status ? status.attempts < test.attemptsAllowed : true;
                 
-                // Check if deadline has passed
                 if (deadlineDateTime < now) {
-                    // Test is overdue
                     if (enabledTests.has(test.id)) {
-                        // Professor has enabled this test
                         console.log(`⚠️✅ Test ${test.testName}: Overdue but ENABLED by professor`);
                         test.professorEnabled = true;
                         overdueTests.push(test);
                     } else if (!status || status.attempts === 0) {
-                        // Not enabled and not attempted
                         console.log(`⚠️ Test ${test.testName}: Overdue and not attempted`);
                         overdueTests.push(test);
                     } else {
@@ -817,7 +836,6 @@ async function loadNotificationDropdown() {
                     }
                     
                 } else {
-                    // Not overdue - normal logic
                     if (!status) {
                         console.log(`✅ Adding test ${test.testName}: Never attempted`);
                         availableTests.push(test);
@@ -1403,29 +1421,97 @@ async function loadNotificationDropdown() {
             }
         };
             window.startOverdueTest = function(testId, encodedTestName) {
-        const testName = decodeURIComponent(encodedTestName);
-        console.log(`Starting overdue test: ${testName} (ID: ${testId})`);
-        window.location.href = `./testdetails.html?testId=${testId}&testName=${encodedTestName}&isOverdue=true`;
-    };
+    // Check if profile is complete
+    if (!isProfileComplete(studentData)) {
+        showProfileRequiredModal();
+        return;
+    }
+    
+    const testName = decodeURIComponent(encodedTestName);
+    console.log(`Starting overdue test: ${testName} (ID: ${testId})`);
+    window.location.href = `./testdetails.html?testId=${testId}&testName=${encodedTestName}&isOverdue=true`;
+};
+                        // Check if profile is complete
+        function isProfileComplete(studentData) {
+            return studentData && 
+                studentData.age > 0 && 
+                studentData.gender && 
+                studentData.gender !== 'Not Specified' &&
+                studentData.height > 0 && 
+                studentData.weight > 0 &&
+                studentData.contactNumber && 
+                studentData.contactNumber !== 'Not Provided';
+        }
 
+        // Show profile completion modal
+        function showProfileRequiredModal() {
+            // Create modal if it doesn't exist
+            let modal = document.getElementById('profileRequiredModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'profileRequiredModal';
+                modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] px-4';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 animate-fade-in">
+                        <div class="text-center mb-6">
+                            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="bi bi-exclamation-triangle text-3xl text-yellow-600"></i>
+                            </div>
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Profile Incomplete</h3>
+                            <p class="text-sm sm:text-base text-gray-600">
+                                You need to complete your profile before taking any tests. Please provide your age, gender, height, weight, and contact number.
+                            </p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button onclick="closeProfileRequiredModal()" class="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all">
+                                Cancel
+                            </button>
+                            <button onclick="goToEditProfile()" class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all">
+                                Edit Profile
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            modal.classList.remove('hidden');
+        }
+
+        window.closeProfileRequiredModal = function() {
+            const modal = document.getElementById('profileRequiredModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        };
+
+        window.goToEditProfile = function() {
+            window.location.href = './studentProfile.html?editProfile=true';
+        };
     window.startTest = function(testId) {
-        // Check available tests first
-        const test = availableTests.find(t => t.id === testId);
-        if (test) {
-            window.location.href = `./testdetails.html?testId=${testId}&testName=${encodeURIComponent(test.testName)}`;
-            return;
-        }
-        
-        // If not found, check overdue tests
-        const overdueTest = overdueTests.find(t => t.id === testId);
-        if (overdueTest) {
-            window.location.href = `./testdetails.html?testId=${testId}&testName=${encodeURIComponent(overdueTest.testName)}&isOverdue=true`;
-            return;
-        }
-        
-        console.error(`Test not found: ${testId}`);
-        alert('Test not found. Please refresh the page and try again.');
-    };
+    // Check if profile is complete
+    if (!isProfileComplete(studentData)) {
+        showProfileRequiredModal();
+        return;
+    }
+    
+    // Check available tests first
+    const test = availableTests.find(t => t.id === testId);
+    if (test) {
+        window.location.href = `./testdetails.html?testId=${testId}&testName=${encodeURIComponent(test.testName)}`;
+        return;
+    }
+    
+    // If not found, check overdue tests
+    const overdueTest = overdueTests.find(t => t.id === testId);
+    if (overdueTest) {
+        window.location.href = `./testdetails.html?testId=${testId}&testName=${encodeURIComponent(overdueTest.testName)}&isOverdue=true`;
+        return;
+    }
+    
+    console.error(`Test not found: ${testId}`);
+    alert('Test not found. Please refresh the page and try again.');
+};
+
 function calculateTestScore(testName, result, testTarget = null) {
     const normalized = testName.toLowerCase().trim();
     
