@@ -1451,8 +1451,17 @@ async function loadNotificationDropdown() {
 
                 let statusIcon = 'circle';
                 let statusText = 'Not Started';
+                     const testDateTime = new Date(`${test.date}T${test.time || '00:00'}`);
+                const now = new Date();
+                const isFutureTest = testDateTime > now;
 
-                if (isViewOnly) {
+            if (isFutureTest) {
+                statusIcon = 'calendar-event';
+                const dateStr = testDateTime.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const timeStr = testDateTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                statusText = `Available on ${dateStr} at ${timeStr}`;
+
+                } else if (isViewOnly) {
                     statusIcon = 'eye';
                     statusText = 'View Only';
                 } else if (isPerfect) {
@@ -1519,9 +1528,14 @@ async function loadNotificationDropdown() {
                                     </div>
                                 </div>
                                 
-                                <!-- Action Button Section -->
+                                    <!-- Action Button Section -->
                                 <div class="flex sm:flex-col justify-end items-end sm:items-stretch gap-2 sm:min-w-[140px]">
-                                    ${isViewOnly ? `
+                                    ${isFutureTest ? `
+                                <div class="flex-1 sm:flex-initial px-5 py-3 bg-blue-100 text-blue-700 rounded-xl font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 border-2 border-blue-300 cursor-not-allowed" title="Test will be available on ${testDateTime.toLocaleDateString()} at ${testDateTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}">
+                                            <i class="bi bi-calendar-check"></i>
+                                            <span>Available Soon</span>
+                                        </div>
+                                    ` : isViewOnly ? `
                                         <div class="flex-1 sm:flex-initial px-5 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 border-2 border-gray-300 cursor-not-allowed" title="You have not been selected for this test">
                                             <i class="bi bi-eye"></i>
                                             <span>View Only</span>
@@ -2013,39 +2027,62 @@ window.toggleCategory = function(categoryId) {
             window.location.href = './studentProfile.html?editProfile=true';
         };
         window.startTest = function(testId) {
-        // Check if profile is complete
-        if (!isProfileComplete(studentData)) {
-            showProfileRequiredModal();
+    // Check if profile is complete
+    if (!isProfileComplete(studentData)) {
+        showProfileRequiredModal();
+        return;
+    }
+    
+    // Find the test
+    const test = availableTests.find(t => t.id === testId);
+    
+    if (test) {
+        // ⭐ NEW: Check if test date is in the future
+        const testDateTime = new Date(`${test.date}T${test.time || '00:00'}`);
+        const now = new Date();
+
+        if (testDateTime > now) {
+            const dateStr = testDateTime.toLocaleDateString('en-US', { 
+                weekday: 'long',
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+            const timeStr = testDateTime.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit', 
+                hour12: true 
+            });
+            
+            alert(`❌ This test is not available yet.\n\nIt will be available on ${dateStr} at ${timeStr}.\n\nPlease check back at that time.`);
             return;
         }
         
-        // ⭐ NEW: Check if test is view-only
-        const test = availableTests.find(t => t.id === testId);
-        if (test && test.isViewOnly === true) {
+        // ⭐ Check if test is view-only
+        if (test.isViewOnly === true) {
             alert('❌ You cannot start this test.\n\nYou have not been selected by your professor to take this test.\n\nPlease contact your professor if you believe this is an error.');
             return;
         }
         
-        // Check available tests first
-        if (test) {
-            window.location.href = `./testdetails.html?testId=${testId}&testName=${encodeURIComponent(test.testName)}`;
+        // Test is available, redirect
+        window.location.href = `./testdetails.html?testId=${testId}&testName=${encodeURIComponent(test.testName)}`;
+        return;
+    }
+    
+    // If not found, check overdue tests
+    const overdueTest = overdueTests.find(t => t.id === testId);
+    if (overdueTest) {
+        if (overdueTest.isViewOnly === true) {
+            alert('❌ You cannot start this test.\n\nYou have not been selected by your professor to take this test.\n\nPlease contact your professor if you believe this is an error.');
             return;
         }
-        
-        // If not found, check overdue tests
-        const overdueTest = overdueTests.find(t => t.id === testId);
-        if (overdueTest) {
-            if (overdueTest.isViewOnly === true) {
-                alert('❌ You cannot start this test.\n\nYou have not been selected by your professor to take this test.\n\nPlease contact your professor if you believe this is an error.');
-                return;
-            }
-            window.location.href = `./testdetails.html?testId=${testId}&testName=${encodeURIComponent(overdueTest.testName)}&isOverdue=true`;
-            return;
-        }
-        
-        console.error(`Test not found: ${testId}`);
-        alert('Test not found. Please refresh the page and try again.');
-    };
+        window.location.href = `./testdetails.html?testId=${testId}&testName=${encodeURIComponent(overdueTest.testName)}&isOverdue=true`;
+        return;
+    }
+    
+    console.error(`Test not found: ${testId}`);
+    alert('Test not found. Please refresh the page and try again.');
+};
 
 function calculateTestScore(testName, result, testTarget = null) {
     const normalized = testName.toLowerCase().trim();
