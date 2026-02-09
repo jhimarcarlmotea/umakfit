@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMakFit - Student Grades</title>
+    <title>UMakFit - Grades Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css?family=Manrope:600,800|Inter:300,500,400,700" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -181,7 +181,7 @@
             background-color: white;
             border-radius: 12px;
             width: 100%;
-            max-width: 600px;
+            max-width: 900px;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
@@ -215,17 +215,134 @@
             margin: 0 auto; 
         }
         
-        /* Edit button */
-        .btn-edit {
-            background-color: #111b66;
+        /* Test Count Badge */
+        .test-count-badge {
+            display: inline-block;
+            background: #ef4444;
             color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            transition: all 0.3s;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
         }
         
-        .btn-edit:hover {
-            background-color: #0d1450;
+        /* Student Info Header */
+        .student-info-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .student-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .student-basic-info {
+            flex: 1;
+        }
+        
+        .student-name {
+            font-family: "Inter", Helvetica;
+            font-weight: 700;
+            color: #1e3a8a;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .student-id {
+            font-family: "Inter", Helvetica;
+            font-weight: 500;
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        /* Score badges */
+        .score-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .score-excellent {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .score-good {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .score-poor {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* Summary Card */
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .summary-stat {
+            text-align: center;
+        }
+        
+        .summary-stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .summary-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        /* Filter Styles */
+        .filter-select {
+            padding: 10px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+
+        .filter-select:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
     </style>
 </head>
@@ -381,53 +498,9 @@
                             <i class="fas fa-graduation-cap text-white text-2xl"></i>
                         </div>
                         <div>
-                            <h1 class="text-blue-900 font-bold text-3xl">Student Grades Management</h1>
-                            <p class="text-gray-600 font-medium text-base mt-2">View, edit, and manage student grades and performance</p>
+                            <h1 class="text-blue-900 font-bold text-3xl">Grades Management</h1>
+                            <p class="text-gray-600 font-medium text-base mt-2">View final grades and student performance overview</p>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Filter Section -->
-                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 mb-8">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-                        <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
-                            <i class="fas fa-filter"></i>
-                            Filter Grades
-                        </h3>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                        <div class="md:col-span-2">
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fas fa-search text-gray-400"></i>
-                                </div>
-                                <input type="text" id="searchGrades" placeholder="Search by student name" onkeyup="filterGradesTable()"
-                                       class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <select id="filterSection" onchange="filterGradesTable()"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">All Sections</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <select id="filterActivity" onchange="filterGradesTable()"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">All Activities</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-end">
-                        <button onclick="clearFilters()" 
-                                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg flex items-center gap-2 transition-all duration-300">
-                            <i class="fas fa-redo"></i>
-                            <span>Clear Filters</span>
-                        </button>
                     </div>
                 </div>
 
@@ -438,6 +511,10 @@
                             <i class="fas fa-chart-pie"></i>
                             Grades Overview
                         </h3>
+                        <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="calculateFinalGrades()">
+                            <i class="fas fa-calculator"></i>
+                            <span>Calculate Final</span>
+                        </button>
                     </div>
                     
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -463,80 +540,86 @@
                     </div>
                 </div>
                 
-                <!-- Student Grades Table -->
-                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 mb-8">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-                        <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
-                            <i class="fas fa-list-alt"></i>
-                            Student Grades
-                        </h3>
-                        <div class="flex gap-2 mt-2 sm:mt-0">
-                            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="exportGrades()">
-                                <i class="fas fa-download"></i>
-                                <span>Export Grades</span>
-                            </button>
-                            <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="calculateFinalGrades()">
-                                <i class="fas fa-calculator"></i>
-                                <span>Calculate Final</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="custom-table" id="gradesTable">
-                            <thead>
-                                <tr>
-                                    <th onclick="sortGrades('studentName')">Student Name</th>
-                                    <th onclick="sortGrades('section')">Section</th>
-                                    <th onclick="sortGrades('activity')">Activity</th>
-                                    <th onclick="sortGrades('score')">Score</th>
-                                    <th onclick="sortGrades('date')">Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="gradesTableBody">
-                                <tr>
-                                    <td colspan="6">
-                                        <div class="empty-state">
-                                            <div class="empty-icon">📊</div>
-                                            <div class="empty-title">Loading Grades Data</div>
-                                            <div class="empty-text">Fetching student grades from the database...</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Final Grades Summary -->
+                <!-- Final Grades Summary - WITH FILTERS -->
                 <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6">
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
                         <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
                             <i class="fas fa-graduation-cap"></i>
                             Final Grades Summary
                         </h3>
-                        <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="saveFinalGradesToPDF()" id="savePdfBtn" style="display: none;">
-                            <i class="fas fa-file-pdf"></i>
-                            <span>Save as PDF</span>
-                        </button>
+                        <div class="flex gap-2 mt-2 sm:mt-0">
+                            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="exportGrades()">
+                                <i class="fas fa-download"></i>
+                                <span>Export Grades</span>
+                            </button>
+                            <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="saveFinalGradesToPDF()" id="savePdfBtn" style="display: none;">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Save as PDF</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ⭐ NEW: FILTER SECTION -->
+                    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-xl border-2 border-gray-200">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                <i class="fas fa-filter text-blue-600"></i>
+                                Filter by Section
+                            </label>
+                            <select id="filterSection" class="filter-select w-full" onchange="applyFilters()">
+                                <option value="">All Sections</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                <i class="fas fa-sort text-blue-600"></i>
+                                Sort by
+                            </label>
+                            <select id="sortBy" class="filter-select w-full" onchange="applyFilters()">
+                                <option value="highest">Highest to Lowest Score</option>
+                                <option value="lowest">Lowest to Highest Score</option>
+                                <option value="name-asc">Name (A-Z)</option>
+                                <option value="name-desc">Name (Z-A)</option>
+                            </select>
+                        </div>
                     </div>
                     
+                    <!-- ⭐ SUMMARY STATISTICS -->
+                    <div id="resultsSummary" class="summary-card" style="display: none; margin-bottom: 20px;">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="summary-stat">
+                                <div class="summary-stat-label">Total Results</div>
+                                <div class="summary-stat-value" id="totalResults">0</div>
+                            </div>
+                            <div class="summary-stat">
+                                <div class="summary-stat-label">Unique Students</div>
+                                <div class="summary-stat-value" id="uniqueStudents">0</div>
+                            </div>
+                            <div class="summary-stat">
+                                <div class="summary-stat-label">Average Score</div>
+                                <div class="summary-stat-value" id="averageScore">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ⭐ FINAL GRADES TABLE - NOW CLICKABLE -->
                     <div class="table-responsive">
                         <table class="custom-table" id="finalGradesTable">
                             <thead>
                                 <tr>
                                     <th>Student Name</th>
                                     <th>Section</th>
-                                    <th>Activities</th>
+                                    <th>Total Activities</th>
                                     <th>Average Score</th>
                                     <th>Final Grade</th>
                                     <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="finalGradesBody">
                                 <tr>
-                                    <td colspan="6">
+                                    <td colspan="7">
                                         <div class="empty-state">
                                             <div class="empty-icon">⏳</div>
                                             <div class="empty-title">Calculating Final Grades...</div>
@@ -570,6 +653,55 @@
                         support the university's educational objectives.
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⭐ NEW: Student Grades Details Modal (Similar to Test Results) -->
+    <div id="studentGradesModal" class="modal-overlay" style="display: none;" onclick="closeStudentGradesModal()">
+        <div class="modal-content" style="max-width: 900px;" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-clipboard-list"></i> <span id="modalStudentName">Student Grades Details</span>
+                </h3>
+                <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closeStudentGradesModal()">&times;</button>
+            </div>
+            
+            <div style="max-height: 70vh; overflow-y: auto;">
+                <div class="p-6">
+                    <!-- Student Info Header -->
+                    <div id="studentInfoHeader" class="student-info-header" style="display: none;">
+                        <div class="student-avatar" id="studentAvatar">??</div>
+                        <div class="student-basic-info">
+                            <div class="student-name" id="studentNameDetail">Student Name</div>
+                            <div class="student-id" id="studentSectionDetail">Section</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Student Grades Table -->
+                    <div class="table-responsive">
+                        <table class="custom-table">
+                            <thead style="position: sticky; top: 0; background: linear-gradient(90deg, rgba(30, 58, 138, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%); z-index: 10;">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Activity</th>
+                                    <th>Result</th>
+                                    <th>Score</th>
+                                    <th>Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentGradesTableBody">
+                                <!-- Grades will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end p-6 border-t border-gray-200 bg-gray-50">
+                <button class="px-6 py-2.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg font-semibold transition-all" onclick="closeStudentGradesModal()">
+                    Close
+                </button>
             </div>
         </div>
     </div>
@@ -646,11 +778,7 @@
         let allActivities = [];
         let allStudents = [];
         let currentFinalGrades = [];
-
-        let sortConfig = {
-            key: null,
-            direction: 'asc'
-        };
+        let filteredFinalGrades = [];
 
         // DOM Elements for navigation
         const mobileMenuButton = document.getElementById('mobileMenuButton');
@@ -994,7 +1122,6 @@
             await loadActivities();
             await loadStudents();
             await loadGrades();
-            updateFilters();
             if (allGrades.length > 0) {
                 setTimeout(() => {
                     calculateAndDisplayFinalGrades();
@@ -1041,7 +1168,9 @@
                             name: grade.testName,
                             date: grade.date,
                             score: grade.score,
-                            formattedDate: grade.formattedDate
+                            formattedDate: grade.formattedDate,
+                            result: grade.result || '',
+                            gradeStatus: grade.gradeStatus || ''
                         };
                         
                         studentGradesMap[studentKey].activityInstances.push(activityInstance);
@@ -1092,17 +1221,57 @@
                 
                 // Store the current final grades
                 currentFinalGrades = finalGrades;
+                filteredFinalGrades = [...finalGrades];
                 
                 // Display the final grades
-                displayFinalGrades(finalGrades);
+                displayFinalGrades(filteredFinalGrades);
                 
                 // Calculate and display statistics
-                updateFinalGradesStats(finalGrades);
+                updateFinalGradesStats(filteredFinalGrades);
                 
             } catch (error) {
                 console.error('Error auto-calculating final grades:', error);
             }
         }
+
+        // ⭐ NEW: Apply Filters Function
+        window.applyFilters = function() {
+            const sectionFilter = document.getElementById('filterSection').value;
+            const sortBy = document.getElementById('sortBy').value;
+            
+            console.log('Applying filters - Section:', sectionFilter, 'Sort:', sortBy);
+            
+            // Start with all final grades
+            let filtered = [...currentFinalGrades];
+            
+            // Apply section filter
+            if (sectionFilter) {
+                filtered = filtered.filter(grade => grade.section === sectionFilter);
+                console.log('After section filter:', filtered.length, 'students');
+            }
+            
+            // Apply sorting
+            if (sortBy === 'highest') {
+                filtered.sort((a, b) => b.averageScore - a.averageScore);
+            } else if (sortBy === 'lowest') {
+                filtered.sort((a, b) => a.averageScore - b.averageScore);
+            } else if (sortBy === 'name-asc') {
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortBy === 'name-desc') {
+                filtered.sort((a, b) => b.name.localeCompare(a.name));
+            }
+            
+            console.log('After sorting:', sortBy);
+            
+            // Update filtered grades
+            filteredFinalGrades = filtered;
+            
+            // Display filtered and sorted grades
+            displayFinalGrades(filteredFinalGrades);
+            
+            // Update statistics for filtered data
+            updateFinalGradesStats(filteredFinalGrades);
+        };
 
         async function loadActivities() {
             try {
@@ -1186,7 +1355,6 @@
                 console.log('Loading grades for', assignedSections.length, 'sections');
 
                 if (assignedSections.length === 0) {
-                    displayGrades([]);
                     return;
                 }
 
@@ -1287,7 +1455,7 @@
                                 studentName: data.studentName || 'Unknown Student',
                                 section: data.section || section.section,
                                 testName: data.testName || 'Unknown Activity',
-                                result: displayResult,  // ⭐ Clean numeric result
+                                result: displayResult,
                                 testUnit: data.testUnit || '',
                                 score: score,
                                 gradeStatus: gradeStatus,
@@ -1333,13 +1501,9 @@
                 });
 
                 console.log(`Total activities loaded: ${allGrades.length}`);
-                
-                displayGrades(allGrades);
-                filterGradesTable();
 
             } catch (error) {
                 console.error('Error in loadGrades:', error);
-                displayGrades([]);
             }
         }
 
@@ -1599,6 +1763,12 @@
             return 'grade-poor';
         }
 
+        function getScoreClass(score) {
+            if (score >= 90) return 'score-excellent';
+            if (score >= 70) return 'score-good';
+            return 'score-poor';
+        }
+
         function getBadgeClass(score) {
             if (score >= 90) return 'badge-excellent';
             if (score >= 80) return 'badge-good';
@@ -1606,87 +1776,85 @@
             return 'badge-poor';
         }
 
-        function displayGrades(grades) {
-    const tableBody = document.getElementById('gradesTableBody');
-    
-    if (grades.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="6" class="py-8">
-                    <div class="flex flex-col items-center justify-center">
-                        <div class="text-4xl mb-3 opacity-40">🔍</div>
-                        <div class="text-gray-700 font-semibold mb-1">No Grades Found</div>
-                        <div class="text-gray-500 text-sm text-center max-w-md">
-                            No grades found for the current filters.<br>
-                            Try adjusting your filters or check if data exists.
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    let html = '';
-    grades.forEach((grade, index) => {
-        // ⭐ Format result to show ONLY the numeric value + unit
-        let displayResult = '-';
-        if (grade.result) {
-            if (typeof grade.result === 'number') {
-                displayResult = `${grade.result} ${grade.testUnit || ''}`.trim();
-            } else if (typeof grade.result === 'string') {
-                // Extract number from string if needed
-                const match = grade.result.match(/(\d+\.?\d*)/);
-                if (match) {
-                    displayResult = `${match[1]} ${grade.testUnit || ''}`.trim();
-                } else {
-                    displayResult = grade.result;
-                }
-            } else if (typeof grade.result === 'object') {
-                const val = grade.result.value || grade.result.repetitions || grade.result.time || 0;
-                displayResult = `${val} ${grade.testUnit || ''}`.trim();
-            }
-            const tableBody = document.getElementById('gradesTableBody');
+        function getRating(score) {
+            if (score >= 90) return { text: 'Excellent', class: 'badge-excellent' };
+            if (score >= 80) return { text: 'Good', class: 'badge-good' };
+            if (score >= 70) return { text: 'Fair', class: 'badge-fair' };
+            return { text: 'Needs Improvement', class: 'badge-poor' };
+        }
+
+        function displayFinalGrades(finalGrades) {
+            const tableBody = document.getElementById('finalGradesBody');
             
-            if (grades.length === 0) {
+            if (finalGrades.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="6">
+                        <td colspan="7">
                             <div class="empty-state">
-                                <div class="empty-icon">🔍</div>
-                                <div class="empty-title">No Grades Found</div>
+                                <div class="empty-icon">📈</div>
+                                <div class="empty-title">No Student Grades Found</div>
                                 <div class="empty-text">
-                                    No grades found for the current filters.<br>
-                                    Try adjusting your filters or check if data exists.
+                                    No student grades match your current filters.<br>
+                                    Try adjusting your filter settings or add activities first.
                                 </div>
                             </div>
                         </td>
                     </tr>
                 `;
+                
+                document.getElementById('savePdfBtn').style.display = 'none';
+                
                 return;
             }
             
-            let html = '';
-            grades.forEach((grade, index) => {
-                let displayResult = grade.result || '-';
-                if (displayResult.length > 50) {
-                    displayResult = displayResult.substring(0, 50) + '...';
-                }
+            // ⭐ UPDATE SUMMARY CARD
+            const summaryCard = document.getElementById('resultsSummary');
+            if (finalGrades.length > 0) {
+                summaryCard.style.display = 'block';
                 
-                const badgeClass = getBadgeClass(grade.score);
+                let totalResults = 0;
+                let totalScore = 0;
+                
+                finalGrades.forEach(grade => {
+                    totalResults += grade.totalActivities;
+                    totalScore += grade.averageScore;
+                });
+                
+                document.getElementById('totalResults').textContent = totalResults;
+                document.getElementById('uniqueStudents').textContent = finalGrades.length;
+                document.getElementById('averageScore').textContent = Math.round(totalScore / finalGrades.length) + '%';
+            }
+            
+            let html = '';
+            finalGrades.forEach((grade, index) => {
+                const badgeClass = getBadgeClass(grade.averageScore);
+                const rating = getRating(grade.averageScore);
                 
                 html += `
-                    <tr>
-                        <td>${grade.studentName || 'Unknown Student'}</td>
-                        <td>${grade.section || 'N/A'}</td>
-                        <td>${grade.testName || 'Unknown Activity'}</td>
+                    <tr onclick="showStudentGrades('${grade.studentKey}')" style="cursor: pointer;">
                         <td>
-                            <span class="${grade.gradeStatus}">${grade.score.toFixed(1)}%</span>
+                            <strong>${grade.name || 'Unknown Student'}</strong>
+                            <span class="test-count-badge">${grade.totalActivities}</span>
+                            ${grade.email ? `<br><small class="text-gray-500">${grade.email}</small>` : ''}
                         </td>
-                        <td>${grade.date}</td>
+                        <td>${grade.section || 'N/A'}</td>
+                        <td><strong>${grade.totalActivities}</strong></td>
                         <td>
-                            <button class="btn-edit" onclick="editGrade('${grade.id}')" title="Edit Grade">
-                                <i class="fas fa-edit"></i>
+                            <span class="${grade.status}">${grade.averageScore.toFixed(1)}%</span>
+                        </td>
+                        <td>
+                            <span class="${grade.status}" style="font-size: 18px;">
+                                <strong>${grade.averageScore.toFixed(1)}%</strong>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${badgeClass}">
+                                ${grade.statusText}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn-edit" onclick="event.stopPropagation(); showStudentGrades('${grade.studentKey}')">
+                                <i class="fas fa-eye"></i> View Details
                             </button>
                         </td>
                     </tr>
@@ -1694,113 +1862,89 @@
             });
             
             tableBody.innerHTML = html;
+            
+            document.getElementById('savePdfBtn').style.display = 'inline-flex';
         }
-        
-        if (displayResult.length > 50) {
-            displayResult = displayResult.substring(0, 50) + '...';
-        }
-        
-        html += `
-            <tr>
-                <td>${grade.studentName || 'Unknown Student'}</td>
-                <td>${grade.section || 'N/A'}</td>
-                <td>${grade.testName || 'Unknown Activity'}</td>
-                <td>
-                    <span class="grade-value ${grade.gradeStatus}">${displayResult}</span>
-                </td>
-                <td>
-                    <span class="grade-value ${grade.gradeStatus}">
-                        ${grade.score.toFixed(1)}%
-                    </span>
-                </td>
-                <td>${grade.date}</td>
-            </tr>
-        `;
-    });
-    
-    tableBody.innerHTML = html;
-}
 
-        function updateFilters() {
-            const activitySelect = document.getElementById('filterActivity');
+        // ⭐ NEW: Show Student's Grades Details in Modal
+        window.showStudentGrades = function(studentKey) {
+            const studentData = currentFinalGrades.find(g => g.studentKey === studentKey);
+            if (!studentData) return;
             
-            activitySelect.innerHTML = '<option value="">All Activities</option>';
+            console.log('📋 Opening grades details for:', studentData.name);
             
-            const uniqueActivities = [];
-            allGrades.forEach(grade => {
-                if (grade.testName && !uniqueActivities.includes(grade.testName)) {
-                    uniqueActivities.push(grade.testName);
-                }
+            // Update modal header
+            document.getElementById('modalStudentName').textContent = `${studentData.name}'s Grades Details (${studentData.totalActivities} activities)`;
+            
+            // Update student info header
+            const nameParts = studentData.name.split(' ');
+            const initials = (nameParts[0]?.charAt(0) || '') + (nameParts[nameParts.length - 1]?.charAt(0) || '');
+            
+            document.getElementById('studentAvatar').textContent = initials.toUpperCase();
+            document.getElementById('studentNameDetail').textContent = studentData.name;
+            document.getElementById('studentSectionDetail').textContent = `${studentData.section} • ${studentData.email || ''}`;
+            document.getElementById('studentInfoHeader').style.display = 'flex';
+            
+            // Sort activities by date (newest first)
+            const sortedActivities = studentData.activityInstances.sort((a, b) => {
+                const dateA = new Date(a.date || a.formattedDate || '');
+                const dateB = new Date(b.date || b.formattedDate || '');
+                return dateB - dateA;
             });
             
-            uniqueActivities.sort((a, b) => a.localeCompare(b));
-            
-            uniqueActivities.forEach(activityName => {
-                const option = document.createElement('option');
-                option.value = activityName;
-                option.textContent = activityName;
-                activitySelect.appendChild(option);
+            // Populate table
+            let html = '';
+            sortedActivities.forEach((activity) => {
+                const dateFormatted = activity.date || activity.formattedDate || 'N/A';
+                const rating = getRating(activity.score);
+                const scoreClass = getScoreClass(activity.score);
+                
+                html += `
+                <tr>
+                    <td>${dateFormatted}</td>
+                    <td><strong>${activity.name}</strong></td>
+                    <td>${activity.result || '-'}</td>
+                    <td>
+                        <span class="score-badge ${scoreClass}">${activity.score.toFixed(1)}%</span>
+                    </td>
+                    <td>
+                        <span class="badge ${rating.class}">${rating.text}</span>
+                    </td>
+                </tr>
+                `;
             });
             
-            console.log('Filter activities updated:', uniqueActivities.length);
-        }
-
-        function sortGrades(key) {
-            if (sortConfig.key === key) {
-                sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortConfig.key = key;
-                sortConfig.direction = 'asc';
-            }
-
-            filterGradesTable();
-        }
-
-        function filterGradesTable() {
-            const searchInput = document.getElementById('searchGrades').value.toLowerCase().trim();
-            const sectionFilter = document.getElementById('filterSection').value;
-            const activityFilter = document.getElementById('filterActivity').value;
+            document.getElementById('studentGradesTableBody').innerHTML = html;
             
-            console.log('Applying filters:', { searchInput, sectionFilter, activityFilter });
-            
-            let filteredGrades = [...allGrades];
-            
-            if (searchInput) {
-                filteredGrades = filteredGrades.filter(grade => 
-                    grade.studentName.toLowerCase().includes(searchInput)
-                );
+            // Show modal
+            document.getElementById('studentGradesModal').style.display = 'flex';
+        };
+
+        // ⭐ NEW: Close Student Grades Modal
+        window.closeStudentGradesModal = function() {
+            document.getElementById('studentGradesModal').style.display = 'none';
+        };
+
+        function updateFinalGradesStats(finalGrades) {
+            if (finalGrades.length === 0) {
+                document.getElementById('totalStudents').textContent = '0';
+                document.getElementById('passedStudents').textContent = '0';
+                document.getElementById('failedStudents').textContent = '0';
+                document.getElementById('overallAverage').textContent = '0.0%';
+                return;
             }
             
-            if (sectionFilter) {
-                filteredGrades = filteredGrades.filter(grade => grade.section === sectionFilter);
-            }
+            const totalStudents = finalGrades.length;
+            const passedStudents = finalGrades.filter(g => g.averageScore >= 70).length;
+            const failedStudents = totalStudents - passedStudents;
             
-            if (activityFilter) {
-                filteredGrades = filteredGrades.filter(grade => grade.testName === activityFilter);
-            }
-
-            if (sortConfig.key) {
-                const multiplier = sortConfig.direction === 'asc' ? 1 : -1;
-                filteredGrades.sort((a, b) => {
-                    let aVal = a[sortConfig.key] || '';
-                    let bVal = b[sortConfig.key] || '';
-                    aVal = typeof aVal === 'string' ? aVal.toLowerCase() : aVal;
-                    bVal = typeof bVal === 'string' ? bVal.toLowerCase() : bVal;
-
-                    if (aVal < bVal) return -1 * multiplier;
-                    if (aVal > bVal) return 1 * multiplier;
-                    return 0;
-                });
-            }
+            const totalAverage = finalGrades.reduce((sum, grade) => sum + grade.averageScore, 0);
+            const overallAverage = (totalAverage / totalStudents).toFixed(1);
             
-            displayGrades(filteredGrades);
-        }
-
-        function clearFilters() {
-            document.getElementById('searchGrades').value = '';
-            document.getElementById('filterSection').value = '';
-            document.getElementById('filterActivity').value = '';
-            filterGradesTable();
+            document.getElementById('totalStudents').textContent = totalStudents;
+            document.getElementById('passedStudents').textContent = passedStudents;
+            document.getElementById('failedStudents').textContent = failedStudents;
+            document.getElementById('overallAverage').textContent = overallAverage + '%';
         }
 
         function editGrade(gradeId) {
@@ -1851,147 +1995,48 @@
             }
         }
 
-        function calculateFinalGrades() {
+        window.calculateFinalGrades = function() {
             try {
                 if (allGrades.length === 0) {
                     alert('No grades available to calculate final grades.');
                     return;
                 }
 
-                const calculateBtn = document.querySelector('.btn-primary-custom');
-                const originalText = calculateBtn.innerHTML;
-                calculateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
-                calculateBtn.disabled = true;
-
                 calculateAndDisplayFinalGrades();
-                
                 alert(`Successfully calculated final grades for ${currentFinalGrades.length} students!`);
-                
-                calculateBtn.innerHTML = originalText;
-                calculateBtn.disabled = false;
 
             } catch (error) {
                 console.error('Error calculating final grades:', error);
                 alert('Error calculating final grades: ' + error.message);
-                
-                const calculateBtn = document.querySelector('.btn-primary-custom');
-                calculateBtn.innerHTML = '<i class="fas fa-calculator"></i> Calculate Final';
-                calculateBtn.disabled = false;
             }
         }
 
-        function displayFinalGrades(finalGrades) {
-            const tableBody = document.getElementById('finalGradesBody');
-            
-            if (finalGrades.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="6">
-                            <div class="empty-state">
-                                <div class="empty-icon">📈</div>
-                                <div class="empty-title">No Student Grades Found</div>
-                                <div class="empty-text">
-                                    No student grades available in the database.<br>
-                                    Add activities and have students submit their results first.
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                
-                document.getElementById('savePdfBtn').style.display = 'none';
-                
+        window.exportGrades = function() {
+            if (filteredFinalGrades.length === 0) {
+                alert('No final grades to export');
                 return;
             }
             
-            let html = '';
-            finalGrades.forEach((grade, index) => {
-                const badgeClass = getBadgeClass(grade.averageScore);
-                
-                html += `
-                    <tr>
-                        <td>
-                            <strong>${grade.name || 'Unknown Student'}</strong>
-                            ${grade.email ? `<br><small class="text-gray-500">${grade.email}</small>` : ''}
-                        </td>
-                        <td>${grade.section || 'N/A'}</td>
-                        <td>
-                            ${grade.totalActivities}
-                            ${grade.activityNames.length > 0 ? 
-                                `<br><small class="text-gray-500">
-                                    <i class="fas fa-info-circle"></i> ${grade.activityNames.length} activities
-                                </small>` : ''
-                            }
-                        </td>
-                        <td>
-                            <span class="${grade.status}">
-                                ${grade.averageScore.toFixed(1)}%
-                            </span>
-                        </td>
-                        <td>
-                            <span class="${grade.status}" style="font-size: 18px;">
-                                <strong>${grade.averageScore.toFixed(1)}%</strong>
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge ${badgeClass}">
-                                ${grade.statusText}
-                            </span>
-                        </td>
-                    </tr>
-                `;
-            });
+            let csv = 'Student Name,Section,Total Activities,Average Score,Final Grade,Status\n';
             
-            tableBody.innerHTML = html;
-            
-            document.getElementById('savePdfBtn').style.display = 'inline-flex';
-        }
-
-        function updateFinalGradesStats(finalGrades) {
-            if (finalGrades.length === 0) return;
-            
-            const totalStudents = finalGrades.length;
-            const passedStudents = finalGrades.filter(g => g.averageScore >= 70).length;
-            const failedStudents = totalStudents - passedStudents;
-            
-            const totalAverage = finalGrades.reduce((sum, grade) => sum + grade.averageScore, 0);
-            const overallAverage = (totalAverage / totalStudents).toFixed(1);
-            
-            document.getElementById('totalStudents').textContent = totalStudents;
-            document.getElementById('passedStudents').textContent = passedStudents;
-            document.getElementById('failedStudents').textContent = failedStudents;
-            document.getElementById('overallAverage').textContent = overallAverage + '%';
-            
-            const passedPercentage = ((passedStudents / totalStudents) * 100).toFixed(1);
-            const failedPercentage = ((failedStudents / totalStudents) * 100).toFixed(1);
-        }
-
-        function exportGrades() {
-            if (allGrades.length === 0) {
-                alert('No grades to export');
-                return;
-            }
-            
-            let csv = 'Student Name,Section,Activity,Score,Date\n';
-            
-            allGrades.forEach(grade => {
-                csv += `"${grade.studentName || ''}","${grade.section || ''}","${grade.testName || ''}",${grade.score || 0},"${grade.date || ''}"\n`;
+            currentFinalGrades.forEach(grade => {
+                csv += `"${grade.name || ''}","${grade.section || ''}",${grade.totalActivities || 0},${grade.averageScore || 0},"${grade.finalGrade || ''}","${grade.statusText || ''}"\n`;
             });
             
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `grades_${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `final_grades_${new Date().toISOString().split('T')[0]}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
             
-            alert('Grades exported successfully!');
+            alert('Final grades exported successfully!');
         }
 
-        function saveFinalGradesToPDF() {
+        window.saveFinalGradesToPDF = function() {
             alert('PDF export feature would be implemented here.\nFor now, you can use the browser\'s Print function (Ctrl+P) and save as PDF.');
         }
 
@@ -2002,9 +2047,8 @@
         window.calculateFinalGrades = calculateFinalGrades;
         window.exportGrades = exportGrades;
         window.saveFinalGradesToPDF = saveFinalGradesToPDF;
-        window.sortGrades = sortGrades;
-        window.filterGradesTable = filterGradesTable;
-        window.clearFilters = clearFilters;
+        window.showStudentGrades = showStudentGrades;
+        window.closeStudentGradesModal = closeStudentGradesModal;
     </script>
 </body>
 </html>

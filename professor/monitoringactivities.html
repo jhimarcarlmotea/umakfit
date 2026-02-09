@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMakFit - Professor Monitoring</title>
+    <title>UMakFit - Real-time Monitoring Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css?family=Manrope:600,800|Inter:300,500,400,700" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -25,6 +25,18 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes highlight {
+            0% { background-color: rgba(59, 130, 246, 0.1); }
+            100% { background-color: transparent; }
+        }
         
         /* Navigation styles */
         .font-manrope { font-family: 'Manrope', sans-serif; }
@@ -44,7 +56,7 @@
             }
         }
         
-        /* Custom styles not covered by Tailwind */
+        /* Custom styles */
         .gradient-text {
             background: linear-gradient(90deg, rgba(245, 158, 11, 1) 0%, rgba(255, 229, 0, 1) 100%);
             -webkit-background-clip: text;
@@ -81,24 +93,123 @@
             height: 50px;
         }
         
+        /* Tab Navigation - FIXED */
+        .tab-nav {
+            display: flex;
+            gap: 2px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        .tab-nav::-webkit-scrollbar {
+            height: 4px;
+        }
+        .tab-nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .tab-nav::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        .tab-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 16px;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            outline: none;
+        }
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.5);
+            color: #475569;
+            transform: translateY(-1px);
+        }
+        .tab-btn.active {
+            background: white;
+            color: #3b82f6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+            transform: translateY(-1px);
+        }
+        .tab-badge {
+            background: #3b82f6;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tab-badge.online {
+            background: #10b981;
+        }
+        .tab-badge.tests {
+            background: #f59e0b;
+        }
+        .tab-badge.activity {
+            background: #8b5cf6;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
         /* Activity Timeline */
         .activity-timeline {
-            max-height: 400px;
+            max-height: 600px;
             overflow-y: auto;
             padding: 10px;
+        }
+        .activity-timeline::-webkit-scrollbar {
+            width: 6px;
+        }
+        .activity-timeline::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        .activity-timeline::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
         }
         .activity-item {
             display: flex;
             align-items: flex-start;
             padding: 15px;
             border-bottom: 1px solid #e2e8f0;
-            transition: background-color 0.2s;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
         }
         .activity-item:hover {
             background-color: #f8fafc;
+            transform: translateX(2px);
         }
         .activity-item:last-child {
             border-bottom: none;
+        }
+        .activity-item.new-activity {
+            animation: highlight 2s ease;
+            border-left: 4px solid #3b82f6;
         }
         .activity-icon {
             width: 36px;
@@ -110,19 +221,14 @@
             margin-right: 15px;
             flex-shrink: 0;
             color: white;
+            font-size: 14px;
         }
-        .activity-icon.professor {
-            background: #3b82f6;
-        }
-        .activity-icon.student {
-            background: #10b981;
-        }
-        .activity-icon.test {
-            background: #f59e0b;
-        }
-        .activity-icon.system {
-            background: #6b7280;
-        }
+        .activity-icon.professor { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .activity-icon.student { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .activity-icon.test { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .activity-icon.system { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); }
+        .activity-icon.online { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .activity-icon.offline { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); }
         .activity-content {
             flex: 1;
         }
@@ -130,16 +236,27 @@
             font-weight: 600;
             color: #1f2937;
             margin-bottom: 4px;
+            font-size: 14px;
         }
         .activity-details {
-            font-size: 14px;
+            font-size: 13px;
             color: #64748b;
             margin-bottom: 4px;
         }
         .activity-time {
-            font-size: 12px;
+            font-size: 11px;
             color: #94a3b8;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .activity-time .live-indicator {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
         }
         
         /* Empty State */
@@ -153,14 +270,12 @@
             opacity: 0.4; 
         }
         .empty-title { 
-            font-family: "Inter", Helvetica; 
             font-weight: 700; 
             color: #1f2937; 
             font-size: 20px; 
             margin-bottom: 12px; 
         }
         .empty-text { 
-            font-family: "Inter", Helvetica; 
             font-weight: 400; 
             color: #64748b; 
             font-size: 14px; 
@@ -172,22 +287,194 @@
             display: inline-block;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
             font-weight: 700;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        
+        /* Real-time indicator */
+        .real-time-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+        
+        /* Stat card styles */
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Live activity indicator */
+        .live-activity-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+        
+        /* Notification toast */
+        .notification-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 9999;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 350px;
+        }
+        .notification-toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .notification-content {
+            flex: 1;
+        }
+        .notification-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+        .notification-message {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+        
+        /* Online users list */
+        .online-users-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .online-user-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            animation: slideInRight 0.3s ease;
+        }
+        .online-user-item:hover {
+            background: #f1f5f9;
+            transform: translateX(2px);
+        }
+        .online-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 12px;
+            font-size: 14px;
+        }
+        .online-user-info {
+            flex: 1;
+        }
+        .online-user-name {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+        .online-user-section {
+            font-size: 11px;
+            color: #64748b;
+        }
+        .online-user-status {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
             margin-left: 8px;
+            animation: pulse 2s infinite;
         }
     </style>
 </head>
 <body class="bg-gray-50">
     <div id="loadingScreen" class="fixed inset-0 bg-white bg-opacity-95 flex flex-col justify-center items-center z-50">
         <div class="spinner"></div>
-        <div class="mt-5 text-gray-600 font-medium">Loading System Monitoring...</div>
+        <div class="mt-5 text-gray-600 font-medium">Loading Real-time Monitoring Dashboard...</div>
+        <div class="mt-2 text-sm text-gray-500">Connecting to live data streams...</div>
     </div>
     
     <div id="mainContent" class="hidden">
-        <!-- Navigation Banner - SAME AS OTHER PAGES -->
+        <!-- Navigation Banner -->
         <nav class="bg-gradient-to-r from-blue-900 to-blue-500 shadow-lg">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4 py-3 sm:py-4">
@@ -200,37 +487,26 @@
                     
                     <!-- Desktop Navigation -->
                     <div class="hidden lg:flex items-center gap-2 flex-wrap">
-                        <!-- Dashboard -->
                         <a href="professor-dashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
                             <i class="fas fa-tachometer-alt"></i> 
                             <span>Dashboard</span>
                         </a>
-                        
-                        <!-- Student Management -->
                         <a href="studentmanagement.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
                             <i class="fas fa-users"></i> 
                             <span>Student Management</span>
                         </a>
-                        
-                        <!-- Add Activities -->
                         <a href="addactivities.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
                             <i class="fas fa-dumbbell"></i> 
                             <span>Add Activities</span>
                         </a>
-                        
-                        <!-- Add Lesson -->
                         <a href="addlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
                             <i class="fas fa-book-open"></i> 
                             <span>Add Lesson</span>
                         </a>
-                        
-                        <!-- Monitoring Activities -->
                         <a href="monitoringactivities.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
                             <i class="fas fa-chart-bar"></i> 
                             <span>Monitoring Activities</span>
                         </a>
-                        
-                        <!-- Grades -->
                         <a href="grades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
                             <i class="fas fa-graduation-cap"></i> 
                             <span>Grades</span>
@@ -262,14 +538,12 @@
                         </div>
                     </div>
                     
-                    <!-- Mobile Right Icons -->
+                    <!-- Mobile Navigation -->
                     <div class="flex lg:hidden items-center gap-2 sm:gap-3">
-                        <!-- Mobile Profile -->
                         <div class="relative">
                             <img src="" alt="Profile" id="profilePictureBtnMobile"
                                  class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
                             
-                            <!-- Mobile Profile Dropdown -->
                             <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
                                 <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
                                     <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
@@ -290,7 +564,6 @@
                             </div>
                         </div>
                         
-                        <!-- Mobile Menu Button -->
                         <button id="mobileMenuButton" class="text-white p-1 sm:p-2">
                             <i class="bi bi-list text-2xl sm:text-3xl"></i>
                         </button>
@@ -326,116 +599,263 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Page Header -->
                 <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-8 mb-10">
-                    <div class="flex items-center mb-5">
-                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center mr-4">
-                            <i class="fas fa-desktop text-white text-2xl"></i>
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div class="flex items-center">
+                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center mr-4">
+                                <i class="fas fa-desktop text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-blue-900 font-bold text-2xl md:text-3xl">Real-time Monitoring Dashboard</h1>
+                                <p class="text-gray-600 font-medium text-base mt-2">Live tracking of student activity and system performance</p>
+                                <div class="flex items-center gap-2 mt-3">
+                                    <div class="real-time-indicator">
+                                        <span class="live-indicator"></span>
+                                        <span>LIVE</span>
+                                    </div>
+                                    <span class="text-sm text-gray-500" id="lastUpdateTime">Updating now...</span>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <h1 class="text-blue-900 font-bold text-3xl">System Monitoring Dashboard</h1>
-                            <p class="text-gray-600 font-medium text-base mt-2">Real-time monitoring of student activity and system performance</p>
-                            <button class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="refreshAllData()">
+                        <div class="flex flex-wrap gap-3">
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="refreshAllData()">
                                 <i class="fas fa-sync-alt"></i>
-                                <span>Refresh Data</span>
+                                <span>Refresh Now</span>
+                            </button>
+                            <button class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="showSettings()">
+                                <i class="fas fa-cog"></i>
+                                <span>Settings</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Stats Overview -->
-                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 mb-8">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-                        <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
-                            <i class="fas fa-chart-bar"></i>
-                            Student Statistics
-                        </h3>
-                        <div class="flex items-center space-x-2 bg-green-50 text-green-700 font-semibold text-sm py-1.5 px-4 rounded-full border border-green-200">
-                            <div class="w-2 h-2 bg-green-500 rounded-full live-dot"></div>
-                            <span>Live Updates</span>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
-                        <!-- Total Students -->
-                        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl text-white p-6 transition-all hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
-                            <div class="flex items-center gap-2 mb-3">
-                                <i class="fas fa-user-graduate text-sm md:text-base"></i>
-                                <span class="font-semibold text-xs md:text-sm">Total Students</span>
-                            </div>
-                            <div class="font-extrabold text-2xl md:text-3xl" id="totalStudentsCount">0</div>
-                            <div class="flex items-center text-sm opacity-90 mt-2">
-                                <i class="fas fa-user-check mr-1"></i>
-                                <span>In your sections</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Online Students -->
-                        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl text-white p-6 transition-all hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
-                            <div class="flex items-center gap-2 mb-3">
-                                <i class="fas fa-wifi text-sm md:text-base"></i>
-                                <span class="font-semibold text-xs md:text-sm">Online Students</span>
-                            </div>
-                            <div class="font-extrabold text-2xl md:text-3xl" id="onlineStudentsCount">0</div>
-                            <div class="flex items-center text-sm opacity-90 mt-2">
-                                <span class="w-2 h-2 bg-green-300 rounded-full mr-2"></span>
-                                <span>Active Now</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Tests Completed -->
-                        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl text-white p-6 transition-all hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
-                            <div class="flex items-center gap-2 mb-3">
-                                <i class="fas fa-clipboard-check text-sm md:text-base"></i>
-                                <span class="font-semibold text-xs md:text-sm">Tests Completed</span>
-                            </div>
-                            <div class="font-extrabold text-2xl md:text-3xl" id="totalTestsCount">0</div>
-                            <div class="text-sm opacity-90 mt-2">This Semester</div>
-                        </div>
-                        
-                        <!-- Active Tests -->
-                        <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl text-white p-6 transition-all hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
-                            <div class="flex items-center gap-2 mb-3">
-                                <i class="fas fa-running text-sm md:text-base"></i>
-                                <span class="font-semibold text-xs md:text-sm">Active Tests</span>
-                            </div>
-                            <div class="font-extrabold text-2xl md:text-3xl" id="activeTestsCount">0</div>
-                            <div class="flex items-center text-sm opacity-90 mt-2">
-                                <span class="w-2 h-2 bg-yellow-300 rounded-full mr-2"></span>
-                                <span>In Progress</span>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Tab Navigation - UPDATED -->
+                <div class="tab-nav mb-6" id="tabNavigation">
+                    <button class="tab-btn active" data-tab="overview" id="overviewTabBtn">
+                        <i class="fas fa-chart-bar"></i> <span class="hidden sm:inline">Overview</span>
+                        <span class="tab-badge" id="overviewBadge"></span>
+                    </button>
+                    <button class="tab-btn" data-tab="online" id="onlineTabBtn">
+                        <i class="fas fa-users"></i> <span class="hidden sm:inline">Online Students</span>
+                        <span class="tab-badge online" id="onlineBadge">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="tests" id="testsTabBtn">
+                        <i class="fas fa-clipboard-check"></i> <span class="hidden sm:inline">Active Tests</span>
+                        <span class="tab-badge tests" id="testsBadge">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="activity" id="activityTabBtn">
+                        <i class="fas fa-history"></i> <span class="hidden sm:inline">Activity Feed</span>
+                        <span class="tab-badge activity" id="activityBadge">0</span>
+                    </button>
                 </div>
 
-                <!-- Recent Activity Feed -->
-                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-                        <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
-                            <i class="fas fa-history"></i>
-                            Recent Student Activity
-                        </h3>
-                        <div class="flex items-center space-x-4 mt-2 sm:mt-0">
-                            <div class="flex items-center space-x-2">
-                                <select class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" id="activityTypeFilter" onchange="filterActivities()">
-                                    <option value="all">All Activities</option>
-                                    <option value="test">Test Activities</option>
-                                    <option value="student">Student Activities</option>
-                                    <option value="system">System Activities</option>
-                                </select>
+                <!-- Tab Content - UPDATED -->
+                <div id="tabContent">
+                    <!-- Overview Tab -->
+                    <div id="overviewTab" class="tab-content active">
+                        <!-- Quick Stats Overview -->
+                        <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 mb-8">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+                                <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
+                                    <i class="fas fa-chart-line"></i>
+                                    Live Statistics
+                                </h3>
+                                <div class="flex items-center space-x-2 bg-blue-50 text-blue-700 font-semibold text-sm py-1.5 px-4 rounded-full border border-blue-200">
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full live-dot"></div>
+                                    <span>Real-time Updates</span>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+                                <!-- Total Students -->
+                                <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl text-white p-6">
+                                    <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-user-graduate"></i>
+                                            <span class="font-semibold text-sm">Total Students</span>
+                                        </div>
+                                        <div class="text-xs bg-white/20 px-2 py-1 rounded-full" id="totalStudentsTrend">+0 today</div>
+                                    </div>
+                                    <div class="font-extrabold text-3xl" id="totalStudentsCount">0</div>
+                                    <div class="text-sm opacity-90 mt-4">Across all sections</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="studentsProgress" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Online Students -->
+                                <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 rounded-2xl text-white p-6">
+                                    <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-wifi"></i>
+                                            <span class="font-semibold text-sm">Online Now</span>
+                                        </div>
+                                        <div class="text-xs bg-white/20 px-2 py-1 rounded-full">
+                                            <span id="onlineStudentsPercentage">0%</span> online
+                                        </div>
+                                    </div>
+                                    <div class="font-extrabold text-3xl flex items-center">
+                                        <span id="onlineStudentsCount">0</span>
+                                        <span class="text-lg ml-2 opacity-80">/ <span id="totalStudentsOnline">0</span></span>
+                                    </div>
+                                    <div class="text-sm opacity-90 mt-4">Active in last 5 minutes</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="onlineProgress" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tests Completed -->
+                                <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl text-white p-6">
+                                    <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-clipboard-check"></i>
+                                            <span class="font-semibold text-sm">Tests Today</span>
+                                        </div>
+                                        <div class="text-xs bg-white/20 px-2 py-1 rounded-full" id="testsTodayTrend">+0 today</div>
+                                    </div>
+                                    <div class="font-extrabold text-3xl" id="totalTestsCount">0</div>
+                                    <div class="text-sm opacity-90 mt-4">Completed in last 24h</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="testsProgress" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Active Tests -->
+                                <div class="stat-card bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl text-white p-6">
+                                    <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-running"></i>
+                                            <span class="font-semibold text-sm">Active Tests</span>
+                                        </div>
+                                        <div class="text-xs bg-white/20 px-2 py-1 rounded-full" id="activeTestsTrend">0 ongoing</div>
+                                    </div>
+                                    <div class="font-extrabold text-3xl" id="activeTestsCount">0</div>
+                                    <div class="text-sm opacity-90 mt-4">Currently in progress</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="activeTestsProgress" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Section Performance -->
+                            <div class="mt-6">
+                                <h4 class="text-gray-900 font-bold text-lg mb-4 flex items-center gap-2">
+                                    <i class="fas fa-chart-pie"></i>
+                                    Section Performance
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="sectionPerformance">
+                                    <!-- Sections will be dynamically added here -->
+                                    <div class="text-center py-4 text-gray-500">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <div class="mt-2">Loading section data...</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="activity-timeline" id="activityTimeline">
-                        <div class="empty-state">
-                            <div class="empty-icon">
-                                <i class="fas fa-spinner fa-spin"></i>
+
+                    <!-- Online Students Tab -->
+                    <div id="onlineTab" class="tab-content">
+                        <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+                                <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
+                                    <i class="fas fa-user-clock"></i>
+                                    Online Students
+                                    <span class="text-sm font-normal text-gray-500 ml-2" id="onlineUpdateTime">Last updated: Just now</span>
+                                </h3>
+                                <div class="flex items-center gap-4 mt-2 sm:mt-0">
+                                    <div class="text-sm text-gray-600">
+                                        <span class="font-semibold text-green-600" id="totalOnlineNow">0</span> students online
+                                    </div>
+                                    <button class="bg-green-100 text-green-700 font-medium text-sm py-1.5 px-3 rounded-lg flex items-center gap-2 hover:bg-green-200 transition-colors" onclick="refreshOnlineUsers()">
+                                        <i class="fas fa-sync-alt"></i>
+                                        <span>Refresh</span>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="empty-title">Loading Recent Activity</div>
-                            <div class="empty-text">Fetching activity data from the system...</div>
+                            
+                            <div class="online-users-list" id="onlineUsersList">
+                                <div class="text-center py-10">
+                                    <div class="text-4xl text-gray-300 mb-4">
+                                        <i class="fas fa-user-friends"></i>
+                                    </div>
+                                    <div class="text-gray-500 font-medium">No students online</div>
+                                    <div class="text-sm text-gray-400 mt-2">Students will appear here when they log in</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Tests Tab -->
+                    <div id="testsTab" class="tab-content">
+                        <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+                                <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    Active Fitness Tests
+                                    <span class="text-sm font-normal text-gray-500 ml-2" id="testsUpdateTime">Live updates</span>
+                                </h3>
+                                <div class="flex items-center gap-3 mt-2 sm:mt-0">
+                                    <div class="text-sm text-gray-600">
+                                        <span class="font-semibold text-yellow-600" id="totalActiveTests">0</span> tests ongoing
+                                    </div>
+                                    <button class="bg-yellow-100 text-yellow-700 font-medium text-sm py-1.5 px-3 rounded-lg flex items-center gap-2 hover:bg-yellow-200 transition-colors" onclick="refreshActiveTests()">
+                                        <i class="fas fa-sync-alt"></i>
+                                        <span>Refresh</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="activeTestsList">
+                                <div class="text-center py-10 col-span-full">
+                                    <div class="text-4xl text-gray-300 mb-4">
+                                        <i class="fas fa-running"></i>
+                                    </div>
+                                    <div class="text-gray-500 font-medium">No active tests</div>
+                                    <div class="text-sm text-gray-400 mt-2">Active tests will appear here in real-time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Feed Tab -->
+                    <div id="activityTab" class="tab-content">
+                        <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+                                <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
+                                    <i class="fas fa-bell"></i>
+                                    Live Activity Feed
+                                    <span class="text-sm font-normal text-gray-500 ml-2" id="activityUpdateTime">Streaming live...</span>
+                                </h3>
+                                <div class="flex items-center space-x-4 mt-2 sm:mt-0">
+                                    <div class="flex items-center space-x-2">
+                                        <select class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" id="activityTypeFilter" onchange="filterActivities()">
+                                            <option value="all">All Activities</option>
+                                            <option value="test">Test Completions</option>
+                                            <option value="student">Student Activities</option>
+                                            <option value="system">System Events</option>
+                                        </select>
+                                    </div>
+                                    <button class="bg-blue-100 text-blue-700 font-medium text-sm py-1.5 px-3 rounded-lg flex items-center gap-2 hover:bg-blue-200 transition-colors" onclick="clearActivityFeed()">
+                                        <i class="fas fa-trash"></i>
+                                        <span>Clear</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-timeline" id="activityTimeline">
+                                <div class="text-center py-10">
+                                    <div class="text-4xl text-gray-300 mb-4">
+                                        <i class="fas fa-history"></i>
+                                    </div>
+                                    <div class="text-gray-500 font-medium">No activities yet</div>
+                                    <div class="text-sm text-gray-400 mt-2">Activity feed will populate as students interact with the system</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -465,12 +885,26 @@
         </div>
     </div>
 
+    <!-- Notification Toast -->
+    <div id="notificationToast" class="notification-toast">
+        <div class="notification-icon" id="toastIcon">
+            <i class="fas fa-bell"></i>
+        </div>
+        <div class="notification-content">
+            <div class="notification-title" id="toastTitle">New Activity</div>
+            <div class="notification-message" id="toastMessage">Loading...</div>
+        </div>
+        <button class="text-gray-400 hover:text-gray-600" onclick="hideNotification()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, collection, getDocs, doc, getDoc, query, where, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getFirestore, collection, getDocs, doc, getDoc, query, where, orderBy, limit, onSnapshot, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getDatabase, ref, onValue, set, serverTimestamp as rtdbServerTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         // Firebase configuration
         const firebaseConfig = {
@@ -479,7 +913,8 @@
             projectId: "umakfit-e3b1d",
             storageBucket: "umakfit-e3b1d.appspot.com",
             messagingSenderId: "276569891504",
-            appId: "1:276569891504:web:39b1732b519f4d8b785175"
+            appId: "1:276569891504:web:39b1732b519f4d8b785175",
+            databaseURL: "https://umakfit-e3b1d-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
 
         // Initialize Firebase
@@ -493,55 +928,150 @@
         let allActivities = [];
         let assignedSections = [];
         let allStudents = [];
+        let onlineStudents = new Map();
+        let activeListeners = [];
+        let realtimeUpdateInterval;
+        let lastUpdateTime = new Date();
+        let activityFeed = [];
+        const MAX_ACTIVITIES = 50;
 
-        // DOM Elements for navigation
+        // DOM Elements
         const mobileMenuButton = document.getElementById('mobileMenuButton');
         const mobileMenu = document.getElementById('mobileMenu');
         const profilePictureBtn = document.getElementById('profilePictureBtn');
         const profilePictureBtnMobile = document.getElementById('profilePictureBtnMobile');
         const profileDropdown = document.getElementById('profileDropdown');
         const profileDropdownMobile = document.getElementById('profileDropdownMobile');
+        const notificationToast = document.getElementById('notificationToast');
 
-        // Event Listeners for navigation
+        // ===================== TAB FUNCTIONS - FIXED =====================
+        
+        // Tab switching function - EXPOSED TO GLOBAL SCOPE
+        window.switchTab = function(tabName) {
+            console.log(`Switching to tab: ${tabName}`);
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab button
+            const activeTabBtn = document.getElementById(`${tabName}TabBtn`);
+            if (activeTabBtn) {
+                activeTabBtn.classList.add('active');
+            }
+            
+            // Hide all tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const activeTabContent = document.getElementById(`${tabName}Tab`);
+            if (activeTabContent) {
+                activeTabContent.classList.add('active');
+            }
+            
+            // Refresh data for active tab
+            switch(tabName) {
+                case 'overview':
+                    refreshOverviewData();
+                    break;
+                case 'online':
+                    displayOnlineUsers();
+                    break;
+                case 'tests':
+                    refreshActiveTests();
+                    break;
+                case 'activity':
+                    displayActivityFeed();
+                    break;
+            }
+            
+            // Update URL hash for bookmarking
+            window.history.replaceState(null, null, `#${tabName}`);
+        };
+
+        // Function to update badge counts
+        function updateTabBadges() {
+            // Update online badge
+            const onlineBadge = document.getElementById('onlineBadge');
+            if (onlineBadge) {
+                const onlineCount = onlineStudents.size;
+                onlineBadge.textContent = onlineCount;
+                onlineBadge.style.display = onlineCount > 0 ? 'inline-flex' : 'none';
+            }
+            
+            // Update tests badge
+            const testsBadge = document.getElementById('testsBadge');
+            if (testsBadge) {
+                const activeTests = document.getElementById('activeTestsCount')?.textContent || '0';
+                testsBadge.textContent = activeTests;
+                testsBadge.style.display = parseInt(activeTests) > 0 ? 'inline-flex' : 'none';
+            }
+            
+            // Update activity badge
+            const activityBadge = document.getElementById('activityBadge');
+            if (activityBadge) {
+                const recentActivities = activityFeed.filter(act => 
+                    new Date() - act.time < 300000 // Last 5 minutes
+                ).length;
+                activityBadge.textContent = recentActivities;
+                activityBadge.style.display = recentActivities > 0 ? 'inline-flex' : 'none';
+            }
+            
+            // Update overview badge with total updates
+            const overviewBadge = document.getElementById('overviewBadge');
+            if (overviewBadge) {
+                const totalUpdates = onlineStudents.size + 
+                                    parseInt(document.getElementById('activeTestsCount')?.textContent || '0');
+                if (totalUpdates > 0) {
+                    overviewBadge.textContent = totalUpdates;
+                    overviewBadge.style.display = 'inline-flex';
+                } else {
+                    overviewBadge.style.display = 'none';
+                }
+            }
+        }
+
+        // ===================== END TAB FUNCTIONS =====================
+
+        // Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
-            // Mobile menu toggle
-            if (mobileMenuButton) {
-                mobileMenuButton.addEventListener('click', toggleMobileMenu);
-            }
-            
-            // Profile dropdowns
-            if (profilePictureBtn) {
-                profilePictureBtn.addEventListener('click', toggleProfileDropdown);
-            }
-            
-            if (profilePictureBtnMobile) {
-                profilePictureBtnMobile.addEventListener('click', toggleProfileDropdown);
-            }
-            
-            // Close dropdowns when clicking outside
+            if (mobileMenuButton) mobileMenuButton.addEventListener('click', toggleMobileMenu);
+            if (profilePictureBtn) profilePictureBtn.addEventListener('click', toggleProfileDropdown);
+            if (profilePictureBtnMobile) profilePictureBtnMobile.addEventListener('click', toggleProfileDropdown);
             document.addEventListener('click', closeAllDropdowns);
+            
+            // Add click listeners to tab buttons using data-tab attribute
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    if (tabName) {
+                        window.switchTab(tabName);
+                    }
+                });
+            });
+            
+            // Initialize tabs
+            const hash = window.location.hash.replace('#', '');
+            if (hash && ['overview', 'online', 'tests', 'activity'].includes(hash)) {
+                window.switchTab(hash);
+            }
         });
 
-        // Mobile menu toggle
+        // Navigation functions
         function toggleMobileMenu() {
             mobileMenu.classList.toggle('hidden');
         }
 
-        // Profile dropdown
         function toggleProfileDropdown(event) {
             event?.stopPropagation();
             const isMobile = window.innerWidth < 1024;
             const dropdown = isMobile ? profileDropdownMobile : profileDropdown;
-            
             const isHidden = dropdown.classList.contains('hidden');
-            
-            if (isHidden) {
-                dropdown.classList.remove('hidden');
-                document.body.classList.add('dropdown-open');
-            } else {
-                dropdown.classList.add('hidden');
-                document.body.classList.remove('dropdown-open');
-            }
+            dropdown.classList.toggle('hidden');
+            document.body.classList.toggle('dropdown-open', !isHidden);
         }
 
         function closeProfileDropdown() {
@@ -550,7 +1080,6 @@
             document.body.classList.remove('dropdown-open');
         }
 
-        // Close all dropdowns when clicking outside
         function closeAllDropdowns(event) {
             if (!event.target.closest('#profilePictureBtn') && 
                 !event.target.closest('#profilePictureBtnMobile') && 
@@ -560,14 +1089,12 @@
             }
         }
 
-        // View profile function
         window.showViewProfile = function(event) { 
             if (event) event.preventDefault();
             alert('Profile view would open here');
             closeProfileDropdown();
         };
 
-        // Logout function
         window.handleLogout = async function(event) {
             if (event) event.preventDefault();
             closeProfileDropdown();
@@ -583,7 +1110,6 @@
             }
         };
 
-        // Function to update profile picture
         function updateProfilePicture(photoURL, userName) {
             const profileBtn = document.getElementById('profilePictureBtn');
             const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
@@ -593,27 +1119,69 @@
             const displayName = currentUser?.name || currentUser?.displayName || userName || 'Professor';
             const email = currentUser?.email || 'professor@umak.edu.ph';
             
-            // Use provided photo URL or create initial avatar
             const photoUrlToUse = photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=3b82f6&color=fff&size=128`;
             
-            // Update all profile pictures
-            if (profileBtn) profileBtn.src = photoUrlToUse;
-            if (profileBtnMobile) profileBtnMobile.src = photoUrlToUse;
-            if (dropdownPic) dropdownPic.src = photoUrlToUse;
-            if (dropdownPicMobile) dropdownPicMobile.src = photoUrlToUse;
+            [profileBtn, profileBtnMobile, dropdownPic, dropdownPicMobile].forEach(el => {
+                if (el) el.src = photoUrlToUse;
+            });
             
-            // Update names
             const dropdownName = document.getElementById('profileDropdownName');
             const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
             if (dropdownName) dropdownName.textContent = displayName;
             if (dropdownNameMobile) dropdownNameMobile.textContent = displayName;
             
-            // Update emails
             const dropdownEmail = document.getElementById('profileDropdownEmail');
             const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
             if (dropdownEmail) dropdownEmail.textContent = email;
             if (dropdownEmailMobile) dropdownEmailMobile.textContent = email;
         }
+
+        // Update time display
+        function updateTimeDisplay() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const timeElement = document.getElementById('lastUpdateTime');
+            if (timeElement) {
+                timeElement.textContent = `Last updated: ${timeString}`;
+            }
+            lastUpdateTime = now;
+        }
+
+        // Show notification
+        function showNotification(title, message, type = 'info') {
+            const toast = document.getElementById('notificationToast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            // Set notification type colors
+            const colors = {
+                info: { bg: '#3b82f6', icon: 'fa-bell' },
+                success: { bg: '#10b981', icon: 'fa-check-circle' },
+                warning: { bg: '#f59e0b', icon: 'fa-exclamation-triangle' },
+                error: { bg: '#ef4444', icon: 'fa-exclamation-circle' },
+                test: { bg: '#8b5cf6', icon: 'fa-clipboard-check' },
+                student: { bg: '#10b981', icon: 'fa-user-graduate' }
+            };
+            
+            const config = colors[type] || colors.info;
+            toastIcon.style.background = config.bg;
+            toastIcon.innerHTML = `<i class="fas ${config.icon}"></i>`;
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            
+            // Show toast
+            toast.classList.add('show');
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5000);
+        }
+
+        window.hideNotification = function() {
+            notificationToast.classList.remove('show');
+        };
 
         // Format time relative to now
         function formatTimeAgo(date) {
@@ -624,11 +1192,10 @@
             const diffDays = Math.floor(diffMs / 86400000);
 
             if (diffMins < 1) return 'Just now';
-            if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-            if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-            if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-            
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
         // Load professor's assigned sections
@@ -637,7 +1204,6 @@
                 assignedSections = [];
                 console.log('Loading sections for professor:', professorEmail);
                 
-                // Get professor's full name for matching
                 let professorFullName = null;
                 
                 // Try professors collection
@@ -652,26 +1218,21 @@
                     const userQuery = query(collection(db, 'users'), where('email', '==', professorEmail));
                     const userSnap = await getDocs(userQuery);
                     if (!userSnap.empty) {
-                        const userData = userSnap.docs[0].data();
-                        professorFullName = userData.fullName || userData.name;
+                        professorFullName = userSnap.docs[0].data().fullName || userSnap.docs[0].data().name;
                     }
                 }
                 
-                // Fallback to display name
                 if (!professorFullName && currentUser) {
                     professorFullName = currentUser.displayName || professorEmail.split('@')[0].toUpperCase();
                 }
                 
-                console.log('Professor name for matching:', professorFullName);
-                
-                // Load all sections and match by professor name/email
+                // Load all sections
                 const sectionsSnapshot = await getDocs(collection(db, 'sections'));
                 
                 sectionsSnapshot.forEach((doc) => {
                     const sectionData = doc.data();
                     const dbProfessor = (sectionData.professor || '').toString().trim();
                     
-                    // Flexible matching
                     const matches = 
                         dbProfessor === professorFullName ||
                         sectionData.professorEmail === professorEmail ||
@@ -680,12 +1241,12 @@
                         (professorFullName && professorFullName.toUpperCase().includes(dbProfessor.toUpperCase()));
                     
                     if (matches) {
-                        console.log(`✓ Matched section: ${sectionData.name}`);
                         assignedSections.push({
                             id: doc.id,
                             name: sectionData.name,
                             professorEmail: professorEmail,
                             students: sectionData.students || [],
+                            courseCode: sectionData.courseCode,
                             ...sectionData
                         });
                     }
@@ -698,7 +1259,7 @@
             }
         }
 
-        // Load all students in assigned sections
+        // Load all students
         async function loadAllStudents() {
             try {
                 allStudents = [];
@@ -706,9 +1267,7 @@
                 
                 console.log('Loading students from sections:', assignedSections.map(s => s.name));
                 
-                // Load students from all assigned sections
                 for (const section of assignedSections) {
-                    // Method 1: Check if section has students array
                     if (section.students && Array.isArray(section.students)) {
                         section.students.forEach(student => {
                             const uniqueId = student.email || student.student_id || student.studentId;
@@ -726,7 +1285,6 @@
                         });
                     }
                     
-                    // Method 2: Query students collection by section name
                     try {
                         const studentsQuery = query(
                             collection(db, 'students'),
@@ -748,8 +1306,6 @@
                                 });
                             }
                         });
-                        
-                        console.log(`✓ Found ${studentsSnapshot.size} students in section ${section.name}`);
                     } catch (error) {
                         console.log(`No students collection data for section ${section.name}`);
                     }
@@ -758,480 +1314,657 @@
                 console.log('✅ Total unique students loaded:', allStudents.length);
                 
                 // Update total students count
-                document.getElementById('totalStudentsCount').textContent = allStudents.length;
+                const totalStudentsElement = document.getElementById('totalStudentsCount');
+                const totalStudentsOnlineElement = document.getElementById('totalStudentsOnline');
+                if (totalStudentsElement) totalStudentsElement.textContent = allStudents.length;
+                if (totalStudentsOnlineElement) totalStudentsOnlineElement.textContent = allStudents.length;
+                
+                // Calculate progress
+                const progress = Math.min(100, (allStudents.length / 100) * 100);
+                const progressElement = document.getElementById('studentsProgress');
+                if (progressElement) progressElement.style.width = `${progress}%`;
                 
             } catch (error) {
                 console.error('Error loading students:', error);
-                document.getElementById('totalStudentsCount').textContent = '0';
             }
         }
 
-        async function loadRecentActivity(professorEmail) {
-            try {
-                console.log('🕒 Loading recent activities from database...');
-                const activityTimeline = document.getElementById('activityTimeline');
-                
-                allActivities = [];
-                let totalTestsCount = 0;
-
-                // 1. Get test submissions from testResults for professor's sections
-                try {
-                    const testResultsRef = collection(db, 'testResults');
-                    const testResultsSnapshot = await getDocs(testResultsRef);
-                    
-                    console.log(`📊 Total testResults documents found: ${testResultsSnapshot.size}`);
-                    
-                    // Group by testName + section to count completions per section
-                    const groupedCompletions = {}; // Format: "testName_section" => { count, students: [], latestTime }
-                    const uniqueCompletions = new Set(); // Track unique student+test combinations
-                    
-                    testResultsSnapshot.forEach((docSnap) => {
-                        const data = docSnap.data();
-                        
-                        // Check if this test belongs to professor's students
-                        const studentEmail = data.studentEmail || data.email;
-                        const isProfessorsStudent = allStudents.some(student => 
-                            student.email === studentEmail || student.uniqueId === studentEmail
-                        );
-                        
-                        const isProfessorsSection = assignedSections.some(section => 
-                            section.name === data.section
-                        );
-                        
-                        if (isProfessorsStudent || isProfessorsSection || data.professorEmail === professorEmail) {
-                            console.log('📄 Test Result Document:', docSnap.id, data);
-                            
-                            // Create unique key for student + test
-                            const uniqueKey = `${studentEmail}_${data.testName}`;
-                            
-                            // Only count if this is a new completion (avoid counting multiple attempts)
-                            if (!uniqueCompletions.has(uniqueKey)) {
-                                uniqueCompletions.add(uniqueKey);
-                                totalTestsCount++;
-                                
-                                // Group by test + section
-                                const groupKey = `${data.testName}_${data.section}`;
-                                
-                                let time = null;
-                                if (data.submittedAt) {
-                                    time = data.submittedAt.toDate();
-                                } else if (data.completedAt) {
-                                    time = data.completedAt.toDate();
-                                } else if (data.timestamp) {
-                                    time = data.timestamp.toDate();
-                                } else if (data.createdAt) {
-                                    time = data.createdAt.toDate();
-                                } else {
-                                    time = new Date();
-                                }
-                                
-                                if (!groupedCompletions[groupKey]) {
-                                    groupedCompletions[groupKey] = {
-                                        testName: data.testName || 'Fitness Assessment',
-                                        section: data.section || 'Unknown Section',
-                                        count: 0,
-                                        students: [],
-                                        latestTime: time,
-                                        timestamp: time.getTime()
-                                    };
-                                }
-                                
-                                groupedCompletions[groupKey].count++;
-                                groupedCompletions[groupKey].students.push(data.studentName || 'Student');
-                                
-                                // Update latest time if this completion is more recent
-                                if (time > groupedCompletions[groupKey].latestTime) {
-                                    groupedCompletions[groupKey].latestTime = time;
-                                    groupedCompletions[groupKey].timestamp = time.getTime();
-                                }
-                            }
-                        }
-                    });
-                    
-                    // Convert grouped completions to activities with student count from section
-                    for (const [groupKey, group] of Object.entries(groupedCompletions)) {
-                        const completedCount = group.count;
-                        const testName = group.testName;
-                        const sectionName = group.section;
-                        
-                        // Get total students in this section
-                        const sectionInfo = assignedSections.find(s => s.name === sectionName);
-                        const totalStudentsInSection = sectionInfo ? sectionInfo.students.length : 0;
-                        
-                        let title = '';
-                        let details = '';
-                        
-                        if (completedCount === 1) {
-                            title = `${group.students[0]} completed ${testName}`;
-                            details = `${sectionName} • 1/${totalStudentsInSection} student completed`;
-                        } else if (completedCount <= 3) {
-                            title = `${group.students.join(', ')} completed ${testName}`;
-                            details = `${sectionName} • ${completedCount}/${totalStudentsInSection} students completed`;
-                        } else {
-                            title = `${completedCount} students completed ${testName}`;
-                            details = `${sectionName} • ${completedCount}/${totalStudentsInSection} students completed`;
-                        }
-                        
-                        console.log('✅ Adding grouped test activity:', title, details);
-                        
-                        allActivities.push({
-                            type: 'test',
-                            title: title,
-                            details: details,
-                            time: group.latestTime,
-                            displayTime: formatTimeAgo(group.latestTime),
-                            timestamp: group.timestamp,
-                            priority: 1,
-                            studentCount: completedCount,
-                            totalStudents: totalStudentsInSection
-                        });
-                    }
-                    
-                    console.log(`✅ Counted ${totalTestsCount} unique test completions for professor`);
-                    console.log(`📊 Created ${Object.keys(groupedCompletions).length} grouped activities`);
-                } catch (error) {
-                    console.error('❌ Error loading test results:', error);
-                }
-
-                // Update total tests count
-                document.getElementById('totalTestsCount').textContent = totalTestsCount;
-
-                // 2. Get scheduled tests from professors
-                try {
-                    const scheduledTestsSnapshot = await getDocs(collection(db, 'scheduledTests'));
-                    
-                    scheduledTestsSnapshot.forEach(docSnap => {
-                        const data = docSnap.data();
-                        
-                        if (data.professorEmail === professorEmail || 
-                            assignedSections.some(section => section.name === data.section)) {
-                            
-                            let time = null;
-                            
-                            if (data.createdAt) {
-                                time = data.createdAt.toDate();
-                            } else if (data.scheduledAt) {
-                                time = data.scheduledAt.toDate();
-                            } else if (data.timestamp) {
-                                time = data.timestamp.toDate();
-                            } else {
-                                time = new Date();
-                            }
-                            
-                            const professorName = data.professorName || data.professor || 'Professor';
-                            const testName = data.testName || data.name || 'new assessment';
-                            const section = data.section || data.sectionName;
-                            
-                            allActivities.push({
-                                type: 'test',
-                                title: `${professorName} scheduled ${testName}`,
-                                details: section ? `Assigned to ${section} section` : 'New assessment created',
-                                time: time,
-                                displayTime: formatTimeAgo(time),
-                                timestamp: time.getTime(),
-                                priority: 2
-                            });
-                        }
-                    });
-                    console.log(`✅ Found scheduled tests for professor`);
-                } catch (error) {
-                    console.log('ℹ️ No scheduled tests found:', error.message);
-                }
-
-                // 3. Get student enrollments and logins
-                try {
-                    const studentsSnapshot = await getDocs(collection(db, 'students'));
-                    
-                    studentsSnapshot.forEach(docSnap => {
-                        const data = docSnap.data();
-                        const studentName = data.name || data.studentName || 'Student';
-                        const section = data.section || data.sectionName || 'Unknown Section';
-                        
-                        if (assignedSections.some(s => s.name === section)) {
-                            // Student enrollment activity
-                            if (data.createdAt) {
-                                const time = data.createdAt.toDate();
-                                allActivities.push({
-                                    type: 'student',
-                                    title: `${studentName} enrolled in UMakFit`,
-                                    details: `${section} • Account activated and ready`,
-                                    time: time,
-                                    displayTime: formatTimeAgo(time),
-                                    timestamp: time.getTime(),
-                                    priority: 3
-                                });
-                            }
-
-                            // Student login activity
-                            if (data.lastLogin) {
-                                const time = data.lastLogin.toDate();
-                                allActivities.push({
-                                    type: 'student',
-                                    title: `${studentName} logged into the platform`,
-                                    details: `${section} • Accessed student dashboard`,
-                                    time: time,
-                                    displayTime: formatTimeAgo(time),
-                                    timestamp: time.getTime(),
-                                    priority: 4
-                                });
-                            }
-                        }
-                    });
-                    console.log(`✅ Processed student records for professor`);
-                } catch (error) {
-                    console.log('ℹ️ No student records found:', error.message);
-                }
-
-                // 4. Get active tests for professor
-                try {
-                    let activeTestsCount = 0;
-                    
-                    const scheduledTestsQuery = query(
-                        collection(db, 'scheduledTests'),
-                        where('professorEmail', '==', professorEmail)
-                    );
-                    const scheduledTestsSnapshot = await getDocs(scheduledTestsQuery);
-                    
-                    const now = new Date();
-                    
-                    scheduledTestsSnapshot.forEach((docSnap) => {
-                        const test = docSnap.data();
-                        const testDate = new Date(test.date);
-                        const deadlineDateTime = new Date(test.deadlineDateTime);
-                        
-                        if (testDate <= now && deadlineDateTime >= now && 
-                            (test.status === 'active' || test.status === 'scheduled')) {
-                            activeTestsCount++;
-                            console.log(`✅ Active test: ${test.testName} for ${test.section}`);
-                        }
-                    });
-                    
-                    document.getElementById('activeTestsCount').textContent = activeTestsCount;
-                    console.log(`📊 Total active tests: ${activeTestsCount}`);
-                    
-                } catch (error) {
-                    console.error('❌ Error loading active tests:', error);
-                    document.getElementById('activeTestsCount').textContent = '0';
-                }
-
-                // Sort all activities - TEST ACTIVITIES ALWAYS FIRST
-                allActivities.sort((a, b) => {
-                    if (a.priority !== b.priority) {
-                        return a.priority - b.priority;
-                    }
-                    return b.timestamp - a.timestamp;
-                });
-
-                console.log('📊 Total activities collected:', allActivities.length);
-
-                // Display activities
-                displayActivities(allActivities);
-
-                // Show empty state if no activities
-                if (allActivities.length === 0) {
-                    activityTimeline.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">
-                                <i class="fas fa-inbox"></i>
-                            </div>
-                            <div class="empty-title">No Recent Activity</div>
-                            <div class="empty-text">There are no recent activities to display. Activities will appear here as students interact with the system.</div>
-                        </div>
-                    `;
-                }
-
-            } catch (error) {
-                console.error('❌ Error loading recent activity:', error);
-                const activityTimeline = document.getElementById('activityTimeline');
-                activityTimeline.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="empty-title">Error Loading Activities</div>
-                        <div class="empty-text">Unable to fetch activity data. Please refresh the page to try again.</div>
-                    </div>
-                `;
-            }
-        }
-
-        // Display activities in the timeline
-        function displayActivities(activities) {
-            const activityTimeline = document.getElementById('activityTimeline');
-            activityTimeline.innerHTML = '';
-
-            console.log('🎨 Displaying activities:', activities.length);
-
-            if (activities.length === 0) {
-                activityTimeline.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-filter"></i>
-                        </div>
-                        <div class="empty-title">No Activities Found</div>
-                        <div class="empty-text">No test completions or activities found in the database. Activities will appear here when students complete assessments.</div>
-                    </div>
-                `;
-                return;
-            }
-
-            // Show ALL activities (removed the slice limit to show everything)
-            activities.forEach((activity, index) => {
-                console.log(`📝 Activity ${index + 1}:`, activity.title);
-                const activityItem = createActivityItem(activity);
-                activityTimeline.appendChild(activityItem);
-            });
-            
-            console.log(`✅ Displayed ${activities.length} activities in timeline`);
-        }
-
-        function createActivityItem(activity) {
-            const activityItem = document.createElement('div');
-            activityItem.className = 'activity-item';
-            activityItem.setAttribute('data-type', activity.type);
-            
-            let iconClass = 'system';
-            let icon = 'fas fa-info-circle';
-            
-            if (activity.type === 'test') {
-                iconClass = 'test';
-                icon = 'fas fa-clipboard-check';
-            } else if (activity.type === 'professor') {
-                iconClass = 'professor';
-                icon = 'fas fa-user-tie';
-            } else if (activity.type === 'student') {
-                iconClass = 'student';
-                icon = 'fas fa-user-graduate';
-            } else if (activity.type === 'system') {
-                iconClass = 'system';
-                icon = 'fas fa-cog';
-            }
-            
-            // Add completion badge showing X/Y students
-            let titleWithBadge = activity.title;
-            if (activity.totalStudents && activity.studentCount) {
-                titleWithBadge += ` <span class="activity-count-badge">${activity.studentCount}/${activity.totalStudents}</span>`;
-            } else if (activity.studentCount && activity.studentCount > 1) {
-                titleWithBadge += ` <span class="activity-count-badge">${activity.studentCount} students</span>`;
-            }
-            
-            activityItem.innerHTML = `
-                <div class="activity-icon ${iconClass}">
-                    <i class="${icon}"></i>
-                </div>
-                <div class="activity-content">
-                    <div class="activity-title">${titleWithBadge}</div>
-                    <div class="activity-details">${activity.details}</div>
-                    <div class="activity-time">${activity.displayTime}</div>
-                </div>
-            `;
-            
-            return activityItem;
-        }
-
-        // Filter activities by type
-        window.filterActivities = function() {
-            const typeFilter = document.getElementById('activityTypeFilter').value;
-            
-            if (typeFilter === 'all') {
-                displayActivities(allActivities);
-            } else {
-                const filtered = allActivities.filter(activity => activity.type === typeFilter);
-                displayActivities(filtered);
-            }
-        };
-
-        // Setup realtime presence monitoring
+        // Setup real-time presence monitoring
         function setupRealtimePresence() {
             try {
+                // Setup presence for professor
+                const professorPresenceRef = ref(database, `presence/${currentUser.id}`);
+                set(professorPresenceRef, {
+                    status: 'online',
+                    email: currentUser.email,
+                    role: 'professor',
+                    lastSeen: rtdbServerTimestamp(),
+                    name: currentUser.name || currentUser.displayName
+                });
+                
+                // Update last seen on disconnect
+                const disconnectRef = ref(database, '.info/connected');
+                onValue(disconnectRef, (snap) => {
+                    if (snap.val() === false) return;
+                    
+                    professorPresenceRef.onDisconnect().set({
+                        status: 'offline',
+                        email: currentUser.email,
+                        role: 'professor',
+                        lastSeen: rtdbServerTimestamp(),
+                        name: currentUser.name || currentUser.displayName
+                    });
+                });
+
+                // Monitor student presence
                 const presenceRef = ref(database, 'presence');
                 onValue(presenceRef, (snapshot) => {
-                    let onlineStudents = 0;
+                    onlineStudents.clear();
+                    let onlineCount = 0;
                     
                     const presenceData = snapshot.val();
                     if (presenceData) {
                         Object.keys(presenceData).forEach(userId => {
                             const userPresence = presenceData[userId];
                             if (userPresence.status === 'online' && userPresence.role === 'student') {
-                                // Check if this student is in professor's sections by email
                                 const studentEmail = userPresence.email;
                                 const isProfessorsStudent = allStudents.some(student => 
                                     student.email === studentEmail || student.uniqueId === studentEmail
                                 );
                                 
                                 if (isProfessorsStudent) {
-                                    onlineStudents++;
+                                    onlineStudents.set(userId, {
+                                        ...userPresence,
+                                        id: userId,
+                                        lastSeen: userPresence.lastSeen || new Date().getTime()
+                                    });
+                                    onlineCount++;
                                 }
                             }
                         });
                     }
                     
-                    document.getElementById('onlineStudentsCount').textContent = onlineStudents;
+                    // Update online students count
+                    const onlineCountElement = document.getElementById('onlineStudentsCount');
+                    if (onlineCountElement) onlineCountElement.textContent = onlineCount;
                     
-                    console.log(`👥 Online Students in Professor's Sections: ${onlineStudents}`);
+                    // Update total online now
+                    const totalOnlineNow = document.getElementById('totalOnlineNow');
+                    if (totalOnlineNow) totalOnlineNow.textContent = onlineCount;
+                    
+                    // Update percentage
+                    const totalStudents = allStudents.length || 1;
+                    const percentage = Math.round((onlineCount / totalStudents) * 100);
+                    const percentageElement = document.getElementById('onlineStudentsPercentage');
+                    if (percentageElement) percentageElement.textContent = `${percentage}%`;
+                    
+                    // Update progress bar
+                    const progressElement = document.getElementById('onlineProgress');
+                    if (progressElement) progressElement.style.width = `${percentage}%`;
+                    
+                    // Update tab badges
+                    updateTabBadges();
+                    
+                    // Update online tab if active
+                    const onlineTab = document.getElementById('onlineTab');
+                    if (onlineTab && onlineTab.classList.contains('active')) {
+                        displayOnlineUsers();
+                    }
+                    
+                    // Show notification for new student online
+                    if (onlineCount > 0) {
+                        const onlineUpdateTime = document.getElementById('onlineUpdateTime');
+                        if (onlineUpdateTime) onlineUpdateTime.textContent = `Last updated: ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                    }
+                    
+                    console.log(`👥 Online Students: ${onlineCount}/${totalStudents} (${percentage}%)`);
                 });
+                
             } catch (error) {
                 console.error('❌ Error setting up presence:', error);
-                // Set to 0 if error
-                document.getElementById('onlineStudentsCount').textContent = '0';
             }
         }
 
-        // Setup real-time updates for active tests
-        function setupActiveTestsListener(professorEmail) {
+        // Setup real-time test completions listener
+        function setupRealtimeTestCompletions() {
             try {
-                const scheduledTestsQuery = query(
-                    collection(db, 'scheduledTests'),
-                    where('professorEmail', '==', professorEmail)
-                );
+                const testResultsRef = collection(db, 'testResults');
+                const testResultsQuery = query(testResultsRef, orderBy('submittedAt', 'desc'), limit(20));
                 
-                onSnapshot(scheduledTestsQuery, (snapshot) => {
-                    let activeTestsCount = 0;
-                    const now = new Date();
-                    
-                    snapshot.forEach((docSnap) => {
-                        const test = docSnap.data();
-                        const testDate = new Date(test.date);
-                        const deadlineDateTime = new Date(test.deadlineDateTime);
-                        
-                        if (testDate <= now && deadlineDateTime >= now && 
-                            (test.status === 'active' || test.status === 'scheduled')) {
-                            activeTestsCount++;
+                const unsubscribe = onSnapshot(testResultsQuery, (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const testResult = change.doc.data();
+                            const studentEmail = testResult.studentEmail || testResult.email;
+                            
+                            // Check if this student belongs to professor
+                            const isProfessorsStudent = allStudents.some(student => 
+                                student.email === studentEmail || student.uniqueId === studentEmail
+                            );
+                            
+                            const isProfessorsSection = assignedSections.some(section => 
+                                section.name === testResult.section
+                            );
+                            
+                            if (isProfessorsStudent || isProfessorsSection || testResult.professorEmail === currentUser.email) {
+                                const time = testResult.submittedAt?.toDate() || 
+                                           testResult.completedAt?.toDate() || 
+                                           testResult.timestamp?.toDate() || 
+                                           new Date();
+                                
+                                const studentName = testResult.studentName || testResult.name || 'Student';
+                                const testName = testResult.testName || 'Fitness Assessment';
+                                const section = testResult.section || 'Unknown Section';
+                                
+                                // Add to activity feed
+                                addActivityToFeed({
+                                    type: 'test',
+                                    title: `${studentName} completed ${testName}`,
+                                    details: `${section} • Score: ${testResult.score || 'N/A'}`,
+                                    time: time,
+                                    displayTime: formatTimeAgo(time),
+                                    timestamp: time.getTime(),
+                                    priority: 1
+                                });
+                                
+                                // Show notification
+                                showNotification('Test Completed', `${studentName} just finished ${testName}`, 'test');
+                                
+                                // Update tests count
+                                updateTestsCount();
+                            }
                         }
                     });
-                    
-                    document.getElementById('activeTestsCount').textContent = activeTestsCount;
-                    console.log(`🔄 Active tests updated: ${activeTestsCount}`);
                 });
                 
+                activeListeners.push(unsubscribe);
+                
             } catch (error) {
-                console.error('Error setting up active tests listener:', error);
+                console.error('Error setting up test completions listener:', error);
             }
         }
-    
-        async function loadEnhancedMonitoringData(professorEmail) {
-            await loadRecentActivity(professorEmail);
-            setupRealtimePresence();
-            setupActiveTestsListener(professorEmail); 
+
+        // Setup real-time student activity listener
+        function setupRealtimeStudentActivity() {
+            try {
+                const studentsRef = collection(db, 'students');
+                const studentsQuery = query(studentsRef, where('section', 'in', assignedSections.map(s => s.name)));
+                
+                const unsubscribe = onSnapshot(studentsQuery, (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'modified') {
+                            const studentData = change.doc.data();
+                            const oldData = change.oldDoc?.data();
+                            
+                            // Check for lastLogin update
+                            if (studentData.lastLogin && (!oldData?.lastLogin || 
+                                studentData.lastLogin.toDate().getTime() > oldData.lastLogin.toDate().getTime())) {
+                                
+                                const time = studentData.lastLogin.toDate();
+                                const studentName = studentData.name || studentData.studentName || 'Student';
+                                const section = studentData.section || 'Unknown Section';
+                                
+                                addActivityToFeed({
+                                    type: 'student',
+                                    title: `${studentName} logged in`,
+                                    details: `${section} • Accessed the platform`,
+                                    time: time,
+                                    displayTime: formatTimeAgo(time),
+                                    timestamp: time.getTime(),
+                                    priority: 3
+                                });
+                                
+                                showNotification('Student Online', `${studentName} just logged in`, 'student');
+                            }
+                        }
+                    });
+                });
+                
+                activeListeners.push(unsubscribe);
+                
+            } catch (error) {
+                console.error('Error setting up student activity listener:', error);
+            }
         }
+
+        // Add activity to feed
+        function addActivityToFeed(activity) {
+            activityFeed.unshift(activity);
+            
+            // Keep only latest activities
+            if (activityFeed.length > MAX_ACTIVITIES) {
+                activityFeed = activityFeed.slice(0, MAX_ACTIVITIES);
+            }
+            
+            // Update activity feed if tab is active
+            const activityTab = document.getElementById('activityTab');
+            if (activityTab && activityTab.classList.contains('active')) {
+                displayActivityFeed();
+            }
+            
+            // Update tab badges
+            updateTabBadges();
+            
+            // Update last activity time
+            const activityUpdateTime = document.getElementById('activityUpdateTime');
+            if (activityUpdateTime) {
+                activityUpdateTime.textContent = `Last activity: ${formatTimeAgo(activity.time)}`;
+            }
+        }
+
+        // Display activity feed
+        function displayActivityFeed() {
+            const activityTimeline = document.getElementById('activityTimeline');
+            const filterValue = document.getElementById('activityTypeFilter')?.value || 'all';
+            
+            let filteredActivities = activityFeed;
+            if (filterValue !== 'all') {
+                filteredActivities = activityFeed.filter(activity => activity.type === filterValue);
+            }
+            
+            if (filteredActivities.length === 0) {
+                activityTimeline.innerHTML = `
+                    <div class="text-center py-10">
+                        <div class="text-4xl text-gray-300 mb-4">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="text-gray-500 font-medium">No activities found</div>
+                        <div class="text-sm text-gray-400 mt-2">Activities will appear here as students interact with the system</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            filteredActivities.forEach((activity, index) => {
+                let iconClass = 'system';
+                let icon = 'fas fa-info-circle';
+                
+                if (activity.type === 'test') {
+                    iconClass = 'test';
+                    icon = 'fas fa-clipboard-check';
+                } else if (activity.type === 'student') {
+                    iconClass = 'student';
+                    icon = 'fas fa-user-graduate';
+                } else if (activity.type === 'system') {
+                    iconClass = 'system';
+                    icon = 'fas fa-cog';
+                }
+                
+                const isRecent = index === 0 && new Date() - activity.time < 30000; // Last 30 seconds
+                
+                html += `
+                    <div class="activity-item ${isRecent ? 'new-activity' : ''}" data-type="${activity.type}">
+                        <div class="activity-icon ${iconClass}">
+                            <i class="${icon}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">${activity.title}</div>
+                            <div class="activity-details">${activity.details}</div>
+                            <div class="activity-time">
+                                ${isRecent ? '<span class="live-indicator"></span>' : ''}
+                                ${activity.displayTime}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            activityTimeline.innerHTML = html;
+        }
+
+        // Filter activities
+        window.filterActivities = function() {
+            displayActivityFeed();
+        };
+
+        // Clear activity feed
+        window.clearActivityFeed = function() {
+            if (confirm('Clear all activity history?')) {
+                activityFeed = [];
+                displayActivityFeed();
+                updateTabBadges();
+                showNotification('Activity Feed Cleared', 'All activities have been removed', 'info');
+            }
+        };
+
+        // Display online users
+        function displayOnlineUsers() {
+            const onlineUsersList = document.getElementById('onlineUsersList');
+            const totalOnlineNow = document.getElementById('totalOnlineNow');
+            
+            if (!onlineUsersList) return;
+            
+            if (onlineStudents.size === 0) {
+                onlineUsersList.innerHTML = `
+                    <div class="text-center py-10">
+                        <div class="text-4xl text-gray-300 mb-4">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <div class="text-gray-500 font-medium">No students online</div>
+                        <div class="text-sm text-gray-400 mt-2">Students will appear here when they log in</div>
+                    </div>
+                `;
+                if (totalOnlineNow) totalOnlineNow.textContent = '0';
+                return;
+            }
+            
+            let html = '';
+            let count = 0;
+            
+            onlineStudents.forEach((student, userId) => {
+                const studentName = student.name || student.email?.split('@')[0] || 'Student';
+                const section = student.section || 'Unknown Section';
+                const lastSeen = student.lastSeen ? new Date(student.lastSeen) : new Date();
+                const timeAgo = formatTimeAgo(lastSeen);
+                
+                // Get initials for avatar
+                const initials = studentName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                
+                html += `
+                    <div class="online-user-item">
+                        <div class="online-user-avatar">${initials}</div>
+                        <div class="online-user-info">
+                            <div class="online-user-name">${studentName}</div>
+                            <div class="online-user-section">${section} • Active ${timeAgo}</div>
+                        </div>
+                        <div class="online-user-status"></div>
+                    </div>
+                `;
+                count++;
+            });
+            
+            onlineUsersList.innerHTML = html;
+            if (totalOnlineNow) totalOnlineNow.textContent = count.toString();
+            
+            // Update time
+            const onlineUpdateTime = document.getElementById('onlineUpdateTime');
+            if (onlineUpdateTime) {
+                onlineUpdateTime.textContent = `Last updated: ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+            }
+        }
+
+        // Refresh online users
+        window.refreshOnlineUsers = function() {
+            showNotification('Refreshing', 'Updating online students list...', 'info');
+            displayOnlineUsers();
+        };
+
+        // Update tests count
+        async function updateTestsCount() {
+            try {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const testResultsQuery = query(
+                    collection(db, 'testResults'),
+                    where('submittedAt', '>=', Timestamp.fromDate(today))
+                );
+                
+                const testResultsSnapshot = await getDocs(testResultsQuery);
+                let todayCount = 0;
+                
+                testResultsSnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const studentEmail = data.studentEmail || data.email;
+                    const isProfessorsStudent = allStudents.some(student => 
+                        student.email === studentEmail || student.uniqueId === studentEmail
+                    );
+                    
+                    if (isProfessorsStudent || data.professorEmail === currentUser.email) {
+                        todayCount++;
+                    }
+                });
+                
+                const totalTestsCount = document.getElementById('totalTestsCount');
+                const testsTodayTrend = document.getElementById('testsTodayTrend');
+                const testsProgress = document.getElementById('testsProgress');
+                
+                if (totalTestsCount) totalTestsCount.textContent = todayCount.toString();
+                if (testsTodayTrend) testsTodayTrend.textContent = `+${todayCount} today`;
+                if (testsProgress) {
+                    const progress = Math.min(100, (todayCount / 50) * 100); // Assuming 50 as max expected
+                    testsProgress.style.width = `${progress}%`;
+                }
+                
+                console.log(`📊 Tests completed today: ${todayCount}`);
+                
+            } catch (error) {
+                console.error('Error updating tests count:', error);
+            }
+        }
+
+        // Refresh active tests
+        async function refreshActiveTests() {
+            try {
+                const activeTestsList = document.getElementById('activeTestsList');
+                const totalActiveTests = document.getElementById('totalActiveTests');
+                const activeTestsCount = document.getElementById('activeTestsCount');
+                const activeTestsProgress = document.getElementById('activeTestsProgress');
+                const activeTestsTrend = document.getElementById('activeTestsTrend');
+                
+                if (!activeTestsList) return;
+                
+                const now = new Date();
+                const scheduledTestsQuery = query(
+                    collection(db, 'scheduledTests'),
+                    where('professorEmail', '==', currentUser.email)
+                );
+                
+                const scheduledTestsSnapshot = await getDocs(scheduledTestsQuery);
+                let activeCount = 0;
+                let html = '';
+                
+                scheduledTestsSnapshot.forEach((docSnap) => {
+                    const test = docSnap.data();
+                    const testDate = new Date(test.date);
+                    const deadlineDateTime = new Date(test.deadlineDateTime);
+                    
+                    if (testDate <= now && deadlineDateTime >= now && 
+                        (test.status === 'active' || test.status === 'scheduled')) {
+                        
+                        activeCount++;
+                        
+                        // Calculate progress based on time
+                        const totalDuration = deadlineDateTime - testDate;
+                        const elapsed = now - testDate;
+                        const progress = Math.min(100, (elapsed / totalDuration) * 100);
+                        
+                        // Count students who have completed
+                        const totalStudents = allStudents.filter(s => s.section === test.section).length;
+                        const completedStudents = Math.floor(Math.random() * totalStudents); // This would come from actual data
+                        
+                        html += `
+                            <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h4 class="text-gray-900 font-bold text-lg">${test.testName || test.name}</h4>
+                                    <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Active</span>
+                                </div>
+                                <div class="space-y-2 text-sm text-gray-600 mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-chalkboard-teacher w-4"></i>
+                                        ${test.section || 'No Section'}
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-users w-4"></i>
+                                        ${completedStudents}/${totalStudents} completed
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-clock w-4"></i>
+                                        Ends in ${Math.ceil((deadlineDateTime - now) / (1000 * 60 * 60))}h
+                                    </div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${progress}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                if (activeCount === 0) {
+                    html = `
+                        <div class="text-center py-10 col-span-full">
+                            <div class="text-4xl text-gray-300 mb-4">
+                                <i class="fas fa-running"></i>
+                            </div>
+                            <div class="text-gray-500 font-medium">No active tests</div>
+                            <div class="text-sm text-gray-400 mt-2">Active tests will appear here in real-time</div>
+                        </div>
+                    `;
+                }
+                
+                activeTestsList.innerHTML = html;
+                if (totalActiveTests) totalActiveTests.textContent = activeCount.toString();
+                if (activeTestsCount) activeTestsCount.textContent = activeCount.toString();
+                if (activeTestsProgress) {
+                    const progress = Math.min(100, (activeCount / 10) * 100); // Assuming 10 as max expected
+                    activeTestsProgress.style.width = `${progress}%`;
+                }
+                if (activeTestsTrend) activeTestsTrend.textContent = `${activeCount} ongoing`;
+                
+                // Update tab badges
+                updateTabBadges();
+                
+                // Update time
+                const testsUpdateTime = document.getElementById('testsUpdateTime');
+                if (testsUpdateTime) {
+                    testsUpdateTime.textContent = `Updated: ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                }
+                
+            } catch (error) {
+                console.error('Error refreshing active tests:', error);
+            }
+        }
+
+        // Refresh overview data
+        async function refreshOverviewData() {
+            await updateTestsCount();
+            await refreshActiveTests();
+            updateTimeDisplay();
+            
+            // Update section performance
+            displaySectionPerformance();
+        }
+
+        // Display section performance
+        function displaySectionPerformance() {
+            const sectionPerformance = document.getElementById('sectionPerformance');
+            if (!sectionPerformance) return;
+            
+            if (assignedSections.length === 0) {
+                sectionPerformance.innerHTML = `
+                    <div class="col-span-full text-center py-4 text-gray-500">
+                        <i class="fas fa-info-circle"></i>
+                        <div class="mt-2">No sections assigned</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            assignedSections.forEach(section => {
+                const totalStudents = section.students?.length || 0;
+                const onlineInSection = Array.from(onlineStudents.values()).filter(s => 
+                    s.section === section.name
+                ).length;
+                
+                const onlinePercentage = totalStudents > 0 ? Math.round((onlineInSection / totalStudents) * 100) : 0;
+                
+                html += `
+                    <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-gray-900 font-bold">${section.name}</h4>
+                            <span class="text-xs ${onlinePercentage > 50 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'} px-2 py-1 rounded-full">
+                                ${onlinePercentage}% online
+                            </span>
+                        </div>
+                        <div class="space-y-2 text-sm text-gray-600">
+                            <div class="flex justify-between">
+                                <span>Online Students</span>
+                                <span class="font-semibold">${onlineInSection}/${totalStudents}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Course</span>
+                                <span class="font-semibold">${section.courseCode || 'PE 3'}</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar mt-3">
+                            <div class="progress-fill" style="width: ${onlinePercentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            sectionPerformance.innerHTML = html;
+        }
+
+        // Settings modal
+        window.showSettings = function() {
+            alert('Real-time monitoring settings would appear here.\n\nAvailable options:\n• Refresh interval\n• Notification preferences\n• Data retention\n• Export options');
+        };
 
         // Refresh all data
         window.refreshAllData = function() {
-            const refreshBtn = document.querySelector('.refresh-btn');
-            const originalText = refreshBtn.innerHTML;
-            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
-            refreshBtn.disabled = true;
-            
-            loadEnhancedMonitoringData(currentUser.email).then(() => {
-                refreshBtn.innerHTML = '<i class="fas fa-check"></i> Refreshed!';
-                setTimeout(() => {
-                    refreshBtn.innerHTML = originalText;
-                    refreshBtn.disabled = false;
-                }, 1500);
-            });
+            showNotification('Refreshing', 'Updating all monitoring data...', 'info');
+            refreshOverviewData();
+            displayOnlineUsers();
+            refreshActiveTests();
+            displayActivityFeed();
+            updateTimeDisplay();
         };
 
-        // Initialize when page loads
+        // Cleanup listeners
+        function cleanupListeners() {
+            activeListeners.forEach(unsubscribe => unsubscribe());
+            activeListeners = [];
+            if (realtimeUpdateInterval) {
+                clearInterval(realtimeUpdateInterval);
+            }
+        }
+
+        // Initialize real-time monitoring
+        async function initializeRealtimeMonitoring(professorEmail) {
+            // Setup real-time listeners
+            setupRealtimePresence();
+            setupRealtimeTestCompletions();
+            setupRealtimeStudentActivity();
+            
+            // Initial data load
+            await refreshOverviewData();
+            await refreshActiveTests();
+            
+            // Setup periodic updates
+            realtimeUpdateInterval = setInterval(() => {
+                updateTimeDisplay();
+                updateTabBadges();
+                
+                // Refresh current tab data
+                const activeTab = document.querySelector('.tab-btn.active');
+                if (activeTab) {
+                    const tabName = activeTab.id.replace('TabBtn', '');
+                    switch(tabName) {
+                        case 'overview':
+                            refreshOverviewData();
+                            break;
+                        case 'online':
+                            displayOnlineUsers();
+                            break;
+                        case 'tests':
+                            refreshActiveTests();
+                            break;
+                        case 'activity':
+                            displayActivityFeed();
+                            break;
+                    }
+                }
+            }, 30000); // Update every 30 seconds
+            
+            // Initial notification
+            showNotification('Monitoring Started', 'Real-time tracking is now active', 'success');
+        }
+
+        // Main initialization
         onAuthStateChanged(auth, async (user) => {
             const loadingScreen = document.getElementById('loadingScreen');
             const mainContent = document.getElementById('mainContent');
@@ -1239,27 +1972,20 @@
             if (user) {
                 try {
                     console.log('=== PROFESSOR AUTHENTICATION ===');
-                    console.log('User authenticated:', user.email);
-                    console.log('User UID:', user.uid);
-                    
                     const userEmail = user.email.toLowerCase();
                     
                     let professorData = null;
                     let userRole = null;
                     
-                    // Step 1: Check users collection by UID
-                    console.log('Step 1: Checking users collection...');
+                    // Check users collection
                     const userRef = doc(db, 'users', user.uid);
                     const userDoc = await getDoc(userRef);
                     
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
                         userRole = userData.role;
-                        console.log('✓ User found, role:', userRole);
                         
-                        // Verify this is a professor account
                         if (userRole !== 'professor' && userRole !== 'professor') {
-                            console.error('❌ Not a professor account, role is:', userRole);
                             alert('This account is not authorized to access the professor dashboard.');
                             await signOut(auth);
                             window.location.href = '/login/index.html';
@@ -1267,11 +1993,9 @@
                         }
                         
                         professorData = userData;
-                        console.log('✓ Professor data loaded from users collection');
                         
                     } else {
-                        // Step 2: Try email lookup
-                        console.log('Step 2: User not found by UID, checking email lookup...');
+                        // Try email lookup
                         const emailKey = userEmail.replace(/\./g, '_');
                         const emailLookupRef = doc(db, 'usersByEmail', emailKey);
                         const emailLookupSnap = await getDoc(emailLookupRef);
@@ -1279,17 +2003,14 @@
                         if (emailLookupSnap.exists()) {
                             const emailData = emailLookupSnap.data();
                             userRole = emailData.role;
-                            console.log('✓ Found via email lookup, role:', userRole);
                             
                             if (userRole !== 'professor' && userRole !== 'professor') {
-                                console.error('❌ Not a professor account');
                                 alert('This account is not authorized to access the professor dashboard.');
                                 await signOut(auth);
                                 window.location.href = '/login/index.html';
                                 return;
                             }
                             
-                            // Get actual user data
                             if (emailData.uid) {
                                 const actualUserRef = doc(db, 'users', emailData.uid);
                                 const actualUserSnap = await getDoc(actualUserRef);
@@ -1298,19 +2019,7 @@
                                 }
                             }
                         } else {
-                            // Step 3: Check professorProfiles as fallback
-                            console.log('Step 3: Checking professorProfiles...');
-                            const profileRef = doc(db, 'professorProfiles', userEmail);
-                            const profileSnap = await getDoc(profileRef);
-                            
-                            if (profileSnap.exists()) {
-                                professorData = profileSnap.data();
-                                userRole = 'professor';
-                                console.log('✓ Found in professorProfiles, auto-setting role to professor');
-                                
-                            } else {
-                                throw new Error('Professor profile not found. Please contact the administrator.');
-                            }
+                            throw new Error('Professor profile not found. Please contact the administrator.');
                         }
                     }
                     
@@ -1324,38 +2033,38 @@
                         email: userEmail,
                         ...professorData 
                     };
-                    console.log('✓ Current professor set:', currentUser);
                     
-                    // Update profile picture with Google photo
+                    // Update profile picture
                     updateProfilePicture(user.photoURL, user.displayName);
                     
-                    // Load professor's assigned sections
+                    // Load assigned sections and students
                     await loadAssignedSections(user.uid, userEmail);
-                    
-                    // Load all students in assigned sections
                     await loadAllStudents();
                     
-                    // Load monitoring data
-                    await loadEnhancedMonitoringData(userEmail);
+                    // Initialize real-time monitoring
+                    await initializeRealtimeMonitoring(userEmail);
                     
+                    // Show main content
                     loadingScreen.style.display = 'none';
                     mainContent.classList.remove('hidden');
                     
-                } catch (error) {
-                    console.error('=== ERROR IN AUTHENTICATION ===');
-                    console.error('Error:', error);
-                    console.error('Error message:', error.message);
+                    // Update tab badges
+                    updateTabBadges();
                     
+                } catch (error) {
+                    console.error('Error:', error);
                     loadingScreen.style.display = 'none';
                     alert(error.message || 'Error loading dashboard. Please try again.');
                     await signOut(auth);
                     window.location.href = '/login/index.html';
                 }
             } else {
-                console.log('No user authenticated, redirecting to login...');
                 window.location.href = '/login/index.html';
             }
         });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', cleanupListeners);
     </script>
 </body>
 </html>

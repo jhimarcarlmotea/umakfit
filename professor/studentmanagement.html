@@ -118,6 +118,7 @@
         }
         .custom-table tbody tr {
             transition: all 0.3s;
+            cursor: pointer;
         }
         .custom-table tbody tr:hover {
             background-color: #f8fafc;
@@ -309,6 +310,177 @@
         .step.completed .step-circle {
             background: #10b981 !important;
             color: white !important;
+        }
+        
+        /* ⭐ NEW: Test Count Badge */
+        .test-count-badge {
+            display: inline-block;
+            background: #ef4444;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+        
+        /* Sorting Dropdown Styles */
+        .sort-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .sort-button {
+            padding: 8px 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #475569;
+        }
+        
+        .sort-button:hover {
+            background: #f1f5f9;
+        }
+        
+        .sort-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 180px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            z-index: 100;
+            border: 1px solid #e2e8f0;
+            margin-top: 5px;
+        }
+        
+        .sort-dropdown-content.show {
+            display: block;
+        }
+        
+        .sort-option {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .sort-option:last-child {
+            border-bottom: none;
+        }
+        
+        .sort-option:hover {
+            background-color: #f8fafc;
+        }
+        
+        .sort-option.active {
+            background-color: #eff6ff;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .sort-icon {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        /* Filter Dropdown Styles */
+        .filter-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .filter-button {
+            padding: 8px 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #475569;
+        }
+        
+        .filter-button:hover {
+            background: #f1f5f9;
+        }
+        
+        .filter-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            z-index: 100;
+            border: 1px solid #e2e8f0;
+            margin-top: 5px;
+        }
+        
+        .filter-dropdown-content.show {
+            display: block;
+        }
+        
+        .filter-option {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .filter-option:last-child {
+            border-bottom: none;
+        }
+        
+        .filter-option:hover {
+            background-color: #f8fafc;
+        }
+        
+        .filter-option.active {
+            background-color: #eff6ff;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .filter-checkbox {
+            margin-right: 8px;
+        }
+        
+        .filter-count {
+            margin-left: auto;
+            font-size: 12px;
+            color: #94a3b8;
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 24px;
+            text-align: center;
+        }
+        
+        .modal-header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
     </style>
 </head>
@@ -616,7 +788,7 @@
                                     <tr>
                                         <th>Student Name</th>
                                         <th>Section</th>
-                                        <th>Overdue Test</th>
+                                        <th>Overdue Tests</th>
                                         <th>Deadline</th>
                                         <th>Actions</th>
                                     </tr>
@@ -662,55 +834,152 @@
         </div>
     </div>
 
-    <!-- View Section Details Modal -->
-<div id="viewSectionModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 900px;">
-        <div class="flex justify-between items-center p-6 border-b border-gray-200">
-            <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <i class="fas fa-layer-group"></i> Section Details
-            </h3>
-            <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closeViewSectionModal()">&times;</button>
-        </div>
-        
-        <div style="max-height: 70vh; overflow-y: auto;">
-            <div class="p-6 border-b border-gray-100">
-                <div id="sectionDetailsContent">
-                    <!-- Will be populated with section info -->
+    <!-- ⭐ UPDATED: Student Overdue Tests Modal with Sorting and Filtering -->
+    <div id="studentTestsModal" class="modal-overlay" style="display: none;" onclick="closeStudentTestsModal()">
+        <div class="modal-content" style="max-width: 900px;" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-clipboard-list"></i> <span id="modalStudentName">Student Tests</span>
+                </h3>
+                <div class="modal-header-controls">
+                    <!-- Test Filter Dropdown -->
+                    <div class="filter-dropdown">
+                        <button class="filter-button" onclick="toggleFilterDropdown(event)">
+                            <i class="fas fa-filter"></i>
+                            <span id="currentFilterLabel">Filter: All Tests</span>
+                            <i class="fas fa-chevron-down sort-icon"></i>
+                        </button>
+                        <div class="filter-dropdown-content" id="filterDropdown">
+                            <div class="filter-option active" onclick="changeFilter('all-tests')">
+                                <i class="fas fa-list"></i>
+                                <span>All Tests</span>
+                                <span class="filter-count" id="count-all">0</span>
+                            </div>
+                            <!-- Test options will be populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <!-- Sorting Dropdown -->
+                    <div class="sort-dropdown">
+                        <button class="sort-button" onclick="toggleSortDropdown(event)">
+                            <i class="fas fa-sort-amount-down"></i>
+                            <span id="currentSortLabel">Sort: Newest First</span>
+                            <i class="fas fa-chevron-down sort-icon"></i>
+                        </button>
+                        <div class="sort-dropdown-content" id="sortDropdown">
+                            <div class="sort-option active" onclick="changeSort('newest-first')">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>Newest First</span>
+                            </div>
+                            <div class="sort-option" onclick="changeSort('oldest-first')">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Oldest First</span>
+                            </div>
+                            <div class="sort-option" onclick="changeSort('test-name-a-z')">
+                                <i class="fas fa-sort-alpha-down"></i>
+                                <span>Test Name A-Z</span>
+                            </div>
+                            <div class="sort-option" onclick="changeSort('test-name-z-a')">
+                                <i class="fas fa-sort-alpha-up"></i>
+                                <span>Test Name Z-A</span>
+                            </div>
+                            <div class="sort-option" onclick="changeSort('score-high-low')">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Score: High to Low</span>
+                            </div>
+                            <div class="sort-option" onclick="changeSort('score-low-high')">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Score: Low to High</span>
+                            </div>
+                            <div class="sort-option" onclick="changeSort('status')">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Status (Pending First)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closeStudentTestsModal()">&times;</button>
                 </div>
             </div>
             
-            <div class="p-6">
-                <h4 class="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
-                    <i class="fas fa-user-graduate"></i> Students in this Section
-                </h4>
-                <div class="table-responsive" style="max-height: 400px; overflow-y: auto; border-radius: 8px;">
-                    <table class="custom-table">
-                        <thead style="position: sticky; top: 0; background: linear-gradient(90deg, rgba(30, 58, 138, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%); z-index: 10;">
-                            <tr>
-                                <th>UMaK ID</th>
-                                <th>Student Name</th>
-                                <th>Email</th>
-                                <th>Total Attempts</th>
-                                <th>Best Score</th>
-                                <th>Average Score</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sectionStudentsTableBody">
-                            <!-- Students will be loaded here -->
-                        </tbody>
-                    </table>
+            <div style="max-height: 70vh; overflow-y: auto;">
+                <div class="p-6">
+                    <div class="table-responsive">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Test Name</th>
+                                    <th>Status</th>
+                                    <th>Deadline</th>
+                                    <th>Score</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTestsTableBody">
+                                <!-- Tests will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="flex justify-end p-6 border-t border-gray-200 bg-gray-50">
-            <button class="px-6 py-2.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg font-semibold transition-all" onclick="closeViewSectionModal()">
-                Close
-            </button>
+            
+            <div class="flex justify-end p-6 border-t border-gray-200 bg-gray-50">
+                <button class="px-6 py-2.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg font-semibold transition-all" onclick="closeStudentTestsModal()">
+                    Close
+                </button>
+            </div>
         </div>
     </div>
-</div>
+
+    <!-- View Section Details Modal -->
+    <div id="viewSectionModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-layer-group"></i> Section Details
+                </h3>
+                <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closeViewSectionModal()">&times;</button>
+            </div>
+            
+            <div style="max-height: 70vh; overflow-y: auto;">
+                <div class="p-6 border-b border-gray-100">
+                    <div id="sectionDetailsContent">
+                        <!-- Will be populated with section info -->
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <h4 class="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
+                        <i class="fas fa-user-graduate"></i> Students in this Section
+                    </h4>
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto; border-radius: 8px;">
+                        <table class="custom-table">
+                            <thead style="position: sticky; top: 0; background: linear-gradient(90deg, rgba(30, 58, 138, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%); z-index: 10;">
+                                <tr>
+                                    <th>UMaK ID</th>
+                                    <th>Student Name</th>
+                                    <th>Email</th>
+                                    <th>Total Attempts</th>
+                                    <th>Best Score</th>
+                                    <th>Average Score</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sectionStudentsTableBody">
+                                <!-- Students will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end p-6 border-t border-gray-200 bg-gray-50">
+                <button class="px-6 py-2.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg font-semibold transition-all" onclick="closeViewSectionModal()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- View Student Details Modal -->
     <div id="viewStudentModal" class="modal-overlay" style="display: none;">
@@ -777,11 +1046,11 @@
                 <div class="flex justify-between mb-6 relative">
                     <div class="absolute top-4 left-8 right-8 h-0.5 bg-gray-200 z-0"></div>
                     <div class="step active flex flex-col items-center gap-2 relative z-10" id="step1">
-                        <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">1</div>
+                        <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold step-circle">1</div>
                         <div class="text-xs font-semibold text-purple-600">View Current</div>
                     </div>
                     <div class="step flex flex-col items-center gap-2 relative z-10" id="step2">
-                        <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold">2</div>
+                        <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold step-circle">2</div>
                         <div class="text-xs font-semibold text-gray-500">Edit Score</div>
                     </div>
                 </div>
@@ -913,6 +1182,13 @@
         window.overdueStudents = [];
         window.filteredOverdueStudents = [];
         window.currentTab = 'all';
+        
+        // ⭐ NEW: Sorting and filtering state for student tests modal
+        window.currentStudentTests = [];
+        window.currentStudentTestsFiltered = [];
+        window.currentSort = 'newest-first';
+        window.currentFilter = 'all-tests';
+        window.availableTestTypes = [];
 
 
         // Navigation functions
@@ -1193,19 +1469,19 @@ async function uploadSectionFromCSV(csvData) {
         // Create proper Firestore document structure
         const sectionData = {
             // Basic Info
-            name: sectionInfo.sectionName,              // "III-A BSCS-CCIS"
-            professor: sectionInfo.professorName,        // "Prof. MENDOZA, MARK CYRUS"
+            name: sectionInfo.sectionName,              
+            professor: sectionInfo.professorName,       
             
             // Course Details
-            courseCode: sectionInfo.courseCode,          // "PE 3"
-            courseTitle: sectionInfo.courseTitle,        // "PHYSICAL ACTIVITIES TOWARD HEALTH..."
-            courseFileNumber: sectionInfo.fileNumber,    // "A1250049"
+            courseCode: sectionInfo.courseCode,         
+            courseTitle: sectionInfo.courseTitle,        
+            courseFileNumber: sectionInfo.fileNumber,    
             
             // Schedule Info (⭐ NEW STANDARDIZED FIELDS)
-            schedule: sectionInfo.timeDayRoom,           // "03:00-05:00 / W / Volleyball Court A"
-            timeSlot: sectionInfo.timeSlot,              // "03:00-05:00"
-            days: sectionInfo.days,                      // "W"
-            room: sectionInfo.room,                      // "Volleyball Court A"
+            schedule: sectionInfo.timeDayRoom,           
+            timeSlot: sectionInfo.timeSlot,              
+            days: sectionInfo.days,                      
+            room: sectionInfo.room,                     
             
             // Academic Info (⭐ NEW STANDARDIZED FIELDS)
             academicYear: sectionInfo.academicYear,      // "2025-2026"
@@ -2570,7 +2846,7 @@ function renderOverdueTable() {
                     <div class="empty-state">
                         <div class="empty-icon">✅</div>
                         <div class="empty-title">No Overdue Tests</div>
-                        <div class="empty-text">All students are up to date with their tests!</div>
+                        <div class="empty-text">All students are up to date!</div>
                     </div>
                 </td>
             </tr>
@@ -2578,68 +2854,54 @@ function renderOverdueTable() {
         return;
     }
     
-    const enabledTestsPromise = getDocs(query(
-        collection(db, 'testPermissions'),
-        where('grantedBy', '==', window.currentUser.email)
-    ));
-    
-    enabledTestsPromise.then(permissionsSnapshot => {
-        const enabledTests = new Map();
-        permissionsSnapshot.forEach(doc => {
-            const perm = doc.data();
-            const key = `${perm.studentEmail}_${perm.testId}`;
-            enabledTests.set(key, {
-                id: doc.id,
-                grantedAt: perm.grantedAt,
-                grantedByName: perm.grantedByName
-            });
-        });
-        
-        let html = '';
-        window.filteredOverdueStudents.forEach(item => {
-            const key = `${item.studentEmail}_${item.testId}`;
-            const isEnabled = enabledTests.has(key);
-            const hasCompleted = item.hasCompleted;
-            const statusColor = hasCompleted ? 'text-green-600' : 'text-red-600';
-            
-            html += `
-                <tr style="${hasCompleted ? 'background-color: #f0fdf4;' : ''}">
-                    <td>
-                        <strong>${item.studentName}</strong><br>
-                        <small style="color: #64748b;">${item.studentId}</small>
-                    </td>
-                    <td>${item.section}</td>
-                    <td>
-                        <strong style="color: ${hasCompleted ? '#10b981' : '#ef4444'};">${item.testName}</strong>
-                        ${isEnabled ? '<br><small style="color: #3b82f6;">✓ Enabled by you</small>' : ''}
-                        ${hasCompleted ? `<br><small class="${statusColor}">✓ Completed (Score: ${item.currentScore.toFixed(1)})</small>` : ''}
-                    </td>
-                    <td><small style="color: #64748b;">${item.deadlineString}</small></td>
-                    <td>
-                        <div class="action-buttons">
-                            ${!hasCompleted && !isEnabled ? `
-                                <button class="btn-action btn-view" onclick="enableOverdueTest('${item.studentEmail}', '${item.testId}', '${item.testName}')">
-                                    <i class="fas fa-unlock"></i> Enable Test
-                                </button>
-                            ` : ''}
-                            ${!hasCompleted && isEnabled ? `
-                                <button class="btn-action" style="background: #3b82f6; color: white;" disabled>
-                                    <i class="fas fa-check-circle"></i> Enabled - Waiting
-                                </button>
-                            ` : ''}
-                            <button class="btn-action btn-attempt" onclick="setOverdueScore('${item.studentEmail}', '${item.testId}', '${item.testName}', ${item.testTarget}, '${item.testUnit}', '${item.studentName}', ${hasCompleted ? item.currentScore : 0}, '${hasCompleted ? item.currentResult : ''}', '${item.resultId || ''}')">
-                                <i class="fas fa-edit"></i> ${hasCompleted ? 'Edit' : 'Set'} Score
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        });
-        
-        tableBody.innerHTML = html;
+    // Group tests by student
+    const studentGroups = {};
+    window.filteredOverdueStudents.forEach(item => {
+        const key = item.studentEmail;
+        if (!studentGroups[key]) {
+            studentGroups[key] = {
+                studentName: item.studentName,
+                studentId: item.studentId,
+                studentEmail: item.studentEmail,
+                section: item.section,
+                tests: []
+            };
+        }
+        studentGroups[key].tests.push(item);
     });
+    
+    // Render one row per student
+    let html = '';
+    Object.values(studentGroups).forEach(group => {
+        const testCount = group.tests.length;
+        const completedCount = group.tests.filter(t => t.hasCompleted).length;
+        const pendingCount = testCount - completedCount;
+        
+        html += `
+            <tr onclick="showStudentTests('${group.studentEmail}')" style="cursor: pointer;">
+                <td>
+                    <strong>${group.studentName}</strong>
+                    <span class="test-count-badge">${testCount}</span>
+                    <br>
+                    <small style="color: #64748b;">${group.studentId}</small>
+                </td>
+                <td>${group.section}</td>
+                <td>
+                    <span style="color: #ef4444; font-weight: 600;">${pendingCount} Pending</span>
+                    ${completedCount > 0 ? `<br><small style="color: #10b981;">✓ ${completedCount} Completed</small>` : ''}
+                </td>
+                <td><small style="color: #64748b;">Multiple deadlines</small></td>
+                <td>
+                    <button class="btn-action btn-view" onclick="event.stopPropagation(); showStudentTests('${group.studentEmail}')">
+                        <i class="fas fa-eye"></i> View Tests
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tableBody.innerHTML = html;
 }
-
 // Filter overdue students
 window.filterOverdueStudents = function() {
     const searchTerm = document.getElementById('searchOverdue').value.toLowerCase();
@@ -2700,7 +2962,6 @@ window.filterOverdueStudents = function() {
         }
     };
            window.setOverdueScore = function(studentEmail, testId, testName, testTarget, testUnit, studentName, currentScore = 0, currentResult = '', resultId = '') {
-    // Open the modal with existing data
     window.openEditScoreModal(studentEmail, testId, testName, testTarget, testUnit, studentName, currentScore, currentResult, resultId);
 };
 window.openEditScoreModal = function(studentEmail, testId, testName, testTarget, testUnit, studentName, currentScore = 0, currentResult = '', resultId = '') {
@@ -3388,7 +3649,7 @@ function calculateScore(testName, result, testTarget = null) {
         if (editScoreData.resultId) {
             await updateDoc(doc(window.db, 'testResults', editScoreData.resultId), resultData);
         } else {
-            await addDoc(collection(window.db, 'testResults'), resultData);
+            await addDoc(collection(window.db, 'testTests'), resultData);
         }
         
         alert(`✅ Score saved: ${finalScore}/100\n📅 Original submission date preserved`);
@@ -3491,6 +3752,468 @@ function calculateScore(testName, result, testTarget = null) {
         });
     }
 });
+
+// ⭐ NEW: Filter functions for student tests modal
+function toggleFilterDropdown(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById('filterDropdown');
+    dropdown.classList.toggle('show');
+}
+
+function changeFilter(filterType) {
+    window.currentFilter = filterType;
+    
+    // Update UI
+    const filterLabel = document.getElementById('currentFilterLabel');
+    const options = document.querySelectorAll('.filter-option');
+    
+    // Remove active class from all options
+    options.forEach(option => option.classList.remove('active'));
+    
+    // Add active class to selected option
+    let labelText = 'Filter: ';
+    options.forEach(option => {
+        if (option.getAttribute('data-test') === filterType || 
+            (filterType === 'all-tests' && option.querySelector('span').textContent === 'All Tests')) {
+            option.classList.add('active');
+        }
+    });
+    
+    // Update label
+    if (filterType === 'all-tests') {
+        labelText += 'All Tests';
+    } else {
+        const testName = getTestNameFromType(filterType);
+        labelText += testName;
+    }
+    filterLabel.textContent = labelText;
+    
+    // Apply filtering
+    filterStudentTests();
+    
+    // Close dropdown
+    document.getElementById('filterDropdown').classList.remove('show');
+}
+
+function getTestNameFromType(testType) {
+    const testMap = {
+        'curl-up': 'Curl-up Test',
+        'sit-up': 'Sit-up Test',
+        'push-up': 'Push-up Test',
+        'plank': 'Plank Test',
+        'sit-and-reach': 'Sit and Reach Test',
+        'step-test': 'Step Test (3-minute)',
+        'grip-strength': 'Grip Strength Test',
+        'mile-run': '1-Mile Run',
+        'bmi': 'BMI Test',
+        'flexibility': 'Flexibility Test'
+    };
+    return testMap[testType] || testType;
+}
+
+function getTestIcon(testName) {
+    const testNameLower = testName.toLowerCase();
+    if (testNameLower.includes('curl') || testNameLower.includes('sit-up')) {
+        return 'fas fa-running';
+    } else if (testNameLower.includes('push-up')) {
+        return 'fas fa-dumbbell';
+    } else if (testNameLower.includes('plank')) {
+        return 'fas fa-hourglass-half';
+    } else if (testNameLower.includes('sit-and-reach') || testNameLower.includes('flexibility')) {
+        return 'fas fa-hands';
+    } else if (testNameLower.includes('step')) {
+        return 'fas fa-stairs';
+    } else if (testNameLower.includes('grip')) {
+        return 'fas fa-hand-fist';
+    } else if (testNameLower.includes('mile') || testNameLower.includes('run')) {
+        return 'fas fa-road';
+    } else if (testNameLower.includes('bmi')) {
+        return 'fas fa-weight-scale';
+    }
+    return 'fas fa-clipboard-check';
+}
+
+function populateTestFilterOptions(tests) {
+    // Extract unique test types
+    const testTypes = {};
+    tests.forEach(test => {
+        const testName = test.testName.toLowerCase();
+        let testType = 'other';
+        
+        // Categorize tests
+        if (testName.includes('curl')) {
+            testType = 'curl-up';
+        } else if (testName.includes('sit-up') && !testName.includes('reach')) {
+            testType = 'sit-up';
+        } else if (testName.includes('push-up')) {
+            testType = 'push-up';
+        } else if (testName.includes('plank')) {
+            testType = 'plank';
+        } else if (testName.includes('sit-and-reach')) {
+            testType = 'sit-and-reach';
+        } else if (testName.includes('step') || testName.includes('3-minute')) {
+            testType = 'step-test';
+        } else if (testName.includes('grip')) {
+            testType = 'grip-strength';
+        } else if (testName.includes('mile') || testName.includes('run')) {
+            testType = 'mile-run';
+        } else if (testName.includes('bmi')) {
+            testType = 'bmi';
+        } else if (testName.includes('flexibility')) {
+            testType = 'flexibility';
+        }
+        
+        if (!testTypes[testType]) {
+            testTypes[testType] = {
+                name: getTestNameFromType(testType),
+                icon: getTestIcon(testName),
+                count: 0
+            };
+        }
+        testTypes[testType].count++;
+    });
+    
+    // Store available test types
+    window.availableTestTypes = Object.keys(testTypes);
+    
+    // Update filter dropdown
+    const filterDropdown = document.getElementById('filterDropdown');
+    let html = `
+        <div class="filter-option active" onclick="changeFilter('all-tests')">
+            <i class="fas fa-list"></i>
+            <span>All Tests</span>
+            <span class="filter-count" id="count-all">${tests.length}</span>
+        </div>
+    `;
+    
+    // Add each test type option
+    Object.entries(testTypes).forEach(([type, data]) => {
+        html += `
+            <div class="filter-option" onclick="changeFilter('${type}')" data-test="${type}">
+                <i class="${data.icon}"></i>
+                <span>${data.name}</span>
+                <span class="filter-count" id="count-${type}">${data.count}</span>
+            </div>
+        `;
+    });
+    
+    filterDropdown.innerHTML = html;
+}
+
+function filterStudentTests() {
+    if (!window.currentStudentTests || window.currentStudentTests.length === 0) return;
+    
+    let filteredTests = [];
+    
+    if (window.currentFilter === 'all-tests') {
+        filteredTests = [...window.currentStudentTests];
+    } else {
+        filteredTests = window.currentStudentTests.filter(test => {
+            const testName = test.testName.toLowerCase();
+            const testType = window.currentFilter;
+            
+            switch(testType) {
+                case 'curl-up':
+                    return testName.includes('curl');
+                case 'sit-up':
+                    return testName.includes('sit-up') && !testName.includes('reach');
+                case 'push-up':
+                    return testName.includes('push-up');
+                case 'plank':
+                    return testName.includes('plank');
+                case 'sit-and-reach':
+                    return testName.includes('sit-and-reach') || testName.includes('reach');
+                case 'step-test':
+                    return testName.includes('step') || testName.includes('3-minute');
+                case 'grip-strength':
+                    return testName.includes('grip');
+                case 'mile-run':
+                    return testName.includes('mile') || testName.includes('run');
+                case 'bmi':
+                    return testName.includes('bmi');
+                case 'flexibility':
+                    return testName.includes('flexibility');
+                default:
+                    return true;
+            }
+        });
+    }
+    
+    window.currentStudentTestsFiltered = filteredTests;
+    sortStudentTests();
+}
+
+// ⭐ UPDATED: Sorting functions for student tests modal
+function toggleSortDropdown(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById('sortDropdown');
+    dropdown.classList.toggle('show');
+}
+
+function changeSort(sortType) {
+    window.currentSort = sortType;
+    
+    // Update UI
+    const sortLabel = document.getElementById('currentSortLabel');
+    const options = document.querySelectorAll('.sort-option');
+    
+    // Remove active class from all options
+    options.forEach(option => option.classList.remove('active'));
+    
+    // Add active class to selected option
+    let labelText = 'Sort: ';
+    options.forEach(option => {
+        if (option.querySelector('span').textContent.includes(getSortLabel(sortType))) {
+            option.classList.add('active');
+        }
+    });
+    
+    // Update label
+    labelText += getSortLabel(sortType);
+    sortLabel.textContent = labelText;
+    
+    // Apply sorting
+    sortStudentTests();
+    
+    // Close dropdown
+    document.getElementById('sortDropdown').classList.remove('show');
+}
+
+function getSortLabel(sortType) {
+    switch(sortType) {
+        case 'newest-first': return 'Newest First';
+        case 'oldest-first': return 'Oldest First';
+        case 'test-name-a-z': return 'Test Name A-Z';
+        case 'test-name-z-a': return 'Test Name Z-A';
+        case 'score-high-low': return 'Score: High to Low';
+        case 'score-low-high': return 'Score: Low to High';
+        case 'status': return 'Status (Pending First)';
+        default: return 'Newest First';
+    }
+}
+
+function sortStudentTests() {
+    if (!window.currentStudentTestsFiltered || window.currentStudentTestsFiltered.length === 0) {
+        // If no filtered tests, use all tests
+        window.currentStudentTestsFiltered = [...window.currentStudentTests];
+    }
+    
+    const sortedTests = [...window.currentStudentTestsFiltered];
+    
+    switch(window.currentSort) {
+        case 'newest-first':
+            sortedTests.sort((a, b) => b.deadline.getTime() - a.deadline.getTime());
+            break;
+        case 'oldest-first':
+            sortedTests.sort((a, b) => a.deadline.getTime() - b.deadline.getTime());
+            break;
+        case 'test-name-a-z':
+            sortedTests.sort((a, b) => a.testName.localeCompare(b.testName));
+            break;
+        case 'test-name-z-a':
+            sortedTests.sort((a, b) => b.testName.localeCompare(a.testName));
+            break;
+        case 'score-high-low':
+            sortedTests.sort((a, b) => {
+                const scoreA = a.hasCompleted ? a.currentScore : 0;
+                const scoreB = b.hasCompleted ? b.currentScore : 0;
+                return scoreB - scoreA;
+            });
+            break;
+        case 'score-low-high':
+            sortedTests.sort((a, b) => {
+                const scoreA = a.hasCompleted ? a.currentScore : 0;
+                const scoreB = b.hasCompleted ? b.currentScore : 0;
+                return scoreA - scoreB;
+            });
+            break;
+        case 'status':
+            sortedTests.sort((a, b) => {
+                // Pending first, then completed
+                if (!a.hasCompleted && b.hasCompleted) return -1;
+                if (a.hasCompleted && !b.hasCompleted) return 1;
+                return b.deadline.getTime() - a.deadline.getTime(); // Then by newest
+            });
+            break;
+    }
+    
+    renderStudentTestsTable(sortedTests);
+}
+
+function renderStudentTestsTable(tests) {
+    let html = '';
+    
+    if (tests.length === 0) {
+        html = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 40px; color: #64748b;">
+                    <div style="font-size: 48px; opacity: 0.3; margin-bottom: 10px;">📋</div>
+                    No tests found for the selected filter
+                </td>
+            </tr>
+        `;
+    } else {
+        tests.forEach(item => {
+            const isEnabled = item.isEnabled || false;
+            const hasCompleted = item.hasCompleted;
+            const testIcon = getTestIcon(item.testName);
+            
+            html += `
+                <tr style="${hasCompleted ? 'background-color: #f0fdf4;' : ''}">
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="${testIcon}" style="color: ${hasCompleted ? '#10b981' : '#ef4444'}; font-size: 18px;"></i>
+                            <div>
+                                <strong style="color: ${hasCompleted ? '#10b981' : '#ef4444'};">${item.testName}</strong>
+                                ${isEnabled ? '<br><small style="color: #3b82f6;">✓ Enabled by you</small>' : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        ${hasCompleted ? 
+                            '<span class="status-badge status-active">Completed</span>' : 
+                            '<span class="status-badge" style="background: #fee2e2; color: #991b1b;">Pending</span>'
+                        }
+                    </td>
+                    <td>
+                        <small style="color: #64748b;">${item.deadlineString}</small>
+                        <br>
+                        <small style="font-size: 11px; color: #94a3b8;">
+                            ${item.deadline.toLocaleDateString('en-US', { 
+                                weekday: 'short', 
+                                month: 'short', 
+                                day: 'numeric',
+                                year: 'numeric'
+                            })}
+                        </small>
+                    </td>
+                    <td>
+                        ${hasCompleted ? 
+                            `<span style="font-weight: 700; color: #1e3a8a;">${item.currentScore.toFixed(1)}%</span>` : 
+                            '<span style="color: #64748b;">Not scored</span>'
+                        }
+                    </td>
+                    <td>
+                        <div class="action-buttons" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            ${!hasCompleted && !isEnabled ? `
+                                <button class="btn-action btn-view" onclick="event.stopPropagation(); enableOverdueTest('${item.studentEmail}', '${item.testId}', '${item.testName}')">
+                                    <i class="fas fa-unlock"></i> Enable
+                                </button>
+                            ` : ''}
+                            ${!hasCompleted && isEnabled ? `
+                                <button class="btn-action" style="background: #3b82f6; color: white;" disabled>
+                                    <i class="fas fa-check-circle"></i> Enabled
+                                </button>
+                            ` : ''}
+                            <button class="btn-action btn-attempt" onclick="event.stopPropagation(); setOverdueScore('${item.studentEmail}', '${item.testId}', '${item.testName}', ${item.testTarget}, '${item.testUnit}', '${item.studentName}', ${hasCompleted ? item.currentScore : 0}, '${hasCompleted ? item.currentResult : ''}', '${item.resultId || ''}')">
+                                <i class="fas fa-edit"></i> ${hasCompleted ? 'Edit' : 'Set'} Score
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+    
+    document.getElementById('studentTestsTableBody').innerHTML = html;
+}
+
+// ⭐ UPDATED: Show student's overdue tests with sorting and filtering
+window.showStudentTests = async function(studentEmail) {
+    const studentTests = window.filteredOverdueStudents.filter(t => t.studentEmail === studentEmail);
+    
+    if (studentTests.length === 0) return;
+    
+    const studentName = studentTests[0].studentName;
+    document.getElementById('modalStudentName').textContent = `${studentName}'s Overdue Tests (${studentTests.length})`;
+    
+    // Get enabled tests
+    const permissionsSnapshot = await getDocs(query(
+        collection(window.db, 'testPermissions'),
+        where('grantedBy', '==', window.currentUser.email)
+    ));
+    
+    const enabledTests = new Map();
+    permissionsSnapshot.forEach(doc => {
+        const perm = doc.data();
+        const key = `${perm.studentEmail}_${perm.testId}`;
+        enabledTests.set(key, { id: doc.id });
+    });
+    
+    // Mark which tests are enabled
+    const enrichedTests = studentTests.map(item => ({
+        ...item,
+        isEnabled: enabledTests.has(`${item.studentEmail}_${item.testId}`)
+    }));
+    
+    // Store tests and apply filtering/sorting
+    window.currentStudentTests = enrichedTests;
+    
+    // Populate filter options
+    populateTestFilterOptions(enrichedTests);
+    
+    // Apply current filter
+    filterStudentTests();
+    
+    // Show modal
+    document.getElementById('studentTestsModal').style.display = 'flex';
+    console.log('📊 Showing', studentTests.length, 'tests for', studentName);
+};
+
+// ⭐ FIXED: Close modal properly
+window.closeStudentTestsModal = function() {
+    document.getElementById('studentTestsModal').style.display = 'none';
+    window.currentStudentTests = [];
+    window.currentStudentTestsFiltered = [];
+    window.currentFilter = 'all-tests';
+    window.currentSort = 'newest-first';
+    
+    // Close dropdowns if open
+    document.getElementById('sortDropdown').classList.remove('show');
+    document.getElementById('filterDropdown').classList.remove('show');
+};
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    const sortDropdown = document.getElementById('sortDropdown');
+    const filterDropdown = document.getElementById('filterDropdown');
+    const sortButton = document.querySelector('.sort-button');
+    const filterButton = document.querySelector('.filter-button');
+    
+    if (sortDropdown && sortButton && 
+        !sortDropdown.contains(event.target) && 
+        !sortButton.contains(event.target)) {
+        sortDropdown.classList.remove('show');
+    }
+    
+    if (filterDropdown && filterButton && 
+        !filterDropdown.contains(event.target) && 
+        !filterButton.contains(event.target)) {
+        filterDropdown.classList.remove('show');
+    }
+});
+
+// ⭐ NEW: Get grade letter function
+function getGradeLetter(score) {
+    if (score >= 97) return 'A+';
+    if (score >= 93) return 'A';
+    if (score >= 90) return 'A-';
+    if (score >= 87) return 'B+';
+    if (score >= 83) return 'B';
+    if (score >= 80) return 'B-';
+    if (score >= 77) return 'C+';
+    if (score >= 73) return 'C';
+    if (score >= 70) return 'C-';
+    if (score >= 67) return 'D+';
+    if (score >= 63) return 'D';
+    if (score >= 60) return 'D-';
+    return 'F';
+}
+
+// Calculate score from result (for preview)
+function calculateScoreFromResult(testName, result, testTarget) {
+    return calculateScore(testName, result, testTarget);
+}
     </script>
 </body>
 </html>

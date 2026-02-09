@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievements - UMakFit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .font-manrope { font-family: 'Manrope', sans-serif; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+        
+        /* Loading animation */
+        .spinner {
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Pulse animation */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Slide down animation */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-down {
+            animation: slideDown 0.3s ease;
+        }
+        
+        /* Card hover effects */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Achievement glow effect */
+        .achievement-unlocked {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .achievement-unlocked::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.3) 0%,
+                rgba(255, 255, 255, 0) 80%
+            );
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
+        
+        /* Fade in animation */
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fade-in 0.3s ease-out;
+        }
+        
+        /* Shimmer effect for loading */
+        .shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        /* Confetti animation */
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f00;
+            top: 0;
+            opacity: 0;
+            z-index: 9999;
+        }
+        
+        /* Achievement popup */
+        .achievement-popup {
+            animation: slideDown 0.5s ease-out;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
+        <img src="logo.png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
+        <div class="spinner"></div>
+        <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Achievements...</div>
+    </div>
+    
+    <!-- Confetti Container -->
+    <div id="confettiContainer" class="fixed inset-0 pointer-events-none z-40"></div>
+    
+    <!-- New Achievement Popup -->
+    <div id="newAchievementPopup" class="hidden fixed top-4 right-4 w-96 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white rounded-xl shadow-2xl p-6 z-50 achievement-popup">
+        <div class="flex items-start gap-4">
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <i class="bi bi-trophy-fill text-2xl"></i>
+            </div>
+            <div class="flex-1">
+                <h3 class="font-bold text-xl mb-1">New Achievement Unlocked!</h3>
+                <p id="popupAchievementTitle" class="text-yellow-100 mb-2">Achievement Title</p>
+                <p id="popupAchievementDesc" class="text-white/90 text-sm">You've earned a new achievement!</p>
+                <div class="mt-3 flex items-center justify-between">
+                    <span id="popupAchievementPoints" class="font-bold text-lg">+100 points</span>
+                    <button onclick="closeAchievementPopup()" class="text-white/80 hover:text-white">
+                        <i class="bi bi-x-lg text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="mainContent" class="hidden">
+        <!-- Navigation -->
+        <nav class="bg-gradient-to-r from-blue-900 to-blue-500 shadow-lg">
+            <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
+                <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+                    <!-- Logo -->
+                    <a href="./studentdashboard.html" class="flex items-center gap-2 sm:gap-3">
+                        <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
+                             alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
+                        <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope bg-gradient-to-r from-yellow-400 to-yellow-200 bg-clip-text text-transparent">
+                            UMakFit
+                        </span>
+                    </a>
+                    
+                    <!-- Desktop Navigation -->
+                    <div class="hidden lg:flex items-center gap-2 flex-wrap">
+                        <a href="./studentdashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                            <i class="bi bi-speedometer2"></i> 
+                            <span class="hidden xl:inline">Dashboard</span>
+                        </a>
+                        <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                            <i class="bi bi-clipboard-check"></i> 
+                            <span class="hidden xl:inline">Test</span>
+                        </a>
+                        <a href="./studentlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                            <i class="bi bi-book"></i> 
+                            <span class="hidden xl:inline">Lessons</span>
+                        </a>
+                        <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                            <i class="bi bi-award"></i> 
+                            <span class="hidden xl:inline">Grades</span>
+                        </a>
+                        <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                            <i class="bi bi-graph-up"></i> 
+                            <span class="hidden xl:inline">Progress</span>
+                        </a>
+                        <a href="./achievements.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                            <i class="bi bi-trophy"></i> 
+                            <span class="hidden xl:inline">Achievements</span>
+                        </a>
+                        
+                        <!-- Profile Dropdown -->
+                        <div class="relative">
+                            <img src="" alt="Profile" id="profilePictureBtn"
+                                 class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
+                            
+                            <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                                <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
+                                    <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                                    <h6 id="profileDropdownName" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
+                                    <p id="profileDropdownEmail" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
+                                </div>
+                                <div class="p-2">
+                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
+                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
+                                    </a>
+                                    <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
+                                    <div class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 logout-btn">
+                                        <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
+                                        <span class="font-medium text-sm sm:text-base">Logout</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile Right Icons -->
+                    <div class="flex lg:hidden items-center gap-2 sm:gap-3">
+                        <!-- Mobile Profile -->
+                        <div class="relative">
+                            <img src="" alt="Profile" id="profilePictureBtnMobile"
+                                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
+                            
+                            <!-- Mobile Profile Dropdown -->
+                            <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                                <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
+                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                                    <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
+                                    <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
+                                </div>
+                                <div class="p-2">
+                                    <a href="./studentprofile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
+                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
+                                    </a>
+                                    <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
+                                    <div class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 logout-btn">
+                                        <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
+                                        <span class="font-medium text-sm sm:text-base">Logout</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mobile Menu Button -->
+                        <button id="mobileMenuButton" class="text-white p-1 sm:p-2">
+                            <i class="bi bi-list text-2xl sm:text-3xl"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Mobile Navigation Menu -->
+                <div id="mobileMenu" class="hidden lg:hidden mt-3 sm:mt-4 space-y-2">
+                    <a href="./studentdashboard.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
+                        <i class="bi bi-speedometer2 mr-2"></i> Dashboard
+                    </a>
+                    <a href="./test.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
+                        <i class="bi bi-clipboard-check mr-2"></i> Test
+                    </a>
+                    <a href="./studentlesson.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
+                        <i class="bi bi-book mr-2"></i> Lessons
+                    </a>
+                    <a href="./studentgrades.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
+                        <i class="bi bi-award mr-2"></i> Grades
+                    </a>
+                    <a href="./progress.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
+                        <i class="bi bi-graph-up mr-2"></i> Progress
+                    </a>
+                    <a href="./achievements.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm">
+                        <i class="bi bi-trophy mr-2"></i> Achievements
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 max-w-7xl">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h1 class="text-3xl sm:text-4xl font-black text-gray-900 mb-2">Achievements</h1>
+                        <p class="text-gray-600 text-sm sm:text-base">Track your accomplishments and milestones on UMakFit</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-gradient-to-r from-blue-100 to-blue-200 px-4 py-2 rounded-lg">
+                            <span class="text-blue-800 text-sm font-semibold">Total Points:</span>
+                            <span id="totalPoints" class="text-blue-900 text-lg font-bold ml-2">0</span>
+                        </div>
+                        <div class="bg-gradient-to-r from-yellow-100 to-yellow-200 px-4 py-2 rounded-lg">
+                            <span class="text-yellow-800 text-sm font-semibold">Achievements:</span>
+                            <span id="achievementCount" class="text-yellow-900 text-lg font-bold ml-2">0/16</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-700 font-medium text-sm">Overall Progress</span>
+                        <span id="progressPercentage" class="text-blue-600 font-bold text-sm">0%</span>
+                    </div>
+                    <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                        <div id="progressBar" class="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Achievements Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - User Profile & Stats -->
+                <div class="lg:col-span-1">
+                    <!-- User Profile Card -->
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-6">
+                        <div class="flex flex-col items-center text-center">
+                            <img id="studentProfilePicture" src="" alt="Profile" class="w-24 h-24 rounded-full border-4 border-blue-500 object-cover mb-4">
+                            <h3 id="studentProfileName" class="text-xl font-bold text-gray-900 mb-1">Student Name</h3>
+                            <p id="studentProfileCourse" class="text-gray-600 text-sm mb-4">Course • Section</p>
+                            
+                            <div class="grid grid-cols-2 gap-4 w-full mb-6">
+                                <div class="bg-blue-50 p-3 rounded-lg">
+                                    <div class="text-blue-800 text-2xl font-bold mb-1" id="completedTests">0</div>
+                                    <div class="text-blue-600 text-xs font-semibold">Tests Completed</div>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-lg">
+                                    <div class="text-green-800 text-2xl font-bold mb-1" id="avgScore">0</div>
+                                    <div class="text-green-600 text-xs font-semibold">Avg. Score</div>
+                                </div>
+                            </div>
+                            
+                            <div class="w-full">
+                                <h4 class="text-gray-700 font-semibold text-sm mb-3 text-left">Recent Badges</h4>
+                                <div class="flex gap-2" id="recentBadges">
+                                    <!-- Recent badges will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <i class="bi bi-bar-chart-fill text-blue-500"></i>
+                            Achievement Stats
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 text-sm">Bronze Achievements</span>
+                                <span class="text-yellow-700 font-bold" id="bronzeCount">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 text-sm">Silver Achievements</span>
+                                <span class="text-gray-500 font-bold" id="silverCount">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 text-sm">Gold Achievements</span>
+                                <span class="text-yellow-500 font-bold" id="goldCount">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 text-sm">Platinum Achievements</span>
+                                <span class="text-blue-500 font-bold" id="platinumCount">0</span>
+                            </div>
+                            
+                            <div class="h-px bg-gray-200 my-2"></div>
+                            
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 text-sm">Current Streak</span>
+                                <span class="text-green-600 font-bold" id="currentStreak">0 days</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 text-sm">Best Streak</span>
+                                <span class="text-green-700 font-bold" id="bestStreak">0 days</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column - Achievements List -->
+                <div class="lg:col-span-2">
+                    <!-- Achievement Categories -->
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">My Achievements</h2>
+                        
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <button class="achievement-filter px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm" data-filter="all">All</button>
+                            <button class="achievement-filter px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-300" data-filter="unlocked">Unlocked</button>
+                            <button class="achievement-filter px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-300" data-filter="locked">Locked</button>
+                            <button class="achievement-filter px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-300" data-filter="profile">Profile</button>
+                            <button class="achievement-filter px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-300" data-filter="tests">Tests</button>
+                            <button class="achievement-filter px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-300" data-filter="performance">Performance</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Achievements Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="achievementsGrid">
+                        <!-- Achievement cards will be loaded here -->
+                        <div class="text-center py-12 col-span-2">
+                            <i class="bi bi-trophy text-6xl text-gray-300 mb-3"></i>
+                            <p class="text-gray-600 font-semibold">Loading achievements...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Legend Section -->
+            <div class="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Achievement Legend</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-yellow-700 flex items-center justify-center">
+                            <i class="bi bi-award text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 text-sm">Bronze</p>
+                            <p class="text-gray-600 text-xs">Basic achievements</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center">
+                            <i class="bi bi-award text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 text-sm">Silver</p>
+                            <p class="text-gray-600 text-xs">Intermediate achievements</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center">
+                            <i class="bi bi-award text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 text-sm">Gold</p>
+                            <p class="text-gray-600 text-xs">Advanced achievements</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                            <i class="bi bi-award text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 text-sm">Platinum</p>
+                            <p class="text-gray-600 text-xs">Elite achievements</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-gradient-to-r from-blue-900 to-blue-800 text-white mt-12 sm:mt-16 py-8 sm:py-12">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
+                    <!-- About UmakFit & College of Human Kinetics -->
+                    <div>
+                        <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                            <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
+                                 alt="UMak Logo" class="h-12 w-auto object-contain">
+                            <div>
+                                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
+                                <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
+                            </div>
+                        </div>
+                        <p class="text-sm lg:text-base leading-relaxed text-blue-100">
+                            UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati. 
+                            Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
+                        </p>
+                        <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
+                            <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Fitness Tracking</span>
+                            <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Performance Assessment</span>
+                            <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Health & Wellness</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div>
+                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
+                        <div class="grid grid-cols-2 gap-4 lg:gap-6">
+                            <div class="space-y-3">
+                                <a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                                    <i class="bi bi-book mr-2"></i>Lessons
+                                </a>
+                                <a href="./test.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                                    <i class="bi bi-clipboard-check mr-2"></i>Tests
+                                </a>
+                                <a href="./progress.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                                    <i class="bi bi-graph-up mr-2"></i>Progress
+                                </a>
+                            </div>
+                            <div class="space-y-3">
+                                <a href="./studentgrades.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                                    <i class="bi bi-award mr-2"></i>Grades
+                                </a>
+                                <a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                                    <i class="bi bi-person-circle mr-2"></i>Profile
+                                </a>
+                                <a href="./achievements.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                                    <i class="bi bi-trophy mr-2"></i>Achievements
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact & Social -->
+                    <div>
+                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
+                        <div class="space-y-4 lg:space-y-5">
+                            <div class="flex items-start gap-3">
+                                <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
+                                <p class="text-sm lg:text-base text-blue-100">
+                                    College of Human Kinetics<br>
+                                    University of Makati<br>
+                                    J.P. Rizal Extension, West Rembo<br>
+                                    Taguig City, Metro Manila
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
+                                <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">
+                                    chk@umak.edu.ph
+                                </a>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
+                                <span class="text-blue-100 text-sm lg:text-base">(02) 8882-0801 loc. 3001</span>
+                            </div>
+                            <div class="flex items-center gap-4 pt-3">
+                                <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
+                                    <i class="bi bi-facebook text-white text-lg lg:text-xl"></i>
+                                </a>
+                                <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
+                                    <i class="bi bi-twitter text-white text-lg lg:text-xl"></i>
+                                </a>
+                                <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
+                                    <i class="bi bi-instagram text-white text-lg lg:text-xl"></i>
+                                </a>
+                                <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
+                                    <i class="bi bi-youtube text-white text-lg lg:text-xl"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Divider -->
+                <div class="border-t border-blue-600/50 mt-8 lg:mt-12 pt-6 lg:pt-8">
+                    <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+                        <!-- Copyright -->
+                        <div class="text-center lg:text-left">
+                            <p class="text-xs lg:text-sm text-blue-200">
+                                © 2025 University of Makati - College of Human Kinetics. All Rights Reserved.
+                            </p>
+                        </div>
+                        
+                        <!-- University Links -->
+                        <div class="flex flex-wrap justify-center gap-3 lg:gap-4">
+                            <a href="https://umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
+                                University of Makati
+                            </a>
+                            <span class="text-blue-400">•</span>
+                            <a href="https://library.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
+                                UMak Online Library
+                            </a>
+                            <span class="text-blue-400">•</span>
+                            <a href="https://tbl.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
+                                TBL Hub
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            collection, 
+            query, 
+            where, 
+            getDocs,
+            orderBy,
+            onSnapshot
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+            authDomain: "umakfit-e3b1d.firebaseapp.com",
+            projectId: "umakfit-e3b1d",
+            storageBucket: "umakfit-e3b1d.appspot.com",
+            messagingSenderId: "276569891504",
+            appId: "1:276569891504:web:39b1732b519f4d8b785175"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Global variables
+        let currentUser = null;
+        let studentData = null;
+        let achievements = [];
+        let unlockedAchievements = [];
+        let testResults = [];
+        let testCategoriesCompleted = new Set();
+        let previousUnlockedCount = 0;
+
+        // ✅ FIXED: Use SAME scoring function as test.html
+        function calculateTestScore(testName, result, testTarget = null) {
+            const normalized = testName.toLowerCase().trim();
+            
+            // Check if result is an object with a pre-calculated score
+            if (result && typeof result === 'object' && result !== null) {
+                if (result.score !== undefined && result.score !== null) {
+                    const score = parseFloat(result.score);
+                    if (!isNaN(score) && score >= 0 && score <= 100) {
+                        console.log(`✅ Using stored score: ${score} for ${testName}`);
+                        return score;
+                    }
+                }
+            }
+            
+            // Extract numeric value from result
+            let numericValue = 0;
+            
+            if (typeof result === 'object' && result !== null) {
+                numericValue = result.repetitions || result.time || result.distance || 
+                              result.value || result.result || result.count || 
+                              result.score || 0;
+            } else if (typeof result === 'string') {
+                const match = result.match(/(\d+\.?\d*)/);
+                if (match) {
+                    numericValue = parseFloat(match[1]);
+                } else {
+                    numericValue = parseFloat(result) || 0;
+                }
+            } else {
+                numericValue = parseFloat(result) || 0;
+            }
+            
+            console.log(`🎯 Calculating: ${testName} | Value: ${numericValue} | Target: ${testTarget}`);
+            
+            // Use test target if available
+            if (testTarget && testTarget > 0) {
+                // REPETITION TESTS (push-ups, sit-ups, curl-ups)
+                if (normalized.includes('push-up') || normalized.includes('pushup') || 
+                    normalized.includes('sit-up') || normalized.includes('situp') ||
+                    normalized.includes('curl-up')) {
+                    
+                    const reps = numericValue;
+                    if (reps >= testTarget) return 100;
+                    
+                    const percentage = (reps / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 100) score = 100;
+                    else if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    console.log(`💪 Strength Test: ${reps}/${testTarget} reps → ${score}%`);
+                    return Math.round(score);
+                }
+                
+                // PLANK (time-based in seconds)
+                if (normalized.includes('plank')) {
+                    let seconds = numericValue;
+                    if (seconds >= testTarget) return 100;
+                    
+                    const percentage = (seconds / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 100) score = 100;
+                    else if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    console.log(`⏱️ Plank Test: ${seconds}s/${testTarget}s → ${score}%`);
+                    return Math.round(score);
+                }
+                
+                // SIT-AND-REACH (flexibility in cm)
+                if (normalized.includes('sit-and-reach')) {
+                    const distance = numericValue;
+                    if (distance >= testTarget) return 100;
+                    
+                    const percentage = (distance / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 100) score = 100;
+                    else if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    console.log(`📏 Flexibility Test: ${distance}cm/${testTarget}cm → ${score}%`);
+                    return Math.round(score);
+                }
+                
+                // GRIP STRENGTH (kg)
+                if (normalized.includes('grip')) {
+                    if (numericValue >= testTarget) return 100;
+                    
+                    const percentage = (numericValue / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                // 1-MILE RUN (seconds - LOWER IS BETTER)
+                if (normalized.includes('mile') || normalized.includes('run')) {
+                    if (numericValue <= testTarget) return 100;
+                    
+                    const percentage = (testTarget / numericValue) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                // STEP TEST (heart rate - LOWER IS BETTER)
+                if (normalized.includes('step test') || normalized.includes('3-minute')) {
+                    if (numericValue <= testTarget) return 100;
+                    
+                    const percentage = (testTarget / numericValue) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+            }
+            
+            // Fallback to default scoring if no target set
+            if (normalized.includes('push-up') || normalized.includes('pushup')) {
+                const reps = numericValue;
+                if (reps >= 40) return 100;
+                if (reps >= 35) return 95;
+                if (reps >= 30) return 90;
+                if (reps >= 25) return 85;
+                if (reps >= 20) return 80;
+                if (reps >= 15) return 75;
+                if (reps >= 10) return 70;
+                if (reps >= 5) return 65;
+                return 60;
+            } else if (normalized.includes('sit-up') || normalized.includes('situp') || normalized.includes('curl-up')) {
+                const reps = numericValue;
+                if (reps >= 50) return 100;
+                if (reps >= 45) return 95;
+                if (reps >= 40) return 90;
+                if (reps >= 35) return 85;
+                if (reps >= 30) return 80;
+                if (reps >= 25) return 75;
+                if (reps >= 20) return 70;
+                if (reps >= 15) return 65;
+                return 60;
+            } else if (normalized.includes('plank')) {
+                let seconds = numericValue;
+                if (seconds >= 180) return 100;
+                if (seconds >= 150) return 95;
+                if (seconds >= 120) return 90;
+                if (seconds >= 100) return 85;
+                if (seconds >= 80) return 80;
+                if (seconds >= 60) return 75;
+                if (seconds >= 45) return 70;
+                if (seconds >= 30) return 65;
+                return 60;
+            } else if (normalized.includes('step test') || normalized.includes('3-minute')) {
+                const heartRate = numericValue;
+                if (heartRate <= 70) return 100;
+                if (heartRate <= 80) return 95;
+                if (heartRate <= 90) return 90;
+                if (heartRate <= 100) return 85;
+                if (heartRate <= 110) return 80;
+                if (heartRate <= 120) return 75;
+                if (heartRate <= 130) return 70;
+                return 65;
+            } else if (normalized.includes('mile') || normalized.includes('run')) {
+                let totalSeconds = numericValue;
+                if (totalSeconds <= 360) return 100;
+                if (totalSeconds <= 420) return 95;
+                if (totalSeconds <= 480) return 90;
+                if (totalSeconds <= 540) return 85;
+                if (totalSeconds <= 600) return 80;
+                if (totalSeconds <= 660) return 75;
+                if (totalSeconds <= 720) return 70;
+                if (totalSeconds <= 780) return 65;
+                return 60;
+            } else if (normalized.includes('sit-and-reach')) {
+                const distance = numericValue;
+                if (distance >= 25) return 100;
+                if (distance >= 20) return 95;
+                if (distance >= 15) return 90;
+                if (distance >= 10) return 85;
+                if (distance >= 5) return 80;
+                if (distance >= 0) return 75;
+                if (distance >= -5) return 70;
+                return 65;
+            } else if (normalized.includes('grip')) {
+                const strength = numericValue;
+                if (strength >= 60) return 100;
+                if (strength >= 55) return 95;
+                if (strength >= 50) return 90;
+                if (strength >= 45) return 85;
+                if (strength >= 40) return 80;
+                if (strength >= 35) return 75;
+                if (strength >= 30) return 70;
+                return 65;
+            }
+            
+            console.log(`❓ Unknown test type: ${testName}, using default score`);
+            return 100; // Default to 100 if we can't determine
+        }
+
+        // ✅ FIXED: Load test results with REAL-TIME updates
+        async function loadTestResults() {
+            try {
+                if (!studentData || !studentData.email) {
+                    testResults = [];
+                    return [];
+                }
+
+                console.log('📊 Loading test results for achievements:', studentData.email);
+                
+                // Set up real-time listener (same as test.html)
+                const resultsQuery = query(
+                    collection(db, 'testResults'),
+                    where('studentEmail', '==', studentData.email)
+                );
+                
+                onSnapshot(resultsQuery, (snapshot) => {
+                    console.log('🔄 Real-time test results update detected in achievements!');
+                    
+                    testResults = [];
+                    testCategoriesCompleted.clear();
+                    
+                    // Group results by test to track best scores ONLY (SAME LOGIC AS test.html)
+                    const testResultsByTest = new Map();
+                    
+                    snapshot.forEach((doc) => {
+                        const result = { id: doc.id, ...doc.data() };
+                        
+                        // ✅ USE SAME SCORING LOGIC AS test.html
+                        const score = calculateTestScore(
+                            result.testName, 
+                            result.resultData || result.result, 
+                            result.testTarget
+                        );
+                        
+                        result.score = score;
+                        
+                        // Parse date
+                        if (result.submittedAt && result.submittedAt.toDate) {
+                            result.submittedAt = result.submittedAt.toDate();
+                        } else if (typeof result.submittedAt === 'string') {
+                            result.submittedAt = new Date(result.submittedAt);
+                        } else if (!result.submittedAt) {
+                            result.submittedAt = new Date();
+                        }
+                        
+                        // Group by testId
+                        const testId = result.testId || result.testName;
+                        if (!testResultsByTest.has(testId)) {
+                            testResultsByTest.set(testId, []);
+                        }
+                        testResultsByTest.get(testId).push(result);
+                    });
+                    
+                    // For each test, keep only the BEST attempt (SAME LOGIC AS test.html)
+                    testResultsByTest.forEach((attempts, testId) => {
+                        // Sort by score (highest first)
+                        attempts.sort((a, b) => b.score - a.score);
+                        
+                        // Take the best score only
+                        const bestAttempt = attempts[0];
+                        
+                        // Add to testResults array
+                        testResults.push(bestAttempt);
+                        
+                        // Track test categories
+                        const category = getTestCategory(bestAttempt.testName);
+                        if (category) {
+                            testCategoriesCompleted.add(category);
+                        }
+                        
+                        console.log(`📝 Test: ${bestAttempt.testName} - Best Score: ${bestAttempt.score} - Total Attempts: ${attempts.length}`);
+                    });
+                    
+                    console.log(`✅ Loaded ${testResults.length} unique tests for achievements`);
+                    console.log(`📊 Categories completed: ${Array.from(testCategoriesCompleted).join(', ')}`);
+                    console.log(`📊 Test results:`, testResults);
+                    
+                    // After loading results, check achievements
+                    checkAchievements();
+                    updateStats();
+                    renderAchievements();
+                    
+                }, (error) => {
+                    console.error('❌ Error in test results listener for achievements:', error);
+                    testResults = [];
+                    checkAchievements();
+                    updateStats();
+                    renderAchievements();
+                });
+                
+            } catch (error) {
+                console.error('❌ Error loading test results for achievements:', error);
+                testResults = [];
+                return testResults;
+            }
+        }
+
+        // Get test category
+        function getTestCategory(testName) {
+            if (!testName) return 'Other';
+            
+            const name = testName.toLowerCase();
+            
+            if (name.includes('step') || name.includes('run') || name.includes('mile') || name.includes('cardio') || name.includes('3-minute')) {
+                return 'Cardiorespiratory';
+            } else if (name.includes('push') || name.includes('grip') || name.includes('strength')) {
+                return 'Muscular Strength';
+            } else if (name.includes('curl') || name.includes('plank') || name.includes('endurance')) {
+                return 'Muscular Endurance';
+            } else if (name.includes('sit') && name.includes('reach') || name.includes('flexibility')) {
+                return 'Flexibility';
+            } else if (name.includes('bmi') || name.includes('body') || name.includes('composition')) {
+                return 'Body Composition';
+            }
+            
+            return 'Other';
+        }
+
+        // Get week number from date
+        function getWeekNumber(date) {
+            if (!date) return 0;
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+            const yearStart = new Date(d.getFullYear(), 0, 1);
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return weekNo;
+        }
+
+        // ✅ FIXED: Achievement definitions with proper conditions
+        const achievementList = [
+            {
+                id: 'first_test',
+                title: 'First Step',
+                description: 'Complete your first fitness test',
+                category: 'tests',
+                tier: 'bronze',
+                points: 100,
+                icon: 'bi-flag',
+                unlocked: false
+            },
+            {
+                id: 'test_master',
+                title: 'Test Master',
+                description: 'Complete 5 different fitness tests',
+                category: 'tests',
+                tier: 'silver',
+                points: 250,
+                icon: 'bi-clipboard-check',
+                unlocked: false
+            },
+            {
+                id: 'perfect_score_100',
+                title: 'Perfect Score',
+                description: 'Achieve a perfect score of 100 on any test',
+                category: 'performance',
+                tier: 'gold',
+                points: 500,
+                icon: 'bi-star',
+                unlocked: false
+            },
+            {
+                id: 'perfect_score_90',
+                title: 'Excellent Performer',
+                description: 'Achieve a score of 90 or above on any test',
+                category: 'performance',
+                tier: 'silver',
+                points: 300,
+                icon: 'bi-award',
+                unlocked: false
+            },
+            {
+                id: 'perfect_score_80',
+                title: 'Good Performer',
+                description: 'Achieve a score of 80 or above on any test',
+                category: 'performance',
+                tier: 'bronze',
+                points: 150,
+                icon: 'bi-check-circle',
+                unlocked: false
+            },
+            {
+                id: 'profile_complete',
+                title: 'Profile Pioneer',
+                description: 'Complete your profile with all required information',
+                category: 'profile',
+                tier: 'bronze',
+                points: 50,
+                icon: 'bi-person-check',
+                unlocked: false
+            },
+            {
+                id: 'week_streak',
+                title: 'Consistency King',
+                description: 'Complete tests in 3 consecutive weeks',
+                category: 'performance',
+                tier: 'silver',
+                points: 300,
+                icon: 'bi-fire',
+                unlocked: false
+            },
+            {
+                id: 'top_performer',
+                title: 'Top Performer',
+                description: 'Achieve an average score above 85%',
+                category: 'performance',
+                tier: 'gold',
+                points: 400,
+                icon: 'bi-trophy',
+                unlocked: false
+            },
+            {
+                id: 'all_categories',
+                title: 'Versatile Athlete',
+                description: 'Complete tests in all 5 fitness categories',
+                category: 'tests',
+                tier: 'platinum',
+                points: 1000,
+                icon: 'bi-award',
+                unlocked: false
+            },
+            {
+                id: 'complete_all',
+                title: 'UMakFit Legend',
+                description: 'Unlock all achievements',
+                category: 'performance',
+                tier: 'platinum',
+                points: 2000,
+                icon: 'bi-crown',
+                unlocked: false
+            }
+        ];
+
+        // ✅ FIXED: Check achievements based on real data
+        function checkAchievements() {
+            try {
+                console.log('=== CHECKING ACHIEVEMENTS ===');
+                console.log('Student data:', studentData);
+                console.log('Test results count:', testResults.length);
+                console.log('Test results:', testResults);
+                console.log('Categories completed:', Array.from(testCategoriesCompleted));
+                
+                // Get previous unlocked count
+                const storedUnlocked = localStorage.getItem(`achievements_unlocked_${studentData?.email}`);
+                previousUnlockedCount = storedUnlocked ? parseInt(storedUnlocked) : 0;
+                
+                // Reset achievements
+                achievements = JSON.parse(JSON.stringify(achievementList));
+                unlockedAchievements = [];
+                
+                // Check all achievements
+                for (const achievement of achievements) {
+                    try {
+                        let isUnlocked = false;
+                        
+                        // Check conditions
+                        switch(achievement.id) {
+                            case 'first_test':
+                                isUnlocked = testResults.length >= 1;
+                                console.log(`🔍 First Test: ${testResults.length >= 1} (${testResults.length} tests)`);
+                                break;
+                                
+                            case 'test_master':
+                                isUnlocked = testResults.length >= 5;
+                                console.log(`🔍 Test Master: ${testResults.length >= 5} (${testResults.length}/5 tests)`);
+                                break;
+                                
+                            case 'perfect_score_100':
+                                isUnlocked = testResults.some(r => {
+                                    const score = r.score || calculateTestScore(r.testName, r.result, r.testTarget);
+                                    return score === 100;
+                                });
+                                console.log(`🔍 Perfect Score 100: ${isUnlocked}`);
+                                break;
+                                
+                            case 'perfect_score_90':
+                                isUnlocked = testResults.some(r => {
+                                    const score = r.score || calculateTestScore(r.testName, r.result, r.testTarget);
+                                    return score >= 90 && score < 100;
+                                });
+                                console.log(`🔍 Excellent Performer: ${isUnlocked}`);
+                                break;
+                                
+                            case 'perfect_score_80':
+                                isUnlocked = testResults.some(r => {
+                                    const score = r.score || calculateTestScore(r.testName, r.result, r.testTarget);
+                                    return score >= 80 && score < 90;
+                                });
+                                console.log(`🔍 Good Performer: ${isUnlocked}`);
+                                break;
+                                
+                            case 'profile_complete':
+                                isUnlocked = studentData && 
+                                    studentData.age > 0 && 
+                                    studentData.height > 0 && 
+                                    studentData.weight > 0 &&
+                                    studentData.contactNumber !== 'Not Provided' &&
+                                    studentData.gender !== 'Not Specified';
+                                console.log(`🔍 Profile Complete: ${isUnlocked}`);
+                                break;
+                                
+                            case 'all_categories':
+                                isUnlocked = testCategoriesCompleted.size >= 5;
+                                console.log(`🔍 All Categories: ${isUnlocked} (${testCategoriesCompleted.size}/5)`);
+                                break;
+                                
+                            case 'top_performer':
+                                if (testResults.length > 0) {
+                                    const totalScore = testResults.reduce((sum, r) => {
+                                        return sum + (r.score || calculateTestScore(r.testName, r.result, r.testTarget));
+                                    }, 0);
+                                    const avgScore = totalScore / testResults.length;
+                                    isUnlocked = avgScore >= 85;
+                                    console.log(`🔍 Top Performer: ${isUnlocked} (Avg: ${avgScore})`);
+                                }
+                                break;
+                                
+                            case 'week_streak':
+                                // Calculate week streak
+                                if (testResults.length >= 2) {
+                                    const weeks = new Set();
+                                    testResults.forEach(r => {
+                                        if (r.submittedAt) {
+                                            const week = getWeekNumber(r.submittedAt);
+                                            weeks.add(week);
+                                        }
+                                    });
+                                    
+                                    const weekArray = Array.from(weeks).sort();
+                                    let maxConsecutive = 1;
+                                    let current = 1;
+                                    
+                                    for (let i = 1; i < weekArray.length; i++) {
+                                        if (weekArray[i] === weekArray[i-1] + 1) {
+                                            current++;
+                                            maxConsecutive = Math.max(maxConsecutive, current);
+                                        } else {
+                                            current = 1;
+                                        }
+                                    }
+                                    
+                                    isUnlocked = maxConsecutive >= 3;
+                                    console.log(`🔍 Week Streak: ${isUnlocked} (Max: ${maxConsecutive} weeks)`);
+                                }
+                                break;
+                                
+                            case 'complete_all':
+                                // This will be checked after all others
+                                break;
+                        }
+                        
+                        achievement.unlocked = isUnlocked;
+                        
+                        if (isUnlocked) {
+                            unlockedAchievements.push(achievement);
+                        }
+                        
+                    } catch (error) {
+                        console.error(`Error checking achievement ${achievement.id}:`, error);
+                        achievement.unlocked = false;
+                    }
+                }
+                
+                // Check "Complete All" achievement
+                const completeAllAchievement = achievements.find(a => a.id === 'complete_all');
+                if (completeAllAchievement) {
+                    const totalAchievements = achievements.length;
+                    const unlockedCount = unlockedAchievements.length;
+                    // Need to unlock ALL other achievements
+                    completeAllAchievement.unlocked = (unlockedCount >= totalAchievements - 1);
+                    
+                    if (completeAllAchievement.unlocked) {
+                        unlockedAchievements.push(completeAllAchievement);
+                    }
+                }
+                
+                console.log(`✅ Checked ${achievements.length} achievements`);
+                console.log(`🏆 Unlocked: ${unlockedAchievements.length} achievements`);
+                console.log('🏆 Unlocked achievements:', unlockedAchievements.map(a => a.title));
+                
+                // Check for new achievements
+                if (unlockedAchievements.length > previousUnlockedCount) {
+                    const newAchievements = unlockedAchievements.slice(previousUnlockedCount);
+                    console.log('🎉 New achievements:', newAchievements.map(a => a.title));
+                    
+                    // Show popup for new achievements
+                    if (newAchievements.length > 0) {
+                        showAchievementPopup(newAchievements[0]);
+                        createConfetti();
+                    }
+                    
+                    // Store new unlocked count
+                    localStorage.setItem(`achievements_unlocked_${studentData?.email}`, unlockedAchievements.length.toString());
+                }
+                
+            } catch (error) {
+                console.error('Error checking achievements:', error);
+            }
+        }
+
+        // Render achievements
+        function renderAchievements() {
+            const grid = document.getElementById('achievementsGrid');
+            if (!grid) return;
+            
+            if (achievements.length === 0) {
+                grid.innerHTML = `
+                    <div class="text-center py-12 col-span-2">
+                        <i class="bi bi-trophy text-6xl text-gray-300 mb-3"></i>
+                        <p class="text-gray-600 font-semibold">No achievements found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            achievements.forEach(achievement => {
+                const isUnlocked = achievement.unlocked;
+                const tierColors = {
+                    'bronze': 'bg-yellow-700',
+                    'silver': 'bg-gray-500',
+                    'gold': 'bg-yellow-500',
+                    'platinum': 'bg-blue-500'
+                };
+                
+                const bgColor = tierColors[achievement.tier] || 'bg-gray-500';
+                const textColor = isUnlocked ? 'text-gray-900' : 'text-gray-500';
+                const borderColor = isUnlocked ? 'border-blue-300' : 'border-gray-300';
+                const opacityClass = isUnlocked ? '' : 'opacity-60';
+                const cardBg = isUnlocked ? 'bg-gradient-to-br from-white to-blue-50' : 'bg-white';
+                
+                // Add progress information for test count achievements
+                let progressInfo = '';
+                let progressValue = 0;
+                let progressMax = 1;
+                
+                switch(achievement.id) {
+                    case 'test_master':
+                        progressInfo = `(${testResults.length}/5 tests)`;
+                        progressValue = testResults.length;
+                        progressMax = 5;
+                        break;
+                    case 'all_categories':
+                        progressInfo = `(${testCategoriesCompleted.size}/5 categories)`;
+                        progressValue = testCategoriesCompleted.size;
+                        progressMax = 5;
+                        break;
+                    case 'top_performer':
+                        if (testResults.length > 0) {
+                            const avgScore = testResults.reduce((sum, r) => sum + (r.score || 0), 0) / testResults.length;
+                            progressInfo = `(${Math.round(avgScore)}% average)`;
+                        }
+                        break;
+                }
+                
+                html += `
+                    <div class="${cardBg} rounded-2xl shadow-lg border ${borderColor} p-5 card-hover ${opacityClass} animate-fade-in">
+                        <div class="flex items-start gap-4">
+                            <!-- Achievement Icon -->
+                            <div class="w-16 h-16 ${bgColor} rounded-xl flex items-center justify-center flex-shrink-0 ${isUnlocked ? 'achievement-unlocked' : ''}">
+                                <i class="bi ${achievement.icon} text-white text-2xl"></i>
+                            </div>
+                            
+                            <!-- Achievement Details -->
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-bold ${textColor} text-lg">${achievement.title}</h4>
+                                        ${progressInfo ? `<span class="text-gray-500 text-sm">${progressInfo}</span>` : ''}
+                                    </div>
+                                    <span class="px-2 py-1 ${bgColor} text-white text-xs font-bold rounded-full">${achievement.tier.toUpperCase()}</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-3">${achievement.description}</p>
+                                
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700 font-semibold text-sm">${achievement.points} points</span>
+                                    <div class="flex gap-2">
+                                        ${isUnlocked ? 
+                                            `<span class="text-green-600 font-bold text-sm flex items-center gap-1">
+                                                <i class="bi bi-unlock"></i> Unlocked
+                                            </span>` : 
+                                            `<span class="text-gray-400 font-bold text-sm flex items-center gap-1">
+                                                <i class="bi bi-lock"></i> Locked
+                                            </span>`
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress bar for specific achievements -->
+                        ${progressMax > 1 ? `
+                        <div class="mt-4">
+                            <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                <span>Progress</span>
+                                <span>${progressValue}/${progressMax}</span>
+                            </div>
+                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full ${bgColor} rounded-full" style="width: ${Math.min((progressValue/progressMax)*100, 100)}%"></div>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            grid.innerHTML = html;
+            
+            // Update stats
+            updateStats();
+        }
+
+        // Filter achievements
+        function filterAchievements(filter) {
+            const grid = document.getElementById('achievementsGrid');
+            if (!grid || achievements.length === 0) return;
+            
+            let filteredAchievements = achievements;
+            
+            if (filter === 'unlocked') {
+                filteredAchievements = achievements.filter(a => a.unlocked);
+            } else if (filter === 'locked') {
+                filteredAchievements = achievements.filter(a => !a.unlocked);
+            } else if (filter !== 'all') {
+                filteredAchievements = achievements.filter(a => a.category === filter);
+            }
+            
+            if (filteredAchievements.length === 0) {
+                grid.innerHTML = `
+                    <div class="text-center py-12 col-span-2">
+                        <i class="bi bi-filter-circle text-6xl text-gray-300 mb-3"></i>
+                        <p class="text-gray-600 font-semibold">No achievements found</p>
+                        <p class="text-gray-400 text-sm">Try a different filter</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            filteredAchievements.forEach(achievement => {
+                const isUnlocked = achievement.unlocked;
+                const tierColors = {
+                    'bronze': 'bg-yellow-700',
+                    'silver': 'bg-gray-500',
+                    'gold': 'bg-yellow-500',
+                    'platinum': 'bg-blue-500'
+                };
+                
+                const bgColor = tierColors[achievement.tier] || 'bg-gray-500';
+                const textColor = isUnlocked ? 'text-gray-900' : 'text-gray-500';
+                const borderColor = isUnlocked ? 'border-blue-300' : 'border-gray-300';
+                const opacityClass = isUnlocked ? '' : 'opacity-60';
+                const cardBg = isUnlocked ? 'bg-gradient-to-br from-white to-blue-50' : 'bg-white';
+                
+                html += `
+                    <div class="${cardBg} rounded-2xl shadow-lg border ${borderColor} p-5 card-hover ${opacityClass}">
+                        <div class="flex items-start gap-4">
+                            <div class="w-16 h-16 ${bgColor} rounded-xl flex items-center justify-center flex-shrink-0 ${isUnlocked ? 'achievement-unlocked' : ''}">
+                                <i class="bi ${achievement.icon} text-white text-2xl"></i>
+                            </div>
+                            
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-bold ${textColor} text-lg">${achievement.title}</h4>
+                                    <span class="px-2 py-1 ${bgColor} text-white text-xs font-bold rounded-full">${achievement.tier.toUpperCase()}</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-3">${achievement.description}</p>
+                                
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700 font-semibold text-sm">${achievement.points} points</span>
+                                    ${isUnlocked ? 
+                                        `<span class="text-green-600 font-bold text-sm flex items-center gap-1">
+                                            <i class="bi bi-unlock"></i> Unlocked
+                                        </span>` : 
+                                        `<span class="text-gray-400 font-bold text-sm flex items-center gap-1">
+                                            <i class="bi bi-lock"></i> Locked
+                                        </span>`
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            grid.innerHTML = html;
+        }
+
+        // Update stats
+        function updateStats() {
+            if (!studentData) return;
+            
+            // Update profile section
+            const profilePic = document.getElementById('studentProfilePicture');
+            const profileName = document.getElementById('studentProfileName');
+            const profileCourse = document.getElementById('studentProfileCourse');
+            const completedTestsEl = document.getElementById('completedTests');
+            const avgScoreEl = document.getElementById('avgScore');
+            
+            if (profilePic) {
+                profilePic.src = currentUser?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(studentData.displayName)}&background=3b82f6&color=fff&size=128`;
+            }
+            if (profileName) profileName.textContent = studentData.displayName;
+            if (profileCourse) profileCourse.textContent = `${studentData.course} • ${studentData.section}`;
+            
+            // Calculate unique tests (already done in loadTestResults)
+            if (completedTestsEl) completedTestsEl.textContent = testResults.length;
+            
+            // Calculate average score
+            if (avgScoreEl) {
+                if (testResults.length > 0) {
+                    const avgScore = testResults.reduce((sum, r) => sum + (r.score || 0), 0) / testResults.length;
+                    avgScoreEl.textContent = Math.round(avgScore);
+                } else {
+                    avgScoreEl.textContent = '0';
+                }
+            }
+            
+            // Update achievement stats
+            const unlockedCount = unlockedAchievements.length;
+            const totalCount = achievements.length;
+            const progressPercentage = Math.round((unlockedCount / totalCount) * 100);
+            
+            // Update progress bar
+            const progressBar = document.getElementById('progressBar');
+            const progressPercentageEl = document.getElementById('progressPercentage');
+            const achievementCountEl = document.getElementById('achievementCount');
+            
+            if (progressBar) {
+                progressBar.style.width = `${progressPercentage}%`;
+            }
+            if (progressPercentageEl) {
+                progressPercentageEl.textContent = `${progressPercentage}%`;
+            }
+            if (achievementCountEl) {
+                achievementCountEl.textContent = `${unlockedCount}/${totalCount}`;
+            }
+            
+            // Calculate total points
+            const totalPoints = unlockedAchievements.reduce((sum, achievement) => sum + achievement.points, 0);
+            const totalPointsEl = document.getElementById('totalPoints');
+            if (totalPointsEl) totalPointsEl.textContent = totalPoints;
+            
+            // Count achievements by tier
+            const bronzeCount = unlockedAchievements.filter(a => a.tier === 'bronze').length;
+            const silverCount = unlockedAchievements.filter(a => a.tier === 'silver').length;
+            const goldCount = unlockedAchievements.filter(a => a.tier === 'gold').length;
+            const platinumCount = unlockedAchievements.filter(a => a.tier === 'platinum').length;
+            
+            document.getElementById('bronzeCount').textContent = bronzeCount;
+            document.getElementById('silverCount').textContent = silverCount;
+            document.getElementById('goldCount').textContent = goldCount;
+            document.getElementById('platinumCount').textContent = platinumCount;
+            
+            // Calculate streak from test results
+            const streak = calculateStreakFromResults();
+            document.getElementById('currentStreak').textContent = `${streak.current} ${streak.current === 1 ? 'day' : 'days'}`;
+            document.getElementById('bestStreak').textContent = `${streak.best} ${streak.best === 1 ? 'day' : 'days'}`;
+            
+            // Update recent badges
+            updateRecentBadges();
+        }
+
+        // Calculate streak from test results
+        function calculateStreakFromResults() {
+            if (testResults.length === 0) {
+                return { current: 0, best: 0 };
+            }
+            
+            // Get unique dates
+            const uniqueDates = new Set();
+            testResults.forEach(result => {
+                if (result.submittedAt) {
+                    const dateStr = result.submittedAt.toISOString().split('T')[0];
+                    uniqueDates.add(dateStr);
+                }
+            });
+            
+            const dates = Array.from(uniqueDates).sort();
+            let currentStreak = 0;
+            let bestStreak = 0;
+            
+            // Calculate streaks
+            let tempStreak = 1;
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            
+            for (let i = 0; i < dates.length; i++) {
+                if (i === 0) {
+                    tempStreak = 1;
+                } else {
+                    const currentDate = new Date(dates[i]);
+                    const prevDate = new Date(dates[i-1]);
+                    const diffDays = Math.floor((currentDate - prevDate) / (1000 * 60 * 60 * 24));
+                    if (diffDays === 1) {
+                        tempStreak++;
+                    } else {
+                        bestStreak = Math.max(bestStreak, tempStreak);
+                        tempStreak = 1;
+                    }
+                }
+                
+                // Check if this date is today or yesterday for current streak
+                if (dates[i] === today || dates[i] === yesterday) {
+                    currentStreak = tempStreak;
+                }
+            }
+            
+            bestStreak = Math.max(bestStreak, tempStreak);
+            
+            return {
+                current: currentStreak,
+                best: bestStreak
+            };
+        }
+
+        // Update recent badges
+        function updateRecentBadges() {
+            const recentBadgesEl = document.getElementById('recentBadges');
+            if (!recentBadgesEl) return;
+            
+            // Get up to 3 most recently unlocked achievements
+            const recentUnlocked = unlockedAchievements.slice(-3).reverse();
+            
+            if (recentUnlocked.length === 0) {
+                recentBadgesEl.innerHTML = `
+                    <div class="text-center text-gray-400 text-sm py-2 w-full">
+                        No badges yet. Complete tests to earn badges!
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            const tierColors = {
+                'bronze': 'bg-yellow-700',
+                'silver': 'bg-gray-500',
+                'gold': 'bg-yellow-500',
+                'platinum': 'bg-blue-500'
+            };
+            
+            recentUnlocked.forEach(achievement => {
+                const bgColor = tierColors[achievement.tier] || 'bg-gray-500';
+                html += `
+                    <div class="relative group">
+                        <div class="w-12 h-12 ${bgColor} rounded-full flex items-center justify-center cursor-pointer">
+                            <i class="bi ${achievement.icon} text-white text-lg"></i>
+                        </div>
+                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                            ${achievement.title}
+                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                                <div class="w-2 h-2 bg-gray-900 rotate-45"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            recentBadgesEl.innerHTML = html;
+        }
+
+        // Show achievement popup
+        function showAchievementPopup(achievement) {
+            const popup = document.getElementById('newAchievementPopup');
+            const title = document.getElementById('popupAchievementTitle');
+            const desc = document.getElementById('popupAchievementDesc');
+            const points = document.getElementById('popupAchievementPoints');
+            
+            if (popup && title && desc && points) {
+                title.textContent = achievement.title;
+                desc.textContent = achievement.description;
+                points.textContent = `+${achievement.points} points`;
+                
+                popup.classList.remove('hidden');
+                
+                // Auto-close after 5 seconds
+                setTimeout(() => {
+                    closeAchievementPopup();
+                }, 5000);
+            }
+        }
+
+        // Close achievement popup
+        window.closeAchievementPopup = function() {
+            const popup = document.getElementById('newAchievementPopup');
+            if (popup) {
+                popup.classList.add('hidden');
+            }
+        };
+
+        // Create confetti effect
+        function createConfetti() {
+            const container = document.getElementById('confettiContainer');
+            if (!container) return;
+            
+            const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                confetti.style.animation = `confetti-fall ${Math.random() * 3 + 2}s linear forwards`;
+                confetti.style.animationDelay = `${Math.random() * 1}s`;
+                
+                container.appendChild(confetti);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    if (confetti.parentElement) {
+                        confetti.remove();
+                    }
+                }, 5000);
+            }
+        }
+
+        // Load student data
+        async function loadStudentData(user) {
+            try {
+                console.log('=== LOADING STUDENT DATA ===');
+                console.log('Student email:', user.email);
+                currentUser = user;
+                
+                // Load student data from students collection
+                const studentsQuery = query(
+                    collection(db, 'students'),
+                    where('email', '==', user.email)
+                );
+                
+                const studentsSnapshot = await getDocs(studentsQuery);
+                
+                if (!studentsSnapshot.empty) {
+                    const studentDoc = studentsSnapshot.docs[0];
+                    const data = studentDoc.data();
+                    
+                    console.log('📋 Raw student data:', data);
+                    
+                    let displayName = '';
+                    if (user.displayName) {
+                        displayName = user.displayName;
+                    } else if (data.firstName || data.lastName) {
+                        displayName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+                    } else {
+                        displayName = user.email.split('@')[0];
+                    }
+
+                    // Store student data
+                    studentData = {
+                        uid: user.uid,
+                        displayName: displayName,
+                        email: data.email || user.email,
+                        studentId: data.umakId || data.studentId || data.student_id || data.id || '000000',
+                        course: data.department || data.course || data.courseCode || 'Not Assigned',
+                        section: data.section || 'Not Assigned',
+                        yearLevel: data.yearLevel || 'Not Assigned',
+                        firstName: data.firstName || '',
+                        lastName: data.lastName || '',
+                        age: data.age || 0,
+                        gender: data.gender || 'Not Specified',
+                        height: data.height || 0,
+                        weight: data.weight || 0,
+                        contactNumber: data.contactNumber || 'Not Provided',
+                        medicalCondition: data.medicalCondition || 'None',
+                        testsDone: data.testsDone || 0,
+                        overallScore: data.overallScore || 0,
+                        bestScore: data.bestScore || 0,
+                        weekStreak: data.weekStreak || 0
+                    };
+                    
+                    console.log('✅ Student data loaded:', studentData);
+                    
+                    // Load test results (with real-time updates)
+                    loadTestResults();
+                    
+                    // Check and update achievements
+                    checkAchievements();
+                    
+                    // Update UI
+                    updateProfileUI();
+                    renderAchievements();
+                    updateStats();
+                    
+                    return studentData;
+                    
+                } else {
+                    console.log('⚠️ No student profile found in students collection');
+                    
+                    // Create minimal student data
+                    studentData = {
+                        uid: user.uid,
+                        displayName: user.displayName || user.email.split('@')[0],
+                        email: user.email,
+                        studentId: 'Not Assigned',
+                        course: 'Not Assigned',
+                        section: 'Not Assigned',
+                        age: 0,
+                        gender: 'Not Specified',
+                        height: 0,
+                        weight: 0,
+                        contactNumber: 'Not Provided',
+                        testsDone: 0,
+                        overallScore: 0,
+                        bestScore: 0,
+                        weekStreak: 0
+                    };
+                    
+                    console.log('⚠️ Using minimal student data');
+                    
+                    // Load test results (with real-time updates)
+                    loadTestResults();
+                    
+                    // Check and update achievements
+                    checkAchievements();
+                    
+                    // Update UI
+                    updateProfileUI();
+                    renderAchievements();
+                    updateStats();
+                    
+                    return studentData;
+                }
+                
+            } catch (error) {
+                console.error('❌ Error loading student data:', error);
+                
+                // Fallback to minimal data
+                studentData = {
+                    uid: user.uid,
+                    displayName: user.displayName || user.email.split('@')[0],
+                    email: user.email,
+                    studentId: 'Error Loading',
+                    course: 'Error Loading',
+                    section: 'Error Loading',
+                    testsDone: 0,
+                    overallScore: 0,
+                    bestScore: 0,
+                    weekStreak: 0
+                };
+                
+                updateProfileUI();
+                
+                return studentData;
+            }
+        }
+
+        // Update profile UI
+        function updateProfileUI() {
+            if (!currentUser) return;
+            
+            const photoURL = currentUser?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(studentData?.displayName || 'User')}&background=3b82f6&color=fff&size=128`;
+            
+            // Update all profile pictures
+            const profileBtn = document.getElementById('profilePictureBtn');
+            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
+            if (profileBtn) profileBtn.src = photoURL;
+            if (profileBtnMobile) profileBtnMobile.src = photoURL;
+            
+            // Update dropdown pictures
+            const dropdownPic = document.getElementById('profileDropdownPicture');
+            const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
+            if (dropdownPic) dropdownPic.src = photoURL;
+            if (dropdownPicMobile) dropdownPicMobile.src = photoURL;
+            
+            // Update names
+            const dropdownName = document.getElementById('profileDropdownName');
+            const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
+            if (dropdownName) dropdownName.textContent = studentData?.displayName || 'Student';
+            if (dropdownNameMobile) dropdownNameMobile.textContent = studentData?.displayName || 'Student';
+            
+            // Update emails
+            const dropdownEmail = document.getElementById('profileDropdownEmail');
+            const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
+            if (dropdownEmail) dropdownEmail.textContent = studentData?.email || currentUser?.email || '';
+            if (dropdownEmailMobile) dropdownEmailMobile.textContent = studentData?.email || currentUser?.email || '';
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Achievement filter buttons
+            document.querySelectorAll('.achievement-filter').forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.achievement-filter').forEach(btn => {
+                        btn.classList.remove('bg-blue-600', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                    
+                    // Add active class to clicked button
+                    button.classList.remove('bg-gray-200', 'text-gray-700');
+                    button.classList.add('bg-blue-600', 'text-white');
+                    
+                    // Filter achievements
+                    const filter = button.getAttribute('data-filter');
+                    filterAchievements(filter);
+                });
+            });
+            
+            // Mobile menu toggle
+            document.getElementById('mobileMenuButton').addEventListener('click', () => {
+                document.getElementById('mobileMenu').classList.toggle('hidden');
+            });
+            
+            // Profile dropdown
+            document.getElementById('profilePictureBtn').addEventListener('click', toggleProfileDropdown);
+            document.getElementById('profilePictureBtnMobile').addEventListener('click', toggleProfileDropdown);
+            
+            // Logout button
+            document.querySelectorAll('.logout-btn').forEach(btn => {
+                btn.addEventListener('click', handleLogout);
+            });
+        }
+        
+        function toggleProfileDropdown() {
+            const isMobile = window.innerWidth < 1024;
+            const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+        
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                window.location.href = '../login/index.html';
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        }
+
+        // Auth state change listener
+        onAuthStateChanged(auth, async (user) => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const mainContent = document.getElementById('mainContent');
+            
+            if (user) {
+                try {
+                    console.log('=== ACHIEVEMENTS: Loading data ===');
+                    console.log('User:', user.email);
+                    
+                    // Check user role
+                    const userRef = doc(db, 'users', user.uid);
+                    const userDoc = await getDoc(userRef);
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        
+                        if (userData.role !== 'student') {
+                            alert('Access Denied: This page is for students only');
+                            await signOut(auth);
+                            window.location.href = '../login/index.html';
+                            return;
+                        }
+                    }
+                    
+                    // Load student data
+                    await loadStudentData(user);
+                    
+                    // Setup event listeners
+                    setupEventListeners();
+                    
+                    // Show the main content
+                    loadingScreen.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                    
+                    console.log('✓ Achievements page loaded successfully');
+                    console.log('📊 Test Results:', testResults);
+                    console.log('🏆 Achievements:', unlockedAchievements.map(a => a.title));
+                    
+                } catch (error) {
+                    console.error('Error loading achievements page:', error);
+                    alert('Error loading achievements. Please try again.');
+                    loadingScreen.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                }
+            } else {    
+                console.log('No user, redirecting to login');
+                window.location.href = '../login/index.html';
+            }
+        });
+    </script>
+</body>
+</html>
