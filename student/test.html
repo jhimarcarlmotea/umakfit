@@ -493,6 +493,20 @@
         max-height: 350px !important;
     }
 }
+        @keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+}
     </style>
 </head>
 <body class="bg-gray-50">
@@ -523,7 +537,7 @@
                             <i class="bi bi-speedometer2"></i> 
                             <span class="hidden xl:inline">Dashboard</span>
                         </a>
-                        <a href="#" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                        <a href="#" onclick="checkProfileBeforeTest(event)" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
                             <i class="bi bi-clipboard-check"></i> 
                             <span class="hidden xl:inline">Test</span>
                         </a>
@@ -635,7 +649,7 @@
                     <a href="./studentDashboard.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
                         <i class="bi bi-speedometer2 mr-2"></i> Dashboard
                     </a>
-                    <a href="#" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm">
+                    <a href="#" onclick="checkProfileBeforeTest(event)" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm">
                         <i class="bi bi-clipboard-check mr-2"></i> Tests
                     </a>
                     <a href="./progress.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
@@ -1784,8 +1798,9 @@ window.toggleCategory = function(categoryId) {
     const isCompleted = completion.completed;
     const isViewOnly = test.isViewOnly === true; 
     
-    html += `
-        <div class="bg-${isCompleted ? 'green' : isProfessorEnabled ? 'blue' : isViewOnly ? 'gray' : 'red'}-50 border-2 border-${isCompleted ? 'green' : isProfessorEnabled ? 'blue' : isViewOnly ? 'gray' : 'red'}-200 rounded-xl p-4 hover:bg-${isCompleted ? 'green' : isProfessorEnabled ? 'blue' : isViewOnly ? 'gray' : 'red'}-100 transition-colors">
+    // NEW CODE
+html += `
+    <div class="bg-${isCompleted ? 'red' : isProfessorEnabled ? 'blue' : isViewOnly ? 'gray' : 'red'}-50 border-2 border-${isCompleted ? 'red' : isProfessorEnabled ? 'blue' : isViewOnly ? 'gray' : 'red'}-200 rounded-xl p-4 hover:bg-${isCompleted ? 'red' : isProfessorEnabled ? 'blue' : isViewOnly ? 'gray' : 'red'}-100 transition-colors">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div class="flex-1">
                     <h4 class="font-semibold text-gray-900 text-base mb-1">
@@ -1795,15 +1810,16 @@ window.toggleCategory = function(categoryId) {
                         ${isCompleted ? '<span class="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded-full">Completed</span>' : ''}
                     </h4>
                     <div class="flex flex-wrap gap-2 text-sm">
-                        <p class="${isCompleted ? 'text-green-600' : isProfessorEnabled ? 'text-blue-600' : isViewOnly ? 'text-gray-600' : 'text-red-600'} font-semibold">
+                        <p class="${isCompleted ? 'text-red-600' : isProfessorEnabled ? 'text-blue-600' : isViewOnly ? 'text-gray-600' : 'text-red-600'} font-semibold">
                             ${isCompleted ? `Score: ${completion.bestScore}/100 • ${completion.attempts} Attempt${completion.attempts > 1 ? 's' : ''}` : 
                               isViewOnly ? '⚠️ You are not selected for this test' :
                               `⚠️ Overdue: ${formatDeadline(test.deadline, test.deadlineTime)}`}
                         </p>
                     </div>
                 </div>
+              
                 ${isCompleted ? `
-                    <div class="w-full sm:w-auto px-5 py-2.5 bg-green-100 text-green-700 rounded-lg font-semibold text-sm text-center border-2 border-green-300">
+                    <div class="w-full sm:w-auto px-5 py-2.5 bg-red-100 text-red-700 rounded-lg font-semibold text-sm text-center border-2 border-red-300">
                         Done
                     </div>
                 ` : isViewOnly ? `
@@ -1814,8 +1830,9 @@ window.toggleCategory = function(categoryId) {
                     <button onclick="startOverdueTest('${test.id}', '${encodeURIComponent(test.testName)}')" class="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-sm hover:from-blue-600 hover:to-blue-700 hover:-translate-y-0.5 hover:shadow-lg transition-all whitespace-nowrap">
                         Take Test Now
                     </button>
+               // NEW CODE
                 ` : `
-                    <div class="w-full sm:w-auto px-5 py-2.5 bg-red-200 text-red-800 rounded-lg font-semibold text-sm text-center border-2 border-red-300">
+                    <div class="w-full sm:w-auto px-5 py-2.5 bg-gray-200 text-gray-700 rounded-lg font-semibold text-sm text-center border-2 border-gray-300">
                         🔒 Test Locked
                     </div>
                 `}
@@ -2053,8 +2070,8 @@ window.toggleCategory = function(categoryId) {
                 }, 100);
             }
         };
-            window.startOverdueTest = function(testId, encodedTestName) {
-    // Check if profile is complete
+           window.startOverdueTest = function(testId, encodedTestName) {
+    // FIRST: Check if profile is complete
     if (!isProfileComplete(studentData)) {
         showProfileRequiredModal();
         return;
@@ -2064,17 +2081,41 @@ window.toggleCategory = function(categoryId) {
     console.log(`Starting overdue test: ${testName} (ID: ${testId})`);
     window.location.href = `./testdetails.html?testId=${testId}&testName=${encodedTestName}&isOverdue=true`;
 };
-                        // Check if profile is complete
-        function isProfileComplete(studentData) {
-            return studentData && 
-                studentData.age > 0 && 
-                studentData.gender && 
-                studentData.gender !== 'Not Specified' &&
-                studentData.height > 0 && 
-                studentData.weight > 0 &&
-                studentData.contactNumber && 
-                studentData.contactNumber !== 'Not Provided';
-        }
+            window.checkProfileBeforeTest = function(event) {
+    event.preventDefault();
+    
+    if (!isProfileComplete(studentData)) {
+        showProfileRequiredModal();
+        return false;
+    }
+    
+    // If profile is complete, navigate to test page
+    window.location.href = './test.html';
+};
+            function checkProfileOnPageLoad() {
+    if (!isProfileComplete(studentData)) {
+        showProfileRequiredModal();
+    }
+}
+    function isProfileComplete(studentData) {
+        if (!studentData) return false;
+        
+        // Check each required field
+        const requiredFields = {
+            age: studentData.age > 0,
+            gender: studentData.gender && studentData.gender !== 'Not Specified',
+            height: studentData.height > 0,
+            weight: studentData.weight > 0,
+            contactNumber: studentData.contactNumber && 
+                        studentData.contactNumber !== 'Not Provided' &&
+                        studentData.contactNumber.trim() !== ''
+        };
+        
+        console.log('Profile Check:', requiredFields);
+        
+        // All fields must be true
+        return Object.values(requiredFields).every(field => field === true);
+    }
 
         // Show profile completion modal
         function showProfileRequiredModal() {
@@ -2121,7 +2162,7 @@ window.toggleCategory = function(categoryId) {
             window.location.href = './studentProfile.html?editProfile=true';
         };
         window.startTest = function(testId) {
-    // Check if profile is complete
+    // FIRST: Check if profile is complete
     if (!isProfileComplete(studentData)) {
         showProfileRequiredModal();
         return;
@@ -2131,7 +2172,7 @@ window.toggleCategory = function(categoryId) {
     const test = availableTests.find(t => t.id === testId);
     
     if (test) {
-        // ⭐ NEW: Check if test date is in the future
+        // Check if test date is in the future
         const testDateTime = new Date(`${test.date}T${test.time || '00:00'}`);
         const now = new Date();
 
@@ -2152,7 +2193,7 @@ window.toggleCategory = function(categoryId) {
             return;
         }
         
-        // ⭐ Check if test is view-only
+        // Check if test is view-only
         if (test.isViewOnly === true) {
             alert('❌ You cannot start this test.\n\nYou have not been selected by your professor to take this test.\n\nPlease contact your professor if you believe this is an error.');
             return;
@@ -2177,7 +2218,47 @@ window.toggleCategory = function(categoryId) {
     console.error(`Test not found: ${testId}`);
     alert('Test not found. Please refresh the page and try again.');
 };
+            function showProfileRequiredModalWithRedirect() {
+    // Create modal
+    let modal = document.getElementById('profileRequiredModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'profileRequiredModal';
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] px-4';
+        modal.innerHTML = `
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 animate-fade-in">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="bi bi-exclamation-triangle text-3xl text-yellow-600"></i>
+                    </div>
+                    <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Profile Incomplete</h3>
+                    <p class="text-sm sm:text-base text-gray-600">
+                        You need to complete your profile before accessing tests. Please provide your age, gender, height, weight, and contact number.
+                    </p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button onclick="cancelAndGoBack()" class="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all">
+                        Cancel
+                    </button>
+                    <button onclick="goToEditProfile()" class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all">
+                        Edit Profile
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    modal.classList.remove('hidden');
+}
 
+// Function to go back to previous page
+window.cancelAndGoBack = function() {
+    window.history.back();
+};
+
+window.goToEditProfile = function() {
+    window.location.href = './studentProfile.html?editProfile=true';
+};
 function calculateTestScore(testName, result, testTarget = null) {
     const normalized = testName.toLowerCase().trim();
     
@@ -2414,7 +2495,7 @@ function calculateTestScore(testName, result, testTarget = null) {
 
       
 
-        onAuthStateChanged(auth, async (user) => {
+       onAuthStateChanged(auth, async (user) => {
     const loadingScreen = document.getElementById('loadingScreen');
     const mainContent = document.getElementById('mainContent');
 
@@ -2422,9 +2503,21 @@ function calculateTestScore(testName, result, testTarget = null) {
         try {
             currentUser = user;
             await loadStudentData(user);
+            
+            // ⭐ CHECK PROFILE COMPLETION - IMMEDIATE STOP
+            if (!isProfileComplete(studentData)) {
+                // Hide loading screen IMMEDIATELY
+                loadingScreen.classList.add('hidden');
+                // DON'T load anything else
+                // Show modal RIGHT AWAY
+                showProfileRequiredModalWithRedirect();
+                return; // STOP completely
+            }
+            
+            // ONLY if profile is complete, continue loading
             await loadAvailableTests();
             await loadRecentTestHistory();
-            setupTestUpdatesForStudent(); // ADD THIS LINE
+            setupTestUpdatesForStudent();
             
             loadingScreen.classList.add('hidden');
             mainContent.classList.remove('hidden');
@@ -2647,6 +2740,7 @@ window.addEventListener('resize', () => {
         }
     }, 250);
 });
+
     </script>
 </body>
 </html>

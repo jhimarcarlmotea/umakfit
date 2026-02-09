@@ -538,14 +538,7 @@
                     <div id="currentStreak" class="text-3xl font-bold text-gray-900">0 weeks</div>
                 </div>
 
-                <!-- Rank -->
-                <div class="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-sm font-semibold text-gray-700">Rank</span>
-                        <i class="bi bi-award text-purple-600 text-xl"></i>
-                    </div>
-                    <div id="rankLevel" class="text-3xl font-bold text-gray-900">Novice</div>
-                </div>
+
                 
                 <!-- Class Ranking -->
                 <div class="p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl">
@@ -2089,7 +2082,10 @@ async function loadUpcomingTests() {
             document.getElementById('completionRate').textContent = '0%';
             document.getElementById('testsCompletedCount').textContent = '0 / 0';
             document.getElementById('currentStreak').textContent = '0 weeks';
-            document.getElementById('rankLevel').textContent = 'Novice';
+            document.getElementById('classRanking').textContent = '--';
+            document.getElementById('classRankingDetails').textContent = 'No section assigned';
+            document.getElementById('strongestCategory').textContent = 'No Data';
+            document.getElementById('strongestCategoryScore').textContent = 'Complete your profile';
             return;
         }
 
@@ -2101,12 +2097,13 @@ async function loadUpcomingTests() {
             where('isActive', '==', true)
         );
         const assignedTestsSnapshot = await getDocs(assignedTestsQuery);
-        
-        const now = new Date();
+
+        console.log('📊 Total scheduled tests found:', assignedTestsSnapshot.size);
+
         const seenTestIds = new Set();
         let totalAssignedTests = 0;
-        
-        // Count unique tests that are either available now or overdue
+
+        // Count unique tests (simplified logic - matches studentgrades.html)
         assignedTestsSnapshot.forEach((doc) => {
             const test = doc.data();
             const testId = doc.id;
@@ -2123,50 +2120,16 @@ async function loadUpcomingTests() {
                 isStudentSelected = test.selectedStudents.includes(studentData.email);
             }
             
-            // Only count tests that the student is selected for
-            if (!isStudentSelected) {
-                return;
-            }
-            
-            // Parse test date and deadline
-            let testDateTime;
-            if (test.date && test.time) {
-                testDateTime = new Date(`${test.date}T${test.time}`);
-            } else if (test.date) {
-                testDateTime = new Date(test.date);
-                testDateTime.setHours(0, 0, 0, 0);
-            } else {
-                testDateTime = new Date(0); // Very old date
-            }
-            
-            let deadlineDateTime;
-            if (test.deadlineDateTime) {
-                deadlineDateTime = new Date(test.deadlineDateTime);
-            } else if (test.deadline) {
-                deadlineDateTime = new Date(test.deadline);
-                if (test.deadlineTime) {
-                    const [hours, minutes] = test.deadlineTime.split(':').map(Number);
-                    deadlineDateTime.setHours(hours, minutes, 0, 0);
-                } else {
-                    deadlineDateTime.setHours(23, 59, 59, 999);
-                }
-            } else {
-                deadlineDateTime = new Date(8640000000000000); // Very far future
-            }
-            
-            // Check if test is available (test date has passed)
-            const isTestAvailable = testDateTime <= now;
-            
-            // Check if test is overdue
-            const isOverdue = deadlineDateTime < now;
-            
-            // Only count tests that are either:
-            // 1. Available now (test date passed, deadline not passed)
-            // 2. Overdue (deadline passed)
-            if (isTestAvailable || isOverdue) {
+            // Count all tests that the student is selected for
+            if (isStudentSelected) {
                 totalAssignedTests++;
+                console.log(`✓ Counted test: ${test.testName}`);
+            } else {
+                console.log(`✗ Skipped test (not selected): ${test.testName}`);
             }
         });
+
+        console.log('📊 Total assigned tests for student:', totalAssignedTests);
 
         // Get completed tests (unique tests only)
         const completedTestsQuery = query(
@@ -2174,84 +2137,59 @@ async function loadUpcomingTests() {
             where('studentEmail', '==', studentData.email)
         );
         const completedTestsSnapshot = await getDocs(completedTestsQuery);
-        
+
         // Count unique completed tests
         const completedTestIds = new Set();
         const tests = [];
-        
+
         completedTestsSnapshot.forEach(doc => {
             const result = doc.data();
             completedTestIds.add(result.testId);
             tests.push(result);
         });
-        
+
         const totalCompleted = completedTestIds.size;
 
         // Calculate completion rate
         const completionRate = totalAssignedTests > 0 ? Math.round((totalCompleted / totalAssignedTests) * 100) : 0;
         document.getElementById('completionRate').textContent = completionRate + '%';
-        
-        // ⭐ NEW: Update Tests Completed Count (replace "Level")
+
+        // Update Tests Completed Count
         document.getElementById('testsCompletedCount').textContent = `${totalCompleted} / ${totalAssignedTests}`;
 
         // Calculate week streak
-        let weekStreak = 0;
-        if (tests.length > 0) {
-            tests.sort((a, b) => {
-                const dateA = a.submittedAt?.toDate?.() || new Date(0);
-                const dateB = b.submittedAt?.toDate?.() || new Date(0);
-                return dateB - dateA;
-            });
-            
-            weekStreak = calculateWeekStreak(tests);
-        }
-        
-        document.getElementById('currentStreak').textContent = weekStreak > 0 ? `${weekStreak} ${weekStreak === 1 ? 'week' : 'weeks'}` : '0 weeks';
-        
-        // Calculate rank/level based on completion rate and average score
-        const avgScore = parseInt(document.getElementById('avgScore').textContent) || 0;
-        const rankLevel = calculateRankLevel(completionRate, avgScore);
-        document.getElementById('rankLevel').textContent = rankLevel;
-        
-        // Calculate Class Ranking
-        await calculateClassRanking();
-        
-        // Calculate Strongest Category
-        await calculateStrongestCategory();
+        const weekStreak = calculateWeekStreak(tests);
+        document.getElementById('currentStreak').textContent = weekStreak + ' week' + (weekStreak !== 1 ? 's' : '');
 
-        const tips = {
-            'Elite': 'Outstanding! You\'re at the top of your game. Maintain this excellence!',
-            'Expert': 'Excellent work! Keep maintaining your fitness routine.',
-            'Advanced': 'Great progress! Challenge yourself with harder variations.',
-            'Intermediate': 'Good job! Stay consistent to reach the next level.',
-            'Beginner': 'Keep pushing! Complete more tests to improve your ranking.',
-            'Novice': 'Complete your pending tests to track your fitness progress!'
-        };
-        document.getElementById('dailyTip').textContent = tips[rankLevel];
-
-        console.log('📊 Performance Summary:', {
+        console.log('📊 Completion Summary:', {
             totalAssignedTests,
             totalCompleted,
             completionRate: completionRate + '%',
-            weekStreak,
-            rankLevel
+            weekStreak: weekStreak + ' weeks'
         });
+
+        // ⭐ Calculate Class Ranking and Strongest Category
+        await calculateClassRanking();
+        await calculateStrongestCategory();
 
     } catch (error) {
         console.error('Error updating performance summary:', error);
         document.getElementById('completionRate').textContent = '0%';
         document.getElementById('testsCompletedCount').textContent = '0 / 0';
+        document.getElementById('currentStreak').textContent = '0 weeks';
+        document.getElementById('classRanking').textContent = '--';
+        document.getElementById('strongestCategory').textContent = 'Error';
     }
 }
 
         // Calculate class ranking
         async function calculateClassRanking() {
-            try {
-                if (!studentData || !studentData.section || studentData.section === 'Not Assigned') {
-                    document.getElementById('classRanking').textContent = 'Not Ranked';
-                    document.getElementById('classRankingDetails').textContent = 'No section assigned';
-                    return;
-                }
+        try {
+            if (!studentData || !studentData.section || studentData.section === 'Not Assigned') {
+                document.getElementById('classRanking').textContent = '--';
+                document.getElementById('classRankingDetails').textContent = 'No section assigned';
+                return;
+            }
                 
                 // Get all students in the same section
                 const studentsQuery = query(
@@ -2321,83 +2259,107 @@ async function loadUpcomingTests() {
             }
         }
 
-        // Calculate strongest category
         async function calculateStrongestCategory() {
-            try {
-                const resultsQuery = query(
-                    collection(db, 'testResults'),
-                    where('studentEmail', '==', studentData.email),
-                    where('status', '==', 'completed')
-                );
-
-                const resultsSnapshot = await getDocs(resultsQuery);
-
-                if (resultsSnapshot.empty) {
-                    document.getElementById('strongestCategory').textContent = 'No Data Yet';
-                    document.getElementById('strongestCategoryScore').textContent = 'Complete tests to see your strongest area';
-                    return;
-                }
-
-                // Initialize category scores using the same categories
-                const categoryScores = {};
-                Object.keys(testCategories).forEach(category => {
-                    categoryScores[category] = {
-                        totalScore: 0,
-                        testCount: 0,
-                        averageScore: 0
-                    };
-                });
-
-                // Calculate scores using getCategoryForTest function
-                resultsSnapshot.forEach((doc) => {
-                    const result = doc.data();
-                    const score = result.score || calculateTestScore(result.testName, result.resultData || result.result, result.testTarget);
-                    const category = getCategoryForTest(result.testName);
-                    
-                    if (categoryScores[category]) {
-                        categoryScores[category].totalScore += score;
-                        categoryScores[category].testCount++;
-                    }
-                });
-
-                // Calculate average scores
-                Object.keys(categoryScores).forEach(category => {
-                    if (categoryScores[category].testCount > 0) {
-                        categoryScores[category].averageScore = 
-                            categoryScores[category].totalScore / categoryScores[category].testCount;
-                    }
-                });
-
-                // Find strongest category
-                let strongestCategory = null;
-                let highestAverageScore = -1;
-
-                Object.entries(categoryScores).forEach(([category, data]) => {
-                    if (data.testCount > 0 && data.averageScore > highestAverageScore) {
-                        highestAverageScore = data.averageScore;
-                        strongestCategory = category;
-                    }
-                });
-
-                // Update UI
-                if (strongestCategory && highestAverageScore > 0) {
-                    document.getElementById('strongestCategory').textContent = strongestCategory;
-                    document.getElementById('strongestCategoryScore').textContent = 
-                        `Average Score: ${Math.round(highestAverageScore)}/100 (${categoryScores[strongestCategory].testCount} test${categoryScores[strongestCategory].testCount > 1 ? 's' : ''})`;
-                } else {
-                    document.getElementById('strongestCategory').textContent = 'No Data';
-                    document.getElementById('strongestCategoryScore').textContent = 'Complete tests to see your strongest area';
-                }
-
-                console.log('📊 Category Scores:', categoryScores);
-                console.log('🏆 Strongest Category:', strongestCategory, 'Score:', highestAverageScore);
-
-            } catch (error) {
-                console.error('Error calculating strongest category:', error);
-                document.getElementById('strongestCategory').textContent = 'Error';
-                document.getElementById('strongestCategoryScore').textContent = 'Unable to calculate';
-            }
+    try {
+        if (!studentData || !studentData.email) {
+            document.getElementById('strongestCategory').textContent = 'No Data';
+            document.getElementById('strongestCategoryScore').textContent = 'Complete tests to see your strongest area';
+            return;
         }
+
+        console.log('🔍 Calculating strongest category for:', studentData.email);
+
+        const resultsQuery = query(
+            collection(db, 'testResults'),
+            where('studentEmail', '==', studentData.email),
+            where('status', '==', 'completed')
+        );
+
+        const resultsSnapshot = await getDocs(resultsQuery);
+
+        if (resultsSnapshot.empty) {
+            console.log('❌ No completed tests found');
+            document.getElementById('strongestCategory').textContent = 'No Data Yet';
+            document.getElementById('strongestCategoryScore').textContent = 'Complete tests to see your strongest area';
+            return;
+        }
+
+        console.log('📊 Found', resultsSnapshot.size, 'completed tests');
+
+        // Initialize category scores using the same categories
+        const categoryScores = {};
+        Object.keys(testCategories).forEach(category => {
+            categoryScores[category] = {
+                totalScore: 0,
+                testCount: 0,
+                averageScore: 0,
+                tests: []
+            };
+        });
+
+        // Calculate scores using getCategoryForTest function
+        resultsSnapshot.forEach((doc) => {
+            const result = doc.data();
+            const score = result.score || calculateTestScore(
+                result.testName, 
+                result.resultData || result.result, 
+                result.testTarget
+            );
+            const category = getCategoryForTest(result.testName);
+            
+            console.log(`📝 Test: ${result.testName} → Category: ${category} → Score: ${score}`);
+            
+            if (categoryScores[category]) {
+                categoryScores[category].totalScore += score;
+                categoryScores[category].testCount++;
+                categoryScores[category].tests.push(result.testName);
+            } else {
+                console.warn(`⚠️ Unknown category: ${category} for test: ${result.testName}`);
+            }
+        });
+
+        // Calculate average scores
+        Object.keys(categoryScores).forEach(category => {
+            if (categoryScores[category].testCount > 0) {
+                categoryScores[category].averageScore = 
+                    categoryScores[category].totalScore / categoryScores[category].testCount;
+            }
+        });
+
+        console.log('📊 Category Scores:', categoryScores);
+
+        // Find strongest category
+        let strongestCategory = null;
+        let highestAverageScore = -1;
+
+        Object.entries(categoryScores).forEach(([category, data]) => {
+            if (data.testCount > 0 && data.averageScore > highestAverageScore) {
+                highestAverageScore = data.averageScore;
+                strongestCategory = category;
+            }
+        });
+
+        // Update UI
+        if (strongestCategory && highestAverageScore > 0) {
+            const categoryData = categoryScores[strongestCategory];
+            document.getElementById('strongestCategory').textContent = strongestCategory;
+            document.getElementById('strongestCategoryScore').textContent = 
+                `Avg: ${Math.round(highestAverageScore)}/100 (${categoryData.testCount} test${categoryData.testCount > 1 ? 's' : ''})`;
+            
+            console.log('✅ Strongest Category:', strongestCategory, 'Score:', Math.round(highestAverageScore));
+        } else {
+            console.log('❌ No valid category data found');
+            document.getElementById('strongestCategory').textContent = 'No Data';
+            document.getElementById('strongestCategoryScore').textContent = 'Complete tests to see your strongest area';
+        }
+
+    } catch (error) {
+        console.error('❌ Error calculating strongest category:', error);
+        console.error('Error details:', error.message, error.stack);
+        document.getElementById('strongestCategory').textContent = 'Error';
+        document.getElementById('strongestCategoryScore').textContent = 'Unable to calculate';
+    }
+}
 
         // Calculate week streak
         function calculateWeekStreak(tests) {
