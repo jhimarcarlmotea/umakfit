@@ -16,31 +16,18 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
-        
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
+        .pulse-animation { animation: pulse 2s infinite; }
         
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .slide-down {
-            animation: slideDown 0.3s ease;
-        }
+        .slide-down { animation: slideDown 0.3s ease; }
         
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
         .spinner {
             border: 4px solid #e5e7eb;
             border-top: 4px solid #3b82f6;
@@ -50,30 +37,11 @@
             animation: spin 1s linear infinite;
         }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
         
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #3b82f6;
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #2563eb;
-        }
-        
-        /* Custom animations for professor dashboard */
-        @keyframes pulse { 
-            0%, 100% { opacity: 1; } 
-            50% { opacity: 0.5; } 
-        }
         @keyframes dropdownSlide {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -86,151 +54,71 @@
             -webkit-text-fill-color: transparent;
         }
         
-        .live-dot {
-            animation: pulse 2s infinite;
-        }
-        
-        /* Custom styles not covered by Tailwind */
-        .custom-shadow {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-        
-        .nav-shadow {
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        .card-shadow {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        
-        .btn-shadow {
-            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
-        }
-        
-        .btn-shadow:hover {
-            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4);
-        }
-        
-        .profile-container {
-            position: relative;
-        }
-        .profile-circle {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 16px;
+        .live-dot { animation: pulse 2s infinite; }
+        .card-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+        /* Section card - clickable filter */
+        .section-card {
             cursor: pointer;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.25s ease;
+            border: 2px solid transparent;
         }
-        .profile-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
+        .section-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.10);
+            border-color: #f59e0b !important;
         }
-        .profile-circle:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        .section-card.active-section {
+            border-color: #3b82f6 !important;
+            background: #eff6ff !important;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
         }
-        .profile-dropdown {
-            position: absolute;
-            top: 55px;
-            right: 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            min-width: 280px;
-            display: none;
-            z-index: 1001;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
+        .section-card.active-section .section-name {
+            color: #1d4ed8 !important;
         }
-        .profile-dropdown.show {
-            display: block;
-            animation: dropdownSlide 0.3s ease-out;
-        }
-        .profile-dropdown-header {
-            padding: 20px;
-            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
-            color: white;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .profile-dropdown-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            display: flex;
+
+        /* Filter badge */
+        .filter-badge {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            border: 3px solid rgba(255,255,255,0.3);
-            overflow: hidden;
+            gap: 6px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid #bfdbfe;
         }
-        .profile-dropdown-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-        .profile-dropdown-name {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-        .profile-dropdown-email {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-        .profile-dropdown-menu {
-            padding: 8px 0;
-        }
-        .profile-dropdown-item {
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .filter-badge .clear-filter {
             cursor: pointer;
-            transition: all 0.2s;
-            color: #374151;
-            text-decoration: none;
             font-size: 14px;
-            font-weight: 500;
-        }
-        .profile-dropdown-item:hover {
-            background: #f8fafc;
+            line-height: 1;
             color: #3b82f6;
+            transition: color 0.2s;
         }
-        .profile-dropdown-item i {
-            width: 20px;
-            font-size: 16px;
+        .filter-badge .clear-filter:hover { color: #dc2626; }
+
+        /* Stat cards transition */
+        .stat-card {
+            transition: all 0.3s ease;
         }
-        .profile-dropdown-divider {
-            height: 1px;
-            background: #e2e8f0;
-            margin: 8px 0;
+
+        /* Profile dropdown */
+        .profile-circle {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700; font-size: 16px;
+            cursor: pointer; border: 2px solid #e2e8f0;
+            transition: all 0.3s; position: relative; overflow: hidden;
         }
-        .profile-dropdown-item.logout {
-            color: #dc2626;
-        }
-        .profile-dropdown-item.logout:hover {
-            background: #fee2e2;
-            color: #991b1b;
-        }
+        .profile-circle img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .profile-circle:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
     </style>
 </head>
 <body class="bg-gray-50">
+
     <!-- Loading Screen -->
     <div id="loadingScreen" class="fixed inset-0 bg-white bg-opacity-95 flex flex-col justify-center items-center z-50">
         <div class="w-12 h-12 border-4 border-gray-100 border-t-blue-500 rounded-full spinner"></div>
@@ -238,11 +126,10 @@
     </div>
     
     <div id="dashboardContent" class="hidden">
-        <!-- Navigation Banner - SAME AS ADD LESSON PAGE -->
+        <!-- Navigation Banner -->
         <nav class="bg-gradient-to-r from-blue-900 to-blue-500 shadow-lg">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4 py-3 sm:py-4">
-                    <!-- Logo -->
                     <a href="#" class="flex items-center gap-2 sm:gap-3">
                         <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope bg-gradient-to-r from-yellow-400 to-yellow-200 bg-clip-text text-transparent">
                             UMakFit
@@ -251,47 +138,29 @@
                     
                     <!-- Desktop Navigation -->
                     <div class="hidden lg:flex items-center gap-2 flex-wrap">
-                        <!-- Dashboard -->
                         <a href="professor-dashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
-                            <i class="fas fa-tachometer-alt"></i> 
-                            <span>Dashboard</span>
+                            <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
                         </a>
-                        
-                        <!-- Student Management -->
                         <a href="studentmanagement.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="fas fa-users"></i> 
-                            <span>Student Management</span>
+                            <i class="fas fa-users"></i><span>Student Management</span>
                         </a>
-                        
-                        <!-- Add Activities -->
                         <a href="addactivities.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="fas fa-dumbbell"></i> 
-                            <span>Add Activities</span>
+                            <i class="fas fa-dumbbell"></i><span>Add Activities</span>
                         </a>
-                        
-                        <!-- Add Lesson -->
                         <a href="addlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="fas fa-book-open"></i> 
-                            <span>Add Lesson</span>
+                            <i class="fas fa-book-open"></i><span>Add Lesson</span>
                         </a>
-                        
-                        <!-- Monitoring Activities -->
                         <a href="monitoringactivities.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="fas fa-chart-bar"></i> 
-                            <span>Monitoring Activities</span>
+                            <i class="fas fa-chart-bar"></i><span>Monitoring Activities</span>
                         </a>
-                        
-                        <!-- Grades -->
                         <a href="grades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="fas fa-graduation-cap"></i> 
-                            <span>Grades</span>
+                            <i class="fas fa-graduation-cap"></i><span>Grades</span>
                         </a>
                         
                         <!-- Profile Dropdown -->
                         <div class="relative">
                             <img src="" alt="Profile" id="profilePictureBtn"
                                  class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
-                            
                             <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
                                 <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
                                     <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
@@ -299,10 +168,10 @@
                                     <p id="profileDropdownEmail" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
                                 </div>
                                 <div class="p-2">
-<a href="professor-profile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-    <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-    <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-</a>
+                                    <a href="professor-profile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
+                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
+                                    </a>
                                     <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
                                     <div onclick="handleLogout(event)" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
                                         <i class="fas fa-sign-out-alt text-lg sm:text-xl"></i>
@@ -315,12 +184,9 @@
                     
                     <!-- Mobile Right Icons -->
                     <div class="flex lg:hidden items-center gap-2 sm:gap-3">
-                        <!-- Mobile Profile -->
                         <div class="relative">
                             <img src="" alt="Profile" id="profilePictureBtnMobile"
                                  class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
-                            
-                            <!-- Mobile Profile Dropdown -->
                             <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
                                 <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
                                     <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
@@ -340,8 +206,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Mobile Menu Button -->
                         <button id="mobileMenuButton" class="text-white p-1 sm:p-2">
                             <i class="bi bi-list text-2xl sm:text-3xl"></i>
                         </button>
@@ -372,9 +236,10 @@
             </div>
         </nav>
 
-        <!-- Main Content - Original professor design -->
+        <!-- Main Content -->
         <div class="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen pt-10 pb-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
                 <!-- Profile Section -->
                 <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-8 mb-10">
                     <div class="flex items-center mb-5">
@@ -400,55 +265,86 @@
                     </div>
                 </div>
                 
+                <!-- ── STAT CARDS ── -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
                     <!-- Card 1: My Sections -->
-                    <div class="bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl text-white p-4 md:p-6 transition-all hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
+                    <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl text-white p-4 md:p-6 hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
                         <div class="flex items-center gap-2 mb-3">
                             <i class="fas fa-layer-group text-sm md:text-base"></i>
                             <span class="font-semibold text-xs md:text-sm">My Sections</span>
                         </div>
                         <div class="font-extrabold text-2xl md:text-3xl" id="statSections">0</div>
+                        <div id="statSectionFilterLabel" class="hidden mt-2 text-xs text-white/80 font-medium"></div>
                     </div>
                     
                     <!-- Card 2: My Students -->
-                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl text-white p-4 md:p-6 transition-all hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
+                    <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl text-white p-4 md:p-6 hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
                         <div class="flex items-center gap-2 mb-3">
                             <i class="fas fa-user-graduate text-sm md:text-base"></i>
-                            <span class="font-semibold text-xs md:text-sm">My Students</span>
+                            <span class="font-semibold text-xs md:text-sm">
+                                My Students
+                                <span id="studentsFilterBadge" class="hidden ml-1 bg-white/30 rounded-full px-2 py-0.5 text-xs">filtered</span>
+                            </span>
                         </div>
                         <div class="font-extrabold text-2xl md:text-3xl" id="statStudents">0</div>
+                        <div id="statStudentsFilterLabel" class="hidden mt-2 text-xs text-white/80 font-medium"></div>
                     </div>
                     
-                    <!-- Card 3: Pending Activities -->
-                    <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl text-white p-4 md:p-6 transition-all hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
+                    <!-- Card 3: Total Activities Posted - NOW WITH REAL-TIME UPDATES -->
+                    <div class="stat-card bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl text-white p-4 md:p-6 hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
                         <div class="flex items-center gap-2 mb-3">
-                            <i class="fas fa-clock text-sm md:text-base"></i>
-                            <span class="font-semibold text-xs md-text-sm">Pending Activities</span>
+                            <i class="fas fa-clipboard-list text-sm md:text-base"></i>
+                            <span class="font-semibold text-xs md:text-sm">
+                                Total Activities Posted
+                                <span id="activitiesFilterBadge" class="hidden ml-1 bg-white/30 rounded-full px-2 py-0.5 text-xs">filtered</span>
+                            </span>
                         </div>
-                        <div class="font-extrabold text-2xl md:text-3xl" id="statPending">0</div>
+                        <div class="font-extrabold text-2xl md:text-3xl" id="statActivities">0</div>
+                        <div id="statActivitiesFilterLabel" class="hidden mt-2 text-xs text-white/80 font-medium"></div>
                     </div>
                 </div>
                 
-                <!-- My Sections Section -->
+                <!-- ── MY SECTIONS (clickable filter) ── -->
                 <div id="sectionsContainer" class="hidden bg-white rounded-2xl card-shadow border border-gray-200 p-6 mb-8">
-                    <div class="flex items-center mb-5">
-                        <i class="fas fa-chalkboard text-gray-700 mr-2"></i>
-                        <h3 class="text-gray-900 font-bold text-xl">My Assigned Sections</h3>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-chalkboard text-gray-700"></i>
+                            <h3 class="text-gray-900 font-bold text-xl">My Assigned Sections</h3>
+                        </div>
+                        <!-- Active filter badge + clear button -->
+                        <div id="activeFilterBadge" class="hidden">
+                            <span class="filter-badge">
+                                <i class="fas fa-filter text-xs"></i>
+                                <span id="activeFilterName">All</span>
+                                <span class="clear-filter" onclick="clearSectionFilter()" title="Clear filter">✕</span>
+                            </span>
+                        </div>
+                        <!-- Hint text when no filter active -->
+                        <div id="filterHint" class="text-xs text-gray-400 italic flex items-center gap-1">
+                            <i class="fas fa-hand-pointer text-gray-300"></i>
+                            Click a section to filter the dashboard
+                        </div>
                     </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="sectionsGrid">
                         <!-- Sections will be dynamically added here -->
                     </div>
                 </div>
                 
-                <!-- Real-time Monitoring -->
+                <!-- ── REAL-TIME MONITORING ── -->
                 <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6">
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-5 space-y-3 sm:space-y-0">
-                        <div class="flex items-center">
-                            <i class="fas fa-desktop text-gray-700 mr-2"></i>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-desktop text-gray-700"></i>
                             <h3 class="text-gray-900 font-bold text-xl">Real-time Activity Monitoring</h3>
+                            <!-- Section filter indicator -->
+                            <span id="monitoringFilterBadge" class="hidden filter-badge ml-2">
+                                <i class="fas fa-filter text-xs"></i>
+                                <span id="monitoringFilterName"></span>
+                            </span>
                         </div>
                         <div class="flex items-center space-x-2 bg-green-50 text-green-700 font-semibold text-sm py-1.5 px-4 rounded-full border border-green-200">
                             <div class="w-2 h-2 bg-green-500 rounded-full live-dot"></div>
@@ -456,7 +352,6 @@
                         </div>
                     </div>
                     
-                    <!-- Enhanced Monitoring Grid -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
                         <div class="bg-gray-50 rounded-xl border border-gray-200 p-5">
                             <div class="flex items-center mb-4">
@@ -487,6 +382,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
         
@@ -534,8 +430,119 @@
         let currentProfessor = null;
         let professorSections = [];
         let professorStudents = [];
+        let totalActivitiesPosted = 0;
+        let allActivitiesData = [];
 
-        // DOM Elements for new navigation
+        // ── LISTENER UNSUBSCRIBE FUNCTIONS ──
+        let unsubscribeActivities = null;
+        let unsubscribeActiveTests = null;
+        let unsubscribeRecentCompletions = null;
+
+        // ── SECTION FILTER STATE ──
+        let activeSectionFilter = null;
+
+        // ── CLEANUP FUNCTION ──
+        function cleanupListeners() {
+            if (unsubscribeActivities) {
+                unsubscribeActivities();
+                unsubscribeActivities = null;
+            }
+            if (unsubscribeActiveTests) {
+                unsubscribeActiveTests();
+                unsubscribeActiveTests = null;
+            }
+            if (unsubscribeRecentCompletions) {
+                unsubscribeRecentCompletions();
+                unsubscribeRecentCompletions = null;
+            }
+        }
+
+        // ── SECTION FILTER FUNCTIONS ──
+        window.selectSectionFilter = function(sectionId) {
+            if (activeSectionFilter === sectionId) {
+                clearSectionFilter();
+                return;
+            }
+            activeSectionFilter = sectionId;
+            const section = professorSections.find(s => s.id === sectionId);
+            const sectionName = section?.name || 'Section';
+
+            document.querySelectorAll('.section-card').forEach(card => {
+                card.classList.remove('active-section');
+            });
+            const activeCard = document.querySelector(`.section-card[data-section-id="${sectionId}"]`);
+            if (activeCard) activeCard.classList.add('active-section');
+
+            document.getElementById('activeFilterBadge').classList.remove('hidden');
+            document.getElementById('activeFilterName').textContent = sectionName;
+            document.getElementById('filterHint').classList.add('hidden');
+
+            document.getElementById('monitoringFilterBadge').classList.remove('hidden');
+            document.getElementById('monitoringFilterName').textContent = sectionName;
+
+            updateStatsForSection(sectionId, sectionName);
+        };
+
+        window.clearSectionFilter = function() {
+            activeSectionFilter = null;
+
+            document.querySelectorAll('.section-card').forEach(card => {
+                card.classList.remove('active-section');
+            });
+
+            document.getElementById('activeFilterBadge').classList.add('hidden');
+            document.getElementById('filterHint').classList.remove('hidden');
+            document.getElementById('monitoringFilterBadge').classList.add('hidden');
+
+            document.getElementById('statSections').textContent = professorSections.length;
+            document.getElementById('statStudents').textContent = professorStudents.length;
+            document.getElementById('statActivities').textContent = totalActivitiesPosted;
+
+            ['statSectionFilterLabel','statStudentsFilterLabel','statActivitiesFilterLabel'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.classList.add('hidden'); el.textContent = ''; }
+            });
+
+            document.getElementById('studentsFilterBadge')?.classList.add('hidden');
+            document.getElementById('activitiesFilterBadge')?.classList.add('hidden');
+
+            setupRealtimeMonitoring();
+        };
+
+        function updateStatsForSection(sectionId, sectionName) {
+            const section = professorSections.find(s => s.id === sectionId);
+            if (!section) return;
+
+            const studentsInSection = section.students || [];
+            const studentCount = studentsInSection.length;
+
+            document.getElementById('statStudents').textContent = studentCount;
+            document.getElementById('studentsFilterBadge')?.classList.remove('hidden');
+
+            const labelEl = document.getElementById('statStudentsFilterLabel');
+            if (labelEl) {
+                labelEl.textContent = `in ${sectionName}`;
+                labelEl.classList.remove('hidden');
+            }
+
+            const sectionActivities = allActivitiesData.filter(a => 
+                a.sectionId === sectionId || 
+                a.section === sectionName ||
+                a.sectionName === sectionName
+            );
+            document.getElementById('statActivities').textContent = sectionActivities.length;
+            document.getElementById('activitiesFilterBadge')?.classList.remove('hidden');
+
+            const actLabel = document.getElementById('statActivitiesFilterLabel');
+            if (actLabel) {
+                actLabel.textContent = `in ${sectionName}`;
+                actLabel.classList.remove('hidden');
+            }
+
+            setupRealtimeMonitoring(sectionId);
+        }
+
+        // ── NAV SETUP ──
         const mobileMenuButton = document.getElementById('mobileMenuButton');
         const mobileMenu = document.getElementById('mobileMenu');
         const profilePictureBtn = document.getElementById('profilePictureBtn');
@@ -543,312 +550,336 @@
         const profileDropdown = document.getElementById('profileDropdown');
         const profileDropdownMobile = document.getElementById('profileDropdownMobile');
 
-        // Event Listeners for new navigation
         document.addEventListener('DOMContentLoaded', () => {
-            // Mobile menu toggle
-            if (mobileMenuButton) {
-                mobileMenuButton.addEventListener('click', toggleMobileMenu);
-            }
-            
-            // Profile dropdowns
-            if (profilePictureBtn) {
-                profilePictureBtn.addEventListener('click', toggleProfileDropdown);
-            }
-            
-            if (profilePictureBtnMobile) {
-                profilePictureBtnMobile.addEventListener('click', toggleProfileDropdown);
-            }
-            
-            // Close dropdowns when clicking outside
+            if (mobileMenuButton) mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            if (profilePictureBtn) profilePictureBtn.addEventListener('click', toggleProfileDropdown);
+            if (profilePictureBtnMobile) profilePictureBtnMobile.addEventListener('click', toggleProfileDropdown);
             document.addEventListener('click', closeAllDropdowns);
+            
+            // Add cleanup on page unload
+            window.addEventListener('beforeunload', cleanupListeners);
         });
 
-        // Mobile menu toggle
-        function toggleMobileMenu() {
-            mobileMenu.classList.toggle('hidden');
-        }
-
-        // Profile dropdown
         function toggleProfileDropdown(event) {
             event?.stopPropagation();
             const isMobile = window.innerWidth < 1024;
             const dropdown = isMobile ? profileDropdownMobile : profileDropdown;
-            
-            const isHidden = dropdown.classList.contains('hidden');
-            
-            if (isHidden) {
-                dropdown.classList.remove('hidden');
-                document.body.classList.add('dropdown-open');
-            } else {
-                dropdown.classList.add('hidden');
-                document.body.classList.remove('dropdown-open');
-            }
+            dropdown.classList.toggle('hidden');
         }
 
-        function closeProfileDropdown() {
-            profileDropdown.classList.add('hidden');
-            profileDropdownMobile.classList.add('hidden');
-            document.body.classList.remove('dropdown-open');
-        }
-
-        // Close all dropdowns when clicking outside
         function closeAllDropdowns(event) {
-            if (!event.target.closest('#profilePictureBtn') && 
-                !event.target.closest('#profilePictureBtnMobile') && 
-                !event.target.closest('#profileDropdown') && 
+            if (!event.target.closest('#profilePictureBtn') &&
+                !event.target.closest('#profilePictureBtnMobile') &&
+                !event.target.closest('#profileDropdown') &&
                 !event.target.closest('#profileDropdownMobile')) {
-                closeProfileDropdown();
+                profileDropdown?.classList.add('hidden');
+                profileDropdownMobile?.classList.add('hidden');
             }
         }
 
-        // View profile function
-        window.showViewProfile = function(event) { 
+        window.showViewProfile = function(event) {
             if (event) event.preventDefault();
-            alert('Profile view would open here');
-            closeProfileDropdown();
+            profileDropdown?.classList.add('hidden');
+            profileDropdownMobile?.classList.add('hidden');
         };
 
-        // Logout function
         window.handleLogout = async function(event) {
             if (event) event.preventDefault();
-            closeProfileDropdown();
+            profileDropdown?.classList.add('hidden');
+            profileDropdownMobile?.classList.add('hidden');
+            
+            // Clean up listeners before logout
+            cleanupListeners();
             
             if (confirm('Are you sure you want to logout?')) {
-                try {
-                    await signOut(auth);
-                    window.location.href = '/login/index.html';
-                } catch (error) {
-                    console.error('Error logging out:', error);
-                    window.location.href = '/login/index.html';
-                }
+                try { 
+                    await signOut(auth); 
+                } catch(e) {}
+                window.location.href = '/login/index.html';
             }
         };
 
-        // Function to update profile picture
         function updateProfilePicture(photoURL, userName) {
-            // For new navigation
-            const profileBtn = document.getElementById('profilePictureBtn');
-            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-            const dropdownPic = document.getElementById('profileDropdownPicture');
-            const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
-            
             const displayName = currentProfessor?.fullName || currentProfessor?.name || userName || 'Professor';
             const email = currentProfessor?.email || 'professor@umak.edu.ph';
-            
-            // Use provided photo URL or create initial avatar
             const photoUrlToUse = photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=3b82f6&color=fff&size=128`;
-            
-            // Update all profile pictures for new navigation
-            if (profileBtn) profileBtn.src = photoUrlToUse;
-            if (profileBtnMobile) profileBtnMobile.src = photoUrlToUse;
-            if (dropdownPic) dropdownPic.src = photoUrlToUse;
-            if (dropdownPicMobile) dropdownPicMobile.src = photoUrlToUse;
-            
-            // Update names
-            const dropdownName = document.getElementById('profileDropdownName');
-            const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
-            if (dropdownName) dropdownName.textContent = displayName;
-            if (dropdownNameMobile) dropdownNameMobile.textContent = displayName;
-            
-            // Update emails
-            const dropdownEmail = document.getElementById('profileDropdownEmail');
-            const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
-            if (dropdownEmail) dropdownEmail.textContent = email;
-            if (dropdownEmailMobile) dropdownEmailMobile.textContent = email;
-            
-            // For old profile section (keep original functionality)
+
+            ['profilePictureBtn','profilePictureBtnMobile','profileDropdownPicture','profileDropdownPictureMobile'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.src = photoUrlToUse;
+            });
+            ['profileDropdownName','profileDropdownNameMobile'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = displayName;
+            });
+            ['profileDropdownEmail','profileDropdownEmailMobile'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = email;
+            });
+
             const userPhoto = document.getElementById('userPhoto');
-            if (userPhoto) {
-                userPhoto.src = photoUrlToUse;
-            }
-            
-            // Update main content
+            if (userPhoto) userPhoto.src = photoUrlToUse;
+
             document.getElementById('userName').textContent = displayName;
             document.getElementById('userEmail').textContent = email;
         }
 
+        // ── REAL-TIME ACTIVITIES COUNTER (FIXED) ──
+        async function loadTotalActivitiesPosted() {
+            try {
+                allActivitiesData = [];
+
+                // Reference to scheduledTests collection (where tests/activities are stored)
+                const activitiesRef = collection(db, 'scheduledTests');
+                
+                // Build query based on professor's sections
+                let activitiesQuery;
+                
+                if (professorSections.length > 0) {
+                    const sectionNames = professorSections.map(s => s.name);
+                    // Firestore 'in' limit is 10
+                    const limitedSections = sectionNames.slice(0, 10);
+                    
+                    activitiesQuery = query(
+                        activitiesRef,
+                        where('professorEmail', '==', currentProfessor.email),
+                        where('section', 'in', limitedSections)
+                    );
+                } else {
+                    activitiesQuery = query(
+                        activitiesRef,
+                        where('professorEmail', '==', currentProfessor.email)
+                    );
+                }
+
+                // Remove previous listener if exists
+                if (unsubscribeActivities) {
+                    unsubscribeActivities();
+                }
+
+                // Set up REAL-TIME listener
+                unsubscribeActivities = onSnapshot(activitiesQuery, (snapshot) => {
+                    // Clear previous data
+                    allActivitiesData = [];
+                    
+                    snapshot.forEach(doc => {
+                        allActivitiesData.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    totalActivitiesPosted = allActivitiesData.length;
+                    
+                    // Update the stat card
+                    document.getElementById('statActivities').textContent = totalActivitiesPosted;
+                    
+                    // If there's an active section filter, update filtered count
+                    if (activeSectionFilter) {
+                        const section = professorSections.find(s => s.id === activeSectionFilter);
+                        if (section) {
+                            const sectionActivities = allActivitiesData.filter(a => 
+                                a.sectionId === activeSectionFilter || 
+                                a.section === section.name
+                            );
+                            document.getElementById('statActivities').textContent = sectionActivities.length;
+                            
+                            const actLabel = document.getElementById('statActivitiesFilterLabel');
+                            if (actLabel) {
+                                actLabel.textContent = `in ${section.name}`;
+                                actLabel.classList.remove('hidden');
+                            }
+                            document.getElementById('activitiesFilterBadge')?.classList.remove('hidden');
+                        }
+                    }
+                    
+                    console.log(`📊 Real-time activities update: ${totalActivitiesPosted} total activities`);
+                }, (error) => {
+                    console.error('Error in real-time activities listener:', error);
+                    // Fallback to getDocs if onSnapshot fails
+                    loadActivitiesFallback();
+                });
+
+            } catch (error) {
+                console.error('Error setting up real-time activities:', error);
+                loadActivitiesFallback();
+            }
+        }
+
+        // Fallback method if real-time fails
+        async function loadActivitiesFallback() {
+            try {
+                const activitiesRef = collection(db, 'scheduledTests');
+                let activitiesSnapshot;
+                
+                if (professorSections.length > 0) {
+                    const sectionNames = professorSections.map(s => s.name).slice(0, 10);
+                    const q = query(
+                        activitiesRef, 
+                        where('professorEmail', '==', currentProfessor.email),
+                        where('section', 'in', sectionNames)
+                    );
+                    activitiesSnapshot = await getDocs(q);
+                } else {
+                    const q = query(activitiesRef, where('professorEmail', '==', currentProfessor.email));
+                    activitiesSnapshot = await getDocs(q);
+                }
+
+                allActivitiesData = [];
+                activitiesSnapshot.forEach(doc => {
+                    allActivitiesData.push({ id: doc.id, ...doc.data() });
+                });
+
+                totalActivitiesPosted = allActivitiesData.length;
+                document.getElementById('statActivities').textContent = totalActivitiesPosted;
+                
+                if (activeSectionFilter) {
+                    const section = professorSections.find(s => s.id === activeSectionFilter);
+                    if (section) {
+                        const sectionActivities = allActivitiesData.filter(a => 
+                            a.sectionId === activeSectionFilter || 
+                            a.section === section.name
+                        );
+                        document.getElementById('statActivities').textContent = sectionActivities.length;
+                    }
+                }
+            } catch (error) {
+                console.error('Error in fallback activities load:', error);
+            }
+        }
+
+        // ── AUTH ──
         onAuthStateChanged(auth, async (user) => {
             const loadingScreen = document.getElementById('loadingScreen');
             const dashboardContent = document.getElementById('dashboardContent');
-            
+
             if (user) {
                 try {
-                    console.log('=== PROFESSOR AUTHENTICATION ===');
-                    console.log('User authenticated:', user.email);
-                    
                     const userEmail = user.email.toLowerCase();
-                    
-                    // First try to find professor by email in professors collection
-                    const professorsQuery = query(
-                        collection(db, 'professors'),
-                        where('email', '==', userEmail)
-                    );
+
+                    const professorsQuery = query(collection(db, 'professors'), where('email', '==', userEmail));
                     const professorsSnapshot = await getDocs(professorsQuery);
-                    
+
                     if (!professorsSnapshot.empty) {
                         const professorDoc = professorsSnapshot.docs[0];
                         currentProfessor = { id: professorDoc.id, ...professorDoc.data() };
-                        console.log('✓ Professor found in professors collection:', currentProfessor);
                     } else {
-                        // Try users collection
-                        const usersQuery = query(
-                            collection(db, 'users'),
-                            where('email', '==', userEmail),
-                            where('role', '==', 'professor')
-                        );
+                        const usersQuery = query(collection(db, 'users'), where('email', '==', userEmail), where('role', '==', 'professor'));
                         const usersSnapshot = await getDocs(usersQuery);
-                        
                         if (!usersSnapshot.empty) {
                             const userDoc = usersSnapshot.docs[0];
                             currentProfessor = { id: userDoc.id, ...userDoc.data() };
-                            console.log('✓ Professor found in users collection:', currentProfessor);
                         } else {
                             throw new Error('Professor account not found. Please contact the secretary.');
                         }
                     }
-                    
-                    // Update profile picture
+
                     updateProfilePicture(user.photoURL, user.displayName);
-                    
-                    // Load professor's sections and students
                     await loadProfessorSections();
-                    await loadProfessorStatistics();
+                    await loadTotalActivitiesPosted(); // This now sets up real-time listener
                     setupRealtimeMonitoring();
-                    
-                    // Show dashboard
+
                     loadingScreen.style.display = 'none';
                     dashboardContent.style.display = 'block';
-                    
+
                 } catch (error) {
-                    console.error('=== ERROR IN AUTHENTICATION ===');
-                    console.error('Error:', error);
-                    
                     loadingScreen.style.display = 'none';
                     alert(error.message || 'Error loading dashboard. Please try again.');
                     await signOut(auth);
                     window.location.href = '/login/index.html';
                 }
             } else {
-                console.log('No user authenticated, redirecting to login...');
                 window.location.href = '/login/index.html';
             }
         });
 
+        // ── LOAD SECTIONS ──
         async function loadProfessorSections() {
             try {
-                console.log('Loading professor sections...');
-                
                 professorSections = [];
                 professorStudents = [];
-                
-                // Get professor's name for matching
+
                 const professorName = currentProfessor.fullName || currentProfessor.name || '';
                 const professorEmail = currentProfessor.email;
-                
-                console.log('Professor name for matching:', professorName);
-                console.log('Professor email:', professorEmail);
-                
-                // Query sections collection for this professor
-                const sectionsQuery = query(
-                    collection(db, 'sections')
-                );
-                const sectionsSnapshot = await getDocs(sectionsQuery);
-                
-                console.log('Total sections in database:', sectionsSnapshot.size);
-                
+
+                const sectionsSnapshot = await getDocs(collection(db, 'sections'));
+
                 sectionsSnapshot.forEach((doc) => {
                     const sectionData = doc.data();
-                    
-                    // Check if this professor teaches this section
-                    const professorMatches = 
+                    const professorMatches =
                         sectionData.professor === professorName ||
                         sectionData.professorEmail === professorEmail ||
                         (sectionData.professor && professorName.includes(sectionData.professor)) ||
                         (sectionData.professor && sectionData.professor.includes(professorName));
-                    
+
                     if (professorMatches) {
-                        console.log(`✓ Section assigned: ${sectionData.name}`);
-                        
-                        professorSections.push({
-                            id: doc.id,
-                            ...sectionData
-                        });
-                        
-                        // Add students from this section
+                        professorSections.push({ id: doc.id, ...sectionData });
                         if (sectionData.students && Array.isArray(sectionData.students)) {
                             sectionData.students.forEach(student => {
-                                professorStudents.push({
-                                    ...student,
-                                    section: sectionData.name,
-                                    sectionId: doc.id
-                                });
+                                professorStudents.push({ ...student, section: sectionData.name, sectionId: doc.id });
                             });
                         }
                     }
                 });
-                
-                console.log(`Found ${professorSections.length} sections with ${professorStudents.length} students`);
-                
-                // Update UI
+
                 document.getElementById('assignedSections').textContent = professorSections.length;
                 document.getElementById('statSections').textContent = professorSections.length;
                 document.getElementById('statStudents').textContent = professorStudents.length;
-                
-                // Display sections if any found
+
                 if (professorSections.length > 0) {
                     document.getElementById('sectionsContainer').classList.remove('hidden');
                     displaySections();
                 }
-                
+
             } catch (error) {
                 console.error('Error loading sections:', error);
             }
         }
 
+        // ── DISPLAY SECTIONS ──
         function displaySections() {
             const sectionsGrid = document.getElementById('sectionsGrid');
-            
+
             if (professorSections.length === 0) {
                 sectionsGrid.innerHTML = `
-                    <div class="col-span-3">
-                        <div class="py-10 text-center">
-                            <div class="text-5xl mb-3 opacity-40">📚</div>
-                            <div class="text-gray-700 font-semibold mb-1">No Sections Assigned</div>
-                            <div class="text-gray-500 text-sm">Sections assigned by the secretary will appear here</div>
-                        </div>
-                    </div>
-                `;
+                    <div class="col-span-3 py-10 text-center">
+                        <div class="text-5xl mb-3 opacity-40">📚</div>
+                        <div class="text-gray-700 font-semibold mb-1">No Sections Assigned</div>
+                        <div class="text-gray-500 text-sm">Sections assigned by the secretary will appear here</div>
+                    </div>`;
                 return;
             }
-            
+
             let html = '';
             professorSections.forEach(section => {
                 const students = section.students || [];
-                const firstFewStudents = students.slice(0, 5);
-                const remainingCount = Math.max(0, students.length - 5);
-                
+                const firstFew = students.slice(0, 5);
+                const remaining = Math.max(0, students.length - 5);
+
                 let studentsHtml = '';
-                firstFewStudents.forEach(student => {
+                firstFew.forEach(student => {
                     const displayName = student.name || student.email || 'Unknown Student';
                     studentsHtml += `<span class="inline-flex items-center bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 m-1">${displayName}</span>`;
                 });
-                
-                if (remainingCount > 0) {
-                    studentsHtml += `<span class="inline-flex items-center bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 m-1">+${remainingCount} more</span>`;
+                if (remaining > 0) {
+                    studentsHtml += `<span class="inline-flex items-center bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 m-1">+${remaining} more</span>`;
                 }
-                
+
                 html += `
-                    <div class="bg-gray-50 rounded-xl border border-gray-200 p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-yellow-500">
-                        <div class="flex justify-between items-center mb-4">
-                            <div class="text-blue-900 font-bold text-lg">${section.name || 'Unnamed Section'}</div>
-                            <div class="bg-blue-500 text-white text-xs font-semibold py-1 px-3 rounded-full">${students.length} students</div>
+                    <div class="section-card bg-gray-50 rounded-xl border border-gray-200 p-5 select-none"
+                         data-section-id="${section.id}"
+                         onclick="selectSectionFilter('${section.id}')">
+
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="section-name text-blue-900 font-bold text-lg">${section.name || 'Unnamed Section'}</div>
+                            <div class="flex items-center gap-2">
+                                <div class="bg-blue-500 text-white text-xs font-semibold py-1 px-3 rounded-full">${students.length} students</div>
+                            </div>
                         </div>
-                        <div class="mb-4">
-                            <div class="flex items-center text-gray-600 text-sm mb-2">
+
+                        <div class="mb-4 space-y-2">
+                            <div class="flex items-center text-gray-600 text-sm">
                                 <i class="fas fa-book w-5"></i>
                                 <span>${section.courseCode || 'PE 3'}</span>
                             </div>
-                            <div class="flex items-center text-gray-600 text-sm mb-2">
+                            <div class="flex items-center text-gray-600 text-sm">
                                 <i class="fas fa-user-tie w-5"></i>
                                 <span>${section.professor || 'Professor'}</span>
                             </div>
@@ -857,6 +888,7 @@
                                 <span>Updated: ${formatDate(section.lastUpdated || section.createdAt)}</span>
                             </div>
                         </div>
+
                         ${students.length > 0 ? `
                             <div class="pt-4 border-t border-gray-200">
                                 <div class="flex items-center text-gray-700 font-semibold text-sm mb-3">
@@ -864,122 +896,86 @@
                                     <span>Students in this section:</span>
                                 </div>
                                 <div class="flex flex-wrap">${studentsHtml}</div>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
+                            </div>` : ''}
+
+                        <div class="mt-4 pt-3 border-t border-dashed border-gray-200 flex items-center gap-1 text-xs text-gray-400">
+                            <i class="fas fa-filter text-gray-300"></i>
+                            <span>Click to filter dashboard by this section</span>
+                        </div>
+                    </div>`;
             });
-            
+
             sectionsGrid.innerHTML = html;
         }
 
-        async function loadProfessorStatistics() {
-            try {
-                // Initialize stats
-                document.getElementById('statPending').textContent = '0';
-                
-                // Get student IDs for querying activities
-                const studentIds = professorStudents.map(s => s.studentId || s.uid || s.email);
-                if (studentIds.length === 0) return;
-                
-                // Query activity results for these students
-                const activitiesQuery = query(
-                    collection(db, 'activityResults'),
-                    where('studentId', 'in', studentIds.slice(0, 10))
-                );
-                const activitiesSnapshot = await getDocs(activitiesQuery);
-                
-                let pendingCount = 0;
-                
-                activitiesSnapshot.forEach(doc => {
-                    const activity = doc.data();
-                    if (activity.status === 'pending') {
-                        pendingCount++;
-                    }
-                });
-                
-                // Update stats
-                document.getElementById('statPending').textContent = pendingCount;
-                
-            } catch (error) {
-                console.error('Error loading statistics:', error);
-            }
-        }
+        // ── REAL-TIME MONITORING ──
+        function setupRealtimeMonitoring(filterSectionId = null) {
+            if (unsubscribeActiveTests) unsubscribeActiveTests();
+            if (unsubscribeRecentCompletions) unsubscribeRecentCompletions();
 
-        function setupRealtimeMonitoring() {
+            let studentsPool = professorStudents;
+            if (filterSectionId) {
+                studentsPool = professorStudents.filter(s => s.sectionId === filterSectionId);
+            }
+
+            const studentIds = studentsPool.map(s => s.studentId || s.uid || s.email);
+            if (studentIds.length === 0) return;
+
             try {
-                // Get student IDs for monitoring
-                const studentIds = professorStudents.map(s => s.studentId || s.uid || s.email);
-                
-                if (studentIds.length > 0) {
-                    // Set up real-time listener for active tests
-                    const activeTestsQuery = query(
-                        collection(db, 'activeTests'),
-                        where('studentId', 'in', studentIds.slice(0, 10)),
-                        where('status', '==', 'active')
-                    );
-                    
-                    onSnapshot(activeTestsQuery, (snapshot) => {
-                        updateActiveTestsList(snapshot);
-                    });
-                    
-                    // Set up real-time listener for recent completions
-                    const recentCompletionsQuery = query(
-                        collection(db, 'activityResults'),
-                        where('studentId', 'in', studentIds.slice(0, 10)),
-                        where('status', '==', 'completed'),
-                        orderBy('submittedAt', 'desc')
-                    );
-                    
-                    onSnapshot(recentCompletionsQuery, (snapshot) => {
-                        updateRecentCompletions(snapshot);
-                    });
-                }
-                
+                const activeTestsQuery = query(
+                    collection(db, 'activeTests'),
+                    where('studentId', 'in', studentIds.slice(0, 10)),
+                    where('status', '==', 'active')
+                );
+                unsubscribeActiveTests = onSnapshot(activeTestsQuery, (snapshot) => {
+                    updateActiveTestsList(snapshot, studentsPool);
+                });
+
+                const recentCompletionsQuery = query(
+                    collection(db, 'activityResults'),
+                    where('studentId', 'in', studentIds.slice(0, 10)),
+                    where('status', '==', 'completed'),
+                    orderBy('submittedAt', 'desc')
+                );
+                unsubscribeRecentCompletions = onSnapshot(recentCompletionsQuery, (snapshot) => {
+                    updateRecentCompletions(snapshot, studentsPool);
+                });
             } catch (error) {
                 console.error('Error setting up real-time monitoring:', error);
             }
         }
 
-        function updateActiveTestsList(snapshot) {
+        function updateActiveTestsList(snapshot, studentsPool) {
             const container = document.getElementById('activeTestsList');
-            
             if (snapshot.empty) {
                 container.innerHTML = `
                     <div class="py-10 text-center">
                         <div class="text-5xl mb-3 opacity-40">👥</div>
                         <div class="text-gray-700 font-semibold mb-1">No Active Activities</div>
                         <div class="text-gray-500 text-sm">Students will appear here when they start activities</div>
-                    </div>
-                `;
+                    </div>`;
                 return;
             }
-            
+
             let html = '';
             let count = 0;
             snapshot.forEach((doc) => {
                 if (count >= 8) return;
                 count++;
-                
                 const activity = doc.data();
                 const progress = activity.progress || 0;
                 const studentName = activity.studentName || 'Unknown Student';
                 const initials = getInitials(studentName);
-                
-                // Find student info
-                const studentInfo = professorStudents.find(s => 
-                    s.studentId === activity.studentId || 
+                const studentInfo = studentsPool.find(s =>
+                    s.studentId === activity.studentId ||
                     s.email === activity.studentEmail ||
                     s.uid === activity.studentId
                 );
-                
                 const section = studentInfo?.section || 'N/A';
-                
+
                 html += `
                     <div class="flex items-center p-3 bg-white rounded-lg border border-gray-100 mb-2 hover:bg-gray-50 hover:translate-x-1 transition-all duration-300">
-                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold mr-3">
-                            ${initials}
-                        </div>
+                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold mr-3">${initials}</div>
                         <div class="flex-1">
                             <div class="font-semibold text-gray-900">${studentName}</div>
                             <div class="flex space-x-4 text-xs text-gray-500">
@@ -991,53 +987,43 @@
                             <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
                             <span class="text-blue-600 font-semibold text-sm">${progress}%</span>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
-            
             container.innerHTML = html;
         }
 
-        function updateRecentCompletions(snapshot) {
+        function updateRecentCompletions(snapshot, studentsPool) {
             const container = document.getElementById('recentCompletions');
-            
             if (snapshot.empty) {
                 container.innerHTML = `
                     <div class="py-10 text-center">
                         <div class="text-5xl mb-3 opacity-40">✅</div>
                         <div class="text-gray-700 font-semibold mb-1">No Recent Activities</div>
                         <div class="text-gray-500 text-sm">Completed activities will appear here</div>
-                    </div>
-                `;
+                    </div>`;
                 return;
             }
-            
+
             let html = '';
             let count = 0;
             snapshot.forEach((doc) => {
                 if (count >= 5) return;
                 count++;
-                
                 const result = doc.data();
                 const studentName = result.studentName || 'Unknown Student';
                 const activityName = result.activityName || 'Unknown Activity';
                 const score = result.score || 0;
                 const initials = getInitials(studentName);
-                
-                // Find student info
-                const studentInfo = professorStudents.find(s => 
-                    s.studentId === result.studentId || 
+                const studentInfo = studentsPool.find(s =>
+                    s.studentId === result.studentId ||
                     s.email === result.studentEmail ||
                     s.uid === result.studentId
                 );
-                
                 const section = studentInfo?.section || 'N/A';
-                
+
                 html += `
                     <div class="flex items-center p-3 bg-white rounded-lg border border-gray-100 mb-2 hover:bg-gray-50 hover:translate-x-1 transition-all duration-300">
-                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold mr-3">
-                            ${initials}
-                        </div>
+                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold mr-3">${initials}</div>
                         <div class="flex-1">
                             <div class="font-semibold text-gray-900">${studentName}</div>
                             <div class="flex space-x-4 text-xs text-gray-500">
@@ -1046,35 +1032,24 @@
                             </div>
                         </div>
                         <div class="text-gray-700 font-medium">Score: ${score}</div>
-                    </div>
-                `;
+                    </div>`;
             });
-            
             container.innerHTML = html;
         }
 
         function getInitials(name) {
             if (!name) return '??';
-            const nameParts = name.split(' ');
-            if (nameParts.length >= 2) {
-                return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
-            }
+            const parts = name.split(' ');
+            if (parts.length >= 2) return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
             return name.substring(0, 2).toUpperCase();
         }
 
         function formatDate(timestamp) {
             if (!timestamp) return 'Unknown';
-            
             try {
                 const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-                return date.toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                });
-            } catch (error) {
-                return 'Invalid date';
-            }
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch { return 'Invalid date'; }
         }
     </script>
 </body>
