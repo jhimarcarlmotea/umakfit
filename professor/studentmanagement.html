@@ -482,6 +482,172 @@
             gap: 10px;
             flex-wrap: wrap;
         }
+        
+        /* Responsive Table Styles */
+        @media (max-width: 768px) {
+            /* Hide tables on mobile */
+            .custom-table {
+                display: none;
+            }
+            
+            /* Mobile card view for sections */
+            .mobile-cards-container {
+                display: block;
+            }
+            
+            .section-card {
+                background: white;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                padding: 16px;
+                margin-bottom: 12px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            
+            .section-card-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                padding-bottom: 8px;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            
+            .section-card-label {
+                font-weight: 600;
+                color: #64748b;
+                font-size: 13px;
+                min-width: 120px;
+            }
+            
+            .section-card-value {
+                flex: 1;
+                text-align: right;
+                color: #1e293b;
+                font-weight: 500;
+                font-size: 14px;
+            }
+            
+            /* Mobile card view for students */
+            .student-card {
+                background: white;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                padding: 16px;
+                margin-bottom: 12px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            
+            .student-card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 12px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            
+            .student-card-info {
+                flex: 1;
+            }
+            
+            .student-card-name {
+                font-weight: 700;
+                color: #1e3a8a;
+                font-size: 16px;
+                margin-bottom: 4px;
+            }
+            
+            .student-card-id {
+                color: #64748b;
+                font-size: 13px;
+            }
+            
+            .student-card-details {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            
+            .student-card-detail {
+                text-align: center;
+                padding: 10px;
+                background: #f8fafc;
+                border-radius: 6px;
+            }
+            
+            .student-card-label-small {
+                display: block;
+                font-size: 11px;
+                color: #64748b;
+                margin-bottom: 4px;
+            }
+            
+            .student-card-value {
+                display: block;
+                font-weight: 600;
+                color: #1e293b;
+                font-size: 14px;
+            }
+            
+            /* Show mobile containers, hide tables */
+            .mobile-sections-container,
+            .mobile-students-container {
+                display: block;
+            }
+            
+            /* Hide table-responsive container on mobile */
+            .table-responsive {
+                display: none;
+            }
+            
+            /* Adjust modal for mobile */
+            .modal-content {
+                width: 95%;
+                margin: 10px;
+            }
+            
+            /* Mobile pagination */
+            .mobile-pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 20px;
+                gap: 10px;
+            }
+            
+            .mobile-pagination-button {
+                padding: 8px 16px;
+                background: #3b82f6;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+            
+            .mobile-pagination-button:disabled {
+                background: #94a3b8;
+                cursor: not-allowed;
+            }
+            
+            .mobile-pagination-info {
+                font-size: 14px;
+                color: #64748b;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            /* Hide mobile containers on desktop */
+            .mobile-sections-container,
+            .mobile-students-container {
+                display: none;
+            }
+            
+            /* Show tables on desktop */
+            .table-responsive {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -678,6 +844,11 @@
                         </table>
                     </div>
 
+                    <!-- Mobile Sections Container -->
+                    <div class="mobile-sections-container" id="mobileSectionsContainer" style="display: none;">
+                        <!-- Mobile cards will be inserted here -->
+                    </div>
+
                     <div class="mt-5 text-sm text-gray-600">
                         Showing <span id="sectionCount">0</span> sections
                     </div>
@@ -750,6 +921,11 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Mobile Students Container -->
+                        <div class="mobile-students-container" id="mobileStudentsContainer" style="display: none;">
+                            <!-- Mobile cards will be inserted here -->
                         </div>
                         
                         <div class="mt-5 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -1189,7 +1365,6 @@
         window.currentSort = 'newest-first';
         window.currentFilter = 'all-tests';
         window.availableTestTypes = [];
-
 
         // Navigation functions
         const mobileMenuButton = document.getElementById('mobileMenuButton');
@@ -1942,9 +2117,9 @@ function populateSectionsTable() {
     });
     
     tableBody.innerHTML = html;
-}
-            function isMobileView() {
-    return window.innerWidth <= 768;
+    
+    // Update mobile view
+    updateResponsiveViews();
 }
 
 function updateStudentsTable(students) {
@@ -2010,6 +2185,197 @@ function updateStudentsTable(students) {
     });
 
     tableBody.innerHTML = rowsHTML;
+    
+    // Update mobile view
+    updateResponsiveViews();
+}
+
+// Function to populate mobile sections view
+function populateMobileSections(sections) {
+    const container = document.getElementById('mobileSectionsContainer');
+    if (!container) return;
+    
+    if (sections.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🏫</div>
+                <div class="empty-title">No Sections Found</div>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    sections.forEach(section => {
+        html += `
+            <div class="section-card">
+                <div class="section-card-row">
+                    <span class="section-card-label">Section Name</span>
+                    <span class="section-card-value"><strong>${section.name}</strong></span>
+                </div>
+                <div class="section-card-row">
+                    <span class="section-card-label">Year Level</span>
+                    <span class="section-card-value">${section.yearLevel || 'N/A'}</span>
+                </div>
+                <div class="section-card-row">
+                    <span class="section-card-label">Total Students</span>
+                    <span class="section-card-value">
+                        <strong style="color: #3b82f6;">${section.studentCount || 0}</strong>
+                    </span>
+                </div>
+                <div class="section-card-row">
+                    <span class="section-card-label">Course Code</span>
+                    <span class="section-card-value">${section.courseCode || 'N/A'}</span>
+                </div>
+                <div class="section-card-row">
+                    <span class="section-card-label">Schedule</span>
+                    <span class="section-card-value">${section.schedule}</span>
+                </div>
+                <div class="section-card-row">
+                    <span class="section-card-label">Academic Year</span>
+                    <span class="section-card-value">${section.createdYear}</span>
+                </div>
+                <div class="section-card-row" style="border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
+                    <span class="section-card-label">Actions</span>
+                    <span class="section-card-value">
+                        <button class="btn-action btn-view" onclick="viewSectionDetails('${section.id}')" style="padding: 6px 12px; font-size: 12px;">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </span>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+// Function to populate mobile students view
+function populateMobileStudents(students) {
+    const container = document.getElementById('mobileStudentsContainer');
+    if (!container) return;
+    
+    if (students.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">👥</div>
+                <div class="empty-title">No Students Found</div>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    students.forEach(student => {
+        let scoreClass = '', scoreText = 'No attempts';
+        if (student.totalAttempts > 0) {
+            if (student.bestScore >= 90) { 
+                scoreClass = 'score-excellent'; 
+                scoreText = 'Excellent'; 
+            } else if (student.bestScore >= 70) { 
+                scoreClass = 'score-good'; 
+                scoreText = 'Good'; 
+            } else { 
+                scoreClass = 'score-poor'; 
+                scoreText = 'Needs Improvement'; 
+            }
+        }
+        
+        let lastAttemptFormatted = 'No attempts';
+        if (student.lastAttempt instanceof Date && !isNaN(student.lastAttempt)) {
+            lastAttemptFormatted = student.lastAttempt.toLocaleDateString('en-US', {
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric'
+            });
+        }
+        
+        html += `
+            <div class="student-card">
+                <div class="student-card-header">
+                    <div class="student-card-info">
+                        <div class="student-card-name">${student.firstName} ${student.lastName}</div>
+                        <div class="student-card-id">${student.umakId || 'N/A'}</div>
+                    </div>
+                    <button class="btn-action btn-view" onclick="viewStudentDetails('${student.id}')" style="padding: 6px 12px; font-size: 12px;">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                </div>
+                <div class="student-card-details">
+                    <div class="student-card-detail">
+                        <span class="student-card-label-small">Section</span>
+                        <span class="student-card-value">${student.section || 'N/A'}</span>
+                    </div>
+                    <div class="student-card-detail">
+                        <span class="student-card-label-small">Best Score</span>
+                        <span class="student-card-value">
+                            ${student.totalAttempts > 0 ? 
+                                `<span class="score-badge ${scoreClass}" style="font-size: 11px;">${student.bestScore}%</span>` : 
+                                '—'
+                            }
+                        </span>
+                    </div>
+                    <div class="student-card-detail">
+                        <span class="student-card-label-small">Average</span>
+                        <span class="student-card-value">
+                            ${student.totalAttempts > 0 ? 
+                                `<strong>${student.averageScore}%</strong>` : 
+                                '—'
+                            }
+                        </span>
+                    </div>
+                    <div class="student-card-detail">
+                        <span class="student-card-label-small">Last Attempt</span>
+                        <span class="student-card-value">${lastAttemptFormatted}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+// Function to check screen size and render appropriate view
+function updateResponsiveViews() {
+    const isMobile = window.innerWidth <= 768;
+    
+    // For sections
+    const sectionsTable = document.getElementById('sectionsTable');
+    const mobileSectionsContainer = document.getElementById('mobileSectionsContainer');
+    
+    if (sectionsTable && mobileSectionsContainer) {
+        if (isMobile) {
+            sectionsTable.closest('.table-responsive').style.display = 'none';
+            mobileSectionsContainer.style.display = 'block';
+            populateMobileSections(window.filteredSections);
+        } else {
+            sectionsTable.closest('.table-responsive').style.display = 'block';
+            mobileSectionsContainer.style.display = 'none';
+        }
+    }
+    
+    // For students
+    const studentsTable = document.getElementById('studentsTable');
+    const mobileStudentsContainer = document.getElementById('mobileStudentsContainer');
+    
+    if (studentsTable && mobileStudentsContainer) {
+        if (isMobile) {
+            studentsTable.closest('.table-responsive').style.display = 'none';
+            mobileStudentsContainer.style.display = 'block';
+            
+            // Get current page students for mobile (no pagination on mobile)
+            populateMobileStudents(window.filteredStudents);
+        } else {
+            studentsTable.closest('.table-responsive').style.display = 'block';
+            mobileStudentsContainer.style.display = 'none';
+        }
+    }
+}
+
+// Check if mobile view
+function isMobileView() {
+    return window.innerWidth <= 768;
 }
 
         function populateSectionFilters() {
@@ -2229,7 +2595,6 @@ async function viewSectionDetails(sectionId) {
             document.getElementById('viewSectionModal').style.display = 'none';
         }
 
-
     async function viewStudentDetails(studentId) {
     try {
         window.currentStudentId = studentId;
@@ -2412,6 +2777,7 @@ async function viewSectionDetails(sectionId) {
         alert('Error: ' + error.message);
     }
 }
+
         // Helper function to format activity type
         function formatActivityType(type) {
             const types = {
@@ -2548,8 +2914,13 @@ async function viewSectionDetails(sectionId) {
                 return matchesSearch;
             });
             
-            window.currentSectionPage = 1;
-            populateSectionsTable();
+            if (window.innerWidth <= 768) {
+                // Mobile view
+                populateMobileSections(window.filteredSections);
+            } else {
+                // Desktop view
+                populateSectionsTable();
+            }
         }
 
         // Filter students
@@ -2591,7 +2962,14 @@ async function viewSectionDetails(sectionId) {
             });
             
             window.currentPage = 1; // Reset to first page when filtering
-            updateStudentsTable(window.filteredStudents);
+            
+            if (window.innerWidth <= 768) {
+                // Mobile view
+                populateMobileStudents(window.filteredStudents);
+            } else {
+                // Desktop view
+                updateStudentsTable(window.filteredStudents);
+            }
         }
 
         // Pagination functions
@@ -2695,6 +3073,7 @@ async function viewSectionDetails(sectionId) {
         });
     }
 }
+
         // Switch between tabs
 window.switchTab = function(tab) {
     window.currentTab = tab;
@@ -2870,6 +3249,8 @@ function renderOverdueTable() {
         studentGroups[key].tests.push(item);
     });
     
+    const isMobile = window.innerWidth <= 768;
+    
     // Render one row per student
     let html = '';
     Object.values(studentGroups).forEach(group => {
@@ -2877,31 +3258,70 @@ function renderOverdueTable() {
         const completedCount = group.tests.filter(t => t.hasCompleted).length;
         const pendingCount = testCount - completedCount;
         
-        html += `
-            <tr onclick="showStudentTests('${group.studentEmail}')" style="cursor: pointer;">
-                <td>
-                    <strong>${group.studentName}</strong>
-                    <span class="test-count-badge">${testCount}</span>
-                    <br>
-                    <small style="color: #64748b;">${group.studentId}</small>
-                </td>
-                <td>${group.section}</td>
-                <td>
-                    <span style="color: #ef4444; font-weight: 600;">${pendingCount} Pending</span>
-                    ${completedCount > 0 ? `<br><small style="color: #10b981;">✓ ${completedCount} Completed</small>` : ''}
-                </td>
-                <td><small style="color: #64748b;">Multiple deadlines</small></td>
-                <td>
-                    <button class="btn-action btn-view" onclick="event.stopPropagation(); showStudentTests('${group.studentEmail}')">
-                        <i class="fas fa-eye"></i> View Tests
-                    </button>
-                </td>
-            </tr>
-        `;
+        if (isMobile) {
+            // Mobile card view
+            html += `
+                <tr>
+                    <td colspan="5" style="padding: 0;">
+                        <div class="student-card" style="margin: 8px; border: 1px solid #fee2e2; background: #fef2f2;">
+                            <div class="student-card-header">
+                                <div class="student-card-info">
+                                    <div class="student-card-name">${group.studentName}</div>
+                                    <div class="student-card-id">${group.studentId} • ${group.section}</div>
+                                </div>
+                                <span class="test-count-badge">${testCount}</span>
+                            </div>
+                            <div class="student-card-details">
+                                <div class="student-card-detail">
+                                    <span class="student-card-label-small">Overdue Tests</span>
+                                    <span class="student-card-value" style="color: #ef4444;">${pendingCount}</span>
+                                </div>
+                                <div class="student-card-detail">
+                                    <span class="student-card-label-small">Completed</span>
+                                    <span class="student-card-value" style="color: #10b981;">${completedCount}</span>
+                                </div>
+                                <div class="student-card-detail">
+                                    <span class="student-card-label-small">Actions</span>
+                                    <span class="student-card-value">
+                                        <button class="btn-action btn-view" onclick="showStudentTests('${group.studentEmail}')" style="padding: 4px 8px; font-size: 11px;">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        } else {
+            // Desktop table view
+            html += `
+                <tr onclick="showStudentTests('${group.studentEmail}')" style="cursor: pointer;">
+                    <td>
+                        <strong>${group.studentName}</strong>
+                        <span class="test-count-badge">${testCount}</span>
+                        <br>
+                        <small style="color: #64748b;">${group.studentId}</small>
+                    </td>
+                    <td>${group.section}</td>
+                    <td>
+                        <span style="color: #ef4444; font-weight: 600;">${pendingCount} Pending</span>
+                        ${completedCount > 0 ? `<br><small style="color: #10b981;">✓ ${completedCount} Completed</small>` : ''}
+                    </td>
+                    <td><small style="color: #64748b;">Multiple deadlines</small></td>
+                    <td>
+                        <button class="btn-action btn-view" onclick="event.stopPropagation(); showStudentTests('${group.studentEmail}')">
+                            <i class="fas fa-eye"></i> View Tests
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
     });
     
     tableBody.innerHTML = html;
 }
+
 // Filter overdue students
 window.filterOverdueStudents = function() {
     const searchTerm = document.getElementById('searchOverdue').value.toLowerCase();
@@ -2961,9 +3381,11 @@ window.filterOverdueStudents = function() {
             alert('Error: ' + error.message);
         }
     };
+
            window.setOverdueScore = function(studentEmail, testId, testName, testTarget, testUnit, studentName, currentScore = 0, currentResult = '', resultId = '') {
     window.openEditScoreModal(studentEmail, testId, testName, testTarget, testUnit, studentName, currentScore, currentResult, resultId);
 };
+
 window.openEditScoreModal = function(studentEmail, testId, testName, testTarget, testUnit, studentName, currentScore = 0, currentResult = '', resultId = '') {
     console.log('🔧 Opening edit score modal for:', studentName);
     
@@ -3075,6 +3497,7 @@ window.openEditScoreModal = function(studentEmail, testId, testName, testTarget,
     document.getElementById('editScoreModal').style.display = 'flex';
     console.log('✅ Modal opened successfully');
 };
+
         // Authentication state change handler
         onAuthStateChanged(auth, async (user) => {
             const loadingScreen = document.getElementById('loadingScreen');
@@ -3112,7 +3535,6 @@ window.openEditScoreModal = function(studentEmail, testId, testName, testTarget,
                 window.location.href = '/login/index.html';
             }
         });
-
             
         // Make functions globally available
         window.viewSectionDetails = viewSectionDetails;
@@ -3128,6 +3550,15 @@ window.openEditScoreModal = function(studentEmail, testId, testName, testTarget,
         window.previousPage = previousPage;
         window.nextPage = nextPage;
         window.signOut = signOut;
+        
+        // Add window resize listener
+        window.addEventListener('resize', updateResponsiveViews);
+        
+        // Initialize responsive views on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Call this after data is loaded
+            setTimeout(updateResponsiveViews, 100);
+        });
     </script>
     
     <script>
@@ -3143,7 +3574,8 @@ window.openEditScoreModal = function(studentEmail, testId, testName, testTarget,
                 }
             }
         }
-         // Edit Score Modal Functions
+        
+        // Edit Score Modal Functions
         let currentStep = 1;
         let editScoreData = {
             studentEmail: '',
@@ -3244,6 +3676,7 @@ window.openEditScoreModal = function(studentEmail, testId, testName, testTarget,
         });
     }
 });
+
 function calculateScore(testName, result, testTarget = null) {
     const normalized = testName.toLowerCase().trim();
     
@@ -3670,6 +4103,7 @@ function calculateScore(testName, result, testTarget = null) {
         }
     }
 };
+
         document.addEventListener('DOMContentLoaded', function() {
     const newResultInput = document.getElementById('newResult');
     const formHint = document.getElementById('resultHint');

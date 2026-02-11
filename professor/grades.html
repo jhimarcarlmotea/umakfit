@@ -87,44 +87,137 @@
             -webkit-overflow-scrolling: touch;
             border-radius: 8px;
             border: 1px solid #e2e8f0;
+            width: 100%;
         }
         
         .custom-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
         }
         
-        .custom-table thead {
-            background: linear-gradient(90deg, rgba(30, 58, 138, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%);
+        /* Desktop table */
+        @media screen and (min-width: 769px) {
+            .custom-table {
+                min-width: 800px;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+            }
+            
+            .custom-table thead {
+                background: linear-gradient(90deg, rgba(30, 58, 138, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%);
+            }
+            
+            .custom-table th {
+                font-weight: 600;
+                color: white;
+                font-size: 14px;
+                text-align: left;
+                padding: 15px 12px;
+                border-bottom: 2px solid #e2e8f0;
+                white-space: nowrap;
+                cursor: pointer;
+                user-select: none;
+            }
+            
+            .custom-table th:hover {
+                background-color: rgba(255,255,255,0.1);
+            }
+            
+            .custom-table td {
+                font-weight: 400;
+                color: #000;
+                font-size: 14px;
+                padding: 16px 12px;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            
+            .custom-table tbody tr {
+                transition: all 0.2s ease;
+            }
+            
+            .custom-table tbody tr:hover {
+                background-color: #f8fafc;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            }
         }
         
-        .custom-table th {
-            font-weight: 600;
-            color: white;
-            font-size: 14px;
-            text-align: left;
-            padding: 15px 12px;
-            border-bottom: 2px solid #e2e8f0;
-            white-space: nowrap;
-            cursor: pointer;
-            user-select: none;
-        }
-        
-        .custom-table th:hover {
-            background-color: rgba(255,255,255,0.1);
-        }
-        
-        .custom-table td {
-            font-weight: 400;
-            color: #000;
-            font-size: 14px;
-            padding: 16px 12px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        
-        .custom-table tbody tr:hover {
-            background-color: #f8fafc;
+        /* Mobile Responsive Table */
+        @media screen and (max-width: 768px) {
+            .table-responsive {
+                overflow-x: visible;
+                border: none;
+                background: transparent;
+            }
+            
+            .custom-table {
+                min-width: 0;
+                width: 100%;
+                background: transparent;
+                border: none;
+            }
+            
+            .custom-table thead {
+                display: none;
+            }
+            
+            .custom-table tbody tr {
+                display: block;
+                margin-bottom: 16px;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                background: white;
+                padding: 16px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            
+            .custom-table tbody tr:active {
+                transform: translateY(2px);
+                box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            }
+            
+            .custom-table tbody td {
+                display: block;
+                padding: 12px 8px 12px 45%;
+                border: none;
+                border-bottom: 1px solid #f1f5f9;
+                text-align: left;
+                position: relative;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+            }
+            
+            .custom-table tbody td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 12px;
+                width: 40%;
+                font-weight: 600;
+                color: #4b5563;
+                font-size: 13px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .custom-table tbody td:last-child {
+                border-bottom: none;
+                justify-content: flex-end;
+                padding-left: 12px;
+            }
+            
+            .custom-table tbody td:last-child:before {
+                display: none;
+            }
+            
+            /* Hide test count badge position */
+            .custom-table tbody td:first-child {
+                position: relative;
+            }
         }
         
         /* Grade colors */
@@ -215,17 +308,7 @@
             margin: 0 auto; 
         }
         
-        /* Test Count Badge */
-        .test-count-badge {
-            display: inline-block;
-            background: #ef4444;
-            color: white;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 12px;
-            margin-left: 8px;
-        }
+
         
         /* Student Info Header */
         .student-info-header {
@@ -343,6 +426,46 @@
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Mobile adjustments for summary card */
+        @media screen and (max-width: 768px) {
+            .summary-card {
+                padding: 16px;
+                margin: 0 0 16px 0;
+                border-radius: 12px;
+                width: 100%;
+            }
+            
+            .summary-stat-value {
+                font-size: 22px;
+            }
+            
+            .summary-stat-label {
+                font-size: 11px;
+            }
+            
+            .empty-state {
+                padding: 40px 20px;
+            }
+            
+            .empty-icon {
+                font-size: 48px;
+            }
+            
+            .empty-title {
+                font-size: 18px;
+            }
+            
+            .empty-text {
+                font-size: 13px;
+            }
+            
+            /* Mobile button touch targets */
+            button {
+                min-height: 44px;
+                min-width: 44px;
+            }
         }
     </style>
 </head>
@@ -1832,28 +1955,29 @@
                 
                 html += `
                     <tr onclick="showStudentGrades('${grade.studentKey}')" style="cursor: pointer;">
-                        <td>
-                            <strong>${grade.name || 'Unknown Student'}</strong>
-                            <span class="test-count-badge">${grade.totalActivities}</span>
-                            ${grade.email ? `<br><small class="text-gray-500">${grade.email}</small>` : ''}
+                        <td data-label="Student Name">
+                            <div style="position: relative;">
+                                <strong>${grade.name || 'Unknown Student'}</strong>
+                                ${grade.email ? `<br><small class="text-gray-500">${grade.email}</small>` : ''}
+                            </div>
                         </td>
-                        <td>${grade.section || 'N/A'}</td>
-                        <td><strong>${grade.totalActivities}</strong></td>
-                        <td>
+                        <td data-label="Section">${grade.section || 'N/A'}</td>
+                        <td data-label="Total Activities"><strong>${grade.totalActivities}</strong></td>
+                        <td data-label="Average Score">
                             <span class="${grade.status}">${grade.averageScore.toFixed(1)}%</span>
                         </td>
-                        <td>
-                            <span class="${grade.status}" style="font-size: 18px;">
+                        <td data-label="Final Grade">
+                            <span class="${grade.status}" style="font-size: 16px;">
                                 <strong>${grade.averageScore.toFixed(1)}%</strong>
                             </span>
                         </td>
-                        <td>
+                        <td data-label="Status">
                             <span class="badge ${badgeClass}">
                                 ${grade.statusText}
                             </span>
                         </td>
-                        <td>
-                            <button class="btn-edit" onclick="event.stopPropagation(); showStudentGrades('${grade.studentKey}')">
+                        <td data-label="Actions">
+                            <button class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1 transition-all duration-300" onclick="event.stopPropagation(); showStudentGrades('${grade.studentKey}')">
                                 <i class="fas fa-eye"></i> View Details
                             </button>
                         </td>
