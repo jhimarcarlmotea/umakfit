@@ -2210,64 +2210,105 @@
                         }
                     }
                 };
-
-        // Load students for the test's section
-        async function loadStudentsForTest(section) {
-            const container = document.getElementById('studentsListContainer');
-            
-            try {
-                container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading students...</p>';
-                
-                // Query students in this section
-                const studentsQuery = query(
-                    collection(db, 'students'),
-                    where('section', '==', section)
-                );
-                
-                const studentsSnapshot = await getDocs(studentsQuery);
-                
-                if (studentsSnapshot.empty) {
-                    container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 20px;">No students found in this section</p>';
-                    window.currentTestStudents = [];
-                    updateStudentSelectionCount();
-                    return;
-                }
-                
-                // Store students
-                window.currentTestStudents = [];
-                studentsSnapshot.forEach((doc) => {
-                    const student = { id: doc.id, ...doc.data() };
-                    window.currentTestStudents.push(student);
-                });
-                
-                 // Sort by name
-                window.currentTestStudents.sort((a, b) => {
-                    const nameA = a.displayName || a.name || a.email;
-                    const nameB = b.displayName || b.name || b.email;
-                    return nameA.localeCompare(nameB);
-                });
-                
-                // Auto-select all students if flag is set
-                if (window.autoSelectAll) {
-                    console.log('🔄 Auto-selecting all students...');
-                    window.currentTestStudents.forEach(student => {
-                        window.selectedStudentEmails.add(student.email);
-                    });
-                    console.log(`✅ Auto-selected ${window.selectedStudentEmails.size} students`);
-                    window.autoSelectAll = false; // Reset flag
-                }
-                
-                console.log(`✅ Loaded ${window.currentTestStudents.length} students`);
-                console.log(`📊 ${window.selectedStudentEmails.size} students currently selected`);
-                
-                renderStudentListForTest();
-                
-            } catch (error) {
-                console.error('Error loading students:', error);
-                container.innerHTML = '<p style="text-align: center; color: #ef4444; padding: 20px;">Error loading students</p>';
-            }
+async function loadStudentsForTest(section) {
+    const container = document.getElementById('studentsListContainer');
+    
+    try {
+        container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading students...</p>';
+        
+        // Query the sections collection
+        const sectionsQuery = query(
+            collection(db, 'sections'),
+            where('name', '==', section)
+        );
+        
+        const sectionsSnapshot = await getDocs(sectionsQuery);
+        
+        if (sectionsSnapshot.empty) {
+            container.innerHTML = `<p style="text-align: center; color: #64748b; padding: 20px;">No section found: ${section}</p>`;
+            window.currentTestStudents = [];
+            updateStudentSelectionCount();
+            return;
         }
-
+        
+        const sectionData = sectionsSnapshot.docs[0].data();
+        console.log('📋 Raw section data:', sectionData);
+        console.log('📋 Students field:', sectionData.students);
+        
+        const rawStudents = sectionData.students || [];
+        
+        if (rawStudents.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 20px;">No students found in this section</p>';
+            window.currentTestStudents = [];
+            updateStudentSelectionCount();
+            return;
+        }
+        
+        // ✅ HANDLE ALL FORMATS: string emails OR objects
+        window.currentTestStudents = rawStudents.map((student, index) => {
+            // If it's already a string (email)
+            if (typeof student === 'string') {
+                return {
+                    id: student,
+                    email: student,
+                    displayName: student,
+                    name: student,
+                    studentNumber: 'N/A'
+                };
+            }
+            
+            // If it's an object - extract fields
+            if (typeof student === 'object' && student !== null) {
+                const email = student.email || student.studentEmail || student.id || `student_${index}`;
+                const name = student.displayName || student.name || student.fullName || 
+                             student.firstName || email;
+                const studentNumber = student.studentNumber || student.studentId || 
+                                     student.idNumber || 'N/A';
+                
+                return {
+                    id: student.id || email,
+                    email: email,
+                    displayName: name,
+                    name: name,
+                    studentNumber: studentNumber,
+                    ...student  // keep all original fields
+                };
+            }
+            
+            // Fallback
+            return {
+                id: `student_${index}`,
+                email: `student_${index}@unknown.com`,
+                displayName: 'Unknown Student',
+                name: 'Unknown Student',
+                studentNumber: 'N/A'
+            };
+        });
+        
+        // Sort safely
+        window.currentTestStudents.sort((a, b) => {
+            const nameA = String(a.displayName || a.name || a.email || '');
+            const nameB = String(b.displayName || b.name || b.email || '');
+            return nameA.localeCompare(nameB);
+        });
+        
+        // Auto-select all if flag is set
+        if (window.autoSelectAll) {
+            window.currentTestStudents.forEach(student => {
+                window.selectedStudentEmails.add(student.email);
+            });
+            window.autoSelectAll = false;
+        }
+        
+        console.log(`✅ Processed ${window.currentTestStudents.length} students:`, window.currentTestStudents);
+        
+        renderStudentListForTest();
+        
+    } catch (error) {
+        console.error('Error loading students:', error);
+        container.innerHTML = `<p style="text-align: center; color: #ef4444; padding: 20px;">Error: ${error.message}</p>`;
+    }
+}
         // Render student list with checkboxes
         function renderStudentListForTest(filterText = '') {
             const container = document.getElementById('studentsListContainer');

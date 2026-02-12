@@ -2,270 +2,450 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UmakFit - Login</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Inter:600,500,400,700" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=0.75, maximum-scale=1.0, user-scalable=yes">
+    <title>UmakFit - Secure Login</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
     <style>
         * {
+            font-family: 'Inter', 'Manrope', sans-serif;
             -webkit-font-smoothing: antialiased;
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
-
+        
+        .font-manrope {
+            font-family: 'Manrope', sans-serif;
+        }
+        
         body {
-            font-family: 'Inter', Helvetica, sans-serif;
             overflow-x: hidden;
             width: 100vw;
-            height: 100vh;
-            margin: 0;  
+            margin: 0;
             padding: 0;
-        }
-
-        .log-in {
-            background-color: #ffffff;
-            width: 100%;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .frame {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            background: linear-gradient(270deg, rgba(6, 182, 212, 1) 0%, rgba(59, 130, 246, 1) 52%, rgba(30, 58, 138, 1) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .rectangle {
-            position: absolute;
-            width: 555px;
-            max-width: 90%;
-            background-color: #ffffff;
-            border-radius: 33px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .rectangle-2 {
-            width: 53px;
-            height: 50px;
-            border-radius: 7px;
-            background: linear-gradient(270deg, rgba(59, 130, 246, 1) 0%, rgba(30, 58, 138, 1) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .text-wrapper-4 {
-            font-weight: 700;
-            color: #000000;
-            font-size: 32px;
-        }
-
-        .text-wrapper-3 {
-            background: linear-gradient(90deg, rgba(18, 27, 103, 1) 0%, rgba(59, 130, 246, 1) 100%);
-            -webkit-background-clip: text !important;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 500;
-            font-size: 32px;
-            letter-spacing: -0.32px;
-        }
-
-        .text-wrapper-5 {
-            font-weight: 600;
-            color: #1e3a8a;
-            font-size: 32px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .p {
-            font-weight: 600;
-            color: #1e3a8a80;
-            font-size: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .rectangle-4 {
-            width: 187px;
-            height: 42px;
-            border-radius: 31px;
-            background: linear-gradient(270deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin: 0 auto 30px;
-        }
-
-        .text-wrapper-6 {
-            font-weight: 600;
-            color: #1e3a8a;
-            font-size: 15px;
-        }
-
-        .image {
-            width: 16px;
-            height: 14px;
-        }
-
-        .rectangle-7 {
-            width: 100%;
-            height: 48px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            border: 1px solid #00000033;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .rectangle-7:hover {
-            background-color: #f9fafb;
-        }
-
-        .img {
-            width: 21px;
-            height: 21px;
-        }
-
-        .text-wrapper-11 {
-            font-weight: 400;
-            color: #000000;
-            font-size: 14px;
-        }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
             flex-direction: column;
-            gap: 20px;
         }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3b82f6;
+        
+        /* Animated background */
+        .animated-bg {
+            background: linear-gradient(145deg, #0b1e33 0%, #1e3a8a 50%, #2563eb 100%);
+            position: relative;
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: pulse 15s ease infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 0.1; }
+        }
+        
+        /* Floating shapes */
+        .floating-shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+            animation: float 20s infinite;
         }
-
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            left: -100px;
+            background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%);
+            animation-delay: -5s;
+        }
+        
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            right: -150px;
+            background: radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%);
+            animation-delay: -10s;
+        }
+        
+        .shape-3 {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(251,191,36,0.1) 0%, transparent 70%);
+            animation-delay: -15s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(5%, 5%) scale(1.05); }
+            50% { transform: translate(10%, -5%) scale(0.95); }
+            75% { transform: translate(-5%, 5%) scale(1.1); }
+        }
+        
+        /* Login card animation */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-card {
+            animation: slideUp 0.6s ease-out;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Google button animation */
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        .loading-text {
-            font-weight: 500;
-            color: #1e3a8a;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        .error-message {
-            color: #dc2626;
-            font-size: 12px;
-            text-align: center;
-            margin: 10px 0;
-            padding: 10px;
-            background: #fee2e2;
-            border-radius: 8px;
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            .rectangle {
-                width: 95%;
-                padding: 30px 20px;
-                margin: 20px;
-            }
-        }
-        .logo-image {
-            width: 32px;
-            height: 32px;
-            object-fit: contain;
-        }
-
-        .rectangle-2 {
-            width: 53px;
+        
+        .spinner {
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
             height: 50px;
-            border-radius: 7px;
-            background: linear-gradient(270deg, rgba(59, 130, 246, 1) 0%, rgba(30, 58, 138, 1) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* ✅ FIXED NAVBAR - SUMMONOD SA SCROLL */
+        .nav-gradient {
+            background: linear-gradient(90deg, #0a1e3c 0%, #1e3a8a 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0.25rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .nav-link {
+            transition: all 0.2s ease;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.95rem;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+        
+        .nav-link.active {
+            background: white;
+            color: #0a1e3c !important;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        /* Mobile menu animation */
+        .slide-down {
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Google button custom */
+        .google-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border-radius: 40px !important;
+        }
+        
+        .google-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .google-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .google-btn:hover {
+            border-color: #2563eb;
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Error message */
+        .error-message {
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        /* Logo glow */
+        .logo-glow {
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
+            transition: all 0.3s ease;
+        }
+        
+        .logo-glow:hover {
+            filter: drop-shadow(0 0 12px rgba(255,255,255,0.5));
+            transform: scale(1.05);
+        }
+        
+        /* Footer */
+        .custom-footer {
+            background: linear-gradient(90deg, #0a1e3c, #0b1e33);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 2rem 0 1rem;
+            width: 100%;
+            position: relative;
+            z-index: 30;
+        }
+        
+        .footer-title {
+            color: #fbbf24;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-text {
+            color: #cbd5e1;
+            font-size: 0.75rem;
+            line-height: 1.6;
+        }
+        
+        /* ✅ PINALAKI ANG LOGIN CARD */
+        .login-card-large {
+            width: 100%;
+            max-width: 650px;
+            padding: 3rem 3.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .login-card-large {
+                padding: 2.5rem 2rem;
+                max-width: 500px;
+            }
         }
     </style>
 </head>
-<body>
-    <div class="loading-overlay" id="loadingOverlay">
+<body class="flex flex-col min-h-screen">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay fixed inset-0 flex flex-col justify-center items-center z-[1100] hidden">
         <div class="spinner"></div>
-        <div class="loading-text" id="loadingText">Checking your account status...</div>
+        <div class="mt-5 text-blue-900 font-semibold text-lg" id="loadingText">Checking your account status...</div>
     </div>
 
-    <div class="log-in">
-        <div class="frame">
-            <div class="rectangle">
-                <div class="logo-container">
-                    <div class="rectangle-2">
-                        <img src="logo.png" alt="UmakFit Logo" class="logo-image">
+    <!-- ✅ FIXED NAVBAR - SUMUSUNOD SA SCROLL -->
+    <!-- ✅ FIXED NAVBAR - PINALIIT, WALANG PADDING SA ITAAS/BABA -->
+    <nav class="nav-gradient shadow-md w-full">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex items-center justify-between py-0"> <!-- ✅ py-0 = walang padding -->
+                
+                <!-- ✅ LOGO LANG LALAKI, NAVBAR HINDI LUMALAKI -->
+                <div class="flex items-center gap-2"> <!-- ✅ gap-2 lang -->
+                    <div class="flex items-center justify-center bg-transparent">
+                        <img src="umaklogo.png" alt="UmakFit Logo" 
+                             class="w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain logo-glow -my-4" id="umakLogo">
                     </div>
-                    <div class="text-wrapper-3">UmakFit</div>
+                    <span class="text-2xl md:text-3xl lg:text-4xl font-extrabold font-manrope bg-gradient-to-r from-amber-300 to-yellow-300 bg-clip-text text-transparent tracking-tight">
+                        UMakFit
+                    </span>
                 </div>
-
-                <div class="text-wrapper-5">Welcome Back</div>
-                <p class="p">Sign in to access your fitness dashboard</p>
-
-                <div class="rectangle-4">
-                    <img class="image" src="https://c.animaapp.com/U8pJpe80/img/image-48@2x.png" alt="University Logo" />
-                    <span class="text-wrapper-6">University of Makati</span>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden lg:flex items-center gap-3">
+                    <a href="#" class="nav-link text-white flex items-center gap-2">
+                        <i class="fas fa-home text-sm"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="#" class="nav-link text-white flex items-center gap-2">
+                        <i class="fas fa-info-circle text-sm"></i>
+                        <span>About Us</span>
+                    </a>
+                    <a href="#" class="nav-link active flex items-center gap-2 bg-white text-blue-900">
+                        <i class="fas fa-sign-in-alt text-sm"></i>
+                        <span>Log in</span>
+                    </a>
                 </div>
+                
+                <!-- Mobile Right -->
+                <div class="flex lg:hidden items-center gap-3">
+                    <a href="#" class="px-4 py-2 bg-white text-blue-900 rounded-full font-semibold text-sm flex items-center gap-2 shadow-md">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Log in</span>
+                    </a>
+                    <button id="mobileMenuButton" class="text-white p-2 hover:bg-white/10 rounded-lg transition">
+                        <i class="bi bi-list text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Navigation Menu -->
+            <div id="mobileMenu" class="hidden lg:hidden pb-4 space-y-2">
+                <a href="#" class="block px-4 py-3 bg-white/10 text-white rounded-lg font-medium text-sm flex items-center gap-3">
+                    <i class="fas fa-home w-5"></i> Home
+                </a>
+                <a href="#" class="block px-4 py-3 bg-white/10 text-white rounded-lg font-medium text-sm flex items-center gap-3">
+                    <i class="fas fa-info-circle w-5"></i> About Us
+                </a>
+                <a href="#" class="block px-4 py-3 bg-white text-blue-900 rounded-lg font-semibold text-sm flex items-center gap-3 shadow-md">
+                    <i class="fas fa-sign-in-alt w-5"></i> Log in
+                </a>
+            </div>
+        </div>
+    </nav>
 
-                <div class="error-message" id="errorMessage"></div>
+    <!-- Main Content - Animated Background -->
+    <div class="animated-bg flex flex-col flex-1">
+        
+        <!-- Floating Shapes -->
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+        
+        <!-- ✅ LOGIN CARD - PINALAKI PARA HINDI NA MAKITA FOOTER AGAD -->
+        <div class="flex-1 flex items-center justify-center px-4 py-16 relative z-20">
+            <div class="w-full max-w-[650px]">
+                <div class="bg-white/95 backdrop-blur-sm rounded-[50px] p-12 md:p-14 shadow-2xl border border-white/30 login-card login-card-large">
+                    
+                    <!-- ✅ WALA NG LOGO DITO - NASA NAVBAR NA -->
+                    <!-- Welcome Text - PINALAKI -->
+                    <h1 class="font-bold text-4xl md:text-5xl lg:text-6xl text-gray-800 text-center mb-6">Welcome Back</h1>
+                    <p class="font-medium text-base md:text-lg text-gray-500 text-center mb-10 leading-relaxed px-4">
+                        Sign in to access your fitness dashboard and track your progress
+                    </p>
 
-                <div class="rectangle-7" onclick="handleGoogleSignIn()">
-                    <img class="img" src="https://c.animaapp.com/U8pJpe80/img/image-49@2x.png" alt="Google" />
-                    <span class="text-wrapper-11">Continue with Umak Gmail</span>
+                    <!-- University Badge - PINALAKI -->
+                    <div class="w-fit mx-auto px-8 py-4 rounded-full bg-gradient-to-r from-amber-50 to-yellow-50 flex items-center justify-center gap-4 mb-10 border border-amber-200/80 shadow-md">
+                        <i class="fas fa-university text-amber-600 text-base"></i>
+                        <span class="font-semibold text-amber-800 text-base tracking-wide">University of Makati</span>
+                        <i class="fas fa-graduation-cap text-amber-600 text-base"></i>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="error-message hidden text-red-700 text-sm text-center mb-6 p-4 bg-red-50 rounded-xl border-l-4 border-red-600 font-medium"></div>
+
+                    <!-- Google Sign In Button - PINALAKI -->
+                    <button class="google-btn w-full h-16 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center gap-4 mt-4 hover:border-blue-500 transition-all" onclick="handleGoogleSignIn()">
+                        <img class="w-6 h-6" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+                        <span class="font-semibold text-gray-700 text-base md:text-lg">Continue with Umak Gmail</span>
+                    </button>
+
+                    <!-- Features - PINALAKI DIN -->
+                    <div class="flex flex-wrap justify-center gap-8 mt-10 pt-8 border-t border-gray-200">
+                        <div class="flex items-center gap-2 text-gray-500 text-sm font-medium">
+                            <i class="fas fa-shield-alt text-blue-500 text-base"></i>
+                            <span>Secure Login</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-500 text-sm font-medium">
+                            <i class="fas fa-lock text-blue-500 text-base"></i>
+                            <span>UMak Email Only</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-500 text-sm font-medium">
+                            <i class="fas fa-bolt text-blue-500 text-base"></i>
+                            <span>Instant Access</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- Footer -->
+    <footer class="custom-footer w-full">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            
+            <!-- University Header -->
+            <div class="text-center mb-6">
+                <h3 class="text-amber-400 font-bold text-lg md:text-xl tracking-wider">University of Makati</h3>
+                <p class="text-gray-400 text-xs uppercase tracking-widest mt-1">Center for Technology Based Learning</p>
+            </div>
+            
+            <!-- CTBL Description - 3 Columns -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-4">
+                <div class="footer-text text-center md:text-left">
+                    <span class="text-amber-400 font-semibold text-sm block mb-2">📍 OUR MISSION</span>
+                    The Center for Technology Based Learning serves as the learning management system operating hub, reporting to the university MANCOM officials, with a director on duty who manages and handles the center's daily operations.
+                </div>
+                <div class="footer-text text-center md:text-left">
+                    <span class="text-amber-400 font-semibold text-sm block mb-2">🤝 COLLABORATION</span>
+                    Working closely with the Office of the President, the Center for Information Technology, and the Deans and Directors to support the LMS end-users' day-to-day activity.
+                </div>
+                <div class="footer-text text-center md:text-left">
+                    <span class="text-amber-400 font-semibold text-sm block mb-2">🎯 FOCUS</span>
+                    The center focuses on implementing new forms of training and determining the validity of data to support the university's educational objectives.
+                </div>
+            </div>
+            
+            <!-- Legacy TBL Hub Link -->
+            <div class="flex justify-center items-center mt-6 pt-4 border-t border-gray-800">
+                <a href="#" class="flex items-center gap-3 text-gray-300 hover:text-amber-400 transition-colors group">
+                    <i class="fas fa-archive text-sm group-hover:text-amber-400"></i>
+                    <span class="text-sm font-medium tracking-wide">Legacy TBL Hub</span>
+                    <i class="fas fa-external-link-alt text-xs opacity-70 group-hover:opacity-100"></i>
+                </a>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="text-center text-gray-500 text-xs mt-6 pt-3 border-t border-gray-800/50">
+                © 2024 University of Makati - Center for Technology Based Learning. All rights reserved.
+            </div>
+        </div>
+    </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     
     <script type="module">
+        // Firebase imports and config
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        import { getDatabase, ref, set, onDisconnect, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, set, onDisconnect, serverTimestamp, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
@@ -304,774 +484,307 @@
         window.set = set;
         window.onDisconnect = onDisconnect;
         window.serverTimestamp = serverTimestamp;
+        window.onValue = onValue;
     </script>
 
-   <script>
-    function showLoading(message = 'Checking your account status...') {
-        document.getElementById('loadingOverlay').style.display = 'flex';
-        document.getElementById('loadingText').textContent = message;
-    }
-
-    function hideLoading() {
-        document.getElementById('loadingOverlay').style.display = 'none';
-    }
-
-    function showError(message) {
-        const errorDiv = document.getElementById('errorMessage');
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
-        setTimeout(() => {
-            errorDiv.style.display = 'none';
-        }, 5000);
-    }
-
-    async function setupUserPresence(user) {
-        try {
-            console.log('Setting up user presence tracking for:', user.email);
+    <script>
+        // ----- NAVBAR TOGGLE -----
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
             
-            let userRole = 'student';
-            const userEmail = user.email.toLowerCase();
-            
-            // Check users collection first (like old code)
-            try {
-                const emailLookupRef = window.doc(window.db, 'users', userEmail.replace(/\./g, '_'));
-                const emailLookupSnap = await window.getDoc(emailLookupRef);
-                if (emailLookupSnap.exists()) {
-                    userRole = emailLookupSnap.data().role || 'student';
-                }
-            } catch (error) {
-                console.log('Error checking users for role:', error);
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    mobileMenu.classList.toggle('hidden');
+                });
             }
             
-            console.log('Detected user role for presence:', userRole);
-            
-            const userPresenceRef = window.ref(window.database, `presence/${user.uid}`);
-            
-            await window.set(userPresenceRef, {
-                status: 'online',
-                lastActive: window.serverTimestamp(),
-                userId: user.uid,
-                email: user.email,
-                name: user.displayName || user.email.split('@')[0],
-                role: userRole,
-                lastLogin: new Date().toISOString()
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('#mobileMenuButton') && !event.target.closest('#mobileMenu')) {
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
             });
 
-            const connectedRef = window.ref(window.database, '.info/connected');
+            // LOGO FALLBACK
+            const logoImg = document.getElementById('umakLogo');
             
-            window.onValue(connectedRef, (snap) => {
-                if (snap.val() === true) {
-                    window.onDisconnect(userPresenceRef).remove();
-                }
-            });
-            
-            console.log('✓ Presence tracking setup complete for', user.email);
-
-        } catch (error) {
-            console.error('Error setting up presence:', error);
-        }
-    }
-
-    async function updatePresenceRole(userId, role) {
-        try {
-            const userPresenceRef = window.ref(window.database, `presence/${userId}`);
-            await window.set(userPresenceRef, {
-                status: 'online',
-                lastActive: window.serverTimestamp(),
-                userId: userId,
-                role: role
-            }, { merge: true });
-            console.log(`✓ Updated presence role to: ${role}`);
-        } catch (error) {
-            console.error('Error updating presence role:', error);
-        }
-    }
-
-    // Check professor collection specifically (like old code)
-    async function checkProfessorStatus(user) {
-        try {
-            console.log('🔍 Checking professor collection for:', user.uid);
-            
-            const professorRef = window.doc(window.db, 'professors', user.uid);
-            const professorSnap = await window.getDoc(professorRef);
-            
-            if (professorSnap.exists()) {
-                const professorData = professorSnap.data();
-                console.log('✅ PROFESSOR FOUND in professors collection:', professorData.role);
-                return professorData;
-            }
-            
-            console.log('✗ Professor not found in professors collection by UID');
-            
-            // Also check by email like new code
-            const professorsQuery = window.query(
-                window.collection(window.db, 'professors'),
-                window.where('email', '==', user.email.toLowerCase())
-            );
-            const professorsSnapshot = await window.getDocs(professorsQuery);
-            
-            if (!professorsSnapshot.empty) {
-                const professorData = professorsSnapshot.docs[0].data();
-                console.log('✅ PROFESSOR FOUND in professors collection by email:', professorData.role);
-                return professorData;
-            }
-            
-            return null;
-            
-        } catch (error) {
-            console.error('Error checking professor status:', error);
-            return null;
-        }
-    }
-
-    // Check if account is deactivated (like new code)
-    async function checkAccountStatus(user) {
-        try {
-            console.log('🔍 Checking account status for:', user.email);
-            
-            const userEmail = user.email.toLowerCase();
-            
-            // Check users collection by email (like old code)
-            try {
-                const emailLookupRef = window.doc(window.db, 'users', userEmail.replace(/\./g, '_'));
-                const emailLookupSnap = await window.getDoc(emailLookupRef);
-                
-                if (emailLookupSnap.exists()) {
-                    const lookupData = emailLookupSnap.data();
-                    console.log('Account status in users:', lookupData.status);
-                    
-                    if (lookupData.status === 'inactive') {
-                        console.log('❌ ACCOUNT DEACTIVATED in users');
-                        return false;
+            function setupLogoFallback(img) {
+                if (!img) return;
+                img.onerror = function() {
+                    console.log('⚠️ Logo not found, showing text logo');
+                    this.style.display = 'none';
+                    const wrapper = this.parentElement;
+                    if (wrapper) {
+                        wrapper.innerHTML = '<span style="color: #fbbf24; font-weight: 800; font-size: 42px; text-shadow: 0 2px 10px rgba(0,0,0,0.2);">U</span>';
                     }
-                }
-            } catch (error) {
-                console.log('Error checking users status:', error);
+                };
             }
             
-            // Check professors collection by email (like new code)
-            try {
-                const professorsQuery = window.query(
-                    window.collection(window.db, 'professors'),
-                    window.where('email', '==', userEmail)
-                );
-                const professorsSnapshot = await window.getDocs(professorsQuery);
-                
-                if (!professorsSnapshot.empty) {
-                    const professorData = professorsSnapshot.docs[0].data();
-                    console.log('Account status in professors:', professorData.status);
-                    
-                    if (professorData.status === 'inactive') {
-                        console.log('❌ ACCOUNT DEACTIVATED in professors');
-                        return false;
-                    }
-                }
-            } catch (error) {
-                console.log('Error checking professors status:', error);
-            }
-            
-            // Check secretaries collection by email (like new code)
-            try {
-                const secretariesQuery = window.query(
-                    window.collection(window.db, 'secretaries'),
-                    window.where('email', '==', userEmail)
-                );
-                const secretariesSnapshot = await window.getDocs(secretariesQuery);
-                
-                if (!secretariesSnapshot.empty) {
-                    const secretaryData = secretariesSnapshot.docs[0].data();
-                    console.log('Account status in secretaries:', secretaryData.status);
-                    
-                    if (secretaryData.status === 'inactive') {
-                        console.log('❌ ACCOUNT DEACTIVATED in secretaries');
-                        return false;
-                    }
-                }
-            } catch (error) {
-                console.log('Error checking secretaries status:', error);
-            }
-            
-            // Check deans collection by email (like new code)
-            try {
-                const deansQuery = window.query(
-                    window.collection(window.db, 'deans'),
-                    window.where('email', '==', userEmail)
-                );
-                const deansSnapshot = await window.getDocs(deansQuery);
-                
-                if (!deansSnapshot.empty) {
-                    const deanData = deansSnapshot.docs[0].data();
-                    console.log('Account status in deans:', deanData.status);
-                    
-                    if (deanData.status === 'inactive') {
-                        console.log('❌ ACCOUNT DEACTIVATED in deans');
-                        return false;
-                    }
-                }
-            } catch (error) {
-                console.log('Error checking deans status:', error);
-            }
-            
-            console.log('✅ Account is ACTIVE');
-            return true;
-            
-        } catch (error) {
-            console.error('Error checking account status:', error);
-            return true;
-        }
-    }
+            setupLogoFallback(logoImg);
 
-    // Check college secretary status (like old code)
-    async function checkSecretaryStatus(user) {
-        try {
-            console.log('🔍 Checking secretary collection for:', user.uid);
-            
-            const secretaryRef = window.doc(window.db, 'secretaries', user.uid);
-            const secretarySnap = await window.getDoc(secretaryRef);
-            
-            if (secretarySnap.exists()) {
-                const secretaryData = secretarySnap.data();
-                console.log('✅ SECRETARY FOUND in secretaries collection:', secretaryData.role);
-                return secretaryData;
-            }
-            
-            console.log('✗ Secretary not found in secretaries collection by UID');
-            
-            // Also check by email like new code
-            const secretariesQuery = window.query(
-                window.collection(window.db, 'secretaries'),
-                window.where('email', '==', user.email.toLowerCase())
-            );
-            const secretariesSnapshot = await window.getDocs(secretariesQuery);
-            
-            if (!secretariesSnapshot.empty) {
-                const secretaryData = secretariesSnapshot.docs[0].data();
-                console.log('✅ SECRETARY FOUND in secretaries collection by email:', secretaryData.role);
-                return secretaryData;
-            }
-            
-            return null;
-            
-        } catch (error) {
-            console.error('Error checking secretary status:', error);
-            return null;
-        }
-    }
+            // Clear session on load
+            try {
+                if (window.signOut) {
+                    window.signOut(window.auth).catch(() => {});
+                }
+            } catch (e) {}
+        });
 
-    // Check dean status (like old code)
-    async function checkDeanStatus(user) {
-        try {
-            console.log('🔍 Checking dean collection for:', user.uid);
-            
-            const deanRef = window.doc(window.db, 'deans', user.uid);
-            const deanSnap = await window.getDoc(deanRef);
-            
-            if (deanSnap.exists()) {
-                const deanData = deanSnap.data();
-                console.log('✅ DEAN FOUND in deans collection:', deanData.role);
-                return deanData;
+        // ----- LOADING FUNCTIONS -----
+        function showLoading(message = 'Checking your account status...') {
+            const overlay = document.getElementById('loadingOverlay');
+            const text = document.getElementById('loadingText');
+            if (overlay && text) {
+                overlay.classList.remove('hidden');
+                overlay.style.display = 'flex';
+                text.textContent = message;
             }
-            
-            console.log('✗ Dean not found in deans collection by UID');
-            
-            // Also check by email like new code
-            const deansQuery = window.query(
-                window.collection(window.db, 'deans'),
-                window.where('email', '==', user.email.toLowerCase())
-            );
-            const deansSnapshot = await window.getDocs(deansQuery);
-            
-            if (!deansSnapshot.empty) {
-                const deanData = deansSnapshot.docs[0].data();
-                console.log('✅ DEAN FOUND in deans collection by email:', deanData.role);
-                return deanData;
-            }
-            
-            return null;
-            
-        } catch (error) {
-            console.error('Error checking dean status:', error);
-            return null;
         }
-    }
 
-    async function checkStudentStatus(user) {
-    try {
-        console.log('🔍 Checking student collection for:', user.email);
-        
-        const studentsQuery = window.query(
-            window.collection(window.db, 'students'),
-            window.where('email', '==', user.email.toLowerCase())
-        );
-        const studentsSnapshot = await window.getDocs(studentsQuery);
-        
-        if (!studentsSnapshot.empty) {
-            const studentDoc = studentsSnapshot.docs[0];
-            const studentData = studentDoc.data();
-            console.log('✅ STUDENT FOUND in students collection');
-            console.log('Student data:', studentData);
-            
-            if (!studentData.createdAt) {
-                const studentRef = window.doc(window.db, 'students', studentDoc.id);
-                await window.setDoc(studentRef, {
-                    createdAt: new Date().toISOString()
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                overlay.style.display = 'none';
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.classList.remove('hidden');
+                errorDiv.style.display = 'block';
+                setTimeout(() => {
+                    errorDiv.classList.add('hidden');
+                    errorDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // ----- AUTH FUNCTIONS -----
+        async function setupUserPresence(user) {
+            try {
+                let userRole = 'student';
+                const userEmail = user.email.toLowerCase();
+                try {
+                    const emailLookupRef = window.doc(window.db, 'users', userEmail.replace(/\./g, '_'));
+                    const emailLookupSnap = await window.getDoc(emailLookupRef);
+                    if (emailLookupSnap.exists()) userRole = emailLookupSnap.data().role || 'student';
+                } catch (error) {}
+                
+                const userPresenceRef = window.ref(window.database, `presence/${user.uid}`);
+                await window.set(userPresenceRef, {
+                    status: 'online',
+                    lastActive: window.serverTimestamp(),
+                    userId: user.uid,
+                    email: user.email,
+                    name: user.displayName || user.email.split('@')[0],
+                    role: userRole,
+                    lastLogin: new Date().toISOString()
+                });
+
+                const connectedRef = window.ref(window.database, '.info/connected');
+                window.onValue(connectedRef, (snap) => {
+                    if (snap.val() === true) {
+                        window.onDisconnect(userPresenceRef).remove();
+                    }
+                });
+            } catch (error) {}
+        }
+
+        async function updatePresenceRole(userId, role) {
+            try {
+                const userPresenceRef = window.ref(window.database, `presence/${userId}`);
+                await window.set(userPresenceRef, { 
+                    status: 'online', 
+                    lastActive: window.serverTimestamp(), 
+                    userId: userId, 
+                    role: role 
                 }, { merge: true });
-                studentData.createdAt = new Date().toISOString();
-            }
-            
-            // Return student data with document ID
-            return { 
-                id: studentDoc.id, 
-                ...studentData,
-                // Set default values if not present
-                emailVerified: studentData.emailVerified || false,
-                privacyAccepted: studentData.privacyAccepted || false
-            };
+            } catch (error) {}
         }
-        
-        console.log('✗ Student not found in students collection');
-        return null;
-        
-    } catch (error) {
-        console.error('Error checking student status:', error);
-        return null;
-    }
-}
 
-    // UPDATED: Check user status with combined logic
-    async function checkUserStatus(user) {
-        try {
-            console.log('=== CHECKING USER STATUS ===');
-            console.log('User Email:', user.email);
-            console.log('User UID:', user.uid);
+        async function checkProfessorStatus(user) {
+            try {
+                const professorRef = window.doc(window.db, 'professors', user.uid);
+                const professorSnap = await window.getDoc(professorRef);
+                if (professorSnap.exists()) return professorSnap.data();
+                
+                const professorsQuery = window.query(window.collection(window.db, 'professors'), window.where('email', '==', user.email.toLowerCase()));
+                const professorsSnapshot = await window.getDocs(professorsQuery);
+                if (!professorsSnapshot.empty) return professorsSnapshot.docs[0].data();
+            } catch (error) {}
+            return null;
+        }
 
-            // FIRST: Check if account is deactivated
-            const isAccountActive = await checkAccountStatus(user);
-            if (!isAccountActive) {
-                console.log('❌ LOGIN BLOCKED: Account is deactivated');
-                await window.signOut(window.auth);
-                hideLoading();
-                showError('Your account has been deactivated. Please contact the administrator.');
-                return;
+        async function checkAccountStatus(user) {
+            try {
+                const userEmail = user.email.toLowerCase();
+                const emailLookupRef = window.doc(window.db, 'users', userEmail.replace(/\./g, '_'));
+                const emailLookupSnap = await window.getDoc(emailLookupRef);
+                if (emailLookupSnap.exists() && emailLookupSnap.data().status === 'inactive') return false;
+                
+                const collections = ['professors', 'secretaries', 'deans'];
+                for (const collectionName of collections) {
+                    const q = window.query(window.collection(window.db, collectionName), window.where('email', '==', userEmail));
+                    const snapshot = await window.getDocs(q);
+                    if (!snapshot.empty && snapshot.docs[0].data().status === 'inactive') return false;
+                }
+                return true;
+            } catch (error) {
+                return true;
             }
+        }
 
-            const userEmail = user.email.toLowerCase();
-            const currentTime = new Date().toISOString();
-            
-            // Setup presence tracking immediately
-            await setupUserPresence(user);
-            
-            // Check for DEAN role first (like old code)
-            const deanData = await checkDeanStatus(user);
-            if (deanData) {
-                console.log('🎯 DEAN ACCOUNT DETECTED');
+        async function checkSecretaryStatus(user) {
+            try {
+                const secretaryRef = window.doc(window.db, 'secretaries', user.uid);
+                const secretarySnap = await window.getDoc(secretaryRef);
+                if (secretarySnap.exists()) return secretarySnap.data();
                 
-                await updatePresenceRole(user.uid, 'dean');
+                const secretariesQuery = window.query(window.collection(window.db, 'secretaries'), window.where('email', '==', user.email.toLowerCase()));
+                const secretariesSnapshot = await window.getDocs(secretariesQuery);
+                if (!secretariesSnapshot.empty) return secretariesSnapshot.docs[0].data();
+            } catch (error) {}
+            return null;
+        }
+
+        async function checkDeanStatus(user) {
+            try {
+                const deanRef = window.doc(window.db, 'deans', user.uid);
+                const deanSnap = await window.getDoc(deanRef);
+                if (deanSnap.exists()) return deanSnap.data();
                 
-                // Update last login
-                try {
-                    const deanRef = window.doc(window.db, 'deans', user.uid);
-                    await window.setDoc(deanRef, {
-                        lastLogin: currentTime,
-                        isActive: true
-                    }, { merge: true });
-                    console.log('✓ Updated dean last login');
-                } catch (error) {
-                    console.error('Error updating dean:', error);
-                }
-                
-                // Also update users collection (like old code)
-                try {
-                    const userRef = window.doc(window.db, 'users', user.uid);
-                    await window.setDoc(userRef, {
-                        role: 'dean',
-                        lastLogin: currentTime,
-                        isActive: true,
-                        displayName: deanData.displayName || user.displayName,
-                        email: user.email
-                    }, { merge: true });
-                    console.log('✓ Updated users collection for dean');
-                } catch (error) {
-                    console.error('Error updating users for dean:', error);
-                }
-                
-                // Redirect to dean dashboard
-                console.log('→ Going to dean dashboard');
-                showLoading('Welcome back Dean! Redirecting to your dashboard...');
-                
-                setTimeout(() => {
-                    window.location.href = '../dean/dean.html';
-                }, 1000);
-                return;
-            }
-            
-            // Check for SECRETARY role (like old code)
-            const secretaryData = await checkSecretaryStatus(user);
-            if (secretaryData) {
-                console.log('🎯 SECRETARY ACCOUNT DETECTED');
-                
-                await updatePresenceRole(user.uid, 'secretary');
-                
-                // Update last login
-                try {
-                    const secretaryRef = window.doc(window.db, 'secretaries', user.uid);
-                    await window.setDoc(secretaryRef, {
-                        lastLogin: currentTime,
-                        isActive: true
-                    }, { merge: true });
-                    console.log('✓ Updated secretary last login');
-                } catch (error) {
-                    console.error('Error updating secretary:', error);
-                }
-                
-                // Also update users collection (like old code)
-                try {
-                    const userRef = window.doc(window.db, 'users', user.uid);
-                    await window.setDoc(userRef, {
-                        role: 'secretary',
-                        lastLogin: currentTime,
-                        isActive: true,
-                        displayName: secretaryData.displayName || user.displayName,
-                        email: user.email
-                    }, { merge: true });
-                    console.log('✓ Updated users collection for secretary');
-                } catch (error) {
-                    console.error('Error updating users for secretary:', error);
-                }
-                
-                // Redirect to secretary dashboard
-                console.log('→ Going to secretary dashboard');
-                showLoading('Welcome back Secretary! Redirecting to your dashboard...');
-                
-                setTimeout(() => {
-                    window.location.href = '../secretary/secretary.html';
-                }, 1000);
-                return;
-            }
-            
-            // Check for PROFESSOR role (like old code)
-            const professorData = await checkProfessorStatus(user);
-            if (professorData) {
-                console.log('🎯 PROFESSOR ACCOUNT DETECTED');
-                
-                await updatePresenceRole(user.uid, 'professor');
-                
-                // Update last login
-                try {
-                    const professorRef = window.doc(window.db, 'professors', user.uid);
-                    await window.setDoc(professorRef, {
-                        lastLogin: currentTime,
-                        isActive: true
-                    }, { merge: true });
-                    console.log('✓ Updated professor last login');
-                } catch (error) {
-                    console.error('Error updating professor:', error);
-                }
-                
-                // Also update users collection (like old code)
-                try {
-                    const userRef = window.doc(window.db, 'users', user.uid);
-                    await window.setDoc(userRef, {
-                        role: 'professor',
-                        lastLogin: currentTime,
-                        isActive: true,
-                        displayName: professorData.displayName || user.displayName,
-                        email: user.email
-                    }, { merge: true });
-                    console.log('✓ Updated users collection for professor');
-                } catch (error) {
-                    console.error('Error updating users for professor:', error);
-                }
-                
-                // Redirect to professor dashboard
-                console.log('→ Going to professor dashboard');
-                showLoading('Welcome back Professor! Redirecting to your dashboard...');
-                
-                setTimeout(() => {
-                    window.location.href = '../professor/professor.html';
-                }, 1000);
-                return;
-            }
-            
-            // Check for STUDENT role (like new code)
-                const studentData = await checkStudentStatus(user);
-                if (studentData) {
-                    console.log('🎯 STUDENT ACCOUNT DETECTED');
-                    console.log('Student Data:', studentData);
-                    
-                    await updatePresenceRole(user.uid, 'student');
-                    
-                    // Update last login in students collection using the correct document ID
-                    try {
-                    const studentRef = window.doc(window.db, 'students', studentData.id);
-                    
-                    // ADD THIS: Prepare update data
-                    const updateData = {
-                        lastLogin: currentTime,
-                        isActive: true,
-                        uid: user.uid
+                const deansQuery = window.query(window.collection(window.db, 'deans'), window.where('email', '==', user.email.toLowerCase()));
+                const deansSnapshot = await window.getDocs(deansQuery);
+                if (!deansSnapshot.empty) return deansSnapshot.docs[0].data();
+            } catch (error) {}
+            return null;
+        }
+
+        async function checkStudentStatus(user) {
+            try {
+                const studentsQuery = window.query(window.collection(window.db, 'students'), window.where('email', '==', user.email.toLowerCase()));
+                const studentsSnapshot = await window.getDocs(studentsQuery);
+                if (!studentsSnapshot.empty) {
+                    const studentDoc = studentsSnapshot.docs[0];
+                    const studentData = studentDoc.data();
+                    return { 
+                        id: studentDoc.id, 
+                        ...studentData,
+                        emailVerified: studentData.emailVerified || false,
+                        privacyAccepted: studentData.privacyAccepted || false
                     };
-                    
-                    // ADD THIS: Set createdAt only if it doesn't exist (first time login)
-                    if (!studentData.createdAt) {
-                        updateData.createdAt = currentTime;
-                    }
-                    
-                    await window.setDoc(studentRef, updateData, { merge: true });
-                    console.log('✓ Updated student last login');
-                } catch (error) {
-                    console.error('Error updating student:', error);
                 }
-                    
-                    // Also update users collection for login tracking
-                    try {
-                        const userRef = window.doc(window.db, 'users', user.uid);
-                        await window.setDoc(userRef, {
-                            role: 'student',
-                            lastLogin: currentTime,
-                            isActive: true,
-                            displayName: studentData.fullName || studentData.name || user.displayName,
-                            email: user.email,
-                            studentId: studentData.studentId || studentData.student_id,
-                            section: studentData.section,
-                            courseCode: studentData.courseCode || studentData.course_code
-                        }, { merge: true });
-                        console.log('✓ Updated users collection for student');
-                    } catch (error) {
-                        console.error('Error updating users for student:', error);
-                    }
-                    
-                    // Check student verification status
-                    console.log('=== STUDENT VERIFICATION STATUS ===');
-                    console.log('Email Verified:', studentData.emailVerified);
-                    console.log('Privacy Accepted:', studentData.privacyAccepted);
-                    
-                    // COMPLETE: Both steps done → DASHBOARD
-                    if (studentData.emailVerified && studentData.privacyAccepted) {
-                        console.log('✅ ALL COMPLETE → studentDashboard.html');
-                        showLoading('Login successful! Loading your dashboard...');
-                        setTimeout(() => {
-                            window.location.href = '../student/studentDashboard.html';
-                        }, 1000);
-                        return;
-                    }
-                    
-                    // STEP 1: Email NOT verified → OTP VERIFICATION
-                    if (!studentData.emailVerified) {
-                        console.log('⚠️ EMAIL NOT VERIFIED → otp-verification.html');
-                        showLoading('Please verify your email...');
-                        setTimeout(() => {
-                            window.location.href = 'otp-verification.html';
-                        }, 1000);
-                        return;
-                    }
-                    
-                    // STEP 2: Email verified but NO privacy → DATA PRIVACY
-                    if (studentData.emailVerified && !studentData.privacyAccepted) {
-                        console.log('⚠️ PRIVACY NOT ACCEPTED → dataprivacy.html');
-                        showLoading('Please accept Data Privacy Agreement...');
-                        setTimeout(() => {
-                            window.location.href = 'dataprivacy.html';
-                        }, 1000);
-                        return;
-                    }
-                    
-                    // Fallback: Default to OTP verification
-                    console.log('❓ UNKNOWN STUDENT STATE → otp-verification.html');
-                    showLoading('Please verify your email...');
-                    setTimeout(() => {
-                        window.location.href = 'otp-verification.html';
-                    }, 1000);
+            } catch (error) {}
+            return null;
+        }
+
+        async function checkUserStatus(user) {
+            try {
+                const isAccountActive = await checkAccountStatus(user);
+                if (!isAccountActive) {
+                    await window.signOut(window.auth);
+                    hideLoading();
+                    showError('Your account has been deactivated. Please contact the administrator.');
                     return;
                 }
-            
-            // OLD CODE LOGIC: Check users collection as fallback (CRITICAL FIX)
-            console.log('🔄 Checking users collection as fallback (old code logic)...');
-            
-            try {
-                const userRef = window.doc(window.db, 'users', user.uid);
-                const userSnap = await window.getDoc(userRef);
+
+                const currentTime = new Date().toISOString();
+                await setupUserPresence(user);
                 
-                if (userSnap.exists()) {
-                    const userData = userSnap.data();
-                    console.log('✅ USER FOUND in users collection (by UID):', userData.role);
-                    
-                    await updatePresenceRole(user.uid, userData.role);
-                    
-                    // Update last login
-                    await window.setDoc(userRef, {
-                        lastLogin: currentTime,
-                        isActive: true
-                    }, { merge: true });
-                    
-                    // Redirect based on role from users collection
-                    if (userData.role === 'dean' || userData.role === 'head_admin') {
-                        console.log('→ Going to dean dashboard');
-                        showLoading('Welcome back Dean! Redirecting to your dashboard...');
-                        setTimeout(() => {
-                            window.location.href = '../dean/dean.html';
-                        }, 1000);
-                        return;
-                    } else if (userData.role === 'secretary' || userData.role === 'college_secretary') {
-                        console.log('→ Going to secretary dashboard');
-                        showLoading('Welcome back Secretary! Redirecting to your dashboard...');
-                        setTimeout(() => {
-                            window.location.href = '../secretary/secretary.html';
-                        }, 1000);
-                        return;
-                    } else if (userData.role === 'professor') {
-                        console.log('→ Going to professor dashboard');
-                        showLoading('Welcome back Professor! Redirecting to your dashboard...');
-                        setTimeout(() => {
-                            window.location.href = '../professor/professor.html';
-                        }, 1000);
-                        return;
-                    } else if (userData.role === 'student') {
-                        console.log('→ Student needs to complete registration');
-                        showLoading('Please complete your student registration...');
-                        setTimeout(() => {
-                            window.location.href = 'otp-verification.html';
-                        }, 1000);
-                        return;
-                    }
+                const deanData = await checkDeanStatus(user);
+                if (deanData) {
+                    await updatePresenceRole(user.uid, 'dean');
+                    showLoading('Welcome back Dean! Redirecting to your dashboard...');
+                    setTimeout(() => { window.location.href = '../dean/dean.html'; }, 1000);
+                    return;
                 }
-            } catch (error) {
-                console.error('Error checking users collection by UID:', error);
-            }
-            
-            // Check users collection by email (old code email lookup)
-            try {
-                const emailLookupRef = window.doc(window.db, 'users', userEmail.replace(/\./g, '_'));
-                const emailLookupSnap = await window.getDoc(emailLookupRef);
                 
-                if (emailLookupSnap.exists()) {
-                    const lookupData = emailLookupSnap.data();
-                    console.log('✅ USER FOUND in users collection (by email):', lookupData.role);
-                    
-                    await updatePresenceRole(user.uid, lookupData.role);
-                    
-                    // Update last login
-                    await window.setDoc(emailLookupRef, {
-                        lastLogin: currentTime,
-                        isActive: true
-                    }, { merge: true });
-                    
-                    // Redirect based on role
-                    if (lookupData.role === 'dean' || lookupData.role === 'head_admin') {
-                        console.log('→ Going to dean dashboard');
-                        showLoading('Welcome back Dean! Redirecting to your dashboard...');
-                        setTimeout(() => {
-                            window.location.href = '../dean/dean.html';
-                        }, 1000);
-                        return;
-                    } else if (lookupData.role === 'secretary' || lookupData.role === 'college_secretary') {
-                        console.log('→ Going to secretary dashboard');
-                        showLoading('Welcome back Secretary! Redirecting to your dashboard...');
-                        setTimeout(() => {
-                            window.location.href = '../secretary/secretary.html';
-                        }, 1000);
-                        return;
-                    } else if (lookupData.role === 'professor') {
-                        console.log('→ Going to professor dashboard');
-                        showLoading('Welcome back Professor! Redirecting to your dashboard...');
-                        setTimeout(() => {
-                            window.location.href = '../professor/professor.html';
-                        }, 1000);
-                        return;
-                    } else if (lookupData.role === 'student') {
-                        console.log('→ Student needs to complete registration');
-                        showLoading('Please complete your student registration...');
-                        setTimeout(() => {
-                            window.location.href = 'otp-verification.html';
-                        }, 1000);
-                        return;
-                    }
+                const secretaryData = await checkSecretaryStatus(user);
+                if (secretaryData) {
+                    await updatePresenceRole(user.uid, 'secretary');
+                    showLoading('Welcome back Secretary! Redirecting to your dashboard...');
+                    setTimeout(() => { window.location.href = '../secretary/secretary.html'; }, 1000);
+                    return;
                 }
-            } catch (error) {
-                console.error('Error checking users collection by email:', error);
-            }
-            
-            // If no record found at all
-            console.log('❌ User not found in any collection');
-            showError('Your account is not yet registered in the system. Please contact your college secretary.');
-            await window.signOut(window.auth);
-            hideLoading();
-            
-        } catch (error) {
-            console.error('❌ Error in checkUserStatus:', error);
-            showError('Error checking account status. Please try again.');
-            await window.signOut(window.auth);
-            hideLoading();
-        }
-    }
-
-    async function handleGoogleSignIn() {
-        showLoading('Connecting to Google...');
-
-        try {
-            // Force sign out first
-            try {
-                await window.signOut(window.auth);
-                console.log('✓ Signed out existing session');
-            } catch (e) {
-                console.log('No session to sign out');
-            }
-
-            // Configure provider
-            window.googleProvider.setCustomParameters({
-                prompt: 'select_account',
-                hd: 'umak.edu.ph'
-            });
-
-            console.log('📝 Opening Google sign-in...');
-            const result = await window.signInWithPopup(window.auth, window.googleProvider);
-            
-            console.log('✓ Google sign-in successful');
-            console.log('User:', result.user.email);
-            
-            // Validate UMak email
-            if (!result.user.email.endsWith('@umak.edu.ph')) {
-                console.log('❌ Invalid email domain');
+                
+                const professorData = await checkProfessorStatus(user);
+                if (professorData) {
+                    await updatePresenceRole(user.uid, 'professor');
+                    showLoading('Welcome back Professor! Redirecting to your dashboard...');
+                    setTimeout(() => { window.location.href = '../professor/professor.html'; }, 1000);
+                    return;
+                }
+                
+                const studentData = await checkStudentStatus(user);
+                if (studentData) {
+                    await updatePresenceRole(user.uid, 'student');
+                    
+                    if (studentData.emailVerified && studentData.privacyAccepted) {
+                        showLoading('Login successful! Loading your dashboard...');
+                        setTimeout(() => { window.location.href = '../student/studentDashboard.html'; }, 1000);
+                    } else if (!studentData.emailVerified) {
+                        showLoading('Please verify your email...');
+                        setTimeout(() => { window.location.href = 'otp-verification.html'; }, 1000);
+                    } else if (studentData.emailVerified && !studentData.privacyAccepted) {
+                        showLoading('Please accept Data Privacy Agreement...');
+                        setTimeout(() => { window.location.href = 'dataprivacy.html'; }, 1000);
+                    }
+                    return;
+                }
+                
+                showError('Your account is not yet registered in the system. Please contact your college secretary.');
                 await window.signOut(window.auth);
                 hideLoading();
-                showError('Please use your UMak Gmail account (@umak.edu.ph)');
-                return;
+                
+            } catch (error) {
+                showError('Error checking account status. Please try again.');
+                await window.signOut(window.auth);
+                hideLoading();
             }
-            
-            console.log('✓ Valid UMak email');
-            
-            // Check user status and redirect
-            await checkUserStatus(result.user);
+        }
 
-        } catch (error) {
-            console.error('❌ Google sign-in error:', error);
-            hideLoading();
-            
-            let errorMessage = 'Failed to sign in with Google';
-            if (error.code === 'auth/popup-closed-by-user') {
-                errorMessage = 'Sign in was cancelled. Please try again.';
-            } else if (error.code === 'auth/popup-blocked') {
-                errorMessage = 'Popup blocked. Please allow popups for this site.';
-            } else if (error.code === 'auth/cancelled-popup-request') {
-                errorMessage = 'Please complete the sign-in process.';
+        async function handleGoogleSignIn() {
+            showLoading('Connecting to Google...');
+
+            try {
+                try { await window.signOut(window.auth); } catch (e) {}
+
+                window.googleProvider.setCustomParameters({
+                    prompt: 'select_account',
+                    hd: 'umak.edu.ph'
+                });
+
+                const result = await window.signInWithPopup(window.auth, window.googleProvider);
+                
+                if (!result.user.email.endsWith('@umak.edu.ph')) {
+                    await window.signOut(window.auth);
+                    hideLoading();
+                    showError('Please use your UMak Gmail account (@umak.edu.ph)');
+                    return;
+                }
+                
+                await checkUserStatus(result.user);
+
+            } catch (error) {
+                hideLoading();
+                let errorMessage = 'Failed to sign in with Google';
+                if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage = 'Sign in was cancelled. Please try again.';
+                } else if (error.code === 'auth/popup-blocked') {
+                    errorMessage = 'Popup blocked. Please allow popups for this site.';
+                }
+                showError(errorMessage);
             }
-            
-            showError(errorMessage);
         }
-    }
 
-    // Clear session on page load
-    window.addEventListener('DOMContentLoaded', async () => {
-        console.log('🔄 Page loaded - Clearing session');
-        try {
-            await window.signOut(window.auth);
-            console.log('✓ Session cleared');
-        } catch (e) {
-            console.log('No session to clear');
-        }
-    });
-
-    window.handleGoogleSignIn = handleGoogleSignIn;
-</script>
+        window.handleGoogleSignIn = handleGoogleSignIn;
+    </script>
 </body>
 </html>
