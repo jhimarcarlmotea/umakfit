@@ -385,16 +385,33 @@
 
                 <!-- Lessons Container -->
                 <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 mb-8">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-                        <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
-                            <i class="fas fa-book"></i>
-                            My Lessons
-                        </h3>
-                        <button class="mt-2 sm:mt-0 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="showAddLessonModal()">
-                            <i class="fas fa-plus"></i>
-                            <span>Create New Lesson</span>
-                        </button>
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+                <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
+                    <i class="fas fa-book"></i>
+                    My Lessons
+                </h3>
+                <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                    <!-- Filter Dropdown -->
+                    <div class="flex items-center gap-2">
+                        <label for="lessonTypeFilter" class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                            <i class="fas fa-filter"></i> Filter:
+                        </label>
+                        <select id="lessonTypeFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" onchange="filterLessons()">
+                            <option value="all">All Types</option>
+                            <option value="lecture">Lecture</option>
+                            <option value="reading">Reading Material</option>
+                            <option value="video">Video Lesson</option>
+                            <option value="quiz">Quiz</option>
+                            <option value="assignment">Assignment</option>
+                        </select>
                     </div>
+                    <!-- Create Button -->
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="showAddLessonModal()">
+                        <i class="fas fa-plus"></i>
+                        <span>Create New Lesson</span>
+                    </button>
+                </div>
+            </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="lessonsGrid">
                         <div class="col-span-3">
@@ -1178,7 +1195,142 @@
             
             lessonsGrid.innerHTML = html;
         }
+            window.filterLessons = function() {
+    const filterValue = document.getElementById('lessonTypeFilter').value;
+    
+    if (filterValue === 'all') {
+        displayLessons();
+        return;
+    }
+    
+    const filteredLessons = allLessons.filter(lesson => lesson.type === filterValue);
+    displayFilteredLessons(filteredLessons, filterValue);
+};
 
+function displayFilteredLessons(lessons, filterType) {
+    const lessonsGrid = document.getElementById('lessonsGrid');
+    
+    if (lessons.length === 0) {
+        lessonsGrid.innerHTML = `
+            <div class="col-span-3">
+                <div class="flex flex-col items-center justify-center py-12">
+                    <div class="text-5xl mb-3 opacity-40">🔍</div>
+                    <div class="text-gray-700 font-semibold mb-1">No ${filterType} Lessons Found</div>
+                    <div class="text-gray-500 text-sm text-center max-w-md">
+                        You haven't created any ${filterType} lessons yet.
+                    </div>
+                    <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2" onclick="document.getElementById('lessonTypeFilter').value = 'all'; filterLessons();">
+                        <i class="fas fa-times"></i> Clear Filter
+                    </button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    
+    lessons.forEach(lesson => {
+        const date = lesson.publishDate ? 
+            lesson.publishDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 
+            lesson.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        
+        const contentPreview = lesson.content && lesson.content.length > 120 ? 
+            lesson.content.substring(0, 120) + '...' : 
+            (lesson.content || 'No content');
+        
+        let badgeClass = 'badge-draft';
+        let badgeText = lesson.status || 'draft';
+        if (lesson.status === 'published') {
+            badgeClass = 'badge-published';
+            badgeText = 'Published';
+        } else if (lesson.status === 'scheduled') {
+            badgeClass = 'badge-scheduled';
+            badgeText = 'Scheduled';
+        } else {
+            badgeText = 'Draft';
+        }
+        
+        const hasFiles = lesson.materials && lesson.materials.length > 0;
+        const fileCount = hasFiles ? lesson.materials.length : 0;
+        const hasYouTube = lesson.youtubeVideoId && lesson.youtubeVideoId.trim() !== '';
+        
+        html += `
+            <div class="bg-gray-50 rounded-xl border border-gray-200 p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-blue-500">
+                <div class="flex justify-between items-start mb-3">
+                    <h4 class="text-gray-900 font-bold text-lg">${lesson.title || 'Untitled Lesson'}</h4>
+                    <span class="badge ${badgeClass}">${badgeText}</span>
+                </div>
+                
+                <div class="space-y-1 mb-3 text-sm text-gray-600">
+                    <div class="flex items-center gap-2"><i class="fas fa-chalkboard-teacher w-4"></i> ${lesson.section || 'No Section'}</div>
+                    <div class="flex items-center gap-2"><i class="fas fa-calendar-alt w-4"></i> ${date}</div>
+                    <div class="flex items-center gap-2"><i class="fas fa-tag w-4"></i> ${lesson.type || 'lecture'}</div>
+                    ${hasYouTube ? `
+                        <div class="flex items-center gap-2">
+                            <i class="fab fa-youtube text-red-600 w-4"></i> 
+                            <span>Includes Video</span>
+                        </div>
+                    ` : ''}
+                    ${hasFiles ? `<div class="flex items-center gap-2"><i class="fas fa-paperclip w-4"></i> ${fileCount} file${fileCount > 1 ? 's' : ''}</div>` : ''}
+                </div>
+                
+                ${lesson.description ? `
+                    <div class="mb-3">
+                        <div class="text-blue-900 font-medium text-sm mb-1">Description:</div>
+                        <div class="text-gray-700 text-sm">${lesson.description}</div>
+                    </div>
+                ` : ''}
+                
+                <div class="mb-3">
+                    <div class="text-blue-900 font-medium text-sm mb-1">Content Preview:</div>
+                    <div class="text-gray-700 text-sm">${contentPreview}</div>
+                </div>
+                
+                ${hasFiles ? `
+                    <div class="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <div class="text-blue-900 font-medium text-sm mb-2 flex items-center gap-1">
+                            <i class="fas fa-folder-open"></i> Attached Files:
+                        </div>
+                        <div class="space-y-1">
+                            ${lesson.materials.map((file, index) => `
+                                <div class="uploaded-file-item">
+                                    <i class="${getFileIcon(file.name)}"></i>
+                                    <a href="#" onclick="viewFile('${lesson.id}', ${index}); return false;">${file.name}</a>
+                                    <span class="text-xs text-gray-500">${formatFileSize(file.size)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div class="flex justify-between items-center pt-3 border-t border-gray-200">
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600 flex items-center gap-1" onclick="editLesson('${lesson.id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 flex items-center gap-1" onclick="deleteLesson('${lesson.id}')">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </button>
+                    </div>
+                    <div>
+                        ${lesson.status === 'published' ? `
+                            <button class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 flex items-center gap-1" onclick="viewLessonDetails('${lesson.id}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        ` : `
+                            <button class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 flex items-center gap-1" onclick="publishLesson('${lesson.id}')">
+                                <i class="fas fa-paper-plane"></i> Publish
+                            </button>
+                        `}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    lessonsGrid.innerHTML = html;
+}
         window.showAddLessonModal = function() {
             editingLessonId = null;
             selectedFiles = [];
