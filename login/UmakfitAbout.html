@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - UMakFIT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+            .font-montserrat {
+    font-family: 'Montserrat', sans-serif;
+}
+        .gradient-text {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(30, 58, 138, 0.15);
+        }
+        
+        .section-divider {
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            height: 2px;
+        }
+            /* Hamburger Menu Styles */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+            z-index: 60;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        /* Mobile Drawer */
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
+            z-index: 55;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+        }
+
+        .mobile-drawer.active {
+            right: 0;
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            
+            .desktop-nav {
+                display: none;
+            }
+        }
+        
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50">
+    
+   <!-- Header -->
+<header class="shadow-lg fixed w-full top-0 z-50" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+           <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-16 h-16 flex items-center justify-center overflow-visible">
+                    <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-20 h-20 object-contain">
+                </div>
+                <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-montserrat" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                    UMakFIT
+                </span>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="desktop-nav hidden md:flex items-center gap-8">
+                <a href="./UmakfitLandingpage.html#features" class="text-white/80 hover:text-white font-medium transition-colors">Features</a>
+                <a href="./UmakfitLandingpage.html#benefits" class="text-white/80 hover:text-white font-medium transition-colors">Benefits</a>
+                <a href="./UmakfitAbout.html" class="text-white/80 hover:text-white font-medium transition-colors">About</a>
+               <a href="#footer" class="text-white/80 hover:text-white font-medium transition-colors">Contact</a>
+            </div>
+
+            <!-- Login Button (Desktop) -->
+            <button class="hidden md:block text-blue-900 px-6 py-2.5 rounded-lg font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);">
+                Login to UMakFIT
+            </button>
+
+            <!-- Hamburger Menu (Mobile) -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Drawer Overlay -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-drawer" id="mobileDrawer">
+        <div class="p-6 pt-8">
+            <!-- Drawer Header -->
+            <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-900 rounded-xl flex items-center justify-center text-2xl">
+                    🏃
+                </div>
+                <span class="text-2xl font-extrabold font-montserrat" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                    UMakFIT
+                </span>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="space-y-2 mb-8">
+                <a href="./UmakfitLandingpage.html#features" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
+                    Features
+                </a>
+                <a href="./UmakfitLandingpage.html#benefits" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
+                    Benefits
+                </a>
+                <a href="./UmakfitAbout.html" class="mobile-nav-link block text-white bg-white/10 font-semibold py-3 px-4 rounded-lg transition-all">
+                    About
+                </a>
+                <a href="#footer" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
+                    Contact
+                </a>
+            </nav>
+
+            <!-- Login Button (Mobile) -->
+            <button class="w-full text-blue-900 px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);">
+                Login to UMakFIT
+            </button>
+        </div>
+    </div>
+</header>
+
+    
+    <section class="py-24 mt-20">
+        <div class="max-w-5xl mx-auto text-center px-4">
+            <h2 class="text-5xl font-bold gradient-text mb-6">About UMakFIT</h2>
+            <p class="text-gray-600 text-xl leading-relaxed max-w-3xl mx-auto">
+                Empowering students and faculty with comprehensive fitness assessment and tracking solutions for a healthier campus community
+            </p>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="py-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-3 mb-6">
+                        
+                        <h3 class="text-4xl font-bold gradient-text">Our Mission</h3>
+                    </div>
+                    <p class="text-gray-700 text-lg leading-relaxed">
+                        To attain its vision, the CHK will provide a comprehensive and cross-disciplinary curriculum that is responsive to the needs of the students and other stakeholders. It shall promote excellence in teaching and management of sports and wellness education.
+                    </p>
+                    <div class="flex items-center space-x-2 pt-4">
+                        <div class="w-20 h-1 bg-gradient-to-r from-blue-900 to-blue-500 rounded-full"></div>
+                        <div class="w-10 h-1 bg-blue-300 rounded-full"></div>
+                        <div class="w-5 h-1 bg-blue-200 rounded-full"></div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center">
+                    <div class="w-full max-w-md h-96 rounded-2xl overflow-hidden flex items-center justify-center">
+                        <img src="OFFICIAL-CHK-LOGO-College-of-Human-Kinetics.png" alt="Our Mission" class="w-full h-full object-contain">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vision Section -->
+    <section class="py-20 px-6 bg-gradient-to-br from-blue-50 to-cyan-50">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="flex justify-center order-2 md:order-1">
+                    <div class="w-full max-w-md h-96 rounded-2xl overflow-hidden flex items-center justify-center">
+                        <img src="OFFICIAL-CHK-LOGO-College-of-Human-Kinetics.png" alt="Our Vision" class="w-full h-full object-contain">
+                    </div>
+                </div>
+                
+                <div class="space-y-6 order-1 md:order-2">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <h3 class="text-4xl font-bold gradient-text">Our Vision</h3>
+                    </div>
+                    <p class="text-gray-700 text-lg leading-relaxed">
+                        To become the leading fitness assessment platform in Philippine universities, fostering a culture of health consciousness and evidence-based fitness practices that contribute to the holistic development of students and the advancement of health research in academia.
+                    </p>
+                    <div class="flex items-center space-x-2 pt-4">
+                        <div class="w-20 h-1 bg-gradient-to-r from-blue-900 to-blue-500 rounded-full"></div>
+                        <div class="w-10 h-1 bg-blue-300 rounded-full"></div>
+                        <div class="w-5 h-1 bg-blue-200 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Story Section -->
+    <section class="py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-12">
+                <h3 class="text-5xl font-bold gradient-text mb-4">Our Story</h3>
+                <div class="section-divider w-32 mx-auto mt-6"></div>
+            </div>
+            
+            <div class="bg-white rounded-3xl shadow-xl p-10 space-y-6">
+                <p class="text-gray-700 text-lg leading-relaxed">
+                    <span class="text-6xl font-bold gradient-text float-left mr-4 leading-none">U</span>
+                    <span class="text-gray-700">MakFIT was born from a simple observation: fitness assessment in universities was often manual, time-consuming, and provided limited insights into student health trends. Faculty members spent countless hours recording data, calculating scores, and generating reports, while students rarely had access to their historical fitness data or personalized improvement recommendations.</span>
+                </p>
+                <p class="text-gray-700 text-lg leading-relaxed">
+                    Recognizing this gap, a team of passionate developers, health professionals, and educators from the University of Makati came together with a shared vision: to create a comprehensive digital platform that would transform how fitness assessment is conducted in academic settings.
+                </p>
+                <p class="text-gray-700 text-lg leading-relaxed">
+                    Today, UMakFIT stands as a testament to innovation in health technology, serving hundreds of students and providing valuable research data that contributes to the understanding of youth fitness in the Philippines. We continue to evolve, incorporating feedback from our community and staying at the forefront of fitness assessment technology.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Values Section -->
+<section class="py-20 px-6 relative overflow-hidden" style="background: linear-gradient(to bottom, #f3e5c3 0%, #e8d4a8 100%);">
+    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 50% 50%, white 1px, transparent 1px); background-size: 40px 40px;"></div>
+    
+    <div class="relative max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h3 class="text-5xl font-bold mb-4" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Our Core Values</h3>
+<p class="text-amber-800/80 text-lg">The principles that guide everything we do</p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Value 1 -->
+            <div class="bg-white rounded-2xl p-8 shadow-xl card-hover">
+                <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl mb-6 flex items-center justify-center">
+                    <span class="text-5xl">🏅</span>
+                </div>
+                <h4 class="text-2xl font-bold text-blue-900 mb-4">Sports Development</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    Foster the development of sports both in the local and national level through the development of sport extension programs.
+                </p>
+            </div>
+
+            <!-- Value 2 -->
+            <div class="bg-white rounded-2xl p-8 shadow-xl card-hover">
+                <div class="w-20 h-20 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl mb-6 flex items-center justify-center">
+                    <span class="text-5xl">🤝</span>
+                </div>
+                <h4 class="text-2xl font-bold text-blue-900 mb-4">Inclusive Participation</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    Maximize clients' participation in sports regardless of background and build a culture of goodwill through healthy sports.
+                </p>
+            </div>
+
+            <!-- Value 3 -->
+            <div class="bg-white rounded-2xl p-8 shadow-xl card-hover">
+                <div class="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl mb-6 flex items-center justify-center">
+                    <span class="text-5xl">💪</span>
+                </div>
+                <h4 class="text-2xl font-bold text-blue-900 mb-4">Physical Education</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    A physically educated individual who values activity and its contributions to a healthful lifestyle.
+                </p>
+            </div>
+
+            <!-- Value 4 -->
+            <div class="bg-white rounded-2xl p-8 shadow-xl card-hover">
+                <div class="w-20 h-20 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-2xl mb-6 flex items-center justify-center">
+                    <span class="text-5xl">🌟</span>
+                </div>
+                <h4 class="text-2xl font-bold text-blue-900 mb-4">Health Advocacy</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    Produce Health and wellness advocates who promote the importance of physical activity and the role it plays in the pursuits of life's health and well-being.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Who We Serve Section -->
+    <section class="py-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h3 class="text-4xl font-bold gradient-text mb-6">Who We Serve</h3>
+                <p class="text-gray-600 text-lg max-w-4xl mx-auto leading-relaxed">
+                    UMakFIT is built for the entire University of Makati community, bringing together students, faculty, researchers, and health professionals in a collaborative ecosystem focused on wellness and academic excellence.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Students -->
+                <div class="relative">
+                    <div class="absolute left-0 top-0 w-2 h-full bg-gradient-to-b from-blue-900 to-amber-500 rounded-full"></div>
+                    <div class="pl-6">
+                        <h4 class="text-2xl font-semibold text-blue-900 mb-2">Students</h4>
+                        <p class="text-amber-500 font-semibold mb-4">All Programs & Year Levels</p>
+                        <p class="text-black/60 leading-relaxed">
+                            Track your fitness journey, access personalized insights, and take control of your health with easy-to-use assessment tools and comprehensive progress reports.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Physical Education Faculty -->
+                <div class="relative">
+                    <div class="absolute left-0 top-0 w-2 h-full bg-gradient-to-b from-blue-900 to-amber-500 rounded-full"></div>
+                    <div class="pl-6">
+                        <h4 class="text-2xl font-semibold text-blue-900 mb-2">Physical Education Faculty</h4>
+                        <p class="text-amber-500 font-semibold mb-4">CHK Department</p>
+                        <p class="text-black/60 leading-relaxed">
+                            Streamline assessment processes, monitor class progress, and generate detailed reports for effective teaching and student health management.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Researchers -->
+                <div class="relative">
+                    <div class="absolute left-0 top-0 w-2 h-full bg-gradient-to-b from-blue-900 to-amber-500 rounded-full"></div>
+                    <div class="pl-6">
+                        <h4 class="text-2xl font-semibold text-blue-900 mb-2">Researchers</h4>
+                        <p class="text-amber-500 font-semibold mb-4">Academic Researchers</p>
+                        <p class="text-black/60 leading-relaxed">
+                            Access aggregated data, perform statistical analysis, and contribute to evidence-based health research with comprehensive analytics tools.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 px-6 bg-gradient-to-r from-blue-900 via-blue-700 to-blue-500 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        
+        <div class="relative max-w-4xl mx-auto text-center">
+            <h3 class="text-5xl font-bold text-white mb-6">Ready to Transform Fitness Assessment?</h3>
+            <p class="text-white/90 text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
+                Join the UMakFIT community and experience the future of fitness tracking in education
+            </p>
+            <button class="bg-gradient-to-r from-amber-400 to-amber-500 text-blue-900 font-bold px-12 py-4 rounded-2xl hover:from-amber-500 hover:to-amber-600 transition shadow-2xl transform hover:scale-105 text-lg">
+                Get Started Today
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+<footer id="footer" class="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 sm:py-12 mt-16 sm:mt-20">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
+            <!-- About UmakFit & College of Human Kinetics -->
+            <div>
+                <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                    <img src="UMakfit Logo (2).png" 
+                         alt="UMak Logo" class="h-12 w-auto object-contain">
+                    <div>
+                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
+                        <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
+                    </div>
+                </div>
+                <p class="text-sm lg:text-base leading-relaxed text-blue-100">
+                    UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati. 
+                    Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
+                </p>
+                <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
+                    <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Fitness Tracking</span>
+                    <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Performance Assessment</span>
+                    <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Health & Wellness</span>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
+                <div class="grid grid-cols-2 gap-4 lg:gap-6">
+                    <div class="space-y-3">
+                        <a href="#features" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                            <i class="bi bi-list-check mr-2"></i>Features
+                        </a>
+                        <a href="#benefits" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                            <i class="bi bi-star mr-2"></i>Benefits
+                        </a>
+                        <a href="./UmakfitAbout.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                            <i class="bi bi-info-circle mr-2"></i>About
+                        </a>
+                    </div>
+                    <div class="space-y-3">
+                        <a href="#contact" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                            <i class="bi bi-envelope mr-2"></i>Contact
+                        </a>
+                        <a href="#" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                            <i class="bi bi-person-circle mr-2"></i>Student Login
+                        </a>
+                        <a href="#" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                            <i class="bi bi-person-badge mr-2"></i>Faculty Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact & Social -->
+            <div>
+                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
+                <div class="space-y-4 lg:space-y-5">
+                    <div class="flex items-start gap-3">
+                        <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
+                        <p class="text-sm lg:text-base text-blue-100">
+                            College of Human Kinetics<br>
+                            University of Makati<br>
+                            3rd floor, Administration Building, University of Makati, 
+                            JP Rizal Ext., West Rembo, Taguig City<br>
+                            
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
+                        <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">
+                            chk@umak.edu.ph
+                        </a>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
+                        <span class="text-blue-100 text-sm lg:text-base">+63 933 189 7230</span>
+                    </div>
+                    <div class="flex items-center gap-4 pt-3 justify-center lg:justify-start">
+                        <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
+                            <i class="bi bi-facebook text-white text-lg lg:text-xl"></i>
+                        </a>
+                        <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
+                            <i class="bi bi-twitter text-white text-lg lg:text-xl"></i>
+                        </a>
+                        <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
+                            <i class="bi bi-instagram text-white text-lg lg:text-xl"></i>
+                        </a>
+                        <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
+                            <i class="bi bi-youtube text-white text-lg lg:text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Divider -->
+        <div class="border-t border-blue-600/50 mt-8 lg:mt-12 pt-6 lg:pt-8">
+            <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+                <!-- Copyright -->
+                <div class="text-center lg:text-left">
+                    <p class="text-xs lg:text-sm text-blue-200">
+                        © 2025 University of Makati - College of Human Kinetics. All Rights Reserved.
+                    </p>
+                </div>
+                
+                <!-- University Links -->
+                <div class="flex flex-wrap justify-center gap-3 lg:gap-4">
+                    <a href="https://umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
+                        University of Makati
+                    </a>
+                    <span class="text-blue-400">•</span>
+                    <a href="https://library.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
+                        UMak Online Library
+                    </a>
+                    <span class="text-blue-400">•</span>
+                    <a href="https://tbl.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
+                        TBL Hub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+        <script>
+    // Hamburger Menu Toggle
+    const hamburger = document.getElementById('hamburger');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+    // Toggle drawer
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        mobileDrawer.classList.toggle('active');
+        drawerOverlay.classList.toggle('active');
+        document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+    });
+
+    // Close drawer when overlay is clicked
+    drawerOverlay.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        mobileDrawer.classList.remove('active');
+        drawerOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+
+    // Close drawer when nav link is clicked
+    mobileNavLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            mobileDrawer.classList.remove('active');
+            drawerOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    });
+</script>
+</body>
+</html>

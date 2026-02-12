@@ -475,6 +475,76 @@
             justify-content: center;
         }
     }
+        /* Hamburger Menu Styles */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+            z-index: 60;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        /* Mobile Drawer */
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
+            z-index: 55;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+        }
+
+        .mobile-drawer.active {
+            right: 0;
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (max-width: 1023px) {
+            .hamburger {
+                display: flex;
+            }
+        }
     </style>
 </head>
 <body>
@@ -490,7 +560,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
             <!-- Logo -->
             <a href="#" class="flex items-center gap-2 sm:gap-3">
-                <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
+                <img src="UMakfit Logo (2).png" 
                      alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
                 <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
                     UMakFit
@@ -551,64 +621,79 @@
             </div>
             
             <!-- Mobile Right Icons -->
-            <div class="flex lg:hidden items-center gap-2 sm:gap-3">
-                <!-- Mobile Profile -->
-                <div class="relative">
-                    <img src="" alt="Profile" id="profilePictureBtnMobile" onclick="toggleProfileDropdown()"
-                         class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
-                    
-                    <!-- Mobile Profile Dropdown -->
-                    <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-                        <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                            <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
-                            <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
-                            <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
-                        </div>
-                        <div class="p-2">
-                            <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                                <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-                                <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-                            </a>
-                            <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                            <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
-                                <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
-                                <span class="font-medium text-sm sm:text-base">Logout</span>
-                            </div>
-                        </div>
-                    </div>
+<div class="flex lg:hidden items-center gap-2 sm:gap-3">
+    <!-- Mobile Profile -->
+    <div class="relative">
+        <img src="" alt="Profile" id="profilePictureBtnMobile" onclick="toggleProfileDropdown()"
+            class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
+        
+        <!-- Mobile Profile Dropdown -->
+        <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+            <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
+                <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
+                <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
+            </div>
+            <div class="p-2">
+                <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                    <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
+                    <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
+                </a>
+                <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
+                <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                    <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
+                    <span class="font-medium text-sm sm:text-base">Logout</span>
                 </div>
-                
-                <!-- Mobile Menu Button -->
-                <button onclick="toggleMobileMenu()" class="text-white p-1 sm:p-2">
-                    <i class="bi bi-list text-2xl sm:text-3xl"></i>
-                </button>
             </div>
         </div>
-        
-        <!-- Mobile Navigation Menu -->
-        <div id="mobileMenu" class="hidden lg:hidden mt-3 sm:mt-4 space-y-2">
-            <a href="./studentDashboard.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
-                <i class="bi bi-speedometer2 mr-2"></i> Dashboard
-            </a>
-            <a href="./test.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm">
-                <i class="bi bi-clipboard-check mr-2"></i> Tests
-            </a>
-            <a href="./progress.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
-                <i class="bi bi-graph-up mr-2"></i> Progress
-            </a>
-            <a href="./studentlesson.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
-                <i class="bi bi-book mr-2"></i> Lesson
-            </a>
-            <a href="./studentgrades.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
-                <i class="bi bi-award mr-2"></i> Grade
-            </a>
-            <a href="./achievements.html" class="block px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm">
-                <i class="bi bi-trophy mr-2"></i> Achievements
-            </a>
-        </div>
     </div>
-</nav>
+    
+    <!-- Hamburger Menu Button -->
+    <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+         </nav>
+       <!-- Mobile Drawer Overlay -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
 
+<!-- Mobile Drawer -->
+<div class="mobile-drawer" id="mobileDrawer">
+    <div class="p-6 pt-8">
+        <!-- Drawer Header -->
+        <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
+            <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
+                 alt="UMak Logo" class="h-12 w-auto object-contain">
+            <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                UMakFIT
+            </span>
+        </div>
+
+        <!-- Navigation Links - BAGUHIN MO LANG YUNG ACTIVE LINK BASED SA PAGE -->
+        <nav class="space-y-2">
+            <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                <i class="bi bi-speedometer2 mr-3"></i>Dashboard
+            </a>
+            <a href="./test.html" class="mobile-nav-link block text-white bg-white/10 font-semibold py-3 px-4 rounded-lg transition-all">
+                <i class="bi bi-clipboard-check mr-3"></i>Test
+            </a>
+            <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                <i class="bi bi-book mr-3"></i>Lessons
+            </a>
+            <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                <i class="bi bi-award mr-3"></i>Grades
+            </a>
+            <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                <i class="bi bi-graph-up mr-3"></i>Progress
+            </a>
+            <a href="./achievements.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                <i class="bi bi-trophy mr-3"></i>Achievements
+            </a>
+        </nav>
+    </div>
+</div>
         <div class="main-content">
             <div class="result-container">
                 <!-- Hero Section with Score -->
@@ -1101,11 +1186,42 @@ Make each recommendation unique and tailored to their exact score and test type.
                 window.location.href = '../login/index.html';
             }
         });
-        // Mobile menu toggle
-    window.toggleMobileMenu = function() {
-        const menu = document.getElementById('mobileMenu');
-        menu.classList.toggle('hidden');
-    };
+        // Hamburger Menu and Drawer functionality
+        const hamburger = document.getElementById('hamburger');
+        const mobileDrawer = document.getElementById('mobileDrawer');
+        const drawerOverlay = document.getElementById('drawerOverlay');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+        // Toggle drawer
+        if (hamburger) {
+            hamburger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                hamburger.classList.toggle('active');
+                mobileDrawer.classList.toggle('active');
+                drawerOverlay.classList.toggle('active');
+                document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+            });
+        }
+
+        // Close drawer when overlay is clicked
+        if (drawerOverlay) {
+            drawerOverlay.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                mobileDrawer.classList.remove('active');
+                drawerOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+
+        // Close drawer when nav link is clicked
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                mobileDrawer.classList.remove('active');
+                drawerOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
 
     window.toggleProfileDropdown = function() {
         const isMobile = window.innerWidth < 1024;
