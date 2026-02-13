@@ -540,7 +540,6 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <!-- Hamburger Menu -->
                         <div class="hamburger" id="hamburger">
                             <span></span>
@@ -661,7 +660,7 @@
                     <!-- About UmakFit & College of Human Kinetics -->
                     <div>
                         <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                            <img src="UMakfit Logo (2).png" 
+                            <img src="Umaklogo.png" 
                                  alt="UMak Logo" class="h-12 w-auto object-contain">
                             <div>
                                 <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
@@ -979,12 +978,6 @@
             }
         }
 
-        window.showViewProfile = function(event) { 
-            if (event) event.preventDefault();
-            alert('Profile view would open here');
-            closeProfileDropdown();
-        };
-
         window.handleLogout = async function(event) {
             if (event) event.preventDefault();
             closeProfileDropdown();
@@ -1007,8 +1000,8 @@
             const dropdownPic = document.getElementById('profileDropdownPicture');
             const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
             
-            const displayName = window.currentProfessor?.fullName || window.currentProfessor?.name || userName || 'Professor';
-            const email = window.currentProfessor?.email || window.currentUser?.email || 'professor@umak.edu.ph';
+            const displayName = currentProfessor?.fullName || currentProfessor?.name || userName || 'Professor';
+            const email = currentProfessor?.email || window.currentUser?.email || 'professor@umak.edu.ph';
             
             const photoUrlToUse = photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=3b82f6&color=fff&size=128`;
             
@@ -1108,16 +1101,17 @@
                     
                     window.currentUser = user;
                     
-                    // Update profile picture with Google photo
-                    updateProfilePicture(user.photoURL, user.displayName);
-                    
                     currentProfessor = { 
                         id: user.uid, 
                         email: user.email,
                         name: user.displayName
                     };
                     
-                    await loadProfessorData();
+                    await loadProfessorData(user);
+                    
+                    // Update profile picture after professor data is loaded
+                    updateProfilePicture(user.photoURL, user.displayName);
+                    
                     await loadAssignedSections();
                     await loadLessons();
                     
@@ -1157,11 +1151,11 @@
             }
         });
 
-        async function loadProfessorData() {
+        async function loadProfessorData(user) {
             try {
                 const professorsQuery = query(
                     collection(db, 'professors'),
-                    where('email', '==', currentProfessor.email)
+                    where('email', '==', user.email)
                 );
                 const professorsSnapshot = await getDocs(professorsQuery);
                 
@@ -1169,16 +1163,14 @@
                     const professorData = professorsSnapshot.docs[0].data();
                     currentProfessor = {
                         ...currentProfessor,
-                        name: professorData.fullName || professorData.name,
-                        fullName: professorData.fullName || professorData.name,
-                        firstName: professorData.firstName,
-                        lastName: professorData.lastName
+                        id: professorsSnapshot.docs[0].id,
+                        fullName: professorData.fullName || professorData.name || user.displayName,
+                        name: professorData.name || professorData.fullName || user.displayName
                     };
-                    window.currentProfessor = currentProfessor;
                 } else {
                     const usersQuery = query(
                         collection(db, 'users'),
-                        where('email', '==', currentProfessor.email)
+                        where('email', '==', user.email)
                     );
                     const usersSnapshot = await getDocs(usersQuery);
                     
@@ -1192,14 +1184,14 @@
                         
                         currentProfessor = {
                             ...currentProfessor,
-                            name: userData.name || userData.fullName,
-                            fullName: userData.name || userData.fullName
+                            id: usersSnapshot.docs[0].id,
+                            fullName: userData.fullName || userData.name || user.displayName,
+                            name: userData.name || userData.fullName || user.displayName
                         };
-                        window.currentProfessor = currentProfessor;
                     }
                 }
                 
-                updateProfilePicture(null, currentProfessor.name);
+                window.currentProfessor = currentProfessor;
                 
             } catch (error) {
                 console.error('Error loading professor data:', error);
