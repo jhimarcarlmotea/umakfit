@@ -828,19 +828,30 @@
                         </button>
                     </div>
                     
-                    <!-- Search Box -->
-                    <div class="relative mb-6">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-search text-gray-400"></i>
+                    <!-- Search + Filter Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                            <input type="text" id="searchSchedule" 
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                placeholder="Search by Test Name or Section" 
+                                onkeyup="filterScheduleTable()">
                         </div>
-                        <input type="text" id="searchSchedule" 
-                               class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                               placeholder="Search by Test Name or Section" 
-                               onkeyup="filterScheduleTable()">
+                        <select id="filterTestType" onchange="filterScheduleTable()"
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-700">
+                            <option value="">All Test Types</option>
+                            <option value="3-Minute Step Test">3-Minute Step Test</option>
+                            <option value="Curl-Up Test">Curl-Up Test</option>
+                            <option value="Push-Up Test">Push-Up Test</option>
+                            <option value="Sit-and-Reach">Sit-and-Reach Test</option>
+                            <option value="Skinfold Caliper">Skinfold Caliper</option>
+                        </select>
                     </div>
                     
                     <!-- Schedule Table -->
-                    <div class="table-responsive">
+                    <div class="table-responsive" style="max-height: 420px; overflow-y: auto; border-radius: 8px; border: 1px solid #e2e8f0;">
                         <table class="custom-table" id="scheduleTable">
                             <thead>
                                 <tr>
@@ -1567,11 +1578,17 @@ function getScoreClass(score) {
                 const tableBody = document.getElementById('scheduleTableBody');
 
                 if (!testsSnapshot.empty) {
-                    let html = '';
-                    let hasVisibleTests = false;
-                    
-                    testsSnapshot.forEach((docSnap) => {
-                        const test = docSnap.data();
+                let html = '';
+                let hasVisibleTests = false;
+
+                const sortedDocs = [...testsSnapshot.docs].sort((a, b) => {
+                    const aTime = a.data().createdAt?.seconds || 0;
+                    const bTime = b.data().createdAt?.seconds || 0;
+                    return bTime - aTime;
+                });
+
+                sortedDocs.forEach((docSnap) => {
+                    const test = docSnap.data();
                         
                         const deadlineDateTime = new Date(test.deadlineDateTime);
                         const now = new Date();
@@ -3121,77 +3138,85 @@ async function loadStudentsForTest(section) {
         };
 
         window.saveEditTest = async function() {
-            const testId = document.getElementById('editTestId').value;
-            const newDate = document.getElementById('editTestDate').value;
-            const newTime = document.getElementById('editTestTime').value;
-            const newDeadline = document.getElementById('editTestDeadline').value;
-            const newDeadlineTime = document.getElementById('editTestDeadlineTime').value;
-            const newTarget = document.getElementById('editTestTarget').value;
-            
-            if (!newDate || !newTime || !newDeadline || !newDeadlineTime) {
-                alert('Please fill in all required fields');
-                return;
-            }
-            
-            // Validate test date + time is not in the past
-            const testDateTime = new Date(`${newDate}T${newTime}`);
-            const now = new Date();
-            
-            if (testDateTime < now) {
-                alert('❌ Error: Test date and time cannot be in the past.\n\nPlease select a future date and time.');
-                return;
-            }
-            
-            // Validate deadline is after test date + time
-            const deadlineDateTime = new Date(`${newDeadline}T${newDeadlineTime}`);
-            
-            if (deadlineDateTime <= testDateTime) {
-                alert('❌ Error: Deadline must be after the test date and time.');
-                return;
-            }
-                
-                const saveBtn = document.querySelector('#editTestModal .btn-success');
-                const cancelBtn = document.querySelector('#editTestModal .btn-secondary');
-                const originalText = saveBtn.textContent;
-                
-                try {
-                    saveBtn.disabled = true;
-                    cancelBtn.disabled = true;
-                    saveBtn.textContent = 'Saving...';
-                    
-                    const updateData = {
-                    date: newDate,
-                    time: newTime,
-                    dateTime: testDateTime.toISOString(),
-                    deadline: newDeadline,
-                    deadlineTime: newDeadlineTime,
-                    deadlineDateTime: deadlineDateTime.toISOString(),
-                    testTarget: newTarget ? parseInt(newTarget) : null,
-                    updatedAt: serverTimestamp()
-                };
-                    
-                    if (testDateTime <= now && deadlineDateTime >= now) {
-                    updateData.status = 'active';
-                } else if (deadlineDateTime < now) {
-                    updateData.status = 'completed';
-                } else {
-                    updateData.status = 'scheduled';
-                }
-                    
-                    await updateDoc(doc(db, 'scheduledTests', testId), updateData);
-                    
-                    closeEditTestModal();
-                    alert('✅ Test updated successfully!');
-                    await loadScheduledTests(window.currentUser.email, window.currentUser.uid);
-                    
-                } catch (error) {
-                    console.error('❌ Error:', error);
-                    alert('Error updating test: ' + error.message);
-                    saveBtn.disabled = false;
-                    cancelBtn.disabled = false;
-                    saveBtn.textContent = originalText;
-                }
-            };
+    const testId = document.getElementById('editTestId').value;
+    const newDate = document.getElementById('editTestDate').value;
+    const newTime = document.getElementById('editTestTime').value;
+    const newDeadline = document.getElementById('editTestDeadline').value;
+    const newDeadlineTime = document.getElementById('editTestDeadlineTime').value;
+    const newTarget = document.getElementById('editTestTarget').value;
+    
+    if (!newDate || !newTime || !newDeadline || !newDeadlineTime) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    
+    // Only validate that deadline is after test date + time
+    const testDateTime = new Date(`${newDate}T${newTime}`);
+    const deadlineDateTime = new Date(`${newDeadline}T${newDeadlineTime}`);
+    
+    if (deadlineDateTime <= testDateTime) {
+        alert('❌ Error: Deadline must be after the test date and time.');
+        return;
+    }
+    
+    const saveBtn = document.querySelector('#editTestModal .modal-footer button:last-child');
+    const cancelBtn = document.querySelector('#editTestModal .modal-footer button:first-child');
+    const originalText = saveBtn ? saveBtn.textContent : 'Save Changes';
+    
+    try {
+        if (saveBtn) saveBtn.disabled = true;
+        if (cancelBtn) cancelBtn.disabled = true;
+        if (saveBtn) saveBtn.textContent = 'Saving...';
+        
+        const updateData = {
+            date: newDate,
+            time: newTime,
+            dateTime: testDateTime.toISOString(),
+            deadline: newDeadline,
+            deadlineTime: newDeadlineTime,
+            deadlineDateTime: deadlineDateTime.toISOString(),
+            testTarget: newTarget ? parseInt(newTarget) : null,
+            updatedAt: serverTimestamp()
+        };
+        
+        const now = new Date();
+        if (testDateTime <= now && deadlineDateTime >= now) {
+            updateData.status = 'active';
+        } else if (deadlineDateTime < now) {
+            updateData.status = 'completed';
+        } else {
+            updateData.status = 'scheduled';
+        }
+        
+        await updateDoc(doc(db, 'scheduledTests', testId), updateData);
+        
+        // Re-enable buttons BEFORE closing modal
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalText;
+        }
+        if (cancelBtn) {
+            cancelBtn.disabled = false;
+        }
+        
+        closeEditTestModal();
+        alert('✅ Test updated successfully!');
+        await loadScheduledTests(window.currentUser.email, window.currentUser.uid);
+        
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert('Error updating test: ' + error.message);
+        
+        // Re-enable buttons on error
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalText;
+        }
+        if (cancelBtn) {
+            cancelBtn.disabled = false;
+        }
+    }
+};
 
         // Export functions to window
         window.loadScheduledTests = loadScheduledTests;
@@ -3201,30 +3226,42 @@ async function loadStudentsForTest(section) {
 
     <script>
         // Filter functions
-        function filterScheduleTable() {
-            const input = document.getElementById('searchSchedule');
-            const filter = input.value.toUpperCase();
-            const table = document.getElementById('scheduleTable');
-            const tr = table.getElementsByTagName('tr');
+       function filterScheduleTable() {
+        const searchInput = document.getElementById('searchSchedule');
+        const typeFilter = document.getElementById('filterTestType');
+        
+        const searchValue = (searchInput?.value || '').toUpperCase();
+        const typeValue = (typeFilter?.value || '').toUpperCase();
+        
+        const table = document.getElementById('scheduleTable');
+        const tr = table.getElementsByTagName('tr');
+        
+        for (let i = 1; i < tr.length; i++) {
+            const td = tr[i].getElementsByTagName('td');
+            if (td.length <= 1) continue; // skip empty state rows
             
-            for (let i = 1; i < tr.length; i++) {
-                const td = tr[i].getElementsByTagName('td');
-                let showRow = false;
-                
-                // Check each column for matches
-                for (let j = 0; j < td.length; j++) {
-                    if (td[j]) {
-                        const txtValue = td[j].textContent || td[j].innerText;
-                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                            showRow = true;
-                            break;
-                        }
-                    }
+            let showRow = true;
+            
+            // Search filter — check test name (col 0) and section (col 1)
+            if (searchValue) {
+                const testName = (td[0]?.textContent || '').toUpperCase();
+                const section  = (td[1]?.textContent || '').toUpperCase();
+                if (!testName.includes(searchValue) && !section.includes(searchValue)) {
+                    showRow = false;
                 }
-                
-                tr[i].style.display = showRow ? '' : 'none';
             }
+            
+            // Test type filter — check test name (col 0)
+            if (showRow && typeValue) {
+                const testName = (td[0]?.textContent || '').toUpperCase();
+                if (!testName.includes(typeValue)) {
+                    showRow = false;
+                }
+            }
+            
+            tr[i].style.display = showRow ? '' : 'none';
         }
+    }
         
         function filterResultsTable() {
             const searchInput = document.getElementById('searchResults');

@@ -1067,6 +1067,9 @@
     
     const randomId = 'lesson-' + Math.random().toString(36).substr(2, 9);
     
+    // Check if there's a YouTube video
+    const hasYouTube = lesson.youtubeVideoId && lesson.youtubeVideoId.trim() !== '';
+    
     return `
         <div class="lesson-card" id="${randomId}">
             <div class="lesson-header" onclick="toggleLesson('${randomId}')">
@@ -1088,9 +1091,9 @@
                             ${lesson.type || 'Lecture'}
                         </span>
                         <span class="lesson-meta-item">
-                            <i class="bi bi-person-fill"></i>
-                            ${lesson.professorName || 'Professor'}
-                        </span>
+                        <i class="bi bi-person-fill"></i>
+                        ${lesson.professorName || 'Professor'}
+                    </span>
                     </div>
                 </div>
                 ${statusBadge}
@@ -1100,6 +1103,20 @@
                 <div class="lesson-content-inner">
                     ${lesson.description ? `
                         <p class="lesson-description">${lesson.description}</p>
+                    ` : ''}
+                    
+                    ${hasYouTube ? `
+                        <div class="lesson-content-box" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left-color: #dc2626;">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="bi bi-youtube text-red-600" style="font-size: 20px;"></i>
+                                <span class="font-semibold text-gray-900 text-sm">Video Lesson:</span>
+                            </div>
+                            <a href="${lesson.youtubeLink || `https://www.youtube.com/watch?v=${lesson.youtubeVideoId}`}" 
+                            target="_blank" 
+                            class="text-blue-600 hover:underline text-sm break-all">
+                                ${lesson.youtubeLink || `https://www.youtube.com/watch?v=${lesson.youtubeVideoId}`}
+                            </a>
+                        </div>
                     ` : ''}
                     
                     ${lesson.content ? `
