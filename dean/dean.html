@@ -69,12 +69,6 @@
             position: relative;
             overflow: hidden;
         }
-        .profile-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
         .profile-circle:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
@@ -287,7 +281,9 @@
         .page-icon.post-assessment { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
         .page-icon.account { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
         .page-icon.section { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .page-icon.rank { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
         .page-icon.profile { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .page-icon.student-rank { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); }
         
         .page-title {
             font-family: "Inter", Helvetica; 
@@ -491,6 +487,10 @@
             background: #f59e0b;
             color: white;
         }
+        .btn-view {
+            background: #3b82f6;
+            color: white;
+        }
         .btn-deactivate {
             background: #dc2626;
             color: white;
@@ -649,7 +649,7 @@
             opacity: 0.8;
         }
         
-        /* BMI Assessment Styles */
+        /* BMI Category Styles */
         .bmi-category {
             padding: 8px 12px;
             border-radius: 20px;
@@ -670,6 +670,83 @@
             color: #92400e;
         }
         .bmi-obese {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* Rank Styles */
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .rank-1 {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+        }
+        .rank-2 {
+            background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+            color: white;
+        }
+        .rank-3 {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            color: white;
+        }
+        .rank-4, .rank-5, .rank-6, .rank-7, .rank-8, .rank-9, .rank-10 {
+            background: #f1f5f9;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        .trend-up {
+            color: #10b981;
+        }
+        .trend-down {
+            color: #ef4444;
+        }
+        .trend-neutral {
+            color: #6b7280;
+        }
+        .progress-container {
+            width: 100px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 4px;
+        }
+        
+        /* Score Badge Styles */
+        .score-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .score-excellent {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .score-good {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .score-fair {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .score-poor {
             background: #fee2e2;
             color: #991b1b;
         }
@@ -753,7 +830,7 @@
             background-color: white;
             border-radius: 12px;
             width: 100%;
-            max-width: 500px;
+            max-width: 600px;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
@@ -850,6 +927,51 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
+        /* Section Performance Card */
+        .performance-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .performance-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+            border-color: #3b82f6;
+        }
+        .performance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .performance-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .performance-subtitle {
+            font-size: 14px;
+            color: #64748b;
+        }
+        .performance-stat {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+        .performance-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1e3a8a;
+        }
+        .performance-label {
+            font-size: 14px;
+            color: #64748b;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header-top .container { padding: 0 15px; }
@@ -939,13 +1061,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="bmi-management.html">
-                                <i class="fas fa-weight"></i> BMI Management
+                            <a class="nav-link" href="#" onclick="showSectionRanking()">
+                                <i class="fas fa-trophy"></i> Section Ranking
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSectionManagement()">
-                                <i class="fas fa-users"></i> Sections
+                            <a class="nav-link" href="#" onclick="showStudentRanking()">
+                                <i class="fas fa-user-graduate"></i> Student Ranking
                             </a>
                         </li>
                         <li class="nav-item">
@@ -961,7 +1083,7 @@
         <div class="main-content">
             <div class="container">
                 
-                <!-- Dashboard Page -->
+                <!-- Dashboard Page (UNCHANGED) -->
                 <div id="dashboardPage" class="management-page active">
                     <div class="dashboard-header">
                         <div class="dashboard-header-content">
@@ -1024,6 +1146,44 @@
                         </div>
                     </div>
 
+                    <!-- Top Performing Sections -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="table-container">
+                                <div class="table-header">
+                                    <div class="table-title">
+                                        <i class="fas fa-trophy"></i> Top 5 Performing Sections
+                                    </div>
+                                    <a href="#" onclick="showSectionRanking()" style="color: #3b82f6; font-weight: 600; text-decoration: none;">
+                                        View Full Ranking <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="custom-table" id="topSectionsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Rank</th>
+                                                <th>Section</th>
+                                                <th>Professor</th>
+                                                <th>College</th>
+                                                <th>Students</th>
+                                                <th>Avg. Test Score</th>
+                                                <th>Improvement</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="topSectionsTableBody">
+                                            <tr>
+                                                <td colspan="7" class="text-center py-4">
+                                                    <div class="text-muted">Loading section rankings...</div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- BMI Overview -->
                     <div class="row">
                         <div class="col-12">
@@ -1076,7 +1236,270 @@
                     </div>
                 </div>
 
-                <!-- Pre-Assessment Page -->
+                <!-- Section Ranking Page (UNCHANGED) -->
+                <div id="sectionRankingPage" class="management-page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <div class="page-icon rank">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div>
+                                <h1 class="page-title">Section Performance Ranking</h1>
+                                <p class="page-description">Ranking based on average test scores from pre and post assessments</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="action-btn secondary" onclick="refreshSectionRanking()">
+                            <i class="fas fa-sync"></i> Refresh Rankings
+                        </button>
+                        <button class="action-btn primary" onclick="exportRankingReport()">
+                            <i class="fas fa-file-export"></i> Export Report
+                        </button>
+                    </div>
+
+                    <div id="rankingAlert" style="display: none;"></div>
+
+                    <!-- Summary Stats -->
+                    <div class="row stats-row g-3 mb-4">
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="stat-card purple">
+                                <div class="stat-label">
+                                    <i class="fas fa-layer-group"></i> Total Sections
+                                </div>
+                                <div class="stat-value" id="totalSectionsRanked">0</div>
+                                <div class="stat-subtitle">Active sections</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="stat-card green">
+                                <div class="stat-label">
+                                    <i class="fas fa-chart-line"></i> Average Score
+                                </div>
+                                <div class="stat-value" id="overallAvgScore">0.0</div>
+                                <div class="stat-subtitle">All sections</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="stat-card blue">
+                                <div class="stat-label">
+                                    <i class="fas fa-arrow-up"></i> Top Section
+                                </div>
+                                <div class="stat-value" id="topSectionName">N/A</div>
+                                <div class="stat-subtitle" id="topSectionScore">0.0 avg</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="stat-card orange">
+                                <div class="stat-label">
+                                    <i class="fas fa-users"></i> Students Assessed
+                                </div>
+                                <div class="stat-value" id="totalStudentsAssessed">0</div>
+                                <div class="stat-subtitle">With test results</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div class="table-title">
+                                <i class="fas fa-list-ol"></i> Section Performance Rankings
+                            </div>
+                            <div class="filter-group">
+                                <select class="form-control" id="assessmentTypeFilter" onchange="filterRankings()" style="width: 180px;">
+                                    <option value="all">All Assessments</option>
+                                    <option value="pre">Pre-Assessment Only</option>
+                                    <option value="post">Post-Assessment Only</option>
+                                    <option value="improvement">Improvement Score</option>
+                                </select>
+                                <select class="form-control" id="collegeFilter" onchange="filterRankings()" style="width: 180px;">
+                                    <option value="all">All Colleges</option>
+                                </select>
+                                <div class="search-box">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" class="search-input" id="searchRankings" placeholder="Search sections..." onkeyup="filterRankings()">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="custom-table" id="sectionRankingTable">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Section</th>
+                                        <th>College</th>
+                                        <th>Professor</th>
+                                        <th>Students</th>
+                                        <th>Pre-Test Avg</th>
+                                        <th>Post-Test Avg</th>
+                                        <th>Improvement</th>
+                                        <th>Avg Score</th>
+                                        <th>Performance</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sectionRankingTableBody">
+                                    <tr>
+                                        <td colspan="11" class="text-center py-4">
+                                            <div class="text-muted">Loading section rankings...</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Section Details Modal -->
+                    <div id="sectionDetailsModal" class="modal-overlay" style="display: none;">
+                        <div class="modal-content" style="max-width: 800px;">
+                            <div class="modal-header">
+                                <h3 class="modal-title" id="sectionDetailsTitle">Section Performance Details</h3>
+                                <button class="close-modal" onclick="closeSectionDetailsModal()">&times;</button>
+                            </div>
+                            <div class="modal-body" id="sectionDetailsContent">
+                                <!-- Section details will be loaded here -->
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn-secondary" onclick="closeSectionDetailsModal()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: Student Ranking Page (Filtered by Section) -->
+                <div id="studentRankingPage" class="management-page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <div class="page-icon student-rank">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div>
+                                <h1 class="page-title">Student Performance Ranking</h1>
+                                <p class="page-description">Ranking of students by average test score - filter by section</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="action-btn secondary" onclick="refreshStudentRanking()">
+                            <i class="fas fa-sync"></i> Refresh Rankings
+                        </button>
+                        <button class="action-btn primary" onclick="exportStudentRankingReport()">
+                            <i class="fas fa-file-export"></i> Export Report
+                        </button>
+                    </div>
+
+                    <div id="studentRankingAlert" style="display: none;"></div>
+
+                    <!-- Summary Stats -->
+                    <div class="row stats-row g-3 mb-4">
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="stat-card purple">
+                                <div class="stat-label">
+                                    <i class="fas fa-users"></i> Total Students
+                                </div>
+                                <div class="stat-value" id="totalStudentsRanked">0</div>
+                                <div class="stat-subtitle">With test results</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="stat-card green">
+                                <div class="stat-label">
+                                    <i class="fas fa-chart-line"></i> Average Score
+                                </div>
+                                <div class="stat-value" id="studentOverallAvgScore">0.0</div>
+                                <div class="stat-subtitle">All students</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="stat-card blue">
+                                <div class="stat-label">
+                                    <i class="fas fa-arrow-up"></i> Top Student
+                                </div>
+                                <div class="stat-value" id="topStudentName">N/A</div>
+                                <div class="stat-subtitle" id="topStudentScore">0.0 avg</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="stat-card orange">
+                                <div class="stat-label">
+                                    <i class="fas fa-layer-group"></i> Sections
+                                </div>
+                                <div class="stat-value" id="studentSectionsCount">0</div>
+                                <div class="stat-subtitle">With data</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section Filter -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div class="table-title">
+                                <i class="fas fa-filter"></i> Filter Students by Section
+                            </div>
+                            <div class="filter-group">
+                                <select class="form-control" id="studentSectionFilter" onchange="filterStudentRankings()" style="width: 250px;">
+                                    <option value="all">All Sections</option>
+                                </select>
+                                <select class="form-control" id="studentTestTypeFilter" onchange="filterStudentRankings()" style="width: 180px;">
+                                    <option value="all">All Tests</option>
+                                    <option value="pre">Pre-Test Only</option>
+                                    <option value="post">Post-Test Only</option>
+                                </select>
+                                <div class="search-box">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" class="search-input" id="searchStudentRankings" placeholder="Search student name..." onkeyup="filterStudentRankings()">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="custom-table" id="studentRankingTable">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Student Name</th>
+                                        <th>Section</th>
+                                        <th>Student ID</th>
+                                        <th>Tests Taken</th>
+                                        <th>Pre-Test Avg</th>
+                                        <th>Post-Test Avg</th>
+                                        <th>Improvement</th>
+                                        <th>Avg Score</th>
+                                        <th>Rating</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentRankingTableBody">
+                                    <tr>
+                                        <td colspan="11" class="text-center py-4">
+                                            <div class="text-muted">Loading student rankings...</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Student Details Modal -->
+                    <div id="studentDetailsModal" class="modal-overlay" style="display: none;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 class="modal-title" id="studentDetailsTitle">Student Performance Details</h3>
+                                <button class="close-modal" onclick="closeStudentDetailsModal()">&times;</button>
+                            </div>
+                            <div class="modal-body" id="studentDetailsContent">
+                                <!-- Student details will be loaded here -->
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn-secondary" onclick="closeStudentDetailsModal()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pre-Assessment Page (UNCHANGED) -->
                 <div id="preAssessmentPage" class="management-page">
                     <div class="page-header">
                         <div class="page-header-content">
@@ -1143,7 +1566,7 @@
                     </div>
                 </div>
 
-                <!-- Post-Assessment Page -->
+                <!-- Post-Assessment Page (UNCHANGED) -->
                 <div id="postAssessmentPage" class="management-page">
                     <div class="page-header">
                         <div class="page-header-content">
@@ -1211,95 +1634,7 @@
                     </div>
                 </div>
 
-                <!-- Section Management Page -->
-                <div id="sectionPage" class="management-page">
-                    <div class="page-header">
-                        <div class="page-header-content">
-                            <div class="page-icon section">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div>
-                                <h1 class="page-title">Section Management</h1>
-                                <p class="page-description">Create and manage class sections</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="action-btn primary" onclick="showAddSectionForm()">
-                            <i class="fas fa-plus-circle"></i> Create New Section
-                        </button>
-                        <button class="action-btn secondary" onclick="refreshSections()">
-                            <i class="fas fa-sync"></i> Refresh Data
-                        </button>
-                    </div>
-
-                    <div id="sectionAlert" style="display: none;"></div>
-
-                    <div id="addSectionForm" class="form-container" style="display: none;">
-                        <h3 class="form-title">
-                            <i class="fas fa-plus-circle"></i> Create New Section
-                        </h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Section</label>
-                                <input type="text" class="form-control" id="sectionName" placeholder="e.g., BSCS 1A" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">College</label>
-                                <input type="text" class="form-control" id="sectionCollege" placeholder="Enter college name" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">School Year</label>
-                                <input type="text" class="form-control" id="sectionYear" readonly>
-                            </div>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="action-btn primary" onclick="saveSection()">
-                                <i class="fas fa-save"></i> Create Section
-                            </button>
-                            <button class="action-btn" style="background: #6b7280; color: white;" onclick="hideAddSectionForm()">
-                                <i class="fas fa-times"></i> Cancel
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="table-container">
-                        <div class="table-header">
-                            <div class="table-title">
-                                <i class="fas fa-list"></i> Section List
-                            </div>
-                            <div class="search-box">
-                                <i class="fas fa-search search-icon"></i>
-                                <input type="text" class="search-input" id="searchSections" placeholder="Search sections..." onkeyup="filterSections()">
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="custom-table" id="sectionsTable">
-                                <thead>
-                                    <tr>
-                                        <th>Section Name</th>
-                                        <th>College</th>
-                                        <th>Professor</th>
-                                        <th>Students</th>
-                                        <th>School Year</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="sectionsTableBody">
-                                    <tr>
-                                        <td colspan="7" class="text-center py-4">
-                                            <div class="text-muted">Loading sections...</div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Account Management Page -->
+                <!-- Account Management Page (UNCHANGED) -->
                 <div id="accountPage" class="management-page">
                     <div class="page-header">
                         <div class="page-header-content">
@@ -1323,23 +1658,22 @@
 
                     <div class="table-container">
                         <div class="table-header">
-    <div class="table-title">
-        <i class="fas fa-list"></i> All User Accounts
-        <span class="badge bg-primary" style="font-size: 12px; margin-left: 10px;">
-            Total: <span id="totalAccountsCount">0</span>
-        </span>
-    </div>
-    <div class="filter-group">
-        <select class="form-control" id="roleFilter" onchange="filterAccountsByRole()" style="width: 150px;">
-            <option value="all">All Roles</option>
-            <!-- Options will be populated dynamically -->
-        </select>
-        <div class="search-box">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" id="searchAccounts" placeholder="Search by name, email, role..." onkeyup="filterAccounts()">
-        </div>
-    </div>
-</div>
+                            <div class="table-title">
+                                <i class="fas fa-list"></i> All User Accounts
+                                <span class="badge bg-primary" style="font-size: 12px; margin-left: 10px;">
+                                    Total: <span id="totalAccountsCount">0</span>
+                                </span>
+                            </div>
+                            <div class="filter-group">
+                                <select class="form-control" id="roleFilter" onchange="filterAccountsByRole()" style="width: 150px;">
+                                    <option value="all">All Roles</option>
+                                </select>
+                                <div class="search-box">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" class="search-input" id="searchAccounts" placeholder="Search by name, email, role..." onkeyup="filterAccounts()">
+                                </div>
+                            </div>
+                        </div>
                         <div class="table-responsive">
                             <table class="custom-table" id="accountsTable">
                                 <thead>
@@ -1364,7 +1698,7 @@
                     </div>
                 </div>
 
-                <!-- Profile Page -->
+                <!-- Profile Page (UNCHANGED) -->
                 <div id="profilePage" class="management-page">
                     <div class="page-header">
                         <div class="page-header-content">
@@ -1439,7 +1773,7 @@
         </div>
     </div>
 
-    <!-- Assessment Detail Modal -->
+    <!-- Assessment Detail Modal (UNCHANGED) -->
     <div id="assessmentDetailModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -1457,73 +1791,47 @@
         </div>
     </div>
 
-   <!-- Edit Role Modal -->
-<div id="editRoleModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 class="modal-title">Edit User Role</h3>
-            <button class="close-modal" onclick="closeEditRoleModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label class="form-label">User: <strong id="editRoleUserName"></strong></label>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Current Email: <strong id="editRoleUserEmail"></strong></label>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Current Role: <strong id="editRoleCurrentRole"></strong></label>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Select New Role</label>
-                <select class="form-control" id="editRoleSelect">
-                    <option value="">Select Role</option>
-                    <option value="dean">Dean</option>
-                    <option value="professor">Professor</option>
-                    <option value="secretary">Secretary</option>
-                    <option value="student">Student</option>
-                </select>
-            </div>
-            <div class="alert alert-info mt-3" style="padding: 10px; background: #dbeafe; color: #1e40af; border-radius: 8px; font-size: 13px;">
-                <i class="fas fa-info-circle"></i> Note: Changing a user's role may affect their permissions and access to different parts of the system.
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-secondary" onclick="closeEditRoleModal()">Cancel</button>
-            <button class="btn-success" onclick="updateUserRole()">Update Role</button>
-        </div>
-    </div>
-</div>
-
-
-    <!-- Assign Professor Modal -->
-    <div id="assignProfessorModal" class="modal-overlay" style="display: none;">
+    <!-- Edit Role Modal (UNCHANGED) -->
+    <div id="editRoleModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Assign Professor to Section</h3>
-                <button class="close-modal" onclick="closeAssignProfessorModal()">&times;</button>
+                <h3 class="modal-title">Edit User Role</h3>
+                <button class="close-modal" onclick="closeEditRoleModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="form-label">Select Professor</label>
-                    <select class="form-control" id="assignProfessorSelect">
-                        <option value="">Select Professor</option>
-                    </select>
+                    <label class="form-label">User: <strong id="editRoleUserName"></strong></label>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Section: <strong id="assignSectionName"></strong></label>
+                    <label class="form-label">Current Email: <strong id="editRoleUserEmail"></strong></label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Current Role: <strong id="editRoleCurrentRole"></strong></label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Select New Role</label>
+                    <select class="form-control" id="editRoleSelect">
+                        <option value="">Select Role</option>
+                        <option value="dean">Dean</option>
+                        <option value="professor">Professor</option>
+                        <option value="secretary">Secretary</option>
+                        <option value="student">Student</option>
+                    </select>
+                </div>
+                <div class="alert alert-info mt-3" style="padding: 10px; background: #dbeafe; color: #1e40af; border-radius: 8px; font-size: 13px;">
+                    <i class="fas fa-info-circle"></i> Note: Changing a user's role may affect their permissions and access to different parts of the system.
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeAssignProfessorModal()">Cancel</button>
-                <button class="btn-success" onclick="assignProfessorToSection()">Assign Professor</button>
+                <button class="btn-secondary" onclick="closeEditRoleModal()">Cancel</button>
+                <button class="btn-success" onclick="updateUserRole()">Update Role</button>
             </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script type="module">
+  <script type="module">
         // Import Firebase modules
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -1553,10 +1861,171 @@
         let currentUserToEdit = null;
         let deanData = null;
         let sections = [];
-        let professors = [];
-        let currentSectionToAssign = null;
+        let sectionRankings = [];
+        let filteredRankings = [];
+        let allColleges = new Set();
+        
+        // Student Ranking Variables
+        let testResults = [];
+        let studentRankings = [];
+        let filteredStudentRankings = [];
+        let studentSections = new Set();
 
-        // Toggle Profile Dropdown
+        // ==================== TEST SCORE CALCULATION ====================
+        
+        function calculateTestScore(testName, result, testTarget) {
+            const normalized = testName.toLowerCase();
+            
+            let numericValue = 0;
+            
+            if (typeof result === 'object' && result !== null) {
+                numericValue = result.value || result.result || result.score || result.count || 0;
+            } else if (typeof result === 'string') {
+                const match = result.match(/(\d+\.?\d*)/);
+                if (match) {
+                    numericValue = parseFloat(match[1]);
+                } else {
+                    numericValue = parseFloat(result) || 0;
+                }
+            } else {
+                numericValue = parseFloat(result) || 0;
+            }
+            
+            if (!testTarget || testTarget <= 0) {
+                return calculateDefaultScore(normalized, numericValue);
+            }
+            
+            if (normalized.includes('push-up') || normalized.includes('pushup') || 
+                normalized.includes('sit-up') || normalized.includes('situp') ||
+                normalized.includes('curl-up') || normalized.includes('curl up')) {
+                
+                if (numericValue >= testTarget) return 100;
+                const percentage = (numericValue / testTarget) * 100;
+                if (percentage >= 90) return 95;
+                if (percentage >= 80) return 90;
+                if (percentage >= 70) return 85;
+                if (percentage >= 60) return 80;
+                if (percentage >= 50) return 75;
+                return Math.max(50, Math.round(percentage));
+            }
+            
+            if (normalized.includes('plank')) {
+                if (numericValue >= testTarget) return 100;
+                const percentage = (numericValue / testTarget) * 100;
+                if (percentage >= 90) return 95;
+                if (percentage >= 80) return 90;
+                if (percentage >= 70) return 85;
+                if (percentage >= 60) return 80;
+                if (percentage >= 50) return 75;
+                return Math.max(50, Math.round(percentage));
+            }
+            
+            if (normalized.includes('grip')) {
+                if (numericValue >= testTarget) return 100;
+                const percentage = (numericValue / testTarget) * 100;
+                if (percentage >= 90) return 95;
+                if (percentage >= 80) return 90;
+                if (percentage >= 70) return 85;
+                if (percentage >= 60) return 80;
+                if (percentage >= 50) return 75;
+                return Math.max(50, Math.round(percentage));
+            }
+            
+            if (normalized.includes('sit-and-reach')) {
+                if (numericValue >= testTarget) return 100;
+                const percentage = (numericValue / testTarget) * 100;
+                if (percentage >= 90) return 95;
+                if (percentage >= 80) return 90;
+                if (percentage >= 70) return 85;
+                if (percentage >= 60) return 80;
+                if (percentage >= 50) return 75;
+                return Math.max(50, Math.round(percentage));
+            }
+            
+            if (normalized.includes('mile') || normalized.includes('run')) {
+                if (numericValue <= testTarget) return 100;
+                const percentage = (testTarget / numericValue) * 100;
+                if (percentage >= 90) return 95;
+                if (percentage >= 80) return 90;
+                if (percentage >= 70) return 85;
+                if (percentage >= 60) return 80;
+                if (percentage >= 50) return 75;
+                return Math.max(50, Math.round(percentage));
+            }
+            
+            if (normalized.includes('step test') || normalized.includes('3-minute')) {
+                if (numericValue <= testTarget) return 100;
+                const percentage = (testTarget / numericValue) * 100;
+                if (percentage >= 90) return 95;
+                if (percentage >= 80) return 90;
+                if (percentage >= 70) return 85;
+                if (percentage >= 60) return 80;
+                if (percentage >= 50) return 75;
+                return Math.max(50, Math.round(percentage));
+            }
+            
+            if (normalized.includes('bmi')) {
+                const bmi = numericValue;
+                if (bmi >= 18.5 && bmi <= 24.9) return 100;
+                if (bmi >= 17.0 && bmi < 18.5) return 85;
+                if (bmi >= 25.0 && bmi < 27.0) return 85;
+                if (bmi >= 16.0 && bmi < 17.0) return 70;
+                if (bmi >= 27.0 && bmi < 30.0) return 70;
+                return 60;
+            }
+            
+            if (normalized.includes('skinfold')) {
+                const difference = Math.abs(numericValue - testTarget);
+                const percentage = Math.abs(1 - difference / testTarget) * 100;
+                return Math.max(50, Math.round(percentage));
+            }
+            
+            return calculateDefaultScore(normalized, numericValue);
+        }
+
+        function calculateDefaultScore(normalized, numericValue) {
+            if (normalized.includes('push-up') || normalized.includes('pushup')) {
+                if (numericValue >= 40) return 100;
+                if (numericValue >= 30) return 90;
+                if (numericValue >= 20) return 80;
+                return 70;
+            }
+            if (normalized.includes('curl-up')) {
+                if (numericValue >= 75) return 100;
+                if (numericValue >= 50) return 90;
+                if (numericValue >= 30) return 80;
+                return 70;
+            }
+            if (normalized.includes('grip')) {
+                if (numericValue >= 60) return 100;
+                if (numericValue >= 50) return 90;
+                if (numericValue >= 40) return 80;
+                return 70;
+            }
+            if (normalized.includes('plank')) {
+                if (numericValue >= 120) return 100;
+                if (numericValue >= 90) return 90;
+                if (numericValue >= 60) return 80;
+                return 70;
+            }
+            if (normalized.includes('sit-and-reach')) {
+                if (numericValue >= 20) return 100;
+                if (numericValue >= 15) return 90;
+                if (numericValue >= 10) return 80;
+                return 70;
+            }
+            return 75;
+        }
+
+        function getScoreRating(score) {
+            if (score >= 90) return { text: 'Excellent', class: 'score-excellent' };
+            if (score >= 80) return { text: 'Good', class: 'score-good' };
+            if (score >= 70) return { text: 'Fair', class: 'score-fair' };
+            return { text: 'Needs Improvement', class: 'score-poor' };
+        }
+
+        // ==================== AUTH & INITIALIZATION ====================
+
         window.toggleProfileDropdown = function(event) {
             if (event) {
                 event.preventDefault();
@@ -1566,7 +2035,6 @@
             dropdown.classList.toggle('show');
         };
 
-        // Show View Profile Page
         window.showViewProfile = function(event) {
             if (event) {
                 event.preventDefault();
@@ -1582,7 +2050,6 @@
             loadProfileData();
         };
         
-        // Load Profile Data
         function loadProfileData() {
             if (deanData && currentUser) {
                 const email = deanData.email || currentUser.email;
@@ -1625,19 +2092,16 @@
             }
         }
 
-        // Get initials from email
         function getInitialsFromEmail(email) {
             if (!email) return 'D';
             return email.charAt(0).toUpperCase();
         }
 
-        // Update profile display
         async function updateProfileDisplay(userData) {
             deanData = userData;
             const email = userData.email || currentUser.email;
             const name = userData.name || 'Dean';
             
-            // Update profile elements
             document.getElementById('profileCircle').innerHTML = getInitialsFromEmail(email);
             document.getElementById('profileDropdownAvatar').innerHTML = getInitialsFromEmail(email);
             document.getElementById('profileAvatarLarge').innerHTML = getInitialsFromEmail(email);
@@ -1648,61 +2112,60 @@
             document.getElementById('deanWelcome').textContent = `Welcome, ${name}`;
         }
 
-        // Show Dashboard
         window.showDashboard = function() {
             hideAllPages();
             document.getElementById('dashboardPage').classList.add('active');
             setActiveNav(0);
             loadDashboardStats();
+            loadTopSections();
         };
 
-        // Show Pre-Assessment
+        window.showSectionRanking = function() {
+            hideAllPages();
+            document.getElementById('sectionRankingPage').classList.add('active');
+            setActiveNav(1);
+            loadSectionRankings();
+        };
+
+        window.showStudentRanking = function() {
+            hideAllPages();
+            document.getElementById('studentRankingPage').classList.add('active');
+            setActiveNav(2);
+            loadStudentRankings();
+        };
+
         window.showPreAssessment = function() {
             hideAllPages();
             document.getElementById('preAssessmentPage').classList.add('active');
-            setActiveNav(1);
+            setActiveNav(3);
             loadPreAssessments();
         };
 
-        // Show Post-Assessment
         window.showPostAssessment = function() {
             hideAllPages();
             document.getElementById('postAssessmentPage').classList.add('active');
-            setActiveNav(2);
+            setActiveNav(4);
             loadPostAssessments();
         };
 
-        // Show Section Management
-        window.showSectionManagement = function() {
-            hideAllPages();
-            document.getElementById('sectionPage').classList.add('active');
-            setActiveNav(3);
-            loadSections();
-            loadProfessors();
-        };
-
-        // Show Account Management
         window.showAccountManagement = function() {
             hideAllPages();
             document.getElementById('accountPage').classList.add('active');
-            setActiveNav(4);
+            setActiveNav(5);
             loadAllAccounts();
         };
 
-        // Hide all pages
         function hideAllPages() {
             const pages = document.querySelectorAll('.management-page');
             pages.forEach(page => page.classList.remove('active'));
         }
 
-        // Set active navigation
         function setActiveNav(index) {
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => link.classList.remove('active'));
             if (navLinks[index]) navLinks[index].classList.add('active');
         }
 
-        // Calculate BMI category
         function getBMICategory(bmi) {
             if (bmi < 18.5) return 'underweight';
             if (bmi < 25) return 'normal';
@@ -1710,7 +2173,6 @@
             return 'obese';
         }
 
-        // Get BMI category display name
         function getBMICategoryDisplay(category) {
             switch(category) {
                 case 'underweight': return 'Underweight';
@@ -1721,18 +2183,16 @@
             }
         }
 
-        // Get BMI category class
         function getBMICategoryClass(category) {
             switch(category) {
                 case 'underweight': return 'bmi-underweight';
                 case 'normal': return 'bmi-normal';
                 case 'overweight': return 'bmi-overweight';
                 case 'obese': return 'bmi-obese';
-                default: return 'bmi-normal';
+                default: return '';
             }
         }
 
-        // Get current academic year
         function getCurrentAcademicYear() {
             const now = new Date();
             const currentYear = now.getFullYear();
@@ -1745,7 +2205,6 @@
             }
         }
 
-        // Handle logout
         window.handleLogout = async function(event) {
             if (event) {
                 event.preventDefault();
@@ -1759,12 +2218,46 @@
                     window.location.href = '/login/index.html';
                 } catch (error) {
                     console.error('Error logging out:', error);
-                    showAlert('preAssessmentAlert', 'Error logging out. Please try again.', 'error');
+                    showAlert('dashboardAlert', 'Error logging out. Please try again.', 'error');
                 }
             }
         };
 
-        // Initialize when page loads
+        // ==================== FIXED: LOAD TEST RESULTS FIRST ====================
+        
+        async function loadTestResults() {
+            try {
+                const resultsQuery = query(collection(db, 'testResults'), orderBy('submittedAt', 'desc'));
+                const snapshot = await getDocs(resultsQuery);
+                testResults = [];
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    
+                    let score = data.score;
+                    if (!score && score !== 0) {
+                        score = calculateTestScore(data.testName, data.result, data.testTarget);
+                    }
+                    
+                    testResults.push({
+                        id: doc.id,
+                        ...data,
+                        score: score || 0
+                    });
+                });
+                
+                console.log(`✅ Loaded ${testResults.length} test results from testResults collection`);
+                return testResults;
+                
+            } catch (error) {
+                console.error('Error loading test results:', error);
+                testResults = [];
+                return [];
+            }
+        }
+
+        // ==================== INITIALIZATION ====================
+
         onAuthStateChanged(auth, async (user) => {
             const loadingScreen = document.getElementById('loadingScreen');
             const mainContent = document.getElementById('mainContent');
@@ -1774,11 +2267,9 @@
                     currentUser = user;
                     console.log('Dean authentication check:', user.email);
                     
-                    // Check multiple collections for dean role
                     let deanFound = false;
                     let userData = null;
                     
-                    // Check deans collection first
                     try {
                         const deanRef = doc(db, 'deans', user.uid);
                         const deanDoc = await getDoc(deanRef);
@@ -1794,7 +2285,6 @@
                         console.log('Error checking deans collection:', error);
                     }
                     
-                    // Check users collection with dean role
                     if (!deanFound) {
                         try {
                             const userRef = doc(db, 'users', user.uid);
@@ -1812,7 +2302,6 @@
                         }
                     }
                     
-                    // Check users by email
                     if (!deanFound) {
                         try {
                             const emailKey = user.email.toLowerCase().replace(/\./g, '_');
@@ -1839,29 +2328,32 @@
                         return;
                     }
                     
-                    // Update profile with dean data
                     await updateProfileDisplay(userData || {
                         email: user.email,
                         name: 'Dean',
                         role: 'dean'
                     });
 
-                    // Load dashboard data
-                    console.log('Loading dashboard statistics...');
+                    console.log('🚀 Loading dashboard data...');
+                    
+                    // CRITICAL: Load test results FIRST
+                    await loadTestResults();
+                    
+                    // Then load everything else
                     await loadDashboardStats();
                     await loadPreAssessments();
                     await loadPostAssessments();
                     await loadAllAccounts();
                     await loadSections();
-                    await loadProfessors();
+                    await loadSectionRankings(); // Now uses testResults data
+                    await loadTopSections();
+                    await loadStudentRankings();
                     
                     console.log('✅ Dean dashboard loaded successfully');
                     
-                    // Show dashboard
                     loadingScreen.style.display = 'none';
                     mainContent.style.display = 'block';
                     
-                    // Add click outside listener for profile dropdown
                     document.addEventListener('click', function(event) {
                         const profileContainer = document.querySelector('.profile-container');
                         const profileDropdown = document.getElementById('profileDropdown');
@@ -1882,10 +2374,10 @@
             }
         });
 
-        // Load dashboard statistics
+        // ==================== DASHBOARD FUNCTIONS ====================
+
         async function loadDashboardStats() {
             try {
-                // Load user counts
                 const usersSnapshot = await getDocs(collection(db, 'users'));
                 let profCount = 0;
                 let studentCount = 0;
@@ -1900,7 +2392,6 @@
                 document.getElementById('totalProfessors').textContent = profCount;
                 document.getElementById('totalStudents').textContent = studentCount;
                 
-                // Load assessment counts and BMI categories
                 const preAssessmentsQuery = query(collection(db, 'assessments'), where('type', '==', 'pre'));
                 const preSnapshot = await getDocs(preAssessmentsQuery);
                 document.getElementById('totalPreAssessments').textContent = preSnapshot.size;
@@ -1909,7 +2400,6 @@
                 const postSnapshot = await getDocs(postAssessmentsQuery);
                 document.getElementById('totalPostAssessments').textContent = postSnapshot.size;
                 
-                // Calculate BMI categories
                 let underweight = 0, normal = 0, overweight = 0, obese = 0;
                 
                 preSnapshot.forEach(doc => {
@@ -1935,7 +2425,961 @@
             }
         }
 
-        // Load pre-assessments
+        window.refreshDashboardData = async function() {
+            showAlert('dashboardAlert', 'Refreshing dashboard data...', 'success');
+            await loadTestResults();
+            await loadDashboardStats();
+            await loadTopSections();
+        };
+
+        // ==================== FIXED: SECTION RANKING USING testResults ====================
+
+        async function loadSections() {
+            try {
+                const querySnapshot = await getDocs(collection(db, 'sections'));
+                sections = [];
+                
+                querySnapshot.forEach((sectionDoc) => {
+                    const sectionData = sectionDoc.data();
+                    sections.push({ 
+                        id: sectionDoc.id, 
+                        ...sectionData 
+                    });
+                });
+                
+                console.log('✅ Loaded sections:', sections.length);
+                
+            } catch (error) {
+                console.error('Error loading sections:', error);
+                sections = [];
+            }
+        }
+
+        async function loadSectionRankings() {
+            try {
+                showLoading('Calculating section rankings from test results...');
+                
+                await loadSections();
+                
+                if (testResults.length === 0) {
+                    console.log('⚠️ No test results found in database');
+                    sectionRankings = [];
+                    filteredRankings = [];
+                    renderSectionRankingTable();
+                    updateRankingSummaryStats();
+                    hideLoading();
+                    showAlert('rankingAlert', 'No test results found in database.', 'info');
+                    return;
+                }
+                
+                console.log(`📊 Processing ${testResults.length} test results for section rankings`);
+                
+                const sectionTestResults = {};
+                const sectionStudentCounts = {};
+                const sectionNames = {};
+                
+                sections.forEach(section => {
+                    const sectionName = section.name;
+                    
+                    let professorName = 'Unassigned';
+                    if (section.professorName) {
+                        professorName = section.professorName;
+                    } else if (section.professor) {
+                        professorName = section.professor;
+                    } else if (section.assignedProfessor) {
+                        professorName = section.assignedProfessor;
+                    }
+                    
+                    sectionTestResults[sectionName] = {
+                        pre: [],
+                        post: [],
+                        preScores: [],
+                        postScores: [],
+                        allScores: []
+                    };
+                    sectionStudentCounts[sectionName] = new Set();
+                    sectionNames[sectionName] = {
+                        college: section.college || 'N/A',
+                        professor: professorName,
+                        studentCount: section.studentCount || 0,
+                        professorEmail: section.professorEmail || '',
+                        professorId: section.professorId || ''
+                    };
+                });
+                
+                // Process test results from testResults collection
+                testResults.forEach(test => {
+                    const section = test.section;
+                    if (!section) return;
+                    
+                    const score = test.score || 0;
+                    const testType = test.type || 'unknown';
+                    
+                    if (!sectionTestResults[section]) {
+                        sectionTestResults[section] = {
+                            pre: [],
+                            post: [],
+                            preScores: [],
+                            postScores: [],
+                            allScores: []
+                        };
+                        sectionStudentCounts[section] = new Set();
+                        sectionNames[section] = {
+                            college: 'N/A',
+                            professor: 'Unassigned',
+                            studentCount: 0,
+                            professorEmail: '',
+                            professorId: ''
+                        };
+                    }
+                    
+                    if (testType === 'pre') {
+                        sectionTestResults[section].pre.push(test);
+                        if (score > 0) {
+                            sectionTestResults[section].preScores.push(score);
+                            sectionTestResults[section].allScores.push(score);
+                        }
+                    } else if (testType === 'post') {
+                        sectionTestResults[section].post.push(test);
+                        if (score > 0) {
+                            sectionTestResults[section].postScores.push(score);
+                            sectionTestResults[section].allScores.push(score);
+                        }
+                    } else {
+                        if (score > 0) {
+                            sectionTestResults[section].allScores.push(score);
+                        }
+                    }
+                    
+                    if (test.studentId || test.studentEmail) {
+                        const studentKey = test.studentId || test.studentEmail;
+                        sectionStudentCounts[section].add(studentKey);
+                    }
+                });
+                
+                Object.keys(sectionStudentCounts).forEach(section => {
+                    if (sectionStudentCounts[section] instanceof Set) {
+                        sectionStudentCounts[section] = sectionStudentCounts[section].size;
+                    }
+                });
+                
+                sectionRankings = [];
+                allColleges.clear();
+                
+                for (const [sectionName, data] of Object.entries(sectionTestResults)) {
+                    
+                    if (data.allScores.length === 0 && data.preScores.length === 0 && data.postScores.length === 0) {
+                        continue;
+                    }
+                    
+                    const preAvg = data.preScores.length > 0 
+                        ? data.preScores.reduce((a, b) => a + b, 0) / data.preScores.length 
+                        : 0;
+                    
+                    const postAvg = data.postScores.length > 0 
+                        ? data.postScores.reduce((a, b) => a + b, 0) / data.postScores.length 
+                        : 0;
+                    
+                    const improvement = postAvg - preAvg;
+                    
+                    let avgScore = 0;
+                    if (data.allScores.length > 0) {
+                        avgScore = data.allScores.reduce((a, b) => a + b, 0) / data.allScores.length;
+                    } else if (preAvg > 0 && postAvg > 0) {
+                        avgScore = (preAvg + postAvg) / 2;
+                    } else if (preAvg > 0) {
+                        avgScore = preAvg;
+                    } else if (postAvg > 0) {
+                        avgScore = postAvg;
+                    }
+                    
+                    const sectionInfo = sectionNames[sectionName] || {
+                        college: 'N/A',
+                        professor: 'Unassigned',
+                        studentCount: sectionStudentCounts[sectionName] || 0
+                    };
+                    
+                    if (sectionInfo.college && sectionInfo.college !== 'N/A') {
+                        allColleges.add(sectionInfo.college);
+                    }
+                    
+                    sectionRankings.push({
+                        name: sectionName,
+                        college: sectionInfo.college,
+                        professor: sectionInfo.professor,
+                        professorEmail: sectionInfo.professorEmail || '',
+                        professorId: sectionInfo.professorId || '',
+                        studentCount: Math.max(
+                            sectionStudentCounts[sectionName] || 0, 
+                            sectionInfo.studentCount || 0
+                        ),
+                        preTestCount: data.pre.length,
+                        postTestCount: data.post.length,
+                        preTestAvg: parseFloat(preAvg.toFixed(2)),
+                        postTestAvg: parseFloat(postAvg.toFixed(2)),
+                        improvement: parseFloat(improvement.toFixed(2)),
+                        avgScore: parseFloat(avgScore.toFixed(2)),
+                        totalTests: data.allScores.length,
+                        preScores: data.preScores,
+                        postScores: data.postScores,
+                        allScores: data.allScores
+                    });
+                }
+                
+                sectionRankings.sort((a, b) => b.avgScore - a.avgScore);
+                
+                console.log(`✅ Calculated rankings for ${sectionRankings.length} sections with test results`);
+                console.log('📊 Top 5 sections by average score:');
+                sectionRankings.slice(0, 5).forEach((s, i) => {
+                    console.log(`   ${i+1}. ${s.name}: ${s.avgScore} (${s.totalTests} tests, Prof: ${s.professor})`);
+                });
+                
+                updateCollegeFilter();
+                filterRankings();
+                updateRankingSummaryStats();
+                
+                hideLoading();
+                
+            } catch (error) {
+                console.error('Error loading section rankings:', error);
+                hideLoading();
+                showAlert('rankingAlert', 'Error loading section rankings: ' + error.message, 'error');
+            }
+        }
+
+        function updateCollegeFilter() {
+            const collegeFilter = document.getElementById('collegeFilter');
+            if (!collegeFilter) return;
+            
+            const currentValue = collegeFilter.value;
+            const sortedColleges = Array.from(allColleges).sort();
+            
+            collegeFilter.innerHTML = '<option value="all">All Colleges</option>';
+            sortedColleges.forEach(college => {
+                const option = document.createElement('option');
+                option.value = college;
+                option.textContent = college;
+                collegeFilter.appendChild(option);
+            });
+            
+            collegeFilter.value = currentValue;
+        }
+
+        window.filterRankings = function() {
+            const searchTerm = document.getElementById('searchRankings')?.value.toLowerCase() || '';
+            const assessmentType = document.getElementById('assessmentTypeFilter')?.value || 'all';
+            const college = document.getElementById('collegeFilter')?.value || 'all';
+            
+            filteredRankings = sectionRankings.filter(section => {
+                const matchesSearch = section.name.toLowerCase().includes(searchTerm) ||
+                                    section.professor.toLowerCase().includes(searchTerm);
+                
+                const matchesCollege = college === 'all' || section.college === college;
+                
+                let matchesAssessmentType = true;
+                if (assessmentType === 'pre') {
+                    matchesAssessmentType = section.preTestCount > 0;
+                } else if (assessmentType === 'post') {
+                    matchesAssessmentType = section.postTestCount > 0;
+                } else if (assessmentType === 'improvement') {
+                    matchesAssessmentType = section.improvement !== 0;
+                }
+                
+                return matchesSearch && matchesCollege && matchesAssessmentType;
+            });
+            
+            if (assessmentType === 'pre') {
+                filteredRankings.sort((a, b) => b.preTestAvg - a.preTestAvg);
+            } else if (assessmentType === 'post') {
+                filteredRankings.sort((a, b) => b.postTestAvg - a.postTestAvg);
+            } else if (assessmentType === 'improvement') {
+                filteredRankings.sort((a, b) => b.improvement - a.improvement);
+            } else {
+                filteredRankings.sort((a, b) => b.avgScore - a.avgScore);
+            }
+            
+            renderSectionRankingTable();
+        };
+
+        function renderSectionRankingTable() {
+            const tbody = document.getElementById('sectionRankingTableBody');
+            if (!tbody) return;
+            
+            if (filteredRankings.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="11" class="text-center py-4">
+                            <div class="text-muted">No section rankings available. Please check if test results exist in the database.</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            filteredRankings.forEach((section, index) => {
+                const rank = index + 1;
+                const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-4';
+                
+                let improvementClass = 'trend-neutral';
+                let improvementIcon = 'minus';
+                if (section.improvement > 0) {
+                    improvementClass = 'trend-up';
+                    improvementIcon = 'arrow-up';
+                } else if (section.improvement < 0) {
+                    improvementClass = 'trend-down';
+                    improvementIcon = 'arrow-down';
+                }
+                
+                const performancePercent = Math.min(Math.max((section.avgScore / 100) * 100, 0), 100);
+                const professorName = section.professor || 'Unassigned';
+                
+                html += `
+                    <tr>
+                        <td>
+                            <div class="rank-badge ${rankClass}">${rank}</div>
+                        </td>
+                        <td><strong>${section.name}</strong></td>
+                        <td>${section.college}</td>
+                        <td>${professorName}</td>
+                        <td>${section.studentCount}</td>
+                        <td>${section.preTestAvg > 0 ? section.preTestAvg.toFixed(1) : 'N/A'}</td>
+                        <td>${section.postTestAvg > 0 ? section.postTestAvg.toFixed(1) : 'N/A'}</td>
+                        <td>
+                            <span class="${improvementClass}">
+                                <i class="fas fa-${improvementIcon}"></i> 
+                                ${section.improvement > 0 ? '+' : ''}${section.improvement.toFixed(1)}
+                            </span>
+                        </td>
+                        <td><strong>${section.avgScore > 0 ? section.avgScore.toFixed(1) : '0.0'}</strong></td>
+                        <td style="width: 120px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-weight: 600; color: #1e3a8a;">${performancePercent.toFixed(0)}%</span>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: ${performancePercent}%;"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons-small">
+                                <button class="btn-small btn-view" onclick="viewSectionDetails('${section.name.replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        function updateRankingSummaryStats() {
+            const totalSections = sectionRankings.length;
+            document.getElementById('totalSectionsRanked').textContent = totalSections;
+            
+            const avgScores = sectionRankings.map(s => s.avgScore).filter(s => s > 0);
+            const overallAvg = avgScores.length > 0 
+                ? (avgScores.reduce((a, b) => a + b, 0) / avgScores.length).toFixed(1)
+                : '0.0';
+            document.getElementById('overallAvgScore').textContent = overallAvg;
+            
+            if (sectionRankings.length > 0) {
+                const topSection = sectionRankings[0];
+                document.getElementById('topSectionName').textContent = topSection.name;
+                document.getElementById('topSectionScore').textContent = `${topSection.avgScore.toFixed(1)} avg`;
+            } else {
+                document.getElementById('topSectionName').textContent = 'N/A';
+                document.getElementById('topSectionScore').textContent = '0.0 avg';
+            }
+            
+            const totalStudents = sectionRankings.reduce((sum, s) => sum + s.studentCount, 0);
+            document.getElementById('totalStudentsAssessed').textContent = totalStudents;
+        }
+
+        async function loadTopSections() {
+            if (sectionRankings.length === 0) {
+                await loadSectionRankings();
+            }
+            
+            const tbody = document.getElementById('topSectionsTableBody');
+            if (!tbody) return;
+            
+            const topSections = sectionRankings.slice(0, 5);
+            
+            if (topSections.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <div class="text-muted">No section rankings available. Test results may not exist yet.</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            topSections.forEach((section, index) => {
+                const rank = index + 1;
+                const rankClass = `rank-${rank}`;
+                
+                let improvementClass = 'trend-neutral';
+                let improvementIcon = 'minus';
+                if (section.improvement > 0) {
+                    improvementClass = 'trend-up';
+                    improvementIcon = 'arrow-up';
+                } else if (section.improvement < 0) {
+                    improvementClass = 'trend-down';
+                    improvementIcon = 'arrow-down';
+                }
+                
+                const professorName = section.professor || 'Unassigned';
+                
+                html += `
+                    <tr>
+                        <td>
+                            <div class="rank-badge ${rankClass}" style="width: 28px; height: 28px; font-size: 14px;">${rank}</div>
+                        </td>
+                        <td><strong>${section.name}</strong></td>
+                        <td>${professorName}</td>
+                        <td>${section.college}</td>
+                        <td>${section.studentCount}</td>
+                        <td><strong>${section.avgScore.toFixed(1)}</strong></td>
+                        <td>
+                            <span class="${improvementClass}">
+                                <i class="fas fa-${improvementIcon}"></i> 
+                                ${section.improvement > 0 ? '+' : ''}${section.improvement.toFixed(1)}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        window.refreshSectionRanking = function() {
+            showAlert('rankingAlert', 'Refreshing section rankings...', 'success');
+            loadTestResults().then(() => {
+                loadSectionRankings();
+            });
+        };
+
+        window.exportRankingReport = function() {
+            if (sectionRankings.length === 0) {
+                showAlert('rankingAlert', 'No data to export.', 'error');
+                return;
+            }
+            
+            let csvContent = "Rank,Section,College,Professor,Students,Pre-Test Avg,Post-Test Avg,Improvement,Avg Score,Total Tests\n";
+            
+            sectionRankings.forEach((section, index) => {
+                const professorName = section.professor || 'Unassigned';
+                csvContent += `${index + 1},${section.name},${section.college},${professorName},${section.studentCount},${section.preTestAvg},${section.postTestAvg},${section.improvement},${section.avgScore},${section.totalTests}\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `section_rankings_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showAlert('rankingAlert', 'Report exported successfully!', 'success');
+        };
+
+        window.viewSectionDetails = async function(sectionName) {
+            const section = sectionRankings.find(s => s.name === sectionName);
+            if (!section) return;
+            
+            document.getElementById('sectionDetailsTitle').textContent = `Section Details: ${sectionName}`;
+            
+            const professorName = section.professor || 'Unassigned';
+            const professorEmail = section.professorEmail || 'Not assigned';
+            
+            let detailsHtml = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="profile-card" style="padding: 20px;">
+                            <h4 style="color: #1e3a8a; font-size: 18px; margin-bottom: 20px;">
+                                <i class="fas fa-info-circle"></i> Section Information
+                            </h4>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Section Name</div>
+                                <div class="profile-info-value">${section.name}</div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">College</div>
+                                <div class="profile-info-value">${section.college}</div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Professor</div>
+                                <div class="profile-info-value">${professorName}</div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Professor Email</div>
+                                <div class="profile-info-value" style="font-size: 14px;">${professorEmail}</div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Total Students</div>
+                                <div class="profile-info-value">${section.studentCount}</div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Total Test Results</div>
+                                <div class="profile-info-value">${section.totalTests || 0}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="profile-card" style="padding: 20px;">
+                            <h4 style="color: #1e3a8a; font-size: 18px; margin-bottom: 20px;">
+                                <i class="fas fa-chart-line"></i> Performance Metrics
+                            </h4>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Average Test Score</div>
+                                <div class="profile-info-value" style="font-size: 24px; font-weight: 700; color: #1e3a8a;">
+                                    ${section.avgScore.toFixed(1)}
+                                </div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Pre-Test Average</div>
+                                <div class="profile-info-value">${section.preTestAvg > 0 ? section.preTestAvg.toFixed(1) : 'N/A'}</div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Post-Test Average</div>
+                                <div class="profile-info-value">${section.postTestAvg > 0 ? section.postTestAvg.toFixed(1) : 'N/A'}</div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Improvement</div>
+                                <div class="profile-info-value" style="${section.improvement > 0 ? 'color: #10b981' : section.improvement < 0 ? 'color: #ef4444' : 'color: #6b7280'}">
+                                    ${section.improvement > 0 ? '+' : ''}${section.improvement.toFixed(1)}
+                                </div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Overall Rank</div>
+                                <div class="profile-info-value" style="font-size: 24px; font-weight: 700;">
+                                    <span class="rank-badge rank-${sectionRankings.findIndex(s => s.name === sectionName) + 1}" style="width: 40px; height: 40px; font-size: 18px;">
+                                        ${sectionRankings.findIndex(s => s.name === sectionName) + 1}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('sectionDetailsContent').innerHTML = detailsHtml;
+            document.getElementById('sectionDetailsModal').style.display = 'flex';
+        };
+
+        window.closeSectionDetailsModal = function() {
+            document.getElementById('sectionDetailsModal').style.display = 'none';
+        };
+
+        // ==================== STUDENT RANKING FUNCTIONS ====================
+
+        async function loadStudentRankings() {
+            try {
+                showLoading('Calculating student rankings...');
+                
+                if (testResults.length === 0) {
+                    await loadTestResults();
+                }
+                
+                const studentData = {};
+                studentSections.clear();
+                
+                testResults.forEach(test => {
+                    const studentId = test.studentId || test.studentEmail || test.studentName;
+                    const studentName = test.studentName || 'Unknown Student';
+                    const section = test.section || 'N/A';
+                    const testName = test.testName || 'Unknown Test';
+                    const type = test.type || 'unknown';
+                    const score = test.score || 0;
+                    
+                    if (!studentData[studentId]) {
+                        studentData[studentId] = {
+                            name: studentName,
+                            id: studentId,
+                            section: section,
+                            tests: [],
+                            preScores: [],
+                            postScores: [],
+                            allScores: []
+                        };
+                    }
+                    
+                    studentData[studentId].tests.push({
+                        name: testName,
+                        type: type,
+                        score: score,
+                        date: test.submittedAt
+                    });
+                    
+                    studentData[studentId].allScores.push(score);
+                    
+                    if (type === 'pre') {
+                        studentData[studentId].preScores.push(score);
+                    } else if (type === 'post') {
+                        studentData[studentId].postScores.push(score);
+                    }
+                    
+                    if (section !== 'N/A') {
+                        studentSections.add(section);
+                    }
+                });
+                
+                studentRankings = [];
+                
+                for (const [studentId, data] of Object.entries(studentData)) {
+                    const avgScore = data.allScores.length > 0 
+                        ? data.allScores.reduce((a, b) => a + b, 0) / data.allScores.length 
+                        : 0;
+                    
+                    const preAvg = data.preScores.length > 0 
+                        ? data.preScores.reduce((a, b) => a + b, 0) / data.preScores.length 
+                        : 0;
+                    
+                    const postAvg = data.postScores.length > 0 
+                        ? data.postScores.reduce((a, b) => a + b, 0) / data.postScores.length 
+                        : 0;
+                    
+                    const improvement = postAvg - preAvg;
+                    
+                    studentRankings.push({
+                        id: studentId,
+                        name: data.name,
+                        section: data.section,
+                        testsTaken: data.tests.length,
+                        preTestAvg: parseFloat(preAvg.toFixed(2)),
+                        postTestAvg: parseFloat(postAvg.toFixed(2)),
+                        improvement: parseFloat(improvement.toFixed(2)),
+                        avgScore: parseFloat(avgScore.toFixed(2)),
+                        preScores: data.preScores,
+                        postScores: data.postScores,
+                        allScores: data.allScores,
+                        tests: data.tests
+                    });
+                }
+                
+                studentRankings.sort((a, b) => b.avgScore - a.avgScore);
+                
+                console.log(`✅ Calculated rankings for ${studentRankings.length} students`);
+                
+                updateStudentSectionFilter();
+                filterStudentRankings();
+                updateStudentRankingSummaryStats();
+                
+                hideLoading();
+                
+            } catch (error) {
+                console.error('Error loading student rankings:', error);
+                hideLoading();
+                showAlert('studentRankingAlert', 'Error loading student rankings: ' + error.message, 'error');
+            }
+        }
+
+        function updateStudentSectionFilter() {
+            const sectionFilter = document.getElementById('studentSectionFilter');
+            if (!sectionFilter) return;
+            
+            const currentValue = sectionFilter.value;
+            const sortedSections = Array.from(studentSections).sort();
+            
+            sectionFilter.innerHTML = '<option value="all">All Sections</option>';
+            sortedSections.forEach(section => {
+                const option = document.createElement('option');
+                option.value = section;
+                option.textContent = section;
+                sectionFilter.appendChild(option);
+            });
+            
+            sectionFilter.value = currentValue;
+        }
+
+        window.filterStudentRankings = function() {
+            const searchTerm = document.getElementById('searchStudentRankings')?.value.toLowerCase() || '';
+            const sectionFilter = document.getElementById('studentSectionFilter')?.value || 'all';
+            const testTypeFilter = document.getElementById('studentTestTypeFilter')?.value || 'all';
+            
+            filteredStudentRankings = studentRankings.filter(student => {
+                const matchesSearch = student.name.toLowerCase().includes(searchTerm) ||
+                                    student.id.toLowerCase().includes(searchTerm);
+                
+                const matchesSection = sectionFilter === 'all' || student.section === sectionFilter;
+                
+                let matchesTestType = true;
+                if (testTypeFilter === 'pre') {
+                    matchesTestType = student.preScores.length > 0;
+                } else if (testTypeFilter === 'post') {
+                    matchesTestType = student.postScores.length > 0;
+                }
+                
+                return matchesSearch && matchesSection && matchesTestType;
+            });
+            
+            renderStudentRankingTable();
+            updateStudentRankingSummaryStats();
+        };
+
+        function renderStudentRankingTable() {
+            const tbody = document.getElementById('studentRankingTableBody');
+            if (!tbody) return;
+            
+            if (filteredStudentRankings.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="11" class="text-center py-4">
+                            <div class="text-muted">No student rankings available.</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            filteredStudentRankings.forEach((student, index) => {
+                const rank = index + 1;
+                const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-4';
+                
+                let improvementClass = 'trend-neutral';
+                let improvementIcon = 'minus';
+                if (student.improvement > 0) {
+                    improvementClass = 'trend-up';
+                    improvementIcon = 'arrow-up';
+                } else if (student.improvement < 0) {
+                    improvementClass = 'trend-down';
+                    improvementIcon = 'arrow-down';
+                }
+                
+                const rating = getScoreRating(student.avgScore);
+                
+                html += `
+                    <tr>
+                        <td>
+                            <div class="rank-badge ${rankClass}">${rank}</div>
+                        </td>
+                        <td><strong>${student.name}</strong></td>
+                        <td>${student.section}</td>
+                        <td>${student.id}</td>
+                        <td>${student.testsTaken}</td>
+                        <td>${student.preTestAvg > 0 ? student.preTestAvg.toFixed(1) : 'N/A'}</td>
+                        <td>${student.postTestAvg > 0 ? student.postTestAvg.toFixed(1) : 'N/A'}</td>
+                        <td>
+                            <span class="${improvementClass}">
+                                <i class="fas fa-${improvementIcon}"></i> 
+                                ${student.improvement > 0 ? '+' : ''}${student.improvement.toFixed(1)}
+                            </span>
+                        </td>
+                        <td><strong>${student.avgScore.toFixed(1)}</strong></td>
+                        <td><span class="score-badge ${rating.class}">${rating.text}</span></td>
+                        <td>
+                            <div class="action-buttons-small">
+                                <button class="btn-small btn-view" onclick="viewStudentDetails('${student.id.replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        function updateStudentRankingSummaryStats() {
+            document.getElementById('totalStudentsRanked').textContent = filteredStudentRankings.length;
+            
+            const avgScores = filteredStudentRankings.map(s => s.avgScore).filter(s => s > 0);
+            const overallAvg = avgScores.length > 0 
+                ? (avgScores.reduce((a, b) => a + b, 0) / avgScores.length).toFixed(1)
+                : '0.0';
+            document.getElementById('studentOverallAvgScore').textContent = overallAvg;
+            
+            if (filteredStudentRankings.length > 0) {
+                const topStudent = filteredStudentRankings[0];
+                document.getElementById('topStudentName').textContent = topStudent.name;
+                document.getElementById('topStudentScore').textContent = `${topStudent.avgScore.toFixed(1)} avg`;
+            } else {
+                document.getElementById('topStudentName').textContent = 'N/A';
+                document.getElementById('topStudentScore').textContent = '0.0 avg';
+            }
+            
+            document.getElementById('studentSectionsCount').textContent = studentSections.size;
+        }
+
+        window.refreshStudentRanking = function() {
+            showAlert('studentRankingAlert', 'Refreshing student rankings...', 'success');
+            loadTestResults().then(() => {
+                loadStudentRankings();
+            });
+        };
+
+        window.exportStudentRankingReport = function() {
+            if (filteredStudentRankings.length === 0) {
+                showAlert('studentRankingAlert', 'No data to export.', 'error');
+                return;
+            }
+            
+            let csvContent = "Rank,Student Name,Section,Student ID,Tests Taken,Pre-Test Avg,Post-Test Avg,Improvement,Avg Score,Rating\n";
+            
+            filteredStudentRankings.forEach((student, index) => {
+                const rating = getScoreRating(student.avgScore).text;
+                csvContent += `${index + 1},${student.name},${student.section},${student.id},${student.testsTaken},${student.preTestAvg},${student.postTestAvg},${student.improvement},${student.avgScore},${rating}\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `student_rankings_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showAlert('studentRankingAlert', 'Report exported successfully!', 'success');
+        };
+
+        window.viewStudentDetails = async function(studentId) {
+            const student = studentRankings.find(s => s.id === studentId);
+            if (!student) return;
+            
+            document.getElementById('studentDetailsTitle').textContent = `Student Performance: ${student.name}`;
+            
+            let testHistoryHtml = '';
+            if (student.tests && student.tests.length > 0) {
+                const sortedTests = [...student.tests].sort((a, b) => {
+                    const dateA = a.date?.toDate?.() || new Date(a.date || 0);
+                    const dateB = b.date?.toDate?.() || new Date(b.date || 0);
+                    return dateB - dateA;
+                });
+                
+                sortedTests.forEach(test => {
+                    const testDate = test.date?.toDate?.() || new Date(test.date || 0);
+                    const dateStr = testDate.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+                    
+                    testHistoryHtml += `
+                        <tr>
+                            <td>${test.name}</td>
+                            <td>${test.type || 'N/A'}</td>
+                            <td>${test.score}</td>
+                            <td>${dateStr}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                testHistoryHtml = `
+                    <tr>
+                        <td colspan="4" class="text-center py-2">No test history available.</td>
+                    </tr>
+                `;
+            }
+            
+            const rating = getScoreRating(student.avgScore);
+            
+            let detailsHtml = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="profile-card" style="padding: 20px;">
+                            <h4 style="color: #1e3a8a; font-size: 18px; margin-bottom: 20px;">
+                                <i class="fas fa-user"></i> Student Information
+                            </h4>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Full Name</div>
+                                <div class="profile-info-value">${student.name}</div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Student ID</div>
+                                <div class="profile-info-value">${student.id}</div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Section</div>
+                                <div class="profile-info-value">${student.section}</div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Tests Taken</div>
+                                <div class="profile-info-value">${student.testsTaken}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="profile-card" style="padding: 20px;">
+                            <h4 style="color: #1e3a8a; font-size: 18px; margin-bottom: 20px;">
+                                <i class="fas fa-chart-line"></i> Performance Summary
+                            </h4>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Average Score</div>
+                                <div class="profile-info-value" style="font-size: 28px; font-weight: 800; color: #1e3a8a;">
+                                    ${student.avgScore.toFixed(1)}
+                                </div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Rating</div>
+                                <div class="profile-info-value">
+                                    <span class="score-badge ${rating.class}" style="font-size: 14px; padding: 6px 12px;">${rating.text}</span>
+                                </div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Pre-Test Average</div>
+                                <div class="profile-info-value">${student.preTestAvg > 0 ? student.preTestAvg.toFixed(1) : 'N/A'}</div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Post-Test Average</div>
+                                <div class="profile-info-value">${student.postTestAvg > 0 ? student.postTestAvg.toFixed(1) : 'N/A'}</div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Improvement</div>
+                                <div class="profile-info-value" style="${student.improvement > 0 ? 'color: #10b981' : student.improvement < 0 ? 'color: #ef4444' : 'color: #6b7280'}">
+                                    ${student.improvement > 0 ? '+' : ''}${student.improvement.toFixed(1)}
+                                </div>
+                            </div>
+                            <div class="profile-info-group">
+                                <div class="profile-info-label">Overall Rank</div>
+                                <div class="profile-info-value" style="font-size: 24px; font-weight: 700;">
+                                    <span class="rank-badge rank-${studentRankings.findIndex(s => s.id === studentId) + 1}" style="width: 40px; height: 40px; font-size: 18px;">
+                                        ${studentRankings.findIndex(s => s.id === studentId) + 1}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 24px;">
+                    <h4 style="color: #1e3a8a; font-size: 18px; margin-bottom: 16px;">
+                        <i class="fas fa-history"></i> Test History
+                    </h4>
+                    <div class="table-responsive">
+                        <table class="custom-table" style="margin-bottom: 0;">
+                            <thead>
+                                <tr>
+                                    <th>Test Name</th>
+                                    <th>Type</th>
+                                    <th>Score</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${testHistoryHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('studentDetailsContent').innerHTML = detailsHtml;
+            document.getElementById('studentDetailsModal').style.display = 'flex';
+        };
+
+        window.closeStudentDetailsModal = function() {
+            document.getElementById('studentDetailsModal').style.display = 'none';
+        };
+
+        // ==================== ASSESSMENT FUNCTIONS ====================
+
         async function loadPreAssessments() {
             try {
                 const assessmentsQuery = query(
@@ -1960,9 +3404,9 @@
             }
         }
 
-        // Render pre-assessments table
         function renderPreAssessmentsTable() {
             const tbody = document.getElementById('preAssessmentsTableBody');
+            if (!tbody) return;
             
             if (preAssessments.length === 0) {
                 tbody.innerHTML = `
@@ -2010,7 +3454,6 @@
             tbody.innerHTML = html;
         }
 
-        // Load post-assessments
         async function loadPostAssessments() {
             try {
                 const assessmentsQuery = query(
@@ -2035,17 +3478,17 @@
             }
         }
 
-        // Render post-assessments table
         function renderPostAssessmentsTable() {
             const tbody = document.getElementById('postAssessmentsTableBody');
+            if (!tbody) return;
             
             if (postAssessments.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                                        <td colspan="9" class="text-center py-4">
-                                            <div class="text-muted">No post-assessment data found.</div>
-                                        </td>
-                                    </tr>
+                        <td colspan="9" class="text-center py-4">
+                            <div class="text-muted">No post-assessment data found.</div>
+                        </td>
+                    </tr>
                 `;
                 return;
             }
@@ -2062,7 +3505,6 @@
                      assessment.assessmentDate.toDate().toLocaleDateString() : 
                      new Date(assessment.assessmentDate).toLocaleDateString()) : 'N/A';
                 
-                // Calculate improvement (this would need pre-assessment data for comparison)
                 const improvement = assessment.improvement || 'No data';
                 
                 html += `
@@ -2089,7 +3531,16 @@
             tbody.innerHTML = html;
         }
 
-        // View assessment details
+        window.refreshPreAssessments = function() {
+            showAlert('preAssessmentAlert', 'Refreshing pre-assessment data...', 'success');
+            loadPreAssessments();
+        };
+
+        window.refreshPostAssessments = function() {
+            showAlert('postAssessmentAlert', 'Refreshing post-assessment data...', 'success');
+            loadPostAssessments();
+        };
+
         window.viewAssessmentDetails = async function(assessmentId, type) {
             try {
                 const assessmentRef = doc(db, 'assessments', assessmentId);
@@ -2118,6 +3569,10 @@
                         <div class="form-group">
                             <label class="form-label">Assessment Date</label>
                             <div class="form-control" style="background: #f8fafc;">${assessmentDate}</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Test Score</label>
+                            <div class="form-control" style="background: #f8fafc;">${assessment.testScore || 'N/A'}</div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Height (cm)</label>
@@ -2166,369 +3621,13 @@
             }
         };
 
-        // Close assessment detail modal
         window.closeAssessmentDetailModal = function() {
             document.getElementById('assessmentDetailModal').style.display = 'none';
         };
 
-        // Load all accounts
-        // ==================== ACCOUNT MANAGEMENT FUNCTIONS ====================
-
-// Load all accounts
-async function loadAllAccounts() {
-    try {
-        const usersSnapshot = await getDocs(collection(db, 'users'));
-        
-        allAccounts = [];
-        
-        usersSnapshot.forEach((userDoc) => {
-            const userData = userDoc.data();
-            const userRole = (userData.role || '').toLowerCase();
-            
-            // Skip head_admin accounts (they shouldn't be managed here)
-            if (userRole === 'head_admin') return;
-            
-            // Get user ID - either from doc.id or uid field
-            const userId = userData.uid || userDoc.id;
-            
-            // Get name - handle different possible name fields
-            let fullName = 'N/A';
-            if (userData.name) {
-                fullName = userData.name;
-            } else if (userData.firstName || userData.lastName) {
-                fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
-            } else if (userData.displayName) {
-                fullName = userData.displayName;
-            } else if (userData.email) {
-                fullName = userData.email.split('@')[0];
-            }
-            
-            // Determine college/section display
-            let collegeSection = 'N/A';
-            if (userData.college) {
-                collegeSection = userData.college;
-            } else if (userData.section) {
-                collegeSection = userData.section;
-            } else if (userData.assignedClass) {
-                collegeSection = userData.assignedClass;
-            }
-            
-            allAccounts.push({
-                id: userId,
-                docId: userDoc.id, // The actual Firestore document ID (usually email-based)
-                name: fullName,
-                email: userData.email || 'N/A',
-                role: userRole,
-                college: collegeSection,
-                status: userData.status || 'active',
-                source: 'users',
-                userData: userData
-            });
-        });
-        
-        console.log(`Loaded ${allAccounts.length} accounts from users collection`);
-        
-        // Update role filter options
-        updateRoleFilterOptions();
-        
-        filteredAccounts = [...allAccounts];
-        renderAccountsTable();
-        
-    } catch (error) {
-        console.error('Error loading accounts:', error);
-        allAccounts = [];
-        filteredAccounts = [];
-        renderAccountsTable();
-        
-        showAlert('accountAlert', `Error loading accounts: ${error.message}`, 'error');
-    }
-}
-
-// Update role filter dropdown options
-function updateRoleFilterOptions() {
-    const roleFilter = document.getElementById('roleFilter');
-    const currentValue = roleFilter.value;
-    
-    // Get all unique roles from accounts
-    const roles = new Set();
-    allAccounts.forEach(account => {
-        if (account.role) {
-            roles.add(account.role);
-        }
-    });
-    
-    // Sort roles alphabetically
-    const sortedRoles = Array.from(roles).sort();
-    
-    // Update dropdown options
-    roleFilter.innerHTML = '<option value="all">All Roles</option>';
-    sortedRoles.forEach(role => {
-        const option = document.createElement('option');
-        option.value = role;
-        option.textContent = role.charAt(0).toUpperCase() + role.slice(1);
-        roleFilter.appendChild(option);
-    });
-    
-    // Restore previous selection
-    roleFilter.value = currentValue;
-}
-
-// Render accounts table
-function renderAccountsTable() {
-    const tbody = document.getElementById('accountsTableBody');
-    
-    if (filteredAccounts.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" class="text-center py-4">
-                    <div class="text-muted">No accounts found.</div>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    let html = '';
-    filteredAccounts.forEach(account => {
-        const displayName = account.name && account.name !== 'N/A' ? account.name : 
-                           (account.email !== 'N/A' ? account.email.split('@')[0] : 'Unknown User');
-        
-        const roleDisplay = account.role ? 
-            account.role.charAt(0).toUpperCase() + account.role.slice(1) : 'Unknown';
-        
-        // Determine role badge color
-        let roleBadgeClass = 'badge bg-secondary';
-        switch(account.role) {
-            case 'dean': roleBadgeClass = 'badge bg-danger'; break;
-            case 'professor': roleBadgeClass = 'badge bg-warning text-dark'; break;
-            case 'secretary': roleBadgeClass = 'badge bg-info'; break;
-            case 'student': roleBadgeClass = 'badge bg-success'; break;
-            default: roleBadgeClass = 'badge bg-secondary';
-        }
-        
-        html += `
-            <tr>
-                <td>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
-                            ${displayName.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                            <div style="font-weight: 600;">${displayName}</div>
-                            <div style="font-size: 12px; color: #6b7280;">${account.email}</div>
-                        </div>
-                    </div>
-                </td>
-                <td>${account.email}</td>
-                <td>
-                    <span class="${roleBadgeClass}" style="font-size: 11px; padding: 4px 8px; border-radius: 12px;">
-                        ${roleDisplay}
-                    </span>
-                </td>
-                <td>${account.college}</td>
-                <td>
-                    <span class="status-badge ${account.status === 'active' ? 'status-active' : 'status-inactive'}">
-                        ${account.status}
-                    </span>
-                </td>
-                <td>
-                    <div class="action-buttons-small">
-                        <button class="btn-small btn-edit" onclick="showEditRoleModal('${account.id}', '${account.docId}', '${displayName.replace(/'/g, "\\'")}', '${account.email.replace(/'/g, "\\'")}', '${account.role}')">
-                            <i class="fas fa-edit"></i> Edit Role
-                        </button>
-                        ${account.status === 'active' ? 
-                            `<button class="btn-small btn-deactivate" onclick="toggleAccountStatus('${account.docId}', 'inactive')">
-                                <i class="fas fa-ban"></i> Deactivate
-                            </button>` : 
-                            `<button class="btn-small btn-activate" onclick="toggleAccountStatus('${account.docId}', 'active')">
-                                <i class="fas fa-check"></i> Activate
-                            </button>`
-                        }
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
-    
-    tbody.innerHTML = html;
-}
-
-// Show edit role modal
-window.showEditRoleModal = function(userId, docId, userName, userEmail, currentRole) {
-    currentUserToEdit = { 
-        id: userId, 
-        docId: docId,
-        name: userName, 
-        email: userEmail, 
-        currentRole: currentRole 
-    };
-    
-    document.getElementById('editRoleUserName').textContent = userName;
-    document.getElementById('editRoleUserEmail').textContent = userEmail;
-    
-    // Update role options in select
-    const roleSelect = document.getElementById('editRoleSelect');
-    roleSelect.innerHTML = `
-        <option value="">Select Role</option>
-        <option value="dean" ${currentRole === 'dean' ? 'selected' : ''}>Dean</option>
-        <option value="professor" ${currentRole === 'professor' ? 'selected' : ''}>Professor</option>
-        <option value="secretary" ${currentRole === 'secretary' ? 'selected' : ''}>Secretary</option>
-        <option value="student" ${currentRole === 'student' ? 'selected' : ''}>Student</option>
-    `;
-    
-    document.getElementById('editRoleModal').style.display = 'flex';
-};
-
-// Close edit role modal
-window.closeEditRoleModal = function() {
-    document.getElementById('editRoleModal').style.display = 'none';
-    currentUserToEdit = null;
-};
-
-// Update user role
-window.updateUserRole = async function() {
-    if (!currentUserToEdit) return;
-    
-    const newRole = document.getElementById('editRoleSelect').value;
-    if (!newRole) {
-        alert('Please select a role.');
-        return;
-    }
-    
-    if (newRole === currentUserToEdit.currentRole) {
-        alert('This is already the current role.');
-        return;
-    }
-    
-    const roleDisplay = newRole.charAt(0).toUpperCase() + newRole.slice(1);
-    
-    if (!confirm(`Are you sure you want to change ${currentUserToEdit.name}'s role to ${roleDisplay}?`)) {
-        return;
-    }
-    
-    try {
-        // Update in Firestore using docId (email-based document ID)
-        const userRef = doc(db, 'users', currentUserToEdit.docId);
-        
-        // Check if document exists
-        const userDoc = await getDoc(userRef);
-        if (!userDoc.exists()) {
-            // Try using the userId if docId doesn't work
-            const userRefAlt = doc(db, 'users', currentUserToEdit.id);
-            const userDocAlt = await getDoc(userRefAlt);
-            
-            if (!userDocAlt.exists()) {
-                throw new Error('User document not found');
-            }
-            
-            // Update using userId
-            await updateDoc(userRefAlt, {
-                role: newRole,
-                updatedAt: serverTimestamp()
-            });
-        } else {
-            // Update using docId
-            await updateDoc(userRef, {
-                role: newRole,
-                updatedAt: serverTimestamp()
-            });
-        }
-        
-        showAlert('accountAlert', `✅ Role updated successfully! ${currentUserToEdit.name} is now a ${roleDisplay}.`, 'success');
-        
-        closeEditRoleModal();
-        await loadAllAccounts();
-        await loadDashboardStats();
-        
-    } catch (error) {
-        console.error('Error updating role:', error);
-        showAlert('accountAlert', `❌ Error updating role: ${error.message}`, 'error');
-    }
-};
-
-// Toggle account status
-window.toggleAccountStatus = async function(docId, newStatus) {
-    const account = allAccounts.find(a => a.docId === docId);
-    if (!account) return;
-    
-    const action = newStatus === 'active' ? 'activate' : 'deactivate';
-    const statusText = newStatus === 'active' ? 'active' : 'inactive';
-    
-    if (!confirm(`Are you sure you want to ${action} ${account.name || account.email}?`)) {
-        return;
-    }
-
-    try {
-        const userRef = doc(db, 'users', docId);
-        const userDoc = await getDoc(userRef);
-        
-        if (!userDoc.exists()) {
-            // Try using the userId
-            const userRefAlt = doc(db, 'users', account.id);
-            await updateDoc(userRefAlt, {
-                status: newStatus,
-                updatedAt: serverTimestamp()
-            });
-        } else {
-            await updateDoc(userRef, {
-                status: newStatus,
-                updatedAt: serverTimestamp()
-            });
-        }
-
-        showAlert('accountAlert', `✅ Account ${action}d successfully! ${account.name || account.email} is now ${statusText}.`, 'success');
-        await loadAllAccounts();
-        await loadDashboardStats();
-        
-    } catch (error) {
-        console.error(`Error ${action}ing account:`, error);
-        showAlert('accountAlert', `❌ Error ${action}ing account: ${error.message}`, 'error');
-    }
-};
-
-// Filter accounts
-window.filterAccounts = function() {
-    const searchTerm = document.getElementById('searchAccounts').value.toLowerCase();
-    const roleFilter = document.getElementById('roleFilter').value;
-    
-    filteredAccounts = allAccounts.filter(account => {
-        const matchesSearch = account.name.toLowerCase().includes(searchTerm) ||
-                            account.email.toLowerCase().includes(searchTerm) ||
-                            account.college.toLowerCase().includes(searchTerm) ||
-                            account.role.toLowerCase().includes(searchTerm);
-        
-        const matchesRole = roleFilter === 'all' || account.role === roleFilter;
-        
-        return matchesSearch && matchesRole;
-    });
-    
-    renderAccountsTable();
-};
-
-// Filter accounts by role
-window.filterAccountsByRole = function() {
-    filterAccounts();
-};
-        window.filterAccounts = function() {
-            const searchTerm = document.getElementById('searchAccounts').value.toLowerCase();
-            const roleFilter = document.getElementById('roleFilter').value;
-            
-            filteredAccounts = allAccounts.filter(account => {
-                const matchesSearch = account.name.toLowerCase().includes(searchTerm) ||
-                                    account.email.toLowerCase().includes(searchTerm) ||
-                                    account.college.toLowerCase().includes(searchTerm);
-                
-                const matchesRole = roleFilter === 'all' || account.role === roleFilter;
-                
-                return matchesSearch && matchesRole;
-            });
-            
-            renderAccountsTable();
-        };
-
         window.filterPreAssessments = function() {
-            const searchTerm = document.getElementById('searchPreAssessments').value.toLowerCase();
-            const categoryFilter = document.getElementById('preAssessmentFilter').value;
+            const searchTerm = document.getElementById('searchPreAssessments')?.value.toLowerCase() || '';
+            const categoryFilter = document.getElementById('preAssessmentFilter')?.value || 'all';
             
             const filteredAssessments = preAssessments.filter(assessment => {
                 const matchesSearch = (assessment.studentName && assessment.studentName.toLowerCase().includes(searchTerm)) ||
@@ -2548,8 +3647,8 @@ window.filterAccountsByRole = function() {
         };
 
         window.filterPostAssessments = function() {
-            const searchTerm = document.getElementById('searchPostAssessments').value.toLowerCase();
-            const categoryFilter = document.getElementById('postAssessmentFilter').value;
+            const searchTerm = document.getElementById('searchPostAssessments')?.value.toLowerCase() || '';
+            const categoryFilter = document.getElementById('postAssessmentFilter')?.value || 'all';
             
             const filteredAssessments = postAssessments.filter(assessment => {
                 const matchesSearch = (assessment.studentName && assessment.studentName.toLowerCase().includes(searchTerm)) ||
@@ -2568,9 +3667,9 @@ window.filterAccountsByRole = function() {
             renderFilteredPostAssessments(filteredAssessments);
         };
 
-        // Render filtered assessments
         function renderFilteredPreAssessments(filteredAssessments) {
             const tbody = document.getElementById('preAssessmentsTableBody');
+            if (!tbody) return;
             
             if (filteredAssessments.length === 0) {
                 tbody.innerHTML = `
@@ -2620,6 +3719,7 @@ window.filterAccountsByRole = function() {
 
         function renderFilteredPostAssessments(filteredAssessments) {
             const tbody = document.getElementById('postAssessmentsTableBody');
+            if (!tbody) return;
             
             if (filteredAssessments.length === 0) {
                 tbody.innerHTML = `
@@ -2670,346 +3770,354 @@ window.filterAccountsByRole = function() {
             tbody.innerHTML = html;
         }
 
-        // ==================== SECTION MANAGEMENT FUNCTIONS ====================
+        // ==================== ACCOUNT MANAGEMENT FUNCTIONS ====================
 
-        // Load sections
-        async function loadSections() {
+        async function loadAllAccounts() {
             try {
-                const querySnapshot = await getDocs(collection(db, 'sections'));
-                sections = [];
+                const usersSnapshot = await getDocs(collection(db, 'users'));
                 
-                querySnapshot.forEach((sectionDoc) => {
-                    sections.push({ id: sectionDoc.id, ...sectionDoc.data() });
-                });
+                allAccounts = [];
                 
-                console.log('Loaded sections:', sections.length);
-                renderSectionsTable();
-                
-            } catch (error) {
-                console.error('Error loading sections:', error);
-                sections = [];
-                renderSectionsTable();
-            }
-        }
-
-        // Load professors
-        async function loadProfessors() {
-            try {
-                const querySnapshot = await getDocs(collection(db, 'users'));
-                professors = [];
-                
-                querySnapshot.forEach((doc) => {
-                    const userData = doc.data();
-                    if (userData.role === 'professor') {
-                        professors.push({ id: doc.id, ...userData });
+                usersSnapshot.forEach((userDoc) => {
+                    const userData = userDoc.data();
+                    const userRole = (userData.role || '').toLowerCase();
+                    
+                    if (userRole === 'head_admin') return;
+                    
+                    const userId = userData.uid || userDoc.id;
+                    
+                    let fullName = 'N/A';
+                    if (userData.name) {
+                        fullName = userData.name;
+                    } else if (userData.firstName || userData.lastName) {
+                        fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
+                    } else if (userData.displayName) {
+                        fullName = userData.displayName;
+                    } else if (userData.email) {
+                        fullName = userData.email.split('@')[0];
                     }
+                    
+                    let collegeSection = 'N/A';
+                    if (userData.college) {
+                        collegeSection = userData.college;
+                    } else if (userData.section) {
+                        collegeSection = userData.section;
+                    } else if (userData.assignedClass) {
+                        collegeSection = userData.assignedClass;
+                    }
+                    
+                    allAccounts.push({
+                        id: userId,
+                        docId: userDoc.id,
+                        name: fullName,
+                        email: userData.email || 'N/A',
+                        role: userRole,
+                        college: collegeSection,
+                        status: userData.status || 'active',
+                        source: 'users',
+                        userData: userData
+                    });
                 });
                 
-                console.log('Loaded professors:', professors.length);
+                console.log(`✅ Loaded ${allAccounts.length} accounts from users collection`);
+                
+                updateRoleFilterOptions();
+                
+                filteredAccounts = [...allAccounts];
+                renderAccountsTable();
+                updateTotalAccountsCount();
                 
             } catch (error) {
-                console.error('Error loading professors:', error);
-                professors = [];
+                console.error('Error loading accounts:', error);
+                allAccounts = [];
+                filteredAccounts = [];
+                renderAccountsTable();
+                showAlert('accountAlert', `Error loading accounts: ${error.message}`, 'error');
             }
         }
 
-        // Render sections table
-        function renderSectionsTable() {
-            const tbody = document.getElementById('sectionsTableBody');
+        function updateRoleFilterOptions() {
+            const roleFilter = document.getElementById('roleFilter');
+            if (!roleFilter) return;
             
-            if (sections.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center py-4">
-                            <div class="text-muted">No sections found. Create your first section above.</div>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
+            const currentValue = roleFilter.value;
             
-            let html = '';
-            sections.forEach(section => {
-                html += `
-                    <tr>
-                        <td>${section.name || 'N/A'}</td>
-                        <td>${section.college || 'N/A'}</td>
-                        <td>${section.professorName || 'Unassigned'}</td>
-                        <td>${section.studentCount || 0}</td>
-                        <td>${section.academicYear || 'N/A'}</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td>
-                            <div class="action-buttons-small">
-                                <button class="btn-small" style="background: #3b82f6; color: white;" onclick="showAssignProfessorModal('${section.id}')">
-                                    <i class="fas fa-user-tie"></i> Assign
-                                </button>
-                                <button class="btn-small" style="background: #dc2626; color: white;" onclick="deleteSection('${section.id}')">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+            const roles = new Set();
+            allAccounts.forEach(account => {
+                if (account.role) {
+                    roles.add(account.role);
+                }
             });
             
-            tbody.innerHTML = html;
-        }
-
-        // Show add section form
-        window.showAddSectionForm = function() {
-            const currentAcademicYear = getCurrentAcademicYear();
-            document.getElementById('sectionYear').value = currentAcademicYear;
+            const sortedRoles = Array.from(roles).sort();
             
-            document.getElementById('addSectionForm').style.display = 'block';
-            document.getElementById('sectionName').value = '';
-            document.getElementById('sectionCollege').value = '';
-        };
-
-        // Hide add section form
-        window.hideAddSectionForm = function() {
-            document.getElementById('addSectionForm').style.display = 'none';
-        };
-
-        // Save section
-        window.saveSection = async function() {
-            const name = document.getElementById('sectionName').value.trim();
-            const college = document.getElementById('sectionCollege').value.trim();
-            const academicYear = document.getElementById('sectionYear').value;
-
-            if (!name || !college) {
-                showAlert('sectionAlert', '❌ Please fill in all required fields.', 'error');
-                return;
-            }
-
-            try {
-                console.log('Creating section...');
-                
-                const sectionData = {
-                    name: name,
-                    college: college,
-                    academicYear: academicYear,
-                    professorEmail: '',
-                    professorName: '',
-                    professorId: '',
-                    studentCount: 0,
-                    status: 'active',
-                    createdAt: serverTimestamp(),
-                    createdBy: currentUser.uid
-                };
-
-                await addDoc(collection(db, 'sections'), sectionData);
-
-                showAlert('sectionAlert', '✅ Section created successfully!', 'success');
-                
-                hideAddSectionForm();
-                await loadSections();
-                await loadDashboardStats();
-                
-            } catch (error) {
-                console.error('Error creating section:', error);
-                showAlert('sectionAlert', `❌ Error creating section: ${error.message}`, 'error');
-            }
-        };
-
-        // Refresh sections
-        window.refreshSections = async function() {
-            await loadSections();
-            await loadProfessors();
-            showAlert('sectionAlert', '✅ Sections list refreshed!', 'success');
-        };
-
-        // Filter sections
-        window.filterSections = function() {
-            const searchTerm = document.getElementById('searchSections').value.toLowerCase();
-            
-            const filteredSections = sections.filter(section => 
-                (section.name && section.name.toLowerCase().includes(searchTerm)) ||
-                (section.college && section.college.toLowerCase().includes(searchTerm)) ||
-                (section.professorName && section.professorName.toLowerCase().includes(searchTerm))
-            );
-            
-            renderFilteredSections(filteredSections);
-        };
-
-        // Render filtered sections
-        function renderFilteredSections(filteredSections) {
-            const tbody = document.getElementById('sectionsTableBody');
-            
-            if (filteredSections.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center py-4">
-                            <div class="text-muted">No sections match your search.</div>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            let html = '';
-            filteredSections.forEach(section => {
-                html += `
-                    <tr>
-                        <td>${section.name || 'N/A'}</td>
-                        <td>${section.college || 'N/A'}</td>
-                        <td>${section.professorName || 'Unassigned'}</td>
-                        <td>${section.studentCount || 0}</td>
-                        <td>${section.academicYear || 'N/A'}</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td>
-                            <div class="action-buttons-small">
-                                <button class="btn-small" style="background: #3b82f6; color: white;" onclick="showAssignProfessorModal('${section.id}')">
-                                    <i class="fas fa-user-tie"></i> Assign
-                                </button>
-                                <button class="btn-small" style="background: #dc2626; color: white;" onclick="deleteSection('${section.id}')">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tbody.innerHTML = html;
-        }
-
-        // Delete section
-        window.deleteSection = async function(id) {
-            if (!confirm('⚠️ Are you sure you want to delete this section?\n\nThis action cannot be undone.')) {
-                return;
-            }
-
-            try {
-                console.log('Deleting section:', id);
-                await deleteDoc(doc(db, 'sections', id));
-                
-                showAlert('sectionAlert', '✅ Section deleted successfully!', 'success');
-                await loadSections();
-                await loadDashboardStats();
-                
-            } catch (error) {
-                console.error('Error deleting section:', error);
-                showAlert('sectionAlert', `❌ Error deleting section: ${error.message}`, 'error');
-            }
-        };
-
-        // Show assign professor modal
-        window.showAssignProfessorModal = function(sectionId) {
-            currentSectionToAssign = sections.find(s => s.id === sectionId);
-            if (!currentSectionToAssign) return;
-
-            document.getElementById('assignSectionName').textContent = currentSectionToAssign.name;
-            updateProfessorDropdown();
-            document.getElementById('assignProfessorModal').style.display = 'flex';
-        };
-
-        // Update professor dropdown
-        function updateProfessorDropdown() {
-            const professorSelect = document.getElementById('assignProfessorSelect');
-            professorSelect.innerHTML = '<option value="">Select Professor</option>';
-            
-            professors.forEach(professor => {
+            roleFilter.innerHTML = '<option value="all">All Roles</option>';
+            sortedRoles.forEach(role => {
                 const option = document.createElement('option');
-                option.value = professor.id;
-                option.setAttribute('data-email', professor.email);
-                option.setAttribute('data-name', professor.name || professor.displayName);
-                option.textContent = `${professor.name || professor.displayName} (${professor.college || 'No College'})`;
-                professorSelect.appendChild(option);
+                option.value = role;
+                option.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+                roleFilter.appendChild(option);
             });
+            
+            roleFilter.value = currentValue;
         }
 
-        // Close assign professor modal
-        window.closeAssignProfessorModal = function() {
-            document.getElementById('assignProfessorModal').style.display = 'none';
-            currentSectionToAssign = null;
-        };
-
-        // Assign professor to section
-      // Assign professor to section - FIXED VERSION
-window.assignProfessorToSection = async function() {
-    const professorSelect = document.getElementById('assignProfessorSelect');
-    const professorId = professorSelect.value;
-    
-    if (!professorId || !currentSectionToAssign) {
-        alert('❌ Please select a professor.');
-        return;
-    }
-
-    try {
-        const selectedOption = professorSelect.options[professorSelect.selectedIndex];
-        const professorEmail = selectedOption.getAttribute('data-email');
-        const professorName = selectedOption.getAttribute('data-name');
-        
-        console.log('=== ASSIGNING PROFESSOR ===');
-        console.log('Professor ID:', professorId);
-        console.log('Section:', currentSectionToAssign.name);
-        console.log('Section data:', currentSectionToAssign);
-
-        // Make sure college field is defined
-        const sectionCollege = currentSectionToAssign.college || 'Not Specified';
-        
-        // Update section with professor info
-        const sectionRef = doc(db, 'sections', currentSectionToAssign.id);
-        await updateDoc(sectionRef, {
-            professorId: professorId,
-            professorEmail: professorEmail,
-            professorName: professorName,
-            updatedAt: serverTimestamp()
-        });
-        console.log('✓ Section updated');
-
-        // Update professor with section info
-        const professorRef = doc(db, 'users', professorId);
-        const professorDoc = await getDoc(professorRef);
-        
-        if (professorDoc.exists()) {
-            const currentData = professorDoc.data();
-            const currentSections = currentData.assignedSections || [];
+        function renderAccountsTable() {
+            const tbody = document.getElementById('accountsTableBody');
+            if (!tbody) return;
             
-            // Add section name if not already in the array
-            if (!currentSections.includes(currentSectionToAssign.name)) {
-                currentSections.push(currentSectionToAssign.name);
+            if (filteredAccounts.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <div class="text-muted">No accounts found.</div>
+                        </td>
+                    </tr>
+                `;
+                return;
             }
             
-            // Prepare update data
-            const updateData = {
-                assignedSections: currentSections,
-                assignedClass: currentSectionToAssign.name,
-                updatedAt: serverTimestamp()
+            let html = '';
+            filteredAccounts.forEach(account => {
+                const displayName = account.name && account.name !== 'N/A' ? account.name : 
+                                   (account.email !== 'N/A' ? account.email.split('@')[0] : 'Unknown User');
+                
+                const roleDisplay = account.role ? 
+                    account.role.charAt(0).toUpperCase() + account.role.slice(1) : 'Unknown';
+                
+                let roleBadgeClass = 'badge bg-secondary';
+                switch(account.role) {
+                    case 'dean': roleBadgeClass = 'badge bg-danger'; break;
+                    case 'professor': roleBadgeClass = 'badge bg-warning text-dark'; break;
+                    case 'secretary': roleBadgeClass = 'badge bg-info'; break;
+                    case 'student': roleBadgeClass = 'badge bg-success'; break;
+                    default: roleBadgeClass = 'badge bg-secondary';
+                }
+                
+                html += `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                                    ${displayName.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600;">${displayName}</div>
+                                    <div style="font-size: 12px; color: #6b7280;">${account.email}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${account.email}</td>
+                        <td>
+                            <span class="${roleBadgeClass}" style="font-size: 11px; padding: 4px 8px; border-radius: 12px;">
+                                ${roleDisplay}
+                            </span>
+                        </td>
+                        <td>${account.college}</td>
+                        <td>
+                            <span class="status-badge ${account.status === 'active' ? 'status-active' : 'status-inactive'}">
+                                ${account.status}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons-small">
+                                <button class="btn-small btn-edit" onclick="showEditRoleModal('${account.id}', '${account.docId}', '${displayName.replace(/'/g, "\\'")}', '${account.email.replace(/'/g, "\\'")}', '${account.role}')">
+                                    <i class="fas fa-edit"></i> Edit Role
+                                </button>
+                                ${account.status === 'active' ? 
+                                    `<button class="btn-small btn-deactivate" onclick="toggleAccountStatus('${account.docId}', 'inactive')">
+                                        <i class="fas fa-ban"></i> Deactivate
+                                    </button>` : 
+                                    `<button class="btn-small btn-activate" onclick="toggleAccountStatus('${account.docId}', 'active')">
+                                        <i class="fas fa-check"></i> Activate
+                                    </button>`
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        function updateTotalAccountsCount() {
+            document.getElementById('totalAccountsCount').textContent = allAccounts.length;
+        }
+
+        window.refreshAccounts = function() {
+            showAlert('accountAlert', 'Refreshing account data...', 'success');
+            loadAllAccounts();
+        };
+
+        window.filterAccounts = function() {
+            const searchTerm = document.getElementById('searchAccounts')?.value.toLowerCase() || '';
+            const roleFilter = document.getElementById('roleFilter')?.value || 'all';
+            
+            filteredAccounts = allAccounts.filter(account => {
+                const matchesSearch = account.name.toLowerCase().includes(searchTerm) ||
+                                    account.email.toLowerCase().includes(searchTerm) ||
+                                    account.college.toLowerCase().includes(searchTerm);
+                
+                const matchesRole = roleFilter === 'all' || account.role === roleFilter;
+                
+                return matchesSearch && matchesRole;
+            });
+            
+            renderAccountsTable();
+        };
+
+        window.filterAccountsByRole = function() {
+            filterAccounts();
+        };
+
+        window.showEditRoleModal = function(userId, docId, userName, userEmail, currentRole) {
+            currentUserToEdit = { 
+                id: userId, 
+                docId: docId,
+                name: userName, 
+                email: userEmail, 
+                currentRole: currentRole 
             };
             
-            // Only add college if it has a value
-            if (sectionCollege && sectionCollege !== 'Not Specified') {
-                updateData.college = sectionCollege;
+            document.getElementById('editRoleUserName').textContent = userName;
+            document.getElementById('editRoleUserEmail').textContent = userEmail;
+            document.getElementById('editRoleCurrentRole').textContent = currentRole.charAt(0).toUpperCase() + currentRole.slice(1);
+            
+            const roleSelect = document.getElementById('editRoleSelect');
+            if (roleSelect) {
+                roleSelect.innerHTML = `
+                    <option value="">Select Role</option>
+                    <option value="dean" ${currentRole === 'dean' ? 'selected' : ''}>Dean</option>
+                    <option value="professor" ${currentRole === 'professor' ? 'selected' : ''}>Professor</option>
+                    <option value="secretary" ${currentRole === 'secretary' ? 'selected' : ''}>Secretary</option>
+                    <option value="student" ${currentRole === 'student' ? 'selected' : ''}>Student</option>
+                `;
             }
             
-            // Add totalStudents only if it exists in the section
-            if (currentSectionToAssign.studentCount !== undefined) {
-                updateData.totalStudents = currentSectionToAssign.studentCount;
+            document.getElementById('editRoleModal').style.display = 'flex';
+        };
+
+        window.closeEditRoleModal = function() {
+            document.getElementById('editRoleModal').style.display = 'none';
+            currentUserToEdit = null;
+        };
+
+        window.updateUserRole = async function() {
+            if (!currentUserToEdit) return;
+            
+            const newRole = document.getElementById('editRoleSelect')?.value;
+            if (!newRole) {
+                alert('Please select a role.');
+                return;
             }
             
-            await updateDoc(professorRef, updateData);
-            console.log('✓ Professor updated');
+            if (newRole === currentUserToEdit.currentRole) {
+                alert('This is already the current role.');
+                return;
+            }
+            
+            const roleDisplay = newRole.charAt(0).toUpperCase() + newRole.slice(1);
+            
+            if (!confirm(`Are you sure you want to change ${currentUserToEdit.name}'s role to ${roleDisplay}?`)) {
+                return;
+            }
+            
+            try {
+                const userRef = doc(db, 'users', currentUserToEdit.docId);
+                const userDoc = await getDoc(userRef);
+                
+                if (!userDoc.exists()) {
+                    const userRefAlt = doc(db, 'users', currentUserToEdit.id);
+                    const userDocAlt = await getDoc(userRefAlt);
+                    
+                    if (!userDocAlt.exists()) {
+                        throw new Error('User document not found');
+                    }
+                    
+                    await updateDoc(userRefAlt, {
+                        role: newRole,
+                        updatedAt: serverTimestamp()
+                    });
+                } else {
+                    await updateDoc(userRef, {
+                        role: newRole,
+                        updatedAt: serverTimestamp()
+                    });
+                }
+                
+                showAlert('accountAlert', `✅ Role updated successfully! ${currentUserToEdit.name} is now a ${roleDisplay}.`, 'success');
+                
+                closeEditRoleModal();
+                await loadAllAccounts();
+                await loadDashboardStats();
+                
+            } catch (error) {
+                console.error('Error updating role:', error);
+                showAlert('accountAlert', `❌ Error updating role: ${error.message}`, 'error');
+            }
+        };
+
+        window.toggleAccountStatus = async function(docId, newStatus) {
+            const account = allAccounts.find(a => a.docId === docId);
+            if (!account) return;
+            
+            const action = newStatus === 'active' ? 'activate' : 'deactivate';
+            const statusText = newStatus === 'active' ? 'active' : 'inactive';
+            
+            if (!confirm(`Are you sure you want to ${action} ${account.name || account.email}?`)) {
+                return;
+            }
+
+            try {
+                const userRef = doc(db, 'users', docId);
+                const userDoc = await getDoc(userRef);
+                
+                if (!userDoc.exists()) {
+                    const userRefAlt = doc(db, 'users', account.id);
+                    await updateDoc(userRefAlt, {
+                        status: newStatus,
+                        updatedAt: serverTimestamp()
+                    });
+                } else {
+                    await updateDoc(userRef, {
+                        status: newStatus,
+                        updatedAt: serverTimestamp()
+                    });
+                }
+
+                showAlert('accountAlert', `✅ Account ${action}d successfully! ${account.name || account.email} is now ${statusText}.`, 'success');
+                await loadAllAccounts();
+                await loadDashboardStats();
+                
+            } catch (error) {
+                console.error(`Error ${action}ing account:`, error);
+                showAlert('accountAlert', `❌ Error ${action}ing account: ${error.message}`, 'error');
+            }
+        };
+
+        // ==================== HELPER FUNCTIONS ====================
+
+        function showLoading(message = 'Processing...') {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.style.display = 'flex';
+                const loadingText = loadingScreen.querySelector('.loading-text');
+                if (loadingText) loadingText.textContent = message;
+            }
         }
 
-        console.log('=== ASSIGNMENT COMPLETE ===');
+        function hideLoading() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.style.display = 'none';
+            }
+        }
 
-        alert(`✅ SUCCESS!\n\nProfessor: ${professorName}\nAssigned to: ${currentSectionToAssign.name}\n\nSection: ${currentSectionToAssign.name}\nCollege: ${sectionCollege}\nSchool Year: ${currentSectionToAssign.academicYear || 'N/A'}\n\nProfessor can now see this section in their dashboard.`);
-        
-        closeAssignProfessorModal();
-        await loadSections();
-        
-    } catch (error) {
-        console.error('=== ERROR IN ASSIGNMENT ===');
-        console.error('Error:', error);
-        console.error('Section data:', currentSectionToAssign);
-        alert(`❌ Error assigning professor: ${error.message}\n\nCheck console for details.`);
-    }
-};
-
-        // Alert function
         function showAlert(alertId, message, type) {
             const alertDiv = document.getElementById(alertId);
+            if (!alertDiv) return;
+            
             alertDiv.className = `alert-message alert-${type}`;
             alertDiv.innerHTML = `
                 <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
@@ -3021,12 +4129,6 @@ window.assignProfessorToSection = async function() {
                 alertDiv.style.display = 'none';
             }, 5000);
         }
-        function updateTotalAccountsCount() {
-    document.getElementById('totalAccountsCount').textContent = allAccounts.length;
-}
-
-// Call this in loadAllAccounts after loading accounts:
-updateTotalAccountsCount();
     </script>
 </body>
 </html>
