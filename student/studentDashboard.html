@@ -960,24 +960,37 @@
 
         // Notification dropdown
         function toggleNotificationDropdown(event) {
-            event?.stopPropagation();
-            const isMobile = window.innerWidth < 1024;
-            const dropdown = isMobile ? notificationDropdownMobile : notificationDropdown;
-            
-            const isHidden = dropdown.classList.contains('hidden');
-            
-            if (isHidden) {
-                dropdown.classList.remove('hidden');
-                document.body.classList.add('dropdown-open');
-                loadNotificationDropdown();
-                updateNavNotificationCount(0);
-                closeProfileDropdown();
-            } else {
-                dropdown.classList.add('hidden');
-                document.body.classList.remove('dropdown-open');
-            }
-        }
-
+    event?.stopPropagation();
+    const isMobile = window.innerWidth < 1024;
+    const dropdown = isMobile ? 
+        document.getElementById('notificationDropdownMobile') : 
+        document.getElementById('notificationDropdown');
+    
+    if (dropdown.classList.contains('hidden')) {
+        dropdown.classList.remove('hidden');
+        loadNotificationDropdown(); // Use unified loader
+        // Close profile dropdowns
+        const profileDropdown = document.getElementById('profileDropdown');
+        const profileDropdownMobile = document.getElementById('profileDropdownMobile');
+        if (profileDropdown) profileDropdown.classList.add('hidden');
+        if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
+    } else {
+        dropdown.classList.add('hidden');
+    }
+}
+                function toggleNotificationDropdownMobile(event) {
+    event?.stopPropagation();
+    const dropdown = document.getElementById('notificationDropdownMobile');
+    
+    if (dropdown.classList.contains('hidden')) {
+        dropdown.classList.remove('hidden');
+        loadNotificationDropdown(); // Use unified function
+        const profileDropdownMobile = document.getElementById('profileDropdownMobile');
+        if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
+    } else {
+        dropdown.classList.add('hidden');
+    }
+}
         function closeNotificationDropdown() {
             notificationDropdown.classList.add('hidden');
             notificationDropdownMobile.classList.add('hidden');
@@ -2549,11 +2562,11 @@ async function loadUpcomingTests() {
         
         if (!dropdownBody) return;
 
-        if (!studentData || !studentData.section || studentData.section === 'Not Assigned') {
+        if (!studentData || !studentData.section) {
             dropdownBody.innerHTML = `
-                <div class="p-6 sm:p-8 text-center text-gray-400">
-                    <i class="bi bi-bell-slash text-4xl sm:text-5xl mb-3 block"></i>
-                    <p class="text-gray-600 text-sm">No section assigned</p>
+                <div class="p-8 text-center text-gray-400">
+                    <i class="bi bi-bell-slash text-5xl mb-3 block"></i>
+                    <p class="text-gray-600">No section assigned</p>
                 </div>
             `;
             return;
@@ -2568,10 +2581,16 @@ async function loadUpcomingTests() {
         const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
         
         if (!notificationsSnapshot.empty) {
-            const notifications = [];
+            // ⭐ FIXED: Use Map to prevent duplicates
+            const notificationsMap = new Map();
+            
             notificationsSnapshot.forEach(doc => {
-                notifications.push({ id: doc.id, ...doc.data() });
+                if (!notificationsMap.has(doc.id)) {
+                    notificationsMap.set(doc.id, { id: doc.id, ...doc.data() });
+                }
             });
+            
+            const notifications = Array.from(notificationsMap.values());
             
             notifications.sort((a, b) => {
                 const dateA = a.createdAt?.toDate?.() || new Date(0);
@@ -2580,7 +2599,7 @@ async function loadUpcomingTests() {
             });
             
             let html = '';
-            notifications.forEach(notification => {
+            notifications.slice(0, 5).forEach(notification => {
                 const createdDate = notification.createdAt?.toDate?.();
                 const dateStr = createdDate ? createdDate.toLocaleDateString('en-US', {
                     month: 'short',
@@ -2588,14 +2607,14 @@ async function loadUpcomingTests() {
                     hour: '2-digit',
                     minute: '2-digit'
                 }) : 'Recently';
-
+                
                 const isRead = readNotifications.includes(notification.id);
                 
                 html += `
-                    <div class="p-3 sm:p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${isRead ? 'bg-gray-50' : 'bg-white'}">
-                        <strong class="text-gray-900 text-xs sm:text-sm block mb-1 font-semibold">${notification.title || 'Notification'}</strong>
-                        <p class="text-gray-600 text-xs sm:text-sm mb-1 leading-relaxed">${notification.message || ''}</p>
-                        <small class="text-gray-400 text-[10px] sm:text-xs">${dateStr}</small>
+                    <div class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${isRead ? 'bg-gray-50' : 'bg-white'}">
+                        <strong class="text-gray-900 text-sm block mb-1 font-semibold">${notification.title || 'Notification'}</strong>
+                        <p class="text-gray-600 text-sm mb-1 leading-relaxed">${notification.message || ''}</p>
+                        <small class="text-gray-400 text-xs">${dateStr}</small>
                     </div>
                 `;
             });
@@ -2604,31 +2623,37 @@ async function loadUpcomingTests() {
             markAllNotificationsAsRead(notifications.map(n => n.id));
         } else {
             dropdownBody.innerHTML = `
-                <div class="p-6 sm:p-8 text-center text-gray-400">
-                    <i class="bi bi-bell-slash text-4xl sm:text-5xl mb-3 block"></i>
-                    <p class="text-gray-600 text-sm">No notifications yet</p>
+                <div class="p-8 text-center text-gray-400">
+                    <i class="bi bi-bell-slash text-5xl mb-3 block"></i>
+                    <p class="text-gray-600">No notifications yet</p>
                 </div>
             `;
         }
     } catch (error) {
-        console.error('Error loading notification dropdown:', error);
+        console.error('Error loading notifications:', error);
     }
 }
-        function markAllNotificationsAsRead(notificationIds) {
+
+function markAllNotificationsAsRead(notificationIds) {
     if (!studentData || !studentData.email) return;
     
     const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
+    // ⭐ Use Set to ensure unique IDs
     const updatedReadNotifications = [...new Set([...readNotifications, ...notificationIds])];
     localStorage.setItem(`readNotifications_${studentData.email}`, JSON.stringify(updatedReadNotifications));
     
-    // Hide badges immediately
-    updateNavNotificationCount(0);
+    // Update BOTH badges
+    const countBadge = document.getElementById('navNotificationCount');
+    const countBadgeMobile = document.getElementById('navNotificationCountMobile');
+    
+    if (countBadge) countBadge.classList.add('hidden');
+    if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
 }
 
 // Check for unread notifications on load
 async function checkUnreadNotifications() {
     try {
-        if (!studentData || !studentData.section || studentData.section === 'Not Assigned') return;
+        if (!studentData || !studentData.section) return;
 
         const notificationsQuery = query(
             collection(db, 'notifications'),
@@ -2638,14 +2663,36 @@ async function checkUnreadNotifications() {
         const notificationsSnapshot = await getDocs(notificationsQuery);
         const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
         
-        let unreadCount = 0;
+        // ⭐ Use Set to count unique unread notifications
+        const uniqueUnreadNotifications = new Set();
+        
         notificationsSnapshot.forEach(doc => {
             if (!readNotifications.includes(doc.id)) {
-                unreadCount++;
+                uniqueUnreadNotifications.add(doc.id);
             }
         });
         
-        updateNavNotificationCount(unreadCount);
+        const unreadCount = uniqueUnreadNotifications.size;
+        
+        // Update BOTH badges with same count
+        const countBadge = document.getElementById('navNotificationCount');
+        const countBadgeMobile = document.getElementById('navNotificationCountMobile');
+        
+        if (unreadCount > 0) {
+            if (countBadge) {
+                countBadge.textContent = unreadCount;
+                countBadge.classList.remove('hidden');
+            }
+            if (countBadgeMobile) {
+                countBadgeMobile.textContent = unreadCount;
+                countBadgeMobile.classList.remove('hidden');
+            }
+        } else {
+            if (countBadge) countBadge.classList.add('hidden');
+            if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
+        }
+        
+        console.log('📬 Unread notifications:', unreadCount);
     } catch (error) {
         console.error('Error checking unread notifications:', error);
     }

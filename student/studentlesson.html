@@ -768,40 +768,48 @@
                 }
 
                 // Toggle notification dropdown (Desktop)
-                function toggleNotificationDropdown(event) {
-                    event?.stopPropagation();
-                    const dropdown = document.getElementById('notificationDropdown');
-                    const profileDropdown = document.getElementById('profileDropdown');
+                async function toggleNotificationDropdown(event) {
+                event?.stopPropagation();
+                const dropdown = document.getElementById('notificationDropdown');
+                const profileDropdown = document.getElementById('profileDropdown');
+                
+                if (dropdown.classList.contains('hidden')) {
+                    dropdown.classList.remove('hidden');
+                    profileDropdown.classList.add('hidden');
+                    loadNotificationDropdown();
                     
-                    if (dropdown.classList.contains('hidden')) {
-                        dropdown.classList.remove('hidden');
-                        profileDropdown.classList.add('hidden');
-                        loadNotificationDropdown();
-                        setTimeout(() => {
-                            document.addEventListener('click', closeOnClickOutside);
-                        }, 100);
-                    } else {
-                        dropdown.classList.add('hidden');
-                    }
+                    // Mark notifications as read and hide badge
+                    markNotificationsAsRead();
+                    
+                    setTimeout(() => {
+                        document.addEventListener('click', closeOnClickOutside);
+                    }, 100);
+                } else {
+                    dropdown.classList.add('hidden');
                 }
+            }
 
                 // Toggle notification dropdown (Mobile)
-                function toggleMobileNotificationDropdown(event) {
-                    event?.stopPropagation();
-                    const dropdown = document.getElementById('notificationDropdownMobile');
-                    const profileDropdown = document.getElementById('profileDropdownMobile');
+                async function toggleMobileNotificationDropdown(event) {
+                event?.stopPropagation();
+                const dropdown = document.getElementById('notificationDropdownMobile');
+                const profileDropdown = document.getElementById('profileDropdownMobile');
+                
+                if (dropdown.classList.contains('hidden')) {
+                    dropdown.classList.remove('hidden');
+                    profileDropdown.classList.add('hidden');
+                    loadNotificationDropdown(true);
                     
-                    if (dropdown.classList.contains('hidden')) {
-                        dropdown.classList.remove('hidden');
-                        profileDropdown.classList.add('hidden');
-                        loadNotificationDropdown(true);
-                        setTimeout(() => {
-                            document.addEventListener('click', closeOnClickOutside);
-                        }, 100);
-                    } else {
-                        dropdown.classList.add('hidden');
-                    }
+                    // Mark notifications as read and hide badge
+                    markNotificationsAsRead();
+                    
+                    setTimeout(() => {
+                        document.addEventListener('click', closeOnClickOutside);
+                    }, 100);
+                } else {
+                    dropdown.classList.add('hidden');
                 }
+            }
 
                 window.closeNotificationDropdown = function() {
                     document.getElementById('notificationDropdown').classList.add('hidden');
@@ -810,7 +818,24 @@
                 window.closeMobileNotificationDropdown = function() {
                     document.getElementById('notificationDropdownMobile').classList.add('hidden');
                 }
-
+                    function markNotificationsAsRead() {
+                if (!studentData || !studentData.section) return;
+                
+                // Store the current timestamp as last checked time
+                const readKey = `notifications_lastChecked_${studentData.section}_${currentUser?.email}`;
+                localStorage.setItem(readKey, new Date().toISOString());
+                
+                // Hide both desktop and mobile badges immediately
+                const desktopBadge = document.getElementById('navNotificationCount');
+                const mobileBadge = document.getElementById('navNotificationCountMobile');
+                
+                if (desktopBadge) {
+                    desktopBadge.classList.add('hidden');
+                }
+                if (mobileBadge) {
+                    mobileBadge.classList.add('hidden');
+                }
+            }
                 // Toggle profile dropdown (Desktop)
                 function toggleProfileDropdown(event) {
                     event?.stopPropagation();
@@ -876,61 +901,126 @@
 
                 // Load notification dropdown
                 async function loadNotificationDropdown(isMobile = false) {
-                    try {
-                        if (!studentData || !studentData.section) return;
+            try {
+                if (!studentData || !studentData.section) return 0;
 
-                        const notificationsQuery = query(
-                            collection(db, 'notifications'),
-                            where('section', '==', studentData.section)
-                        );
+                const notificationsQuery = query(
+                    collection(db, 'notifications'),
+                    where('section', '==', studentData.section)
+                );
+                
+                const notificationsSnapshot = await getDocs(notificationsQuery);
+                const dropdownBody = document.getElementById(isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody');
+                
+                const notificationCount = notificationsSnapshot.size;
+                
+                if (!notificationsSnapshot.empty) {
+                    const notifications = [];
+                    notificationsSnapshot.forEach(doc => {
+                        notifications.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    notifications.sort((a, b) => {
+                        const dateA = a.createdAt?.toDate?.() || new Date(0);
+                        const dateB = b.createdAt?.toDate?.() || new Date(0);
+                        return dateB - dateA;
+                    });
+                    
+                    let html = '';
+                    notifications.slice(0, 5).forEach(notification => {
+                        const createdDate = notification.createdAt?.toDate?.();
+                        const dateStr = createdDate ? createdDate.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) : 'Recently';
                         
-                        const notificationsSnapshot = await getDocs(notificationsQuery);
-                        const dropdownBody = document.getElementById(isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody');
-                        
-                        if (!notificationsSnapshot.empty) {
-                            const notifications = [];
-                            notificationsSnapshot.forEach(doc => {
-                                notifications.push({ id: doc.id, ...doc.data() });
-                            });
-                            
-                            notifications.sort((a, b) => {
-                                const dateA = a.createdAt?.toDate?.() || new Date(0);
-                                const dateB = b.createdAt?.toDate?.() || new Date(0);
-                                return dateB - dateA;
-                            });
-                            
-                            let html = '';
-                            notifications.slice(0, 5).forEach(notification => {
-                                const createdDate = notification.createdAt?.toDate?.();
-                                const dateStr = createdDate ? createdDate.toLocaleDateString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                }) : 'Recently';
-                                
-                                html += `
-                                    <div class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer">
-                                        <strong class="text-gray-900 text-sm block mb-1 font-semibold">${notification.title || 'Notification'}</strong>
-                                        <p class="text-gray-600 text-sm mb-1 leading-relaxed">${notification.message || ''}</p>
-                                        <small class="text-gray-400 text-xs">${dateStr}</small>
-                                    </div>
-                                `;
-                            });
-                            
-                            dropdownBody.innerHTML = html;
-                        } else {
-                            dropdownBody.innerHTML = `
-                                <div class="p-8 text-center text-gray-400">
-                                    <i class="bi bi-bell-slash text-5xl mb-3 block"></i>
-                                    <p class="text-gray-600">No notifications yet</p>
-                                </div>
-                            `;
-                        }
-                    } catch (error) {
-                        console.error('Error loading notifications:', error);
-                    }
+                        html += `
+                            <div class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer">
+                                <strong class="text-gray-900 text-sm block mb-1 font-semibold">${notification.title || 'Notification'}</strong>
+                                <p class="text-gray-600 text-sm mb-1 leading-relaxed">${notification.message || ''}</p>
+                                <small class="text-gray-400 text-xs">${dateStr}</small>
+                            </div>
+                        `;
+                    });
+                    
+                    dropdownBody.innerHTML = html;
+                } else {
+                    dropdownBody.innerHTML = `
+                        <div class="p-8 text-center text-gray-400">
+                            <i class="bi bi-bell-slash text-5xl mb-3 block"></i>
+                            <p class="text-gray-600">No notifications yet</p>
+                        </div>
+                    `;
                 }
+                
+                return notificationCount;
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+                return 0;
+            }
+        }
+                async function updateNotificationCount() {
+    try {
+        if (!studentData || !studentData.section) return;
+
+        // Get last checked timestamp
+        const readKey = `notifications_lastChecked_${studentData.section}_${currentUser?.email}`;
+        const lastCheckedStr = localStorage.getItem(readKey);
+        const lastChecked = lastCheckedStr ? new Date(lastCheckedStr) : null;
+
+        const notificationsQuery = query(
+            collection(db, 'notifications'),
+            where('section', '==', studentData.section)
+        );
+        
+        const notificationsSnapshot = await getDocs(notificationsQuery);
+        
+        // Count only NEW notifications (created after last check)
+        let newCount = 0;
+        notificationsSnapshot.forEach(doc => {
+            const notification = doc.data();
+            const createdAt = notification.createdAt?.toDate?.();
+            
+            // If never checked before, OR notification is newer than last check
+            if (!lastChecked || (createdAt && createdAt > lastChecked)) {
+                newCount++;
+            }
+        });
+        
+        // Update desktop notification count
+        const desktopBadge = document.getElementById('navNotificationCount');
+        if (desktopBadge) {
+            if (newCount > 0) {
+                desktopBadge.textContent = newCount;
+                desktopBadge.classList.remove('hidden');
+            } else {
+                desktopBadge.classList.add('hidden');
+            }
+        }
+        
+        // Update mobile notification count
+        const mobileBadge = document.getElementById('navNotificationCountMobile');
+        if (mobileBadge) {
+            if (newCount > 0) {
+                mobileBadge.textContent = newCount;
+                mobileBadge.classList.remove('hidden');
+            } else {
+                mobileBadge.classList.add('hidden');
+            }
+        }
+    } catch (error) {
+        console.error('Error updating notification count:', error);
+    }
+}
+            function resetNotificationReadStatus() {
+    if (!studentData || !studentData.section) return;
+    
+    const readKey = `notifications_read_${studentData.section}_${currentUser?.email}`;
+    localStorage.removeItem(readKey);
+    updateNotificationCount();
+}
                     // Hamburger Menu and Drawer functionality
                 const hamburger = document.getElementById('hamburger');
                 const mobileDrawer = document.getElementById('mobileDrawer');
@@ -1202,6 +1292,7 @@ function formatFileSize(bytes) {
                 currentUser = user;
                 await loadStudentData(user);
                 updateProfileUI();
+                await updateNotificationCount();
                 await loadLessons();
             } else {
                 window.location.href = '../login/index.html';
