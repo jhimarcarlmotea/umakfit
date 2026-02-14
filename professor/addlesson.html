@@ -1986,43 +1986,39 @@
             }
         }
 
-        async function createLessonNotification(lessonData, lessonId) {
-            try {
-                const sectionInfo = assignedSections.find(s => s.section === lessonData.section);
-                
-                if (!sectionInfo || !sectionInfo.studentList || sectionInfo.studentList.length === 0) {
-                    console.log('No students found in section');
-                    return;
-                }
-                
-                console.log(`Creating notifications for ${sectionInfo.studentList.length} students in ${lessonData.section}`);
-                
-                const notificationPromises = sectionInfo.studentList.map(student => {
-                    const notificationData = {
-                        type: 'new_lesson',
-                        title: `New Lesson: ${lessonData.title}`,
-                        message: `A new ${lessonData.type} lesson "${lessonData.title}" has been published for ${lessonData.section}.`,
-                        section: lessonData.section,
-                        lessonId: lessonId,
-                        lessonTitle: lessonData.title,
-                        professorEmail: currentProfessor.email,
-                        studentEmail: student.email,
-                        studentId: student.studentId || student.uid || student.email,
-                        isRead: false,
-                        createdAt: serverTimestamp()
-                    };
-                    
-                    return addDoc(collection(db, 'notifications'), notificationData);
-                });
-                
-                await Promise.all(notificationPromises);
-                console.log(`✓ Successfully created ${notificationPromises.length} notifications`);
-                
-            } catch (error) {
-                console.error('Error creating notifications:', error);
-                alert('Lesson saved but failed to create some notifications. Students may not be notified.');
-            }
+    async function createLessonNotification(lessonData, lessonId) {
+    try {
+        const sectionInfo = assignedSections.find(s => s.section === lessonData.section);
+        
+        if (!sectionInfo || !sectionInfo.studentList || sectionInfo.studentList.length === 0) {
+            console.log('No students found in section');
+            return;
         }
+        
+        console.log(`Creating notification for section ${lessonData.section} with ${sectionInfo.studentList.length} students`);
+        
+        // ✅ FIX: Create ONE notification for the SECTION, not per student
+        const notificationData = {
+            type: 'new_lesson',
+            title: `New Lesson: ${lessonData.title}`,
+            message: `A new ${lessonData.type} lesson "${lessonData.title}" has been published for ${lessonData.section}.`,
+            section: lessonData.section,
+            lessonId: lessonId,
+            lessonTitle: lessonData.title,
+            professorEmail: currentProfessor.email,
+            isRead: false,
+            createdAt: serverTimestamp()
+        };
+        
+        // Create only ONE notification document
+        await addDoc(collection(db, 'notifications'), notificationData);
+        console.log(`✓ Successfully created 1 notification for section ${lessonData.section}`);
+        
+    } catch (error) {
+        console.error('Error creating notification:', error);
+        alert('Lesson saved but failed to create notification. Students may not be notified.');
+    }
+}
 
         async function editLesson(lessonId) {
             try {

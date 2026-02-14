@@ -16,6 +16,30 @@
             100% { transform: rotate(360deg); }
         }
         
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-down {
+            animation: slideDown 0.3s ease;
+        }
+        
         .spinner {
             border: 4px solid #e5e7eb;
             border-top: 4px solid #3b82f6;
@@ -24,7 +48,8 @@
             height: 50px;
             animation: spin 1s linear infinite;
         }
-        /* Scrollbar styling for test results */
+
+        /* Scrollbar styling */
         #testResultsContainer::-webkit-scrollbar {
             width: 8px;
         }
@@ -43,13 +68,135 @@
             background: #94a3b8;
         }
 
-        /* Mobile scroll optimization */
-        @media (max-width: 768px) {
-            #testResultsContainer {
-                -webkit-overflow-scrolling: touch;
+        /* Notification Styles */
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 0.15rem 0.4rem;
+            border-radius: 10px;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            width: 24rem;
+            max-width: calc(100vw - 2rem);
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            z-index: 9999;
+            max-height: 480px;
+            overflow-y: auto;
+            animation: slideDown 0.3s ease;
+        }
+
+        .notification-dropdown-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 2px solid #e5e7eb;
+            background: linear-gradient(135deg, #f8fafc, #ffffff);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 0.75rem 0.75rem 0 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        @media (min-width: 640px) {
+            .notification-dropdown-header {
+                padding: 1rem 1.25rem;
             }
         }
-            /* Hamburger Menu Styles */
+
+        .notification-dropdown-body {
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .notification-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item strong {
+            color: #111827;
+            font-size: 0.875rem;
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .notification-item p {
+            color: #6b7280;
+            font-size: 0.8125rem;
+            margin-bottom: 0.25rem;
+            line-height: 1.5;
+        }
+
+        .notification-item small {
+            color: #9ca3af;
+            font-size: 0.6875rem;
+            display: block;
+        }
+
+        .notification-dropdown-footer {
+            padding: 0.5rem 0.75rem;
+            border-top: 2px solid #e5e7eb;
+            background-color: #f9fafb;
+            border-radius: 0 0 0.75rem 0.75rem;
+            position: sticky;
+            bottom: 0;
+        }
+
+        @media (min-width: 640px) {
+            .notification-dropdown-footer {
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        .notification-empty {
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        .notification-empty i {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .notification-empty p {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        /* Hamburger Menu Styles */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -114,6 +261,19 @@
             visibility: visible;
         }
 
+        /* Mobile scroll optimization */
+        @media (max-width: 768px) {
+            #testResultsContainer {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .notification-dropdown {
+                width: calc(100vw - 2rem);
+                right: 0;
+                left: auto;
+            }
+        }
+
         @media (max-width: 1023px) {
             .hamburger {
                 display: flex;
@@ -170,29 +330,34 @@
                     <span class="hidden xl:inline">Achievements</span>
                 </a>
                 
-                <!-- Notification Bell -->
+                <!-- Notification Bell - Desktop -->
                 <div class="relative">
                     <button id="notificationBellBtn" 
                             class="w-9 h-9 xl:w-10 xl:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
                         <i class="bi bi-bell-fill text-base xl:text-lg"></i>
-                        <span id="navNotificationCount" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-4.5 flex items-center justify-center">0</span>
+                        <span id="navNotificationCount" class="notification-badge hidden">0</span>
                     </button>
                     
-                    <!-- Notification Dropdown -->
-                    <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl z-[9999] max-h-[480px] overflow-y-auto">
-                        <div class="p-3 sm:p-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center rounded-t-xl sticky top-0 z-10">
+                    <!-- Notification Dropdown - Desktop -->
+                    <div id="notificationDropdown" class="notification-dropdown hidden">
+                        <div class="notification-dropdown-header">
                             <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
                                 <i class="bi bi-bell-fill text-blue-500"></i> Notifications
                             </h6>
-                            <button onclick="closeNotificationDropdown()" class="text-gray-400 hover:text-gray-600 p-1">
+                            <button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600 p-1 transition-colors">
                                 <i class="bi bi-x-lg"></i>
                             </button>
                         </div>
-                        <div id="notificationDropdownBody" class="max-h-96 overflow-y-auto">
-                            <div class="p-6 sm:p-8 text-center text-gray-400">
-                                <i class="bi bi-bell-slash text-4xl sm:text-5xl mb-3 block"></i>
-                                <p class="text-gray-600 text-sm sm:text-base">No notifications yet</p>
+                        <div id="notificationDropdownBody" class="notification-dropdown-body">
+                            <div class="notification-empty">
+                                <i class="bi bi-bell-slash"></i>
+                                <p>No notifications yet</p>
                             </div>
+                        </div>
+                        <div class="notification-dropdown-footer">
+                            <button onclick="window.location.href='./notifications.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
+                                View All Notifications
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -202,7 +367,7 @@
                     <img src="" alt="Profile" id="profilePictureBtn"
                          class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
                     
-                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999]">
+                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
                         <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
                             <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
                             <h6 id="profileDropdownName" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
@@ -224,212 +389,220 @@
             </div>
             
             <!-- Mobile Right Icons -->
-<div class="flex lg:hidden items-center gap-2 sm:gap-3">
-    <!-- Mobile Notification Bell -->
-    <div class="relative">
-        <button id="notificationBellBtnMobile" 
-                class="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
-            <i class="bi bi-bell-fill text-base sm:text-lg"></i>
-            <span id="navNotificationCountMobile" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-4.5 flex items-center justify-center">0</span>
-        </button>
-        
-        <!-- Mobile Notification Dropdown -->
-        <div id="notificationDropdownMobile" class="hidden fixed right-2 top-20 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl z-[9999] max-h-[480px] overflow-y-auto">
-            <div class="p-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center rounded-t-xl sticky top-0 z-10">
-                <h6 class="font-bold text-gray-900 text-base flex items-center gap-2">
-                    <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                </h6>
-                <button onclick="closeNotificationDropdownMobile()" class="text-gray-400 hover:text-gray-600 p-1">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-            <div id="notificationDropdownBodyMobile" class="max-h-96 overflow-y-auto">
-                <div class="p-8 text-center text-gray-400">
-                    <i class="bi bi-bell-slash text-5xl mb-3 block"></i>
-                    <p class="text-gray-600">No notifications yet</p>
+            <div class="flex lg:hidden items-center gap-2 sm:gap-3">
+                <!-- Mobile Notification Bell -->
+                <div class="relative">
+                    <button id="notificationBellBtnMobile" 
+                            class="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
+                        <i class="bi bi-bell-fill text-base sm:text-lg"></i>
+                        <span id="navNotificationCountMobile" class="notification-badge hidden">0</span>
+                    </button>
+                    
+                    <!-- Mobile Notification Dropdown -->
+                    <div id="notificationDropdownMobile" class="notification-dropdown hidden fixed right-2 left-2 top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
+                        <div class="notification-dropdown-header">
+                            <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
+                                <i class="bi bi-bell-fill text-blue-500"></i> Notifications
+                            </h6>
+                            <button id="closeNotificationBtnMobile" class="text-gray-400 hover:text-gray-600 p-1 transition-colors">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        <div id="notificationDropdownBodyMobile" class="notification-dropdown-body">
+                            <div class="notification-empty">
+                                <i class="bi bi-bell-slash"></i>
+                                <p>No notifications yet</p>
+                            </div>
+                        </div>
+                        <div class="notification-dropdown-footer">
+                            <button onclick="window.location.href='./notifications.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
+                                View All Notifications
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile Profile -->
+                <div class="relative">
+                    <img src="" alt="Profile" id="profilePictureBtnMobile" onclick="toggleProfileDropdown()"
+                         class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
+                    
+                    <!-- Mobile Profile Dropdown -->
+                    <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                        <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
+                            <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                            <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
+                            <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
+                        </div>
+                        <div class="p-2">
+                            <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
+                                <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
+                            </a>
+                            <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
+                            <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
+                                <span class="font-medium text-sm sm:text-base">Logout</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hamburger Menu Button -->
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Mobile Profile -->
-    <div class="relative">
-        <img src="" alt="Profile" id="profilePictureBtnMobile" onclick="toggleProfileDropdown()"
-             class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
-        
-        <!-- Mobile Profile Dropdown -->
-        <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-            <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
-                <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
-                <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
-            </div>
-            <div class="p-2">
-                <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                    <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-                    <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-                </a>
-                <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
-                    <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
-                    <span class="font-medium text-sm sm:text-base">Logout</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Hamburger Menu Button -->
-    <div class="hamburger" id="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-</div>
 </nav>
         
         <!-- Mobile Drawer Overlay -->
-<div class="drawer-overlay" id="drawerOverlay"></div>
+        <div class="drawer-overlay" id="drawerOverlay"></div>
 
-<!-- Mobile Drawer -->
-<div class="mobile-drawer" id="mobileDrawer">
-    <div class="p-6 pt-8">
-        <!-- Drawer Header -->
-        <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
-            <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
-                 alt="UMak Logo" class="h-12 w-auto object-contain">
-            <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                UMakFIT
-            </span>
+        <!-- Mobile Drawer -->
+        <div class="mobile-drawer" id="mobileDrawer">
+            <div class="p-6 pt-8">
+                <!-- Drawer Header -->
+                <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
+                    <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
+                         alt="UMak Logo" class="h-12 w-auto object-contain">
+                    <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                        UMakFIT
+                    </span>
+                </div>
+
+                <nav class="space-y-2">
+                    <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                        <i class="bi bi-speedometer2 mr-3"></i>Dashboard
+                    </a>
+                    <a href="./test.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                        <i class="bi bi-clipboard-check mr-3"></i>Test
+                    </a>
+                    <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                        <i class="bi bi-book mr-3"></i>Lessons
+                    </a>
+                    <a href="./studentgrades.html" class="mobile-nav-link block text-white bg-white/10 font-semibold py-3 px-4 rounded-lg transition-all">
+                        <i class="bi bi-award mr-3"></i>Grades
+                    </a>
+                    <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                        <i class="bi bi-graph-up mr-3"></i>Progress
+                    </a>
+                    <a href="./achievements.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                        <i class="bi bi-trophy mr-3"></i>Achievements
+                    </a>
+                </nav>
+            </div>
         </div>
-
-        <nav class="space-y-2">
-            <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                <i class="bi bi-speedometer2 mr-3"></i>Dashboard
-            </a>
-            <a href="./test.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                <i class="bi bi-clipboard-check mr-3"></i>Test
-            </a>
-            <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                <i class="bi bi-book mr-3"></i>Lessons
-            </a>
-            <a href="./studentgrades.html" class="mobile-nav-link block text-white bg-white/10 font-semibold py-3 px-4 rounded-lg transition-all">
-                <i class="bi bi-award mr-3"></i>Grades
-            </a>
-            <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                <i class="bi bi-graph-up mr-3"></i>Progress
-            </a>
-            <a href="./achievements.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                <i class="bi bi-trophy mr-3"></i>Achievements
-            </a>
-        </nav>
-    </div>
-</div>
 
         <!-- Main Content -->
         <div class="container mx-auto px-4 py-8 max-w-7xl">
             <!-- Page Header -->
-<div class="relative mb-4 sm:mb-8">
-    <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-        <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-            <i class="bi bi-award-fill text-lg sm:text-xl md:text-2xl text-white"></i>
-        </div>
-        <h1 class="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent leading-tight">
-            My Grades
-        </h1>
-    </div>
-    <p class="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl pl-0 sm:pl-14">
-        Track your test scores and overall academic performance.
-    </p>
-</div>
+            <div class="relative mb-4 sm:mb-8">
+                <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                        <i class="bi bi-award-fill text-lg sm:text-xl md:text-2xl text-white"></i>
+                    </div>
+                    <h1 class="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent leading-tight">
+                        My Grades
+                    </h1>
+                </div>
+                <p class="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl pl-0 sm:pl-14">
+                    Track your test scores and overall academic performance.
+                </p>
+            </div>
 
             <!-- Overall Summary -->
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
-    <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
-    <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-        <i class="bi bi-graph-up-arrow text-white text-xl"></i>
-    </div>
-    <div>
-        <h2 class="text-2xl font-bold text-gray-900">Performance Overview</h2>
-        <p class="text-sm text-gray-500">Your overall performance summary</p>
-    </div>
-</div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-       <div class="text-center md:text-left">
-            <p class="text-sm text-gray-500 mb-2 font-medium uppercase tracking-wide">Average Score</p>
-            <p class="text-5xl font-bold text-blue-600" id="finalGrade">--</p>
-        </div>
-        <div class="text-center md:text-left">
-            <p class="text-sm text-gray-500 mb-2 font-medium uppercase tracking-wide">Tests Completed</p>
-            <p class="text-5xl font-bold text-gray-900">
-                <span id="completedTests">--</span><span class="text-3xl text-gray-400" id="totalTests">/0</span>
-            </p>
-        </div>
-        <div class="text-center md:text-left">
-            <p class="text-sm text-gray-500 mb-2 font-medium uppercase tracking-wide">Completion Rate</p>
-            <p class="text-5xl font-bold text-gray-900" id="completionRate">--</p>
-        </div>
-    </div>
-</div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                        <i class="bi bi-graph-up-arrow text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Performance Overview</h2>
+                        <p class="text-sm text-gray-500">Your overall performance summary</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center md:text-left">
+                        <p class="text-sm text-gray-500 mb-2 font-medium uppercase tracking-wide">Average Score</p>
+                        <p class="text-5xl font-bold text-blue-600" id="finalGrade">--</p>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <p class="text-sm text-gray-500 mb-2 font-medium uppercase tracking-wide">Tests Completed</p>
+                        <p class="text-5xl font-bold text-gray-900">
+                            <span id="completedTests">--</span><span class="text-3xl text-gray-400" id="totalTests">/0</span>
+                        </p>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <p class="text-sm text-gray-500 mb-2 font-medium uppercase tracking-wide">Completion Rate</p>
+                        <p class="text-5xl font-bold text-gray-900" id="completionRate">--</p>
+                    </div>
+                </div>
+            </div>
 
-           <!-- Grades by Category -->
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
-    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                <i class="bi bi-list-check text-white text-lg"></i>
+            <!-- Grades by Category -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                            <i class="bi bi-list-check text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Performance by Category</h2>
+                            <p class="text-sm text-gray-500">Average scores across fitness categories</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Table Header - Desktop Only -->
+                <div class="hidden md:block px-6 py-3 bg-gray-50 border-b border-gray-200">
+                    <div class="grid grid-cols-12 gap-4 text-sm font-semibold text-gray-600">
+                        <div class="col-span-5">Category</div>
+                        <div class="col-span-3 text-center">Tests Taken</div>
+                        <div class="col-span-4 text-right">Average Score</div>
+                    </div>
+                </div>
+                
+                <div id="categoriesContainer" class="divide-y divide-gray-100">
+                    <!-- Categories will be dynamically inserted -->
+                </div>
             </div>
-            <div>
-                <h2 class="text-xl font-bold text-gray-900">Performance by Category</h2>
-                <p class="text-sm text-gray-500">Average scores across fitness categories</p>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Table Header - Desktop Only -->
-    <div class="hidden md:block px-6 py-3 bg-gray-50 border-b border-gray-200">
-        <div class="grid grid-cols-12 gap-4 text-sm font-semibold text-gray-600">
-            <div class="col-span-5">Category</div>
-            <div class="col-span-3 text-center">Tests Taken</div>
-            <div class="col-span-4 text-right">Average Score</div>
-        </div>
-    </div>
-    
-    <div id="categoriesContainer" class="divide-y divide-gray-100">
-        <!-- Categories will be dynamically inserted -->
-    </div>
-</div>
             
-
-                        <!-- Detailed Test Results -->
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col" style="max-height: 600px;">
-    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                <i class="bi bi-clipboard-data text-white text-lg"></i>
-            </div>
-            <div>
-                <h2 class="text-xl font-bold text-gray-900">Recent Test Results</h2>
-                <p class="text-sm text-gray-500">Your most recent fitness assessments</p>
+            <!-- Detailed Test Results -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col" style="max-height: 600px;">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                            <i class="bi bi-clipboard-data text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Recent Test Results</h2>
+                            <p class="text-sm text-gray-500">Your most recent fitness assessments</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Table Header - Desktop Only -->
+                <div class="hidden md:block px-6 py-3 bg-gray-50 border-b border-gray-200 flex-shrink-0">
+                    <div class="grid grid-cols-12 gap-4 text-sm font-semibold text-gray-600">
+                        <div class="col-span-4">Test Name</div>
+                        <div class="col-span-3">Category</div>
+                        <div class="col-span-2 text-center">Date</div>
+                        <div class="col-span-2 text-right">Score</div>
+                        <div class="col-span-1 text-right">Action</div>
+                    </div>
+                </div>
+                
+                <div id="testResultsContainer" class="divide-y divide-gray-100 overflow-y-auto flex-1">
+                    <!-- Test results will be dynamically inserted -->
+                </div>
             </div>
         </div>
     </div>
-    
-               <!-- Table Header - Desktop Only -->
-    <div class="hidden md:block px-6 py-3 bg-gray-50 border-b border-gray-200 flex-shrink-0">
-        <div class="grid grid-cols-12 gap-4 text-sm font-semibold text-gray-600">
-            <div class="col-span-4">Test Name</div>
-            <div class="col-span-3">Category</div>
-            <div class="col-span-2 text-center">Date</div>
-            <div class="col-span-2 text-right">Score</div>
-            <div class="col-span-1 text-right">Action</div>
-        </div>
-    </div>
-    
-    <div id="testResultsContainer" class="divide-y divide-gray-100 overflow-y-auto flex-1">
-                <!-- Test results will be dynamically inserted -->
-            </div>
-        </div>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -451,432 +624,570 @@
      
         let cachedStudentData = null;
         let cachedTestResults = null;
-
-        
-        async function loadEssentialData(user) {
-            try {
-                // Load student data and test results in parallel
-                const [studentDataResult, assignedTestsResult] = await Promise.allSettled([
-                    loadStudentData(user),
-                    // Pre-load assigned tests count
-                    getDocs(query(
-                        collection(db, 'scheduledTests'),
-                        where('section', '==', studentData?.section || ''),
-                        where('isVisible', '==', true),
-                        where('isActive', '==', true)
-                    ))
-                ]);
-                
-                // Cache the data
-                if (studentDataResult.status === 'fulfilled') {
-                    cachedStudentData = studentDataResult.value;
-                }
-                
-                return cachedStudentData;
-            } catch (error) {
-                console.error('Error in parallel loading:', error);
-                return null;
-            }
-        }
         let currentUser = null;
-
-                // Toggle notification dropdown
-                function toggleNotificationDropdown(event) {
-                    event?.stopPropagation();
-                    const dropdown = document.getElementById('notificationDropdown');
-                    
-                    if (dropdown.classList.contains('hidden')) {
-                        dropdown.classList.remove('hidden');
-                        loadNotificationDropdown();
-                        closeProfileDropdown();
-                    } else {
-                        dropdown.classList.add('hidden');
-                    }
-                }
-
-                window.closeNotificationDropdown = function() {
-                    document.getElementById('notificationDropdown').classList.add('hidden');
-                }
-
-                // Toggle profile dropdown
-                function toggleProfileDropdown(event) {
-                    event?.stopPropagation();
-                    const dropdown = document.getElementById('profileDropdown');
-                    
-                    if (dropdown.classList.contains('hidden')) {
-                        dropdown.classList.remove('hidden');
-                        closeNotificationDropdown();
-                    } else {
-                        dropdown.classList.add('hidden');
-                    }
-                }
-
-                function closeProfileDropdown() {
-                    document.getElementById('profileDropdown').classList.add('hidden');
-                }
-
-                // Close dropdowns when clicking outside
-                document.addEventListener('click', function(event) {
-                    if (!event.target.closest('#notificationBellBtn') && 
-                        !event.target.closest('#notificationDropdown')) {
-                        closeNotificationDropdown();
-                    }
-                    
-                    if (!event.target.closest('#profilePictureBtn') && 
-                        !event.target.closest('#profileDropdown')) {
-                        closeProfileDropdown();
-                    }
-                });
-                    // Hamburger Menu and Drawer functionality
-                const hamburger = document.getElementById('hamburger');
-                const mobileDrawer = document.getElementById('mobileDrawer');
-                const drawerOverlay = document.getElementById('drawerOverlay');
-                const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-
-                // Toggle drawer
-                if (hamburger) {
-                    hamburger.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        hamburger.classList.toggle('active');
-                        mobileDrawer.classList.toggle('active');
-                        drawerOverlay.classList.toggle('active');
-                        document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-                    });
-                }
-
-                // Close drawer when overlay is clicked
-                if (drawerOverlay) {
-                    drawerOverlay.addEventListener('click', () => {
-                        hamburger.classList.remove('active');
-                        mobileDrawer.classList.remove('active');
-                        drawerOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    });
-                }
-
-                // Close drawer when nav link is clicked
-                mobileNavLinks.forEach(link => {
-                    link.addEventListener('click', () => {
-                        hamburger.classList.remove('active');
-                        mobileDrawer.classList.remove('active');
-                        drawerOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    });
-                });
-                // Update profile UI
-                function updateProfileUI() {
-                if (!currentUser || !studentData) return;
-                
-                const photoURL = currentUser?.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(studentData?.displayName || studentData?.firstName + ' ' + studentData?.lastName || 'User') + '&background=3b82f6&color=fff&size=128';
-                
-                // Desktop
-                const profileBtn = document.getElementById('profilePictureBtn');
-                if (profileBtn) profileBtn.src = photoURL;
-                
-                const dropdownPic = document.getElementById('profileDropdownPicture');
-                if (dropdownPic) dropdownPic.src = photoURL;
-                
-                const dropdownName = document.getElementById('profileDropdownName');
-                if (dropdownName) dropdownName.textContent = studentData?.displayName || `${studentData?.firstName || ''} ${studentData?.lastName || ''}`.trim() || 'Student';
-                
-                const dropdownEmail = document.getElementById('profileDropdownEmail');
-                if (dropdownEmail) dropdownEmail.textContent = studentData?.email || currentUser?.email || '';
-                
-                // Mobile
-                const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-                if (profileBtnMobile) profileBtnMobile.src = photoURL;
-                
-                const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
-                if (dropdownPicMobile) dropdownPicMobile.src = photoURL;
-                
-                const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
-                if (dropdownNameMobile) dropdownNameMobile.textContent = studentData?.displayName || `${studentData?.firstName || ''} ${studentData?.lastName || ''}`.trim() || 'Student';
-                
-                const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
-                if (dropdownEmailMobile) dropdownEmailMobile.textContent = studentData?.email || currentUser?.email || '';
-            }
-                async function loadNotificationDropdown(isMobile = false) {
-                try {
-                    if (!studentData || !studentData.section) return;
-
-                    const notificationsQuery = query(
-                        collection(db, 'notifications'),
-                        where('section', '==', studentData.section)
-                    );
-                    
-                    const notificationsSnapshot = await getDocs(notificationsQuery);
-                    const dropdownBody = document.getElementById(isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody');
-                    
-                    if (!notificationsSnapshot.empty) {
-                        const notifications = [];
-                        notificationsSnapshot.forEach(doc => {
-                            notifications.push({ id: doc.id, ...doc.data() });
-                        });
-                        
-                        notifications.sort((a, b) => {
-                            const dateA = a.createdAt?.toDate?.() || new Date(0);
-                            const dateB = b.createdAt?.toDate?.() || new Date(0);
-                            return dateB - dateA;
-                        });
-                        
-                        let html = '';
-                        notifications.slice(0, 5).forEach(notification => {
-                            const createdDate = notification.createdAt?.toDate?.();
-                            const dateStr = createdDate ? createdDate.toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            }) : 'Recently';
-                            
-                            html += `
-                                <div class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer">
-                                    <strong class="text-gray-900 text-sm block mb-1 font-semibold">${notification.title || 'Notification'}</strong>
-                                    <p class="text-gray-600 text-sm mb-1 leading-relaxed">${notification.message || ''}</p>
-                                    <small class="text-gray-400 text-xs">${dateStr}</small>
-                                </div>
-                            `;
-                        });
-                        
-                        dropdownBody.innerHTML = html;
-                    } else {
-                        dropdownBody.innerHTML = `
-                            <div class="p-8 text-center text-gray-400">
-                                <i class="bi bi-bell-slash text-5xl mb-3 block"></i>
-                                <p class="text-gray-600">No notifications yet</p>
-                            </div>
-                        `;
-                    }
-                } catch (error) {
-                    console.error('Error loading notifications:', error);
-                }
-            }
-
-                // Logout handler
-                window.handleLogout = async function() {
-                    if (confirm('Are you sure you want to logout?')) {
-                        try {
-                            await signOut(auth);
-                            window.location.href = '../login/index.html';
-                        } catch (error) {
-                            console.error('Error logging out:', error);
-                            alert('Error logging out. Please try again.');
-                        }
-                    }
-                }
-
-                // Event listeners
-                document.addEventListener('DOMContentLoaded', () => {
-                    const notificationBtn = document.getElementById('notificationBellBtn');
-                    if (notificationBtn) {
-                        notificationBtn.addEventListener('click', toggleNotificationDropdown);
-                    }
-                    
-                    const profileBtn = document.getElementById('profilePictureBtn');
-                    if (profileBtn) {
-                        profileBtn.addEventListener('click', toggleProfileDropdown);
-                    }
-                });
         let studentData = null;
 
-                    const testCategories = {
-                'Cardiorespiratory Endurance': {
-                    tests: ['3-Minute Step Test'],
-                    icon: '❤️',
-                    color: 'from-red-500 to-pink-500'
-                },
-                'Muscular Strength and Endurance': {
-                    tests: ['Curl-Up Test', 'Push-Up Test'],
-                    icon: '💪',
-                    color: 'from-blue-500 to-indigo-500'
-                },
-                'Flexibility': {
-                    tests: ['Sit-and-Reach'],
-                    icon: '🤸',
-                    color: 'from-green-500 to-emerald-500'
-                },
-                'Body Composition': {
-                    tests: ['Skinfold Caliper Measurements'],
-                    icon: '⚖️',
-                    color: 'from-purple-500 to-violet-500'
+        // ========== NOTIFICATION SYSTEM ==========
+        
+        async function checkUnreadNotifications() {
+            try {
+                if (!studentData || !studentData.section) return;
+
+                const notificationsQuery = query(
+                    collection(db, 'notifications'),
+                    where('section', '==', studentData.section)
+                );
+                
+                const notificationsSnapshot = await getDocs(notificationsQuery);
+                
+                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
+                
+                let unreadCount = 0;
+                notificationsSnapshot.forEach(doc => {
+                    if (!readNotifications.includes(doc.id)) {
+                        unreadCount++;
+                    }
+                });
+                
+                const countBadge = document.getElementById('navNotificationCount');
+                const countBadgeMobile = document.getElementById('navNotificationCountMobile');
+                
+                if (unreadCount > 0) {
+                    if (countBadge) {
+                        countBadge.textContent = unreadCount;
+                        countBadge.classList.remove('hidden');
+                    }
+                    if (countBadgeMobile) {
+                        countBadgeMobile.textContent = unreadCount;
+                        countBadgeMobile.classList.remove('hidden');
+                    }
+                } else {
+                    if (countBadge) countBadge.classList.add('hidden');
+                    if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
                 }
-            };
-        function getCategoryForTest(testName) {
-        for (const [category, data] of Object.entries(testCategories)) {
-            if (data.tests.some(t => {
-                const testLower = testName.toLowerCase();
-                const categoryTestLower = t.toLowerCase();
-                return testLower.includes(categoryTestLower) || categoryTestLower.includes(testLower);
-            })) {
-                return category;
+            } catch (error) {
+                console.error('Error checking unread notifications:', error);
             }
         }
-        return 'Cardiorespiratory Endurance'; 
-    }
+
+        async function loadNotificationDropdown(isMobile = false) {
+            try {
+                const activeBodyId = isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody';
+                const dropdownBody = document.getElementById(activeBodyId);
+                
+                if (!dropdownBody) return;
+
+                if (!studentData || !studentData.section) {
+                    dropdownBody.innerHTML = `
+                        <div class="notification-empty">
+                            <i class="bi bi-bell-slash"></i>
+                            <p>No section assigned</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const notificationsQuery = query(
+                    collection(db, 'notifications'),
+                    where('section', '==', studentData.section)
+                );
+                
+                const notificationsSnapshot = await getDocs(notificationsQuery);
+                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
+                
+                if (!notificationsSnapshot.empty) {
+                    const seenNotifications = new Set();
+                    const uniqueNotifications = [];
+                    
+                    notificationsSnapshot.forEach(doc => {
+                        const notification = doc.data();
+                        const contentKey = `${notification.title}|${notification.message}|${notification.createdAt?.toDate?.().getTime() || ''}`;
+                        
+                        if (!seenNotifications.has(contentKey)) {
+                            seenNotifications.add(contentKey);
+                            uniqueNotifications.push({ id: doc.id, ...notification });
+                        }
+                    });
+                    
+                    uniqueNotifications.sort((a, b) => {
+                        const dateA = a.createdAt?.toDate?.() || new Date(0);
+                        const dateB = b.createdAt?.toDate?.() || new Date(0);
+                        return dateB - dateA;
+                    });
+                    
+                    const unreadNotificationIds = [];
+                    uniqueNotifications.forEach(notification => {
+                        if (!readNotifications.includes(notification.id)) {
+                            unreadNotificationIds.push(notification.id);
+                        }
+                    });
+                    
+                    let html = '';
+                    uniqueNotifications.slice(0, 5).forEach(notification => {
+                        const createdDate = notification.createdAt?.toDate?.();
+                        const dateStr = createdDate ? createdDate.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) : 'Recently';
+                        
+                        const isRead = readNotifications.includes(notification.id);
+                        
+                        html += `
+                            <div class="notification-item ${isRead ? 'bg-gray-50' : 'bg-white'}" data-notification-id="${notification.id}">
+                                <strong>${notification.title || 'Notification'}</strong>
+                                <p>${notification.message || ''}</p>
+                                <small>${dateStr}</small>
+                            </div>
+                        `;
+                    });
+                    
+                    dropdownBody.innerHTML = html;
+                    
+                    if (unreadNotificationIds.length > 0) {
+                        markNotificationsAsRead(unreadNotificationIds);
+                    }
+                    
+                } else {
+                    dropdownBody.innerHTML = `
+                        <div class="notification-empty">
+                            <i class="bi bi-bell-slash"></i>
+                            <p>No notifications yet</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            }
+        }
+
+        function markNotificationsAsRead(notificationIds) {
+            if (!studentData || !studentData.email || !notificationIds.length) return;
+            
+            const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
+            const updatedReadNotifications = [...new Set([...readNotifications, ...notificationIds])];
+            
+            localStorage.setItem(`readNotifications_${studentData.email}`, JSON.stringify(updatedReadNotifications));
+            updateNotificationBadgeAfterRead(notificationIds);
+        }
+
+        async function updateNotificationBadgeAfterRead(markedAsReadIds) {
+            try {
+                if (!studentData || !studentData.section) return;
+                
+                const notificationsQuery = query(
+                    collection(db, 'notifications'),
+                    where('section', '==', studentData.section)
+                );
+                
+                const notificationsSnapshot = await getDocs(notificationsQuery);
+                const uniqueNotificationIds = new Set();
+                
+                notificationsSnapshot.forEach(doc => {
+                    uniqueNotificationIds.add(doc.id);
+                });
+                
+                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
+                
+                let unreadCount = 0;
+                uniqueNotificationIds.forEach(notificationId => {
+                    if (!readNotifications.includes(notificationId)) {
+                        unreadCount++;
+                    }
+                });
+                
+                const countBadge = document.getElementById('navNotificationCount');
+                const countBadgeMobile = document.getElementById('navNotificationCountMobile');
+                
+                if (unreadCount > 0) {
+                    if (countBadge) {
+                        countBadge.textContent = unreadCount;
+                        countBadge.classList.remove('hidden');
+                    }
+                    if (countBadgeMobile) {
+                        countBadgeMobile.textContent = unreadCount;
+                        countBadgeMobile.classList.remove('hidden');
+                    }
+                } else {
+                    if (countBadge) countBadge.classList.add('hidden');
+                    if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Error updating notification badge:', error);
+            }
+        }
+
+        function toggleNotificationDropdown(event) {
+            event?.stopPropagation();
+            const isMobile = window.innerWidth < 1024;
+            const dropdown = isMobile ? 
+                document.getElementById('notificationDropdownMobile') : 
+                document.getElementById('notificationDropdown');
+            
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                loadNotificationDropdown(isMobile);
+                
+                const profileDropdown = document.getElementById('profileDropdown');
+                const profileDropdownMobile = document.getElementById('profileDropdownMobile');
+                if (profileDropdown) profileDropdown.classList.add('hidden');
+                if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
+            } else {
+                dropdown.classList.add('hidden');
+            }
+        }
+
+        function closeNotificationDropdown() {
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const notificationDropdownMobile = document.getElementById('notificationDropdownMobile');
+            if (notificationDropdown) notificationDropdown.classList.add('hidden');
+            if (notificationDropdownMobile) notificationDropdownMobile.classList.add('hidden');
+        }
+
+        function setupNotificationListener() {
+            try {
+                if (!studentData || !studentData.section) return;
+
+                const notificationsQuery = query(
+                    collection(db, 'notifications'),
+                    where('section', '==', studentData.section)
+                );
+                
+                onSnapshot(notificationsQuery, (snapshot) => {
+                    console.log('🔔 Notification update detected!');
+                    checkUnreadNotifications();
+                }, (error) => {
+                    console.error('❌ Error in notification listener:', error);
+                });
+                
+            } catch (error) {
+                console.error('Error setting up notification listener:', error);
+            }
+        }
+
+        // ========== END NOTIFICATION SYSTEM ==========
+
+        // Profile dropdown functions
+        function toggleProfileDropdown(event) {
+            event?.stopPropagation();
+            const isMobile = window.innerWidth < 1024;
+            const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
+            
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                closeNotificationDropdown();
+            } else {
+                dropdown.classList.add('hidden');
+            }
+        }
+
+        function closeProfileDropdown() {
+            const profileDropdown = document.getElementById('profileDropdown');
+            const profileDropdownMobile = document.getElementById('profileDropdownMobile');
+            if (profileDropdown) profileDropdown.classList.add('hidden');
+            if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
+        }
+
+        // Hamburger Menu functionality
+        const hamburger = document.getElementById('hamburger');
+        const mobileDrawer = document.getElementById('mobileDrawer');
+        const drawerOverlay = document.getElementById('drawerOverlay');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+        if (hamburger) {
+            hamburger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                hamburger.classList.toggle('active');
+                mobileDrawer.classList.toggle('active');
+                drawerOverlay.classList.toggle('active');
+                document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+            });
+        }
+
+        if (drawerOverlay) {
+            drawerOverlay.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                mobileDrawer.classList.remove('active');
+                drawerOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                mobileDrawer.classList.remove('active');
+                drawerOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Update profile UI
+        function updateProfileUI() {
+            if (!currentUser || !studentData) return;
+            
+            const photoURL = currentUser?.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(studentData?.displayName || studentData?.firstName + ' ' + studentData?.lastName || 'User') + '&background=3b82f6&color=fff&size=128';
+            
+            // Desktop
+            const profileBtn = document.getElementById('profilePictureBtn');
+            if (profileBtn) profileBtn.src = photoURL;
+            
+            const dropdownPic = document.getElementById('profileDropdownPicture');
+            if (dropdownPic) dropdownPic.src = photoURL;
+            
+            const dropdownName = document.getElementById('profileDropdownName');
+            if (dropdownName) dropdownName.textContent = studentData?.displayName || `${studentData?.firstName || ''} ${studentData?.lastName || ''}`.trim() || 'Student';
+            
+            const dropdownEmail = document.getElementById('profileDropdownEmail');
+            if (dropdownEmail) dropdownEmail.textContent = studentData?.email || currentUser?.email || '';
+            
+            // Mobile
+            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
+            if (profileBtnMobile) profileBtnMobile.src = photoURL;
+            
+            const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
+            if (dropdownPicMobile) dropdownPicMobile.src = photoURL;
+            
+            const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
+            if (dropdownNameMobile) dropdownNameMobile.textContent = studentData?.displayName || `${studentData?.firstName || ''} ${studentData?.lastName || ''}`.trim() || 'Student';
+            
+            const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
+            if (dropdownEmailMobile) dropdownEmailMobile.textContent = studentData?.email || currentUser?.email || '';
+        }
+
+        // Logout handler
+        window.handleLogout = async function() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    await signOut(auth);
+                    window.location.href = '../login/index.html';
+                } catch (error) {
+                    console.error('Error logging out:', error);
+                    alert('Error logging out. Please try again.');
+                }
+            }
+        }
+
+        // Test categories
+        const testCategories = {
+            'Cardiorespiratory Endurance': {
+                tests: ['3-Minute Step Test'],
+                icon: '❤️',
+                color: 'from-red-500 to-pink-500'
+            },
+            'Muscular Strength and Endurance': {
+                tests: ['Curl-Up Test', 'Push-Up Test'],
+                icon: '💪',
+                color: 'from-blue-500 to-indigo-500'
+            },
+            'Flexibility': {
+                tests: ['Sit-and-Reach'],
+                icon: '🤸',
+                color: 'from-green-500 to-emerald-500'
+            },
+            'Body Composition': {
+                tests: ['Skinfold Caliper Measurements'],
+                icon: '⚖️',
+                color: 'from-purple-500 to-violet-500'
+            }
+        };
+
+        function getCategoryForTest(testName) {
+            for (const [category, data] of Object.entries(testCategories)) {
+                if (data.tests.some(t => {
+                    const testLower = testName.toLowerCase();
+                    const categoryTestLower = t.toLowerCase();
+                    return testLower.includes(categoryTestLower) || categoryTestLower.includes(testLower);
+                })) {
+                    return category;
+                }
+            }
+            return 'Cardiorespiratory Endurance'; 
+        }
 
         function calculateScore(testName, result, testTarget = null) {
-    const normalized = testName.toLowerCase().trim();
-    
-    // ⭐ CRITICAL: Check if this is a professor override with pre-calculated score
-    if (result && typeof result === 'object' && result !== null) {
-        // If professor already set a final score, use it directly
-        if (result.score !== undefined && result.score !== null) {
-            const score = parseFloat(result.score);
-            if (!isNaN(score) && score >= 0 && score <= 100) {
-                console.log(`✅ Using stored professor score: ${score} for ${testName}`);
-                return score;
+            const normalized = testName.toLowerCase().trim();
+            
+            // Check if professor already set a final score
+            if (result && typeof result === 'object' && result !== null) {
+                if (result.score !== undefined && result.score !== null) {
+                    const score = parseFloat(result.score);
+                    if (!isNaN(score) && score >= 0 && score <= 100) {
+                        console.log(`✅ Using stored professor score: ${score} for ${testName}`);
+                        return score;
+                    }
+                }
             }
-        }
-    }
-    
-    // Extract numeric value from result
-    let numericValue = 0;
-    
-    if (typeof result === 'object' && result !== null) {
-        numericValue = result.repetitions || result.time || result.distance || 
-                      result.value || result.result || result.count || 
-                      result.score || 0;
-    } else if (typeof result === 'string') {
-        const match = result.match(/(\d+\.?\d*)/);
-        if (match) {
-            numericValue = parseFloat(match[1]);
-        } else {
-            numericValue = parseFloat(result) || 0;
-        }
-    } else {
-        numericValue = parseFloat(result) || 0;
-    }
-    
-    console.log(`🎯 Calculating: ${testName} | Value: ${numericValue} | Target: ${testTarget}`);
-    
-    // Use test target if available - THIS IS THE KEY SECTION
-    if (testTarget && testTarget > 0) {
-        // REPETITION TESTS (push-ups, sit-ups, curl-ups)
-        if (normalized.includes('push-up') || normalized.includes('pushup') || 
-            normalized.includes('sit-up') || normalized.includes('situp') ||
-            normalized.includes('curl-up')) {
             
-            const reps = numericValue;
-            if (reps >= testTarget) return 100;
+            // Extract numeric value from result
+            let numericValue = 0;
             
-            const percentage = (reps / testTarget) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
+            if (typeof result === 'object' && result !== null) {
+                numericValue = result.repetitions || result.time || result.distance || 
+                              result.value || result.result || result.count || 
+                              result.score || 0;
+            } else if (typeof result === 'string') {
+                const match = result.match(/(\d+\.?\d*)/);
+                if (match) {
+                    numericValue = parseFloat(match[1]);
+                } else {
+                    numericValue = parseFloat(result) || 0;
+                }
+            } else {
+                numericValue = parseFloat(result) || 0;
+            }
             
-            // Apply grading scale
-            if (percentage >= 100) score = 100;
-            else if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
+            console.log(`🎯 Calculating: ${testName} | Value: ${numericValue} | Target: ${testTarget}`);
             
-            return Math.round(score);
-        }
-        
-        // PLANK (time-based in seconds)
-        if (normalized.includes('plank')) {
-            let seconds = numericValue;
-            if (seconds >= testTarget) return 100;
+            // Use test target if available
+            if (testTarget && testTarget > 0) {
+                if (normalized.includes('push-up') || normalized.includes('pushup') || 
+                    normalized.includes('sit-up') || normalized.includes('situp') ||
+                    normalized.includes('curl-up')) {
+                    
+                    const reps = numericValue;
+                    if (reps >= testTarget) return 100;
+                    
+                    const percentage = (reps / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 100) score = 100;
+                    else if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('plank')) {
+                    let seconds = numericValue;
+                    if (seconds >= testTarget) return 100;
+                    
+                    const percentage = (seconds / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 100) score = 100;
+                    else if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('sit-and-reach')) {
+                    const distance = numericValue;
+                    if (distance >= testTarget) return 100;
+                    
+                    const percentage = (distance / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 100) score = 100;
+                    else if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('grip')) {
+                    if (numericValue >= testTarget) return 100;
+                    
+                    const percentage = (numericValue / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('mile') || normalized.includes('run')) {
+                    if (numericValue <= testTarget) return 100;
+                    
+                    const percentage = (testTarget / numericValue) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('step test') || normalized.includes('3-minute')) {
+                    if (numericValue <= testTarget) return 100;
+                    
+                    const percentage = (testTarget / numericValue) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+            }
             
-            const percentage = (seconds / testTarget) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            if (percentage >= 100) score = 100;
-            else if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-        }
-        
-        // SIT-AND-REACH (flexibility in cm)
-        if (normalized.includes('sit-and-reach')) {
-            const distance = numericValue;
-            if (distance >= testTarget) return 100;
-            
-            const percentage = (distance / testTarget) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            if (percentage >= 100) score = 100;
-            else if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-        }
-        
-        // GRIP STRENGTH (kg)
-        if (normalized.includes('grip')) {
-            if (numericValue >= testTarget) return 100;
-            
-            const percentage = (numericValue / testTarget) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-        }
-        
-        // 1-MILE RUN (seconds - LOWER IS BETTER)
-        if (normalized.includes('mile') || normalized.includes('run')) {
-            if (numericValue <= testTarget) return 100;
-            
-            const percentage = (testTarget / numericValue) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-        }
-        
-        // STEP TEST (heart rate - LOWER IS BETTER)
-        if (normalized.includes('step test') || normalized.includes('3-minute')) {
-            if (numericValue <= testTarget) return 100;
-            
-            const percentage = (testTarget / numericValue) * 100;
-            let score = Math.min(100, Math.max(50, percentage));
-            
-            if (percentage >= 90) score = 95;
-            else if (percentage >= 80) score = 90;
-            else if (percentage >= 70) score = 85;
-            else if (percentage >= 60) score = 80;
-            else if (percentage >= 50) score = 75;
-            
-            return Math.round(score);
-        }
-    }
-    
-    // Fallback to default scoring if no target set
-    return calculateDefaultScore(normalized, numericValue);
-}
-        function getGradeLetter(score) {
-            if (score >= 95) return 'A+';
-            if (score >= 90) return 'A';
-            if (score >= 85) return 'B+';
-            if (score >= 80) return 'B';
-            if (score >= 75) return 'C+';
-            if (score >= 70) return 'C';
-            if (score >= 65) return 'D';
-            return 'F';
+            // Fallback scoring
+            return calculateDefaultScore(normalized, numericValue);
         }
 
-        function getGradeColor(score) {
-            if (score >= 90) return 'text-green-600';
-            if (score >= 80) return 'text-blue-600';
-            if (score >= 70) return 'text-yellow-600';
-            return 'text-red-600';
+        function calculateDefaultScore(normalized, numericValue) {
+            if (normalized.includes('push-up') || normalized.includes('pushup')) {
+                if (numericValue >= 40) return 100;
+                if (numericValue >= 30) return 90;
+                if (numericValue >= 20) return 80;
+                if (numericValue >= 15) return 70;
+                return 60;
+            }
+            
+            if (normalized.includes('curl-up') || normalized.includes('curl up')) {
+                if (numericValue >= 75) return 100;
+                if (numericValue >= 50) return 90;
+                if (numericValue >= 30) return 80;
+                if (numericValue >= 20) return 70;
+                return 60;
+            }
+            
+            if (normalized.includes('plank')) {
+                if (numericValue >= 120) return 100;
+                if (numericValue >= 90) return 90;
+                if (numericValue >= 60) return 80;
+                if (numericValue >= 45) return 70;
+                return 60;
+            }
+            
+            if (normalized.includes('grip')) {
+                if (numericValue >= 60) return 100;
+                if (numericValue >= 50) return 90;
+                if (numericValue >= 40) return 80;
+                if (numericValue >= 30) return 70;
+                return 60;
+            }
+            
+            if (normalized.includes('sit-and-reach')) {
+                if (numericValue >= 20) return 100;
+                if (numericValue >= 15) return 90;
+                if (numericValue >= 10) return 80;
+                if (numericValue >= 5) return 70;
+                return 60;
+            }
+            
+            return 75;
         }
 
         async function loadStudentData(user) {
@@ -899,618 +1210,576 @@
             }
         }
 
-        async function loadGrades() {
-    try {
-        if (!studentData || !studentData.email) {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
-            return;
+        async function loadEssentialData(user) {
+            try {
+                const [studentDataResult] = await Promise.allSettled([
+                    loadStudentData(user)
+                ]);
+                
+                if (studentDataResult.status === 'fulfilled') {
+                    cachedStudentData = studentDataResult.value;
+                }
+                
+                return cachedStudentData;
+            } catch (error) {
+                console.error('Error in parallel loading:', error);
+                return null;
+            }
         }
 
-        // Get all assigned tests (including overdue ones)
-        const assignedTestsQuery = query(
-            collection(db, 'scheduledTests'),
-            where('section', '==', studentData.section),
-            where('isVisible', '==', true),
-            where('isActive', '==', true)
-        );
-        
-        let totalAssignedTests = 0;
-        let overdueTests = 0;
-        let completedTests = 0;
-        
-        // Set up listener for assigned tests
-        onSnapshot(assignedTestsQuery, async (assignedSnapshot) => {
-            const now = new Date();
-            const seenTestIds = new Set();
-            totalAssignedTests = 0;
-            overdueTests = 0;
-            
-            // Count unique tests that are either available now or overdue
-            assignedSnapshot.forEach((doc) => {
-                const test = doc.data();
-                const testId = doc.id;
-                
-                // Skip duplicate test IDs
-                if (seenTestIds.has(testId)) {
+        async function loadGrades() {
+            try {
+                if (!studentData || !studentData.email) {
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('mainContent').classList.remove('hidden');
                     return;
                 }
-                seenTestIds.add(testId);
+
+                // Setup notification listener
+                setupNotificationListener();
+                await checkUnreadNotifications();
+
+                // Get all assigned tests
+                const assignedTestsQuery = query(
+                    collection(db, 'scheduledTests'),
+                    where('section', '==', studentData.section),
+                    where('isVisible', '==', true),
+                    where('isActive', '==', true)
+                );
                 
-                // ⭐ NEW: Check if student is selected for this test
-                let isStudentSelected = true; // Default to true for backward compatibility
-                if (test.selectedStudents && Array.isArray(test.selectedStudents)) {
-                    isStudentSelected = test.selectedStudents.includes(studentData.email);
-                }
+                let totalAssignedTests = 0;
+                let overdueTests = 0;
+                let completedTests = 0;
                 
-                // Only count tests that the student is selected for
-                if (!isStudentSelected) {
-                    return;
-                }
-                
-                // Parse test date and deadline
-                let testDateTime;
-                if (test.date && test.time) {
-                    testDateTime = new Date(`${test.date}T${test.time}`);
-                } else if (test.date) {
-                    testDateTime = new Date(test.date);
-                    testDateTime.setHours(0, 0, 0, 0);
-                } else {
-                    testDateTime = new Date(0); // Very old date
-                }
-                
-                let deadlineDateTime;
-                if (test.deadlineDateTime) {
-                    deadlineDateTime = new Date(test.deadlineDateTime);
-                } else if (test.deadline) {
-                    deadlineDateTime = new Date(test.deadline);
-                    if (test.deadlineTime) {
-                        const [hours, minutes] = test.deadlineTime.split(':').map(Number);
-                        deadlineDateTime.setHours(hours, minutes, 0, 0);
-                    } else {
-                        deadlineDateTime.setHours(23, 59, 59, 999);
-                    }
-                } else {
-                    deadlineDateTime = new Date(8640000000000000); // Very far future
-                }
-                
-                // Check if test is available (test date has passed)
-                const isTestAvailable = testDateTime <= now;
-                
-                // Check if test is overdue
-                const isOverdue = deadlineDateTime < now;
-                
-                // Only count tests that are either:
-                // 1. Available now (test date passed, deadline not passed)
-                // 2. Overdue (deadline passed)
-                if (isTestAvailable || isOverdue) {
-                    totalAssignedTests++;
+                onSnapshot(assignedTestsQuery, async (assignedSnapshot) => {
+                    const now = new Date();
+                    const seenTestIds = new Set();
+                    totalAssignedTests = 0;
+                    overdueTests = 0;
                     
-                    if (isOverdue) {
-                        overdueTests++;
-                    }
-                }
-            });
-            
-            console.log(`📊 Total assigned tests for student: ${totalAssignedTests}`);
-            console.log(`⚠️ Overdue tests: ${overdueTests}`);
-            
-            document.getElementById('totalTests').textContent = `/${totalAssignedTests}`;
-            
-            // Now load the completed tests to calculate completion rate
-            const resultsQuery = query(
-                collection(db, 'testResults'),
-                where('studentEmail', '==', studentData.email)
-            );
-            
-            const resultsSnapshot = await getDocs(resultsQuery);
-            
-            // Count unique tests completed (best score per test)
-            const completedTestIds = new Set();
-            resultsSnapshot.forEach((doc) => {
-                const result = doc.data();
-                completedTestIds.add(result.testId);
-            });
-            
-            completedTests = completedTestIds.size;
-            
-            console.log(`✅ Unique tests completed: ${completedTests}`);
-            
-            // Calculate actual completion rate (completed / total assigned)
-            const completionRate = totalAssignedTests > 0 ? 
-                Math.round((completedTests / totalAssignedTests) * 100) : 0;
-            
-            document.getElementById('completedTests').textContent = completedTests;
-            document.getElementById('completionRate').textContent = completionRate + '%';
-            
-            // Load real-time updates for test results
-            setupRealTimeGradeListener(overdueTests);
-        });
-        
-    } catch (error) {
-        console.error('Error loading grades:', error);
-        document.getElementById('loadingScreen').classList.add('hidden');
-        document.getElementById('mainContent').classList.remove('hidden');
-    }
-}
-
-
-    async function setupRealTimeGradeListener(overdueCount) {
-    try {
-        const resultsQuery = query(
-            collection(db, 'testResults'),
-            where('studentEmail', '==', studentData.email),
-            where('status', 'in', ['completed', 'overdue', 'late'])
-        );
-        
-        onSnapshot(resultsQuery, (resultsSnapshot) => {
-            const testResults = [];
-            const categoryScores = {};
-            const OVERDUE_PENALTY = 0.10;
-            
-            // Initialize categories
-            Object.keys(testCategories).forEach(cat => {
-                categoryScores[cat] = { scores: [], tests: [] };
-            });
-            
-            const testGroups = {};
-            let hasOverdueWithPenalty = false;
-
-            resultsSnapshot.forEach((doc) => {
-                const result = doc.data();
-                
-                // ⭐ CRITICAL: Always use submittedAt for the test date
-                let testDate = new Date();
-                if (result.submittedAt) {
-                    if (typeof result.submittedAt.toDate === 'function') {
-                        testDate = result.submittedAt.toDate();
-                    } else if (result.submittedAt instanceof Date) {
-                        testDate = result.submittedAt;
-                    } else if (typeof result.submittedAt === 'string' || typeof result.submittedAt === 'number') {
-                        testDate = new Date(result.submittedAt);
-                    } else if (result.submittedAt.seconds) {
-                        testDate = new Date(result.submittedAt.seconds * 1000);
-                    }
-                }
-                
-                // ⭐ Check if professor override exists first
-                const isProfessorOverride = result.isProfessorOverride === true;
-                
-                let score = 0;
-                
-                if (isProfessorOverride && typeof result.score === 'number' && !isNaN(result.score)) {
-                    // Use professor's score directly
-                    score = result.score;
-                } else {
-                    // Calculate normally
-                    score = calculateScore(
-                        result.testName, 
-                        result.result || result.resultData, 
-                        result.testTarget
+                    assignedSnapshot.forEach((doc) => {
+                        const test = doc.data();
+                        const testId = doc.id;
+                        
+                        if (seenTestIds.has(testId)) {
+                            return;
+                        }
+                        seenTestIds.add(testId);
+                        
+                        let isStudentSelected = true;
+                        if (test.selectedStudents && Array.isArray(test.selectedStudents)) {
+                            isStudentSelected = test.selectedStudents.includes(studentData.email);
+                        }
+                        
+                        if (!isStudentSelected) {
+                            return;
+                        }
+                        
+                        let testDateTime;
+                        if (test.date && test.time) {
+                            testDateTime = new Date(`${test.date}T${test.time}`);
+                        } else if (test.date) {
+                            testDateTime = new Date(test.date);
+                            testDateTime.setHours(0, 0, 0, 0);
+                        } else {
+                            testDateTime = new Date(0);
+                        }
+                        
+                        let deadlineDateTime;
+                        if (test.deadlineDateTime) {
+                            deadlineDateTime = new Date(test.deadlineDateTime);
+                        } else if (test.deadline) {
+                            deadlineDateTime = new Date(test.deadline);
+                            if (test.deadlineTime) {
+                                const [hours, minutes] = test.deadlineTime.split(':').map(Number);
+                                deadlineDateTime.setHours(hours, minutes, 0, 0);
+                            } else {
+                                deadlineDateTime.setHours(23, 59, 59, 999);
+                            }
+                        } else {
+                            deadlineDateTime = new Date(8640000000000000);
+                        }
+                        
+                        const isTestAvailable = testDateTime <= now;
+                        const isOverdue = deadlineDateTime < now;
+                        
+                        if (isTestAvailable || isOverdue) {
+                            totalAssignedTests++;
+                            
+                            if (isOverdue) {
+                                overdueTests++;
+                            }
+                        }
+                    });
+                    
+                    document.getElementById('totalTests').textContent = `/${totalAssignedTests}`;
+                    
+                    const resultsQuery = query(
+                        collection(db, 'testResults'),
+                        where('studentEmail', '==', studentData.email)
                     );
                     
-                    // ⭐ Apply penalty ONLY if overdue AND not professor override
-                    const isOverdue = (result.status === 'overdue' || result.status === 'late');
-                    if (isOverdue && !isProfessorOverride) {
-                        const penalty = score * OVERDUE_PENALTY;
-                        score = Math.max(0, score - penalty);
-                        hasOverdueWithPenalty = true;
-                    }
-                }
+                    const resultsSnapshot = await getDocs(resultsQuery);
+                    
+                    const completedTestIds = new Set();
+                    resultsSnapshot.forEach((doc) => {
+                        const result = doc.data();
+                        completedTestIds.add(result.testId);
+                    });
+                    
+                    completedTests = completedTestIds.size;
+                    
+                    const completionRate = totalAssignedTests > 0 ? 
+                        Math.round((completedTests / totalAssignedTests) * 100) : 0;
+                    
+                    document.getElementById('completedTests').textContent = completedTests;
+                    document.getElementById('completionRate').textContent = completionRate + '%';
+                    
+                    setupRealTimeGradeListener(overdueTests);
+                });
                 
-                // Validate score
-                score = Math.max(0, Math.min(100, score));
-                
-                const category = getCategoryForTest(result.testName);
-                const testId = result.testId || doc.id;
-                
-                // Keep highest score per test
-                if (!testGroups[testId] || score > testGroups[testId].score) {
-                    testGroups[testId] = {
-                        ...result,
-                        score,
-                        category,
-                        id: doc.id,
-                        isProfessorOverride: isProfessorOverride,
-                        isOverdue: result.status === 'overdue' || result.status === 'late',
-                        submittedAt: testDate
-                    };
-                }
-            });
+            } catch (error) {
+                console.error('Error loading grades:', error);
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+            }
+        }
 
-            // ⭐ Calculate totals from BEST scores only
-            let totalScore = 0;
-            let testCount = 0;
-            
-            Object.values(testGroups).forEach(result => {
-                // Ensure score is valid
-                if (typeof result.score === 'number' && !isNaN(result.score) && result.score >= 0) {
-                    testResults.push(result);
+        async function setupRealTimeGradeListener(overdueCount) {
+            try {
+                const resultsQuery = query(
+                    collection(db, 'testResults'),
+                    where('studentEmail', '==', studentData.email),
+                    where('status', 'in', ['completed', 'overdue', 'late'])
+                );
+                
+                onSnapshot(resultsQuery, (resultsSnapshot) => {
+                    const testResults = [];
+                    const categoryScores = {};
+                    const OVERDUE_PENALTY = 0.10;
                     
-                    if (categoryScores[result.category]) {
-                        categoryScores[result.category].scores.push(result.score);
-                        categoryScores[result.category].tests.push({
-                            name: result.testName,
-                            score: result.score,
-                            isOverdue: result.isOverdue
-                        });
+                    Object.keys(testCategories).forEach(cat => {
+                        categoryScores[cat] = { scores: [], tests: [] };
+                    });
+                    
+                    const testGroups = {};
+                    let hasOverdueWithPenalty = false;
+
+                    resultsSnapshot.forEach((doc) => {
+                        const result = doc.data();
+                        
+                        let testDate = new Date();
+                        if (result.submittedAt) {
+                            if (typeof result.submittedAt.toDate === 'function') {
+                                testDate = result.submittedAt.toDate();
+                            } else if (result.submittedAt instanceof Date) {
+                                testDate = result.submittedAt;
+                            } else if (typeof result.submittedAt === 'string' || typeof result.submittedAt === 'number') {
+                                testDate = new Date(result.submittedAt);
+                            } else if (result.submittedAt.seconds) {
+                                testDate = new Date(result.submittedAt.seconds * 1000);
+                            }
+                        }
+                        
+                        const isProfessorOverride = result.isProfessorOverride === true;
+                        
+                        let score = 0;
+                        
+                        if (isProfessorOverride && typeof result.score === 'number' && !isNaN(result.score)) {
+                            score = result.score;
+                        } else {
+                            score = calculateScore(
+                                result.testName, 
+                                result.result || result.resultData, 
+                                result.testTarget
+                            );
+                            
+                            const isOverdue = (result.status === 'overdue' || result.status === 'late');
+                            if (isOverdue && !isProfessorOverride) {
+                                const penalty = score * OVERDUE_PENALTY;
+                                score = Math.max(0, score - penalty);
+                                hasOverdueWithPenalty = true;
+                            }
+                        }
+                        
+                        score = Math.max(0, Math.min(100, score));
+                        
+                        const category = getCategoryForTest(result.testName);
+                        const testId = result.testId || doc.id;
+                        
+                        if (!testGroups[testId] || score > testGroups[testId].score) {
+                            testGroups[testId] = {
+                                ...result,
+                                score,
+                                category,
+                                id: doc.id,
+                                isProfessorOverride: isProfessorOverride,
+                                isOverdue: result.status === 'overdue' || result.status === 'late',
+                                submittedAt: testDate
+                            };
+                        }
+                    });
+
+                    let totalScore = 0;
+                    let testCount = 0;
+                    
+                    Object.values(testGroups).forEach(result => {
+                        if (typeof result.score === 'number' && !isNaN(result.score) && result.score >= 0) {
+                            testResults.push(result);
+                            
+                            if (categoryScores[result.category]) {
+                                categoryScores[result.category].scores.push(result.score);
+                                categoryScores[result.category].tests.push({
+                                    name: result.testName,
+                                    score: result.score,
+                                    isOverdue: result.isOverdue
+                                });
+                            }
+                            
+                            totalScore += result.score;
+                            testCount++;
+                        }
+                    });
+                    
+                    const avgScore = testCount > 0 ? (totalScore / testCount).toFixed(1) : '0.0';
+                    const finalGrade = document.getElementById('finalGrade');
+                    
+                    if (hasOverdueWithPenalty) {
+                        finalGrade.innerHTML = `
+                            ${avgScore}
+                            <div class="text-xs text-red-600 font-normal mt-2">
+                                ⚠️ 10% penalty applied to overdue test(s)<br>
+                                <span class="text-[10px]">Retake tests to remove penalty</span>
+                            </div>
+                        `;
+                    } else {
+                        finalGrade.textContent = avgScore;
                     }
                     
-                    // ⭐ Add to total for average calculation
-                    totalScore += result.score;
-                    testCount++;
-                }
-            });
+                    document.getElementById('completedTests').textContent = testCount;
+                    
+                    renderCategoryGrades(categoryScores);
+                    renderTestResults(testResults);
+                    
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('mainContent').classList.remove('hidden');
+                });
+                
+            } catch (error) {
+                console.error('Error in real-time listener:', error);
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+            }
+        }
+
+        function renderCategoryGrades(categoryScores) {
+            const container = document.getElementById('categoriesContainer');
             
-            // ⭐ Calculate average with one decimal place - EXACT same as test.html
-            const avgScore = testCount > 0 ? (totalScore / testCount).toFixed(1) : '0.0';
-            const finalGrade = document.getElementById('finalGrade');
-            
-            if (hasOverdueWithPenalty) {
-                finalGrade.innerHTML = `
-                    ${avgScore}
-                    <div class="text-xs text-red-600 font-normal mt-2">
-                        ⚠️ 10% penalty applied to overdue test(s)<br>
-                        <span class="text-[10px]">Retake tests to remove penalty</span>
-                    </div>
-                `;
-            } else {
-                finalGrade.textContent = avgScore;
+            if (!container) {
+                console.error('Categories container not found');
+                return;
             }
             
-            document.getElementById('completedTests').textContent = testCount;
+            let html = '';
+            let hasData = false;
             
-            renderCategoryGrades(categoryScores);
-            renderTestResults(testResults);
-            
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
-        });
-        
-    } catch (error) {
-        console.error('Error in real-time listener:', error);
-        document.getElementById('loadingScreen').classList.add('hidden');
-        document.getElementById('mainContent').classList.remove('hidden');
-    }
-}
-        function validateScore(score) {
-    if (score === null || score === undefined || score === '' || isNaN(score)) {
-        return 0;
-    }
-    
-    const numScore = parseFloat(score);
-    if (isNaN(numScore)) {
-        return 0;
-    }
-    
-    // Ensure score is between 0 and 100
-    return Math.max(0, Math.min(100, numScore));
-}
-        function renderCategoryGrades(categoryScores) {
-    const container = document.getElementById('categoriesContainer');
-    
-    if (!container) {
-        console.error('Categories container not found');
-        return;
-    }
-    
-    let html = '';
-    let hasData = false;
-    
-    Object.entries(categoryScores).forEach(([category, data]) => {
-        if (data.scores.length > 0) {
-            hasData = true;
-            const avgScore = (data.scores.reduce((a, b) => a + b, 0) / data.scores.length).toFixed(1);
-            
-            const scoreColor = parseFloat(avgScore) >= 85 ? 'text-green-600' : 
-                              parseFloat(avgScore) >= 75 ? 'text-blue-600' : 
-                              parseFloat(avgScore) >= 65 ? 'text-yellow-600' : 'text-red-600';
-            
-            // Count overdue tests in this category
-            const overdueCount = data.tests.filter(test => test.isOverdue).length;
-            
-            html += `
-                <div class="px-4 py-4 md:px-6 hover:bg-gray-50 transition-colors">
-                    <!-- Mobile Layout -->
-                    <div class="block md:hidden">
-                        <div class="flex items-center justify-between mb-2">
-                            <h4 class="font-semibold text-gray-900 text-sm">${category}</h4>
-                            ${overdueCount > 0 ? 
-                                `<span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">${overdueCount} overdue</span>` 
-                                : ''}
+            Object.entries(categoryScores).forEach(([category, data]) => {
+                if (data.scores.length > 0) {
+                    hasData = true;
+                    const avgScore = (data.scores.reduce((a, b) => a + b, 0) / data.scores.length).toFixed(1);
+                    
+                    const scoreColor = parseFloat(avgScore) >= 85 ? 'text-green-600' : 
+                                      parseFloat(avgScore) >= 75 ? 'text-blue-600' : 
+                                      parseFloat(avgScore) >= 65 ? 'text-yellow-600' : 'text-red-600';
+                    
+                    const overdueCount = data.tests.filter(test => test.isOverdue).length;
+                    
+                    html += `
+                        <div class="px-4 py-4 md:px-6 hover:bg-gray-50 transition-colors">
+                            <!-- Mobile Layout -->
+                            <div class="block md:hidden">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h4 class="font-semibold text-gray-900 text-sm">${category}</h4>
+                                    ${overdueCount > 0 ? 
+                                        `<span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">${overdueCount} overdue</span>` 
+                                        : ''}
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="text-xs text-gray-500 mb-1">${data.scores.length} test${data.scores.length !== 1 ? 's' : ''}</p>
+                                        <span class="text-2xl font-bold ${scoreColor}">${avgScore}</span>
+                                        <span class="text-xs text-gray-400 ml-1">/ 100</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Desktop Layout -->
+                            <div class="hidden md:grid grid-cols-12 gap-4 items-center">
+                                <div class="col-span-5">
+                                    <h4 class="font-semibold text-gray-900">${category}</h4>
+                                    <p class="text-xs text-gray-500 mt-0.5">
+                                        ${data.scores.length} test${data.scores.length !== 1 ? 's' : ''}
+                                        ${overdueCount > 0 ? 
+                                            ` • <span class="text-red-600">${overdueCount} overdue</span>` 
+                                            : ''}
+                                    </p>
+                                </div>
+                                <div class="col-span-3 text-center">
+                                    <span class="text-gray-600">${data.scores.length} taken</span>
+                                </div>
+                                <div class="col-span-4 text-right flex items-center justify-end gap-4">
+                                    <span class="text-3xl font-bold ${scoreColor}">${avgScore}</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="text-xs text-gray-500 mb-1">${data.scores.length} test${data.scores.length !== 1 ? 's' : ''}</p>
-                                <span class="text-2xl font-bold ${scoreColor}">${avgScore}</span>
-                                <span class="text-xs text-gray-400 ml-1">/ 100</span>
+                    `;
+                }
+            });
+            
+            if (!hasData) {
+                html = `
+                    <div class="px-6 py-12 text-center">
+                        <i class="bi bi-inbox text-gray-300 text-5xl mb-3 block"></i>
+                        <p class="text-gray-500">No category data available yet</p>
+                        <p class="text-gray-400 text-sm mt-2">Complete tests to see your performance by category</p>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function renderTestResults(testResults) {
+            const container = document.getElementById('testResultsContainer');
+            
+            if (!container) {
+                console.error('Test results container not found');
+                return;
+            }
+            
+            if (!testResults || testResults.length === 0) {
+                container.innerHTML = `
+                    <div class="px-6 py-12 text-center">
+                        <i class="bi bi-clipboard-x text-gray-300 text-5xl mb-3 block"></i>
+                        <p class="text-gray-500 font-medium">No test results yet</p>
+                        <p class="text-gray-400 text-sm mt-2">Complete tests to see your results here</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            testResults.sort((a, b) => {
+                let dateA = new Date(0);
+                let dateB = new Date(0);
+                
+                if (a.submittedAt) {
+                    if (typeof a.submittedAt.toDate === 'function') {
+                        dateA = a.submittedAt.toDate();
+                    } else if (a.submittedAt instanceof Date) {
+                        dateA = a.submittedAt;
+                    } else if (a.submittedAt.seconds) {
+                        dateA = new Date(a.submittedAt.seconds * 1000);
+                    } else {
+                        dateA = new Date(a.submittedAt);
+                    }
+                }
+                
+                if (b.submittedAt) {
+                    if (typeof b.submittedAt.toDate === 'function') {
+                        dateB = b.submittedAt.toDate();
+                    } else if (b.submittedAt instanceof Date) {
+                        dateB = b.submittedAt;
+                    } else if (b.submittedAt.seconds) {
+                        dateB = new Date(b.submittedAt.seconds * 1000);
+                    } else {
+                        dateB = new Date(b.submittedAt);
+                    }
+                }
+                
+                return dateB - dateA;
+            });
+            
+            console.log('Rendering', testResults.length, 'test results');
+            
+            let html = '';
+            testResults.forEach((result) => {
+                const scoreColor = result.score >= 85 ? 'text-green-600' : 
+                                  result.score >= 75 ? 'text-blue-600' : 
+                                  result.score >= 65 ? 'text-yellow-600' : 'text-red-600';
+                
+                const date = result.submittedAt?.toDate 
+                    ? result.submittedAt.toDate().toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    })
+                    : (result.submittedAt ? new Date(result.submittedAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    }) : 'N/A');
+                
+                const isOverdue = result.status === 'overdue' || result.status === 'late';
+                const isProfessorOverride = result.isProfessorOverride === true;
+                
+                html += `
+                    <div class="px-6 py-4 hover:bg-gray-50 transition-colors ${isOverdue && !isProfessorOverride ? 'bg-red-50/30' : ''}">
+                        <!-- Mobile Layout -->
+                        <div class="block md:hidden">
+                            <div class="mb-3">
+                                <h4 class="font-semibold text-gray-900 text-sm mb-1">
+                                    ${result.testName}
+                                    ${isProfessorOverride ? 
+                                        '<span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">✓ Professor Set</span>' : 
+                                        ''}
+                                    ${isOverdue && !isProfessorOverride ? 
+                                        '<span class="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">⚠️ Overdue (-10%)</span>' : 
+                                        ''}
+                                </h4>
+                                <p class="text-xs text-gray-500">${result.category}</p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    <i class="bi bi-calendar3"></i> ${date}
+                                </p>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-2xl font-bold ${scoreColor}">${result.score.toFixed(1)}</span>
+                                    <span class="text-xs text-gray-400 ml-1">/ 100</span>
+                                    ${isOverdue && !isProfessorOverride ? 
+                                        '<p class="text-xs text-red-600 mt-1">Penalty applied</p>' : 
+                                        ''}
+                                </div>
+                                <a href="./studentresult.html?resultId=${result.id}" 
+                                   class="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1">
+                                    View <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Desktop Layout -->
+                        <div class="hidden md:grid grid-cols-12 gap-4 items-center">
+                            <div class="col-span-4">
+                                <h4 class="font-semibold text-gray-900">
+                                    ${result.testName}
+                                    ${isProfessorOverride ? 
+                                        '<span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">✓ Professor Set</span>' : 
+                                        ''}
+                                    ${isOverdue && !isProfessorOverride ? 
+                                        '<span class="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">⚠️ Overdue (-10%)</span>' : 
+                                        ''}
+                                </h4>
+                                <p class="text-xs text-gray-500 mt-1">${result.category}</p>
+                            </div>
+                            <div class="col-span-3">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-600 text-sm">${result.category}</span>
+                                    ${isOverdue && !isProfessorOverride ? 
+                                        '<span class="text-xs text-red-600 font-semibold mt-1">⚠️ Submitted Late</span>' : 
+                                        ''}
+                                </div>
+                            </div>
+                            <div class="col-span-2 text-center">
+                                <span class="text-gray-600 text-sm">
+                                    <i class="bi bi-calendar3"></i> ${date}
+                                </span>
+                            </div>
+                            <div class="col-span-2 text-right">
+                                <div>
+                                    <span class="text-3xl font-bold ${scoreColor}">${result.score.toFixed(1)}</span>
+                                    <span class="text-xs text-gray-400 ml-1">/ 100</span>
+                                    ${isOverdue && !isProfessorOverride ? 
+                                        '<p class="text-xs text-red-600 mt-1 font-medium">With penalty</p>' : 
+                                        ''}
+                                </div>
+                            </div>
+                            <div class="col-span-1 text-right">
+                                <a href="./studentresult.html?resultId=${result.id}" 
+                                   class="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1 hover:gap-2 transition-all">
+                                    View <i class="bi bi-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Desktop Layout -->
-                    <div class="hidden md:grid grid-cols-12 gap-4 items-center">
-                        <div class="col-span-5">
-                            <h4 class="font-semibold text-gray-900">${category}</h4>
-                            <p class="text-xs text-gray-500 mt-0.5">
-                                ${data.scores.length} test${data.scores.length !== 1 ? 's' : ''}
-                                ${overdueCount > 0 ? 
-                                    ` • <span class="text-red-600">${overdueCount} overdue</span>` 
-                                    : ''}
-                            </p>
-                        </div>
-                        <div class="col-span-3 text-center">
-                            <span class="text-gray-600">${data.scores.length} taken</span>
-                        </div>
-                        <div class="col-span-4 text-right flex items-center justify-end gap-4">
-                            <span class="text-3xl font-bold ${scoreColor}">${avgScore}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
+                `;
+            });
+            
+            container.innerHTML = html;
         }
-    });
-    
-    if (!hasData) {
-        html = `
-            <div class="px-6 py-12 text-center">
-                <i class="bi bi-inbox text-gray-300 text-5xl mb-3 block"></i>
-                <p class="text-gray-500">No category data available yet</p>
-                <p class="text-gray-400 text-sm mt-2">Complete tests to see your performance by category</p>
-            </div>
-        `;
-    }
-    
-    container.innerHTML = html;
-}
 
-        function renderTestResults(testResults) {
-    const container = document.getElementById('testResultsContainer');
-    
-    if (!container) {
-        console.error('Test results container not found');
-        return;
-    }
-    
-    if (!testResults || testResults.length === 0) {
-        container.innerHTML = `
-            <div class="px-6 py-12 text-center">
-                <i class="bi bi-clipboard-x text-gray-300 text-5xl mb-3 block"></i>
-                <p class="text-gray-500 font-medium">No test results yet</p>
-                <p class="text-gray-400 text-sm mt-2">Complete tests to see your results here</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // Sort by date - most recent first
-    testResults.sort((a, b) => {
-    let dateA = new Date(0);
-    let dateB = new Date(0);
-    
-    // Parse dateA
-    if (a.submittedAt) {
-        if (typeof a.submittedAt.toDate === 'function') {
-            dateA = a.submittedAt.toDate();
-        } else if (a.submittedAt instanceof Date) {
-            dateA = a.submittedAt;
-        } else if (a.submittedAt.seconds) {
-            dateA = new Date(a.submittedAt.seconds * 1000);
-        } else {
-            dateA = new Date(a.submittedAt);
-        }
-    }
-    
-    // Parse dateB
-    if (b.submittedAt) {
-        if (typeof b.submittedAt.toDate === 'function') {
-            dateB = b.submittedAt.toDate();
-        } else if (b.submittedAt instanceof Date) {
-            dateB = b.submittedAt;
-        } else if (b.submittedAt.seconds) {
-            dateB = new Date(b.submittedAt.seconds * 1000);
-        } else {
-            dateB = new Date(b.submittedAt);
-        }
-    }
-    
-    return dateB - dateA; // Most recent first
-});
-    
-    console.log('Rendering', testResults.length, 'test results');
-    
-    let html = '';
-    testResults.forEach((result) => {
-        const scoreColor = result.score >= 85 ? 'text-green-600' : 
-                          result.score >= 75 ? 'text-blue-600' : 
-                          result.score >= 65 ? 'text-yellow-600' : 'text-red-600';
-        
-        const date = result.submittedAt?.toDate 
-            ? result.submittedAt.toDate().toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-            })
-            : (result.submittedAt ? new Date(result.submittedAt).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-            }) : 'N/A');
-        
-        // Check if test is overdue
-        const isOverdue = result.status === 'overdue' || result.status === 'late';
-        const isProfessorOverride = result.isProfessorOverride === true;
-        
-        html += `
-            <div class="px-6 py-4 hover:bg-gray-50 transition-colors ${isOverdue && !isProfessorOverride ? 'bg-red-50/30' : ''}">
-                <!-- Mobile Layout -->
-                <div class="block md:hidden">
-                    <div class="mb-3">
-                        <h4 class="font-semibold text-gray-900 text-sm mb-1">
-                            ${result.testName}
-                            ${isProfessorOverride ? 
-                                '<span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">✓ Professor Set</span>' : 
-                                ''}
-                            ${isOverdue && !isProfessorOverride ? 
-                                '<span class="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">⚠️ Overdue (-10%)</span>' : 
-                                ''}
-                        </h4>
-                        <p class="text-xs text-gray-500">${result.category}</p>
-                        <p class="text-xs text-gray-400 mt-1">
-                            <i class="bi bi-calendar3"></i> ${date}
-                        </p>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-2xl font-bold ${scoreColor}">${result.score.toFixed(1)}</span>
-                            <span class="text-xs text-gray-400 ml-1">/ 100</span>
-                            ${isOverdue && !isProfessorOverride ? 
-                                '<p class="text-xs text-red-600 mt-1">Penalty applied</p>' : 
-                                ''}
-                        </div>
-                        <a href="./studentresult.html?resultId=${result.id}" 
-                           class="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1">
-                            View <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
+        // Setup event listeners
+        function setupEventListeners() {
+            const notificationBtn = document.getElementById('notificationBellBtn');
+            const notificationBtnMobile = document.getElementById('notificationBellBtnMobile');
+            
+            if (notificationBtn) notificationBtn.addEventListener('click', toggleNotificationDropdown);
+            if (notificationBtnMobile) notificationBtnMobile.addEventListener('click', toggleNotificationDropdown);
+            
+            const closeNotificationBtn = document.getElementById('closeNotificationBtn');
+            const closeNotificationBtnMobile = document.getElementById('closeNotificationBtnMobile');
+            
+            if (closeNotificationBtn) {
+                closeNotificationBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeNotificationDropdown();
+                });
+            }
+            
+            if (closeNotificationBtnMobile) {
+                closeNotificationBtnMobile.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeNotificationDropdown();
+                });
+            }
+            
+            const profileBtn = document.getElementById('profilePictureBtn');
+            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
+            
+            if (profileBtn) profileBtn.addEventListener('click', toggleProfileDropdown);
+            if (profileBtnMobile) profileBtnMobile.addEventListener('click', toggleProfileDropdown);
+            
+            document.addEventListener('click', (event) => {
+                if (!event.target.closest('#notificationBellBtn') && 
+                    !event.target.closest('#notificationBellBtnMobile') && 
+                    !event.target.closest('#notificationDropdown') && 
+                    !event.target.closest('#notificationDropdownMobile')) {
+                    closeNotificationDropdown();
+                }
                 
-                <!-- Desktop Layout -->
-                <div class="hidden md:grid grid-cols-12 gap-4 items-center">
-                    <div class="col-span-4">
-                        <h4 class="font-semibold text-gray-900">
-                            ${result.testName}
-                            ${isProfessorOverride ? 
-                                '<span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">✓ Professor Set</span>' : 
-                                ''}
-                            ${isOverdue && !isProfessorOverride ? 
-                                '<span class="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">⚠️ Overdue (-10%)</span>' : 
-                                ''}
-                        </h4>
-                        <p class="text-xs text-gray-500 mt-1">${result.category}</p>
-                    </div>
-                    <div class="col-span-3">
-                        <div class="flex flex-col">
-                            <span class="text-gray-600 text-sm">${result.category}</span>
-                            ${isOverdue && !isProfessorOverride ? 
-                                '<span class="text-xs text-red-600 font-semibold mt-1">⚠️ Submitted Late</span>' : 
-                                ''}
-                        </div>
-                    </div>
-                    <div class="col-span-2 text-center">
-                        <span class="text-gray-600 text-sm">
-                            <i class="bi bi-calendar3"></i> ${date}
-                        </span>
-                    </div>
-                    <div class="col-span-2 text-right">
-                        <div>
-                            <span class="text-3xl font-bold ${scoreColor}">${result.score.toFixed(1)}</span>
-                            <span class="text-xs text-gray-400 ml-1">/ 100</span>
-                            ${isOverdue && !isProfessorOverride ? 
-                                '<p class="text-xs text-red-600 mt-1 font-medium">With penalty</p>' : 
-                                ''}
-                        </div>
-                    </div>
-                    <div class="col-span-1 text-right">
-                        <a href="./studentresult.html?resultId=${result.id}" 
-                           class="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1 hover:gap-2 transition-all">
-                            View <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
-    container.innerHTML = html;
-}
-            const mobileMenuButton = document.getElementById('mobileMenuButton');
-        const mobileMenu = document.getElementById('mobileMenu');
-
-        if (mobileMenuButton) {
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
+                if (!event.target.closest('#profilePictureBtn') && 
+                    !event.target.closest('#profilePictureBtnMobile') && 
+                    !event.target.closest('#profileDropdown') && 
+                    !event.target.closest('#profileDropdownMobile')) {
+                    closeProfileDropdown();
+                }
             });
         }
 
-        // Mobile notification dropdown
-        const notificationBellBtnMobile = document.getElementById('notificationBellBtnMobile');
-        const notificationDropdownMobile = document.getElementById('notificationDropdownMobile');
-
-        if (notificationBellBtnMobile) {
-            notificationBellBtnMobile.addEventListener('click', toggleNotificationDropdownMobile);
-        }
-
-        function toggleNotificationDropdownMobile(event) {
-        event?.stopPropagation();
-        const isHidden = notificationDropdownMobile.classList.contains('hidden');
-        
-        if (isHidden) {
-            notificationDropdownMobile.classList.remove('hidden');
-            closeProfileDropdownMobile();
-            loadNotificationDropdown(true); // Pass true for mobile
-        } else {
-            notificationDropdownMobile.classList.add('hidden');
-        }
-    }
-
-        window.closeNotificationDropdownMobile = function() {
-            notificationDropdownMobile.classList.add('hidden');
-        }
-
-        // Mobile profile dropdown
-        const profilePictureBtnMobile = document.getElementById('profilePictureBtnMobile');
-        const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-
-        if (profilePictureBtnMobile) {
-            profilePictureBtnMobile.addEventListener('click', toggleProfileDropdownMobile);
-        }
-
-        function toggleProfileDropdownMobile(event) {
-            event?.stopPropagation();
-            const isHidden = profileDropdownMobile.classList.contains('hidden');
-            
-            if (isHidden) {
-                profileDropdownMobile.classList.remove('hidden');
-                closeNotificationDropdownMobile();
+        // Auth state change
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                
+                // Show loading screen for a max of 1.5 seconds
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('mainContent').classList.remove('hidden');
+                }, 1500);
+                
+                // Load data in background
+                await loadEssentialData(user);
+                await loadGrades();
+                updateProfileUI();
+                setupEventListeners();
             } else {
-                profileDropdownMobile.classList.add('hidden');
-            }
-        }
-
-        function closeProfileDropdownMobile() {
-            profileDropdownMobile.classList.add('hidden');
-        }
-
-        // Close mobile dropdowns when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('#notificationBellBtnMobile') && 
-                !event.target.closest('#notificationDropdownMobile')) {
-                closeNotificationDropdownMobile();
-            }
-            
-            if (!event.target.closest('#profilePictureBtnMobile') && 
-                !event.target.closest('#profileDropdownMobile')) {
-                closeProfileDropdownMobile();
+                window.location.href = '../login/index.html';
             }
         });
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        currentUser = user;  
-        // Hide loading screen faster by showing main content while loading data
-        setTimeout(() => {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
-        }, 1500); // Max 1.5 second loading screen
-        
-        // Load data in background
-        await loadEssentialData(user);
-        await loadGrades();
-        updateProfileUI();  
-    } else {
-        window.location.href = '../login/index.html';
-    }
-});
+
+        // Make functions globally available
+        window.toggleNotificationDropdown = toggleNotificationDropdown;
+        window.closeNotificationDropdown = closeNotificationDropdown;
+        window.toggleProfileDropdown = toggleProfileDropdown;
+        window.handleLogout = handleLogout;
     </script>
 </body>
 </html>
