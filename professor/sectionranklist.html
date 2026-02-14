@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>UMakFit - Section Rank List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { 
+            -webkit-font-smoothing: antialiased; 
+            box-sizing: border-box; 
+            font-family: 'Poppins', sans-serif; 
+        }
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f6f6f6;
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+        .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Custom animations */
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0.5; } 
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes bounceSlow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .slide-down { animation: slideDown 0.3s ease; }
+        .animate-bounce-slow { animation: bounceSlow 2s ease-in-out infinite; }
+        
+        /* Hamburger Menu Styles */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+            z-index: 60;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        /* Mobile Drawer */
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
+            z-index: 55;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+        }
+
+        .mobile-drawer.active { right: 0; }
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .drawer-overlay.active { opacity: 1; visibility: visible; }
+
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .desktop-nav { display: none; }
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Card shadows */
+        .card-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        
+        /* Loading Screen */
+        .spinner {
+            border: 4px solid #f1f5f9;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Rank badge styles */
+        .rank-1 {
+            background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%);
+            color: #1e293b;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        .rank-2 {
+            background: linear-gradient(135deg, #C0C0C0 0%, #E0E0E0 100%);
+            color: #1e293b;
+            box-shadow: 0 4px 15px rgba(192, 192, 192, 0.3);
+        }
+        .rank-3 {
+            background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(205, 127, 50, 0.3);
+        }
+        .rank-other {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+        }
+        
+        /* Table styles */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+        }
+        
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        @media screen and (min-width: 769px) {
+            .custom-table {
+                min-width: 800px;
+            }
+            
+            .custom-table thead {
+                background: linear-gradient(90deg, rgba(30, 58, 138, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%);
+            }
+            
+            .custom-table th {
+                font-weight: 600;
+                color: white;
+                font-size: 14px;
+                text-align: left;
+                padding: 15px 12px;
+                border-bottom: 2px solid #e2e8f0;
+                white-space: nowrap;
+            }
+            
+            .custom-table td {
+                font-weight: 400;
+                color: #000;
+                font-size: 14px;
+                padding: 16px 12px;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            
+            .custom-table tbody tr {
+                transition: all 0.2s ease;
+            }
+            
+            .custom-table tbody tr:hover {
+                background-color: #f8fafc;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            }
+        }
+        
+        @media screen and (max-width: 768px) {
+            .table-responsive {
+                overflow-x: visible;
+                border: none;
+                background: transparent;
+            }
+            
+            .custom-table {
+                min-width: 0;
+                width: 100%;
+                background: transparent;
+                border: none;
+            }
+            
+            .custom-table thead {
+                display: none;
+            }
+            
+            .custom-table tbody tr {
+                display: block;
+                margin-bottom: 16px;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                background: white;
+                padding: 16px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            }
+            
+            .custom-table tbody td {
+                display: flex;
+                padding: 10px 8px 10px 40%;
+                border: none;
+                border-bottom: 1px solid #f1f5f9;
+                text-align: left;
+                position: relative;
+                min-height: 44px;
+                align-items: center;
+            }
+            
+            .custom-table tbody td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 12px;
+                width: 35%;
+                font-weight: 600;
+                color: #4b5563;
+                font-size: 13px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .custom-table tbody td:last-child {
+                border-bottom: none;
+                padding-left: 40%;
+            }
+        }
+        
+        /* Badge styles */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .badge-excellent {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-good {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-fair {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-poor {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        /* Stats cards */
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        /* Filter select */
+        .filter-select {
+            padding: 10px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+
+        .filter-select:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 overflow-x-hidden">
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white bg-opacity-95 flex flex-col justify-center items-center z-50">
+        <div class="spinner"></div>
+        <div class="mt-5 text-gray-600 font-medium">Loading Section Rank List...</div>
+    </div>
+    
+    <div id="mainContent" class="hidden overflow-x-hidden">
+        <!-- UPDATED NAVIGATION BANNER -->
+        <header class="shadow-lg fixed w-full top-0 z-50" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
+            <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-3">
+                        <div class="w-16 h-16 flex items-center justify-center overflow-visible">
+                            <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-20 h-20 object-contain">
+                        </div>
+                        <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-montserrat gradient-text">
+                            UMakFIT
+                        </span>
+                    </div>
+
+                    <!-- Desktop Navigation -->
+                    <div class="desktop-nav hidden md:flex items-center gap-8">
+                        <a href="professor.html" class="text-white/80 hover:text-white font-medium transition-colors">
+                            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                        </a>
+                        <a href="studentmanagement.html" class="text-white/80 hover:text-white font-medium transition-colors">
+                            <i class="fas fa-users mr-2"></i>Students
+                        </a>
+                        <a href="addactivities.html" class="text-white/80 hover:text-white font-medium transition-colors">
+                            <i class="fas fa-dumbbell mr-2"></i>Activities
+                        </a>
+                        <a href="addlesson.html" class="text-white/80 hover:text-white font-medium transition-colors">
+                            <i class="fas fa-book-open mr-2"></i>Lessons
+                        </a>
+                        <a href="monitoringactivities.html" class="text-white/80 hover:text-white font-medium transition-colors">
+                            <i class="fas fa-chart-bar mr-2"></i>Monitoring
+                        </a>
+                        <a href="grades.html" class="text-white/80 hover:text-white font-medium transition-colors">
+                            <i class="fas fa-graduation-cap mr-2"></i>Grades
+                        </a>
+                        <a href="sectionranklist.html" class="text-white font-medium px-3 py-2 rounded-lg" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);">
+                            <i class="fas fa-trophy mr-2"></i>Section Rank
+                        </a>
+                    </div>
+
+                    <!-- Desktop Profile -->
+                    <div class="hidden md:block relative">
+                        <img src="" alt="Profile" id="profilePictureBtn"
+                             class="w-10 h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
+                        
+                        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                            <div class="p-6 border-b-2 border-gray-200 text-center">
+                                <img src="" alt="Profile" id="profileDropdownPicture" class="w-20 h-20 rounded-full mx-auto mb-3 border-3 border-blue-500 object-cover">
+                                <h6 id="profileDropdownName" class="font-bold text-gray-900 text-lg">Loading...</h6>
+                                <p id="profileDropdownEmail" class="text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
+                            </div>
+                            <div class="p-2">
+                                <a href="professor-profile.html" onclick="showViewProfile(event)" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <i class="bi bi-person-circle text-blue-500 text-xl"></i>
+                                    <span class="font-medium text-gray-700 text-base">View Profile</span>
+                                </a>
+                                <div class="h-px bg-gray-200 my-2"></div>
+                                <div onclick="handleLogout(event)" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                    <i class="fas fa-sign-out-alt text-xl"></i>
+                                    <span class="font-medium text-base">Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Right Icons -->
+                    <div class="flex md:hidden items-center gap-3">
+                        <!-- Mobile Profile -->
+                        <div class="relative">
+                            <img src="" alt="Profile" id="profilePictureBtnMobile"
+                                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
+                            
+                            <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                                <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
+                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                                    <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
+                                    <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
+                                </div>
+                                <div class="p-2">
+                                    <a href="professor-profile.html" onclick="showViewProfile(event)" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
+                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
+                                    </a>
+                                    <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
+                                    <div onclick="handleLogout(event)" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                        <i class="fas fa-sign-out-alt text-lg sm:text-xl"></i>
+                                        <span class="font-medium text-sm sm:text-base">Logout</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hamburger Menu -->
+                        <div class="hamburger" id="hamburger">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Mobile Drawer Overlay -->
+            <div class="drawer-overlay" id="drawerOverlay"></div>
+
+            <!-- Mobile Drawer -->
+            <div class="mobile-drawer" id="mobileDrawer">
+                <div class="p-6 pt-8">
+                    <!-- Drawer Header -->
+                    <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
+                        <div class="w-12 h-12 flex items-center justify-center overflow-visible">
+                            <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-14 h-14 object-contain">
+                        </div>
+                        <span class="text-2xl font-extrabold font-montserrat gradient-text">
+                            UMakFIT
+                        </span>
+                    </div>
+
+                    <!-- Navigation Links -->
+                    <nav class="space-y-2 mb-8">
+                        <a href="professor.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
+                            <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                        </a>
+                        <a href="studentmanagement.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
+                            <i class="fas fa-users mr-3"></i>Student Management
+                        </a>
+                        <a href="addactivities.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
+                            <i class="fas fa-dumbbell mr-3"></i>Add Activities
+                        </a>
+                        <a href="addlesson.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
+                            <i class="fas fa-book-open mr-3"></i>Add Lesson
+                        </a>
+                        <a href="monitoringactivities.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
+                            <i class="fas fa-chart-bar mr-3"></i>Monitoring Activities
+                        </a>
+                        <a href="grades.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
+                            <i class="fas fa-graduation-cap mr-3"></i>Grades
+                        </a>
+                        <a href="sectionranklist.html" class="mobile-nav-link block text-white font-medium py-3 px-4 rounded-lg" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);">
+                            <i class="fas fa-trophy mr-3"></i>Section Rank
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen pt-32 pb-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Page Header -->
+                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-8 mb-8 animate-fade-in-up">
+                    <div class="flex items-center mb-5">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center mr-5 shadow-lg">
+                            <i class="fas fa-trophy text-white text-3xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-blue-900 font-bold text-3xl">Section Rank List</h1>
+                            <p class="text-gray-600 font-medium text-base mt-2">Compare section performance and track progress</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Overview Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div class="stat-card bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl text-white p-6 hover:-translate-y-1 hover:shadow-xl transition-all">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-trophy text-2xl"></i>
+                            <span class="font-semibold">Top Section</span>
+                        </div>
+                        <div class="font-extrabold text-2xl" id="topSectionName">-</div>
+                        <div class="text-sm opacity-90 mt-2" id="topSectionScore">0% average</div>
+                    </div>
+
+                    <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl text-white p-6 hover:-translate-y-1 hover:shadow-xl transition-all">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-chart-line text-2xl"></i>
+                            <span class="font-semibold">Total Sections</span>
+                        </div>
+                        <div class="font-extrabold text-3xl" id="totalSections">0</div>
+                    </div>
+
+                    <div class="stat-card bg-gradient-to-br from-green-500 to-green-700 rounded-2xl text-white p-6 hover:-translate-y-1 hover:shadow-xl transition-all">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-users text-2xl"></i>
+                            <span class="font-semibold">Total Students</span>
+                        </div>
+                        <div class="font-extrabold text-3xl" id="totalStudents">0</div>
+                    </div>
+
+                    <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl text-white p-6 hover:-translate-y-1 hover:shadow-xl transition-all">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-star text-2xl"></i>
+                            <span class="font-semibold">Overall Avg</span>
+                        </div>
+                        <div class="font-extrabold text-3xl" id="overallAvg">0%</div>
+                    </div>
+                </div>
+
+                <!-- Main Content Card -->
+                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+                        <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
+                            <i class="fas fa-ranking-star text-yellow-500"></i>
+                            Section Performance Rankings
+                        </h3>
+                        <div class="flex gap-3 mt-3 sm:mt-0">
+                            <select id="sortBy" class="filter-select" onchange="applyFilters()">
+                                <option value="rank">Sort by Rank</option>
+                                <option value="average-desc">Highest to Lowest Score</option>
+                                <option value="average-asc">Lowest to Highest Score</option>
+                                <option value="students-desc">Most Students</option>
+                                <option value="students-asc">Least Students</option>
+                                <option value="name-asc">Section Name (A-Z)</option>
+                                <option value="name-desc">Section Name (Z-A)</option>
+                            </select>
+                            <button onclick="refreshData()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center gap-2 transition-all">
+                                <i class="fas fa-sync-alt"></i>
+                                <span class="hidden sm:inline">Refresh</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table Responsive -->
+                    <div class="table-responsive">
+                        <table class="custom-table" id="rankTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">Rank</th>
+                                    <th>Section Name</th>
+                                    <th>Total Students</th>
+                                    <th>Students with Grades</th>
+                                    <th>Completion Rate</th>
+                                    <th>Average Score</th>
+                                    <th>Performance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rankTableBody">
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">⏳</div>
+                                            <div class="empty-title">Loading Rankings...</div>
+                                            <div class="empty-text">Please wait while we calculate section performance.</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 sm:py-12">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
+                    <!-- About UmakFit -->
+                    <div>
+                        <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                            <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
+                            <div>
+                                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
+                                <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
+                            </div>
+                        </div>
+                        <p class="text-sm lg:text-base leading-relaxed text-blue-100">
+                            UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati.
+                        </p>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div>
+                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
+                        <div class="grid grid-cols-2 gap-4 lg:gap-6">
+                            <div class="space-y-3">
+                                <a href="professor.html" class="block text-blue-100 hover:text-yellow-300 transition-all">Dashboard</a>
+                                <a href="studentmanagement.html" class="block text-blue-100 hover:text-yellow-300 transition-all">Students</a>
+                                <a href="addactivities.html" class="block text-blue-100 hover:text-yellow-300 transition-all">Activities</a>
+                            </div>
+                            <div class="space-y-3">
+                                <a href="addlesson.html" class="block text-blue-100 hover:text-yellow-300 transition-all">Lessons</a>
+                                <a href="monitoringactivities.html" class="block text-blue-100 hover:text-yellow-300 transition-all">Monitoring</a>
+                                <a href="grades.html" class="block text-blue-100 hover:text-yellow-300 transition-all">Grades</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div>
+                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
+                        <div class="space-y-4">
+                            <p class="text-sm lg:text-base text-blue-100">
+                                College of Human Kinetics<br>
+                                University of Makati<br>
+                                3rd floor, Administration Building
+                            </p>
+                            <p class="text-sm lg:text-base text-blue-100">chk@umak.edu.ph</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border-t border-blue-600/50 mt-8 pt-6">
+                    <p class="text-center text-xs lg:text-sm text-blue-200">
+                        © 2025 University of Makati - College of Human Kinetics. All Rights Reserved.
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, getDocs, query, where, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+            authDomain: "umakfit-e3b1d.firebaseapp.com",
+            projectId: "umakfit-e3b1d",
+            storageBucket: "umakfit-e3b1d.appspot.com",
+            messagingSenderId: "276569891504",
+            appId: "1:276569891504:web:39b1732b519f4d8b785175"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Global variables
+        let currentProfessor = null;
+        let professorSections = [];
+        let allTestResults = [];
+        let sectionRankings = [];
+        let filteredRankings = [];
+
+        // ============ EXACT SCORING FUNCTION FROM GRADES PAGE ============
+        function calculateActivityScore(testName, result, testTarget = null) {
+            const normalized = testName.toLowerCase().trim();
+            
+            // Check for professor override with pre-calculated score
+            if (result && typeof result === 'object' && result !== null) {
+                if (result.score !== undefined && result.score !== null) {
+                    const score = parseFloat(result.score);
+                    if (!isNaN(score) && score >= 0 && score <= 100) {
+                        return score;
+                    }
+                }
+            }
+            
+            // Extract numeric value
+            let numericValue = 0;
+            if (typeof result === 'object' && result !== null) {
+                numericValue = result.repetitions || result.time || result.distance || 
+                              result.value || result.result || result.count || 
+                              result.score || 0;
+            } else if (typeof result === 'string') {
+                const match = result.match(/(\d+\.?\d*)/);
+                if (match) {
+                    numericValue = parseFloat(match[1]);
+                } else {
+                    numericValue = parseFloat(result) || 0;
+                }
+            } else {
+                numericValue = parseFloat(result) || 0;
+            }
+            
+            // Use test target if available
+            if (testTarget && testTarget > 0) {
+                if (normalized.includes('push-up') || normalized.includes('pushup') || 
+                    normalized.includes('sit-up') || normalized.includes('situp') ||
+                    normalized.includes('curl-up')) {
+                    
+                    const reps = numericValue;
+                    if (reps >= testTarget) return 100;
+                    
+                    const percentage = (reps / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 100) score = 100;
+                    else if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('plank')) {
+                    let seconds = numericValue;
+                    if (seconds >= testTarget) return 100;
+                    
+                    const percentage = (seconds / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 100) score = 100;
+                    else if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('sit-and-reach')) {
+                    const distance = numericValue;
+                    if (distance >= testTarget) return 100;
+                    
+                    const percentage = (distance / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 100) score = 100;
+                    else if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('mile') || normalized.includes('run')) {
+                    if (numericValue <= testTarget) return 100;
+                    
+                    const percentage = (testTarget / numericValue) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+            }
+            
+            // FALLBACK DEFAULT SCORING
+            if (normalized.includes('push-up') || normalized.includes('pushup')) {
+                const reps = numericValue;
+                if (reps >= 40) return 100;
+                if (reps >= 35) return 95;
+                if (reps >= 30) return 90;
+                if (reps >= 25) return 85;
+                if (reps >= 20) return 80;
+                if (reps >= 15) return 75;
+                if (reps >= 10) return 70;
+                if (reps >= 5) return 65;
+                return 60;
+            }
+            
+            if (normalized.includes('sit-up') || normalized.includes('situp')) {
+                const reps = numericValue;
+                if (reps >= 50) return 100;
+                if (reps >= 45) return 95;
+                if (reps >= 40) return 90;
+                if (reps >= 35) return 85;
+                if (reps >= 30) return 80;
+                if (reps >= 25) return 75;
+                if (reps >= 20) return 70;
+                if (reps >= 15) return 65;
+                return 60;
+            }
+            
+            if (normalized.includes('plank')) {
+                let seconds = numericValue;
+                if (seconds >= 180) return 100;
+                if (seconds >= 150) return 95;
+                if (seconds >= 120) return 90;
+                if (seconds >= 100) return 85;
+                if (seconds >= 80) return 80;
+                if (seconds >= 60) return 75;
+                if (seconds >= 45) return 70;
+                if (seconds >= 30) return 65;
+                return 60;
+            }
+            
+            return 75;
+        }
+
+        function getPerformanceBadge(score) {
+            if (score >= 90) return { text: 'Excellent', class: 'badge-excellent' };
+            if (score >= 80) return { text: 'Good', class: 'badge-good' };
+            if (score >= 70) return { text: 'Fair', class: 'badge-fair' };
+            return { text: 'Needs Improvement', class: 'badge-poor' };
+        }
+
+        function getRankClass(rank) {
+            if (rank === 1) return 'rank-1';
+            if (rank === 2) return 'rank-2';
+            if (rank === 3) return 'rank-3';
+            return 'rank-other';
+        }
+
+        // Navigation setup
+        const hamburger = document.getElementById('hamburger');
+        const mobileDrawer = document.getElementById('mobileDrawer');
+        const drawerOverlay = document.getElementById('drawerOverlay');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+        const profilePictureBtn = document.getElementById('profilePictureBtn');
+        const profilePictureBtnMobile = document.getElementById('profilePictureBtnMobile');
+        const profileDropdown = document.getElementById('profileDropdown');
+        const profileDropdownMobile = document.getElementById('profileDropdownMobile');
+
+        // Hamburger Menu Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            if (hamburger && mobileDrawer && drawerOverlay) {
+                hamburger.addEventListener('click', () => {
+                    hamburger.classList.toggle('active');
+                    mobileDrawer.classList.toggle('active');
+                    drawerOverlay.classList.toggle('active');
+                    document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+                });
+
+                drawerOverlay.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileDrawer.classList.remove('active');
+                    drawerOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+
+                mobileNavLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        hamburger.classList.remove('active');
+                        mobileDrawer.classList.remove('active');
+                        drawerOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                });
+            }
+            
+            if (profilePictureBtn) {
+                profilePictureBtn.addEventListener('click', toggleProfileDropdown);
+            }
+            
+            if (profilePictureBtnMobile) {
+                profilePictureBtnMobile.addEventListener('click', toggleProfileDropdown);
+            }
+            
+            document.addEventListener('click', closeAllDropdowns);
+        });
+
+        function toggleProfileDropdown(event) {
+            event?.stopPropagation();
+            const isMobile = window.innerWidth < 768;
+            const dropdown = isMobile ? profileDropdownMobile : profileDropdown;
+            dropdown.classList.toggle('hidden');
+        }
+
+        function closeProfileDropdown() {
+            if (profileDropdown) profileDropdown.classList.add('hidden');
+            if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
+        }
+
+        function closeAllDropdowns(event) {
+            if (!event.target.closest('#profilePictureBtn') && 
+                !event.target.closest('#profilePictureBtnMobile') && 
+                !event.target.closest('#profileDropdown') && 
+                !event.target.closest('#profileDropdownMobile')) {
+                closeProfileDropdown();
+            }
+        }
+
+        window.handleLogout = async function(event) {
+            if (event) event.preventDefault();
+            closeProfileDropdown();
+            
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    await signOut(auth);
+                    window.location.href = '/login/index.html';
+                } catch (error) {
+                    console.error('Error logging out:', error);
+                    window.location.href = '/login/index.html';
+                }
+            }
+        };
+
+        function updateProfilePicture(photoURL, userName) {
+            const profileBtn = document.getElementById('profilePictureBtn');
+            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
+            const dropdownPic = document.getElementById('profileDropdownPicture');
+            const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
+            
+            const displayName = currentProfessor?.fullName || currentProfessor?.name || userName || 'Professor';
+            const email = currentProfessor?.email || 'professor@umak.edu.ph';
+            
+            const photoUrlToUse = photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=3b82f6&color=fff&size=128`;
+            
+            if (profileBtn) profileBtn.src = photoUrlToUse;
+            if (profileBtnMobile) profileBtnMobile.src = photoUrlToUse;
+            if (dropdownPic) dropdownPic.src = photoUrlToUse;
+            if (dropdownPicMobile) dropdownPicMobile.src = photoUrlToUse;
+            
+            document.getElementById('profileDropdownName').textContent = displayName;
+            document.getElementById('profileDropdownNameMobile').textContent = displayName;
+            document.getElementById('profileDropdownEmail').textContent = email;
+            document.getElementById('profileDropdownEmailMobile').textContent = email;
+        }
+
+        // Main auth state listener
+        onAuthStateChanged(auth, async (user) => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const mainContent = document.getElementById('mainContent');
+
+            if (user) {
+                try {
+                    console.log('User authenticated:', user.email);
+                    
+                    // Load professor data
+                    const professorsQuery = query(collection(db, 'professors'), where('email', '==', user.email));
+                    const professorsSnapshot = await getDocs(professorsQuery);
+                    
+                    if (!professorsSnapshot.empty) {
+                        currentProfessor = { id: professorsSnapshot.docs[0].id, ...professorsSnapshot.docs[0].data() };
+                    } else {
+                        const usersQuery = query(collection(db, 'users'), where('email', '==', user.email), where('role', '==', 'professor'));
+                        const usersSnapshot = await getDocs(usersQuery);
+                        if (!usersSnapshot.empty) {
+                            currentProfessor = { id: usersSnapshot.docs[0].id, ...usersSnapshot.docs[0].data() };
+                        }
+                    }
+                    
+                    updateProfilePicture(user.photoURL, user.displayName);
+                    
+                    // Load professor's sections
+                    await loadProfessorSections();
+                    
+                    // Load test results
+                    await loadTestResults();
+                    
+                    // Calculate and display rankings
+                    calculateSectionRankings();
+                    
+                    loadingScreen.style.display = 'none';
+                    mainContent.classList.remove('hidden');
+                    
+                } catch (error) {
+                    console.error('Error loading section rank list:', error);
+                    loadingScreen.style.display = 'none';
+                    mainContent.classList.remove('hidden');
+                    alert('Error loading data: ' + error.message);
+                }
+            } else {
+                window.location.href = '/login/index.html';
+            }
+        });
+
+        async function loadProfessorSections() {
+            try {
+                professorSections = [];
+                
+                const professorName = currentProfessor?.fullName || currentProfessor?.name || '';
+                const professorEmail = currentProfessor?.email;
+                
+                const sectionsSnapshot = await getDocs(collection(db, 'sections'));
+                
+                sectionsSnapshot.forEach((doc) => {
+                    const sectionData = doc.data();
+                    
+                    // Check if this section belongs to the professor
+                    const professorMatches =
+                        sectionData.professor === professorName ||
+                        sectionData.professorEmail === professorEmail ||
+                        (sectionData.professor && professorName.includes(sectionData.professor));
+                    
+                    if (professorMatches) {
+                        professorSections.push({
+                            id: doc.id,
+                            name: sectionData.name || 'Unnamed Section',
+                            courseCode: sectionData.courseCode || 'PE 3',
+                            students: sectionData.students || [],
+                            studentCount: (sectionData.students || []).length,
+                            yearLevel: sectionData.yearLevel || 'N/A'
+                        });
+                    }
+                });
+                
+                console.log(`✅ Loaded ${professorSections.length} sections for professor`);
+                
+            } catch (error) {
+                console.error('Error loading professor sections:', error);
+            }
+        }
+
+        async function loadTestResults() {
+            try {
+                allTestResults = [];
+                
+                if (professorSections.length === 0) {
+                    console.log('No sections assigned');
+                    return;
+                }
+                
+                // Get section names
+                const sectionNames = professorSections.map(s => s.name);
+                
+                // Query testResults for these sections
+                const resultsQuery = query(
+                    collection(db, 'testResults'),
+                    where('section', 'in', sectionNames.slice(0, 10)), // Firestore 'in' limit is 10
+                    where('status', '==', 'completed')
+                );
+                
+                const resultsSnapshot = await getDocs(resultsQuery);
+                
+                // Also query testResults without section filter as backup
+                const backupResults = await getDocs(collection(db, 'testResults'));
+                
+                // Process results
+                const bestScoresMap = new Map(); // Track best score per student per test
+                
+                resultsSnapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.status !== 'completed') return;
+                    
+                    const studentEmail = data.studentEmail;
+                    const testId = data.testId || docSnap.id;
+                    const testKey = `${studentEmail}_${testId}`;
+                    
+                    const score = calculateActivityScore(
+                        data.testName,
+                        data.result || data.resultData || data.repetitions || data,
+                        data.testTarget || null
+                    );
+                    
+                    // Keep only best score per test
+                    if (!bestScoresMap.has(testKey) || score > bestScoresMap.get(testKey).score) {
+                        bestScoresMap.set(testKey, {
+                            id: docSnap.id,
+                            studentName: data.studentName || 'Unknown',
+                            studentEmail: studentEmail,
+                            section: data.section,
+                            testName: data.testName,
+                            testId: testId,
+                            score: score,
+                            submittedAt: data.submittedAt
+                        });
+                    }
+                });
+                
+                // Also process backup results that might not have section field
+                backupResults.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.status !== 'completed') return;
+                    
+                    // Check if this result belongs to one of professor's sections by student email
+                    const studentSection = professorSections.find(s => 
+                        s.students && s.students.some(student => student.email === data.studentEmail)
+                    );
+                    
+                    if (studentSection) {
+                        const studentEmail = data.studentEmail;
+                        const testId = data.testId || docSnap.id;
+                        const testKey = `${studentEmail}_${testId}`;
+                        
+                        const score = calculateActivityScore(
+                            data.testName,
+                            data.result || data.resultData || data.repetitions || data,
+                            data.testTarget || null
+                        );
+                        
+                        if (!bestScoresMap.has(testKey) || score > bestScoresMap.get(testKey).score) {
+                            bestScoresMap.set(testKey, {
+                                id: docSnap.id,
+                                studentName: data.studentName || 'Unknown',
+                                studentEmail: studentEmail,
+                                section: studentSection.name,
+                                testName: data.testName,
+                                testId: testId,
+                                score: score,
+                                submittedAt: data.submittedAt
+                            });
+                        }
+                    }
+                });
+                
+                allTestResults = Array.from(bestScoresMap.values());
+                
+                console.log(`✅ Loaded ${allTestResults.length} unique test results`);
+                
+            } catch (error) {
+                console.error('Error loading test results:', error);
+            }
+        }
+
+        function calculateSectionRankings() {
+            try {
+                sectionRankings = [];
+                
+                if (professorSections.length === 0) {
+                    console.log('No sections to rank');
+                    displayRankings([]);
+                    return;
+                }
+                
+                professorSections.forEach(section => {
+                    // Get students in this section
+                    const studentsInSection = section.students || [];
+                    const studentEmails = studentsInSection.map(s => s.email).filter(Boolean);
+                    
+                    // Get test results for this section
+                    const sectionResults = allTestResults.filter(r => r.section === section.name);
+                    
+                    // Group results by student email
+                    const studentScores = new Map();
+                    sectionResults.forEach(result => {
+                        if (!studentScores.has(result.studentEmail)) {
+                            studentScores.set(result.studentEmail, []);
+                        }
+                        studentScores.get(result.studentEmail).push(result.score);
+                    });
+                    
+                    // Calculate average score per student (using best scores per test already)
+                    const studentAverages = [];
+                    studentScores.forEach((scores, email) => {
+                        if (scores.length > 0) {
+                            const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+                            studentAverages.push(avg);
+                        }
+                    });
+                    
+                    // Calculate section statistics
+                    const totalStudents = studentsInSection.length;
+                    const studentsWithGrades = studentAverages.length;
+                    const completionRate = totalStudents > 0 ? (studentsWithGrades / totalStudents) * 100 : 0;
+                    
+                    let sectionAverage = 0;
+                    if (studentAverages.length > 0) {
+                        sectionAverage = studentAverages.reduce((a, b) => a + b, 0) / studentAverages.length;
+                    }
+                    
+                    sectionRankings.push({
+                        id: section.id,
+                        name: section.name,
+                        courseCode: section.courseCode,
+                        yearLevel: section.yearLevel,
+                        totalStudents: totalStudents,
+                        studentsWithGrades: studentsWithGrades,
+                        completionRate: parseFloat(completionRate.toFixed(2)),
+                        averageScore: parseFloat(sectionAverage.toFixed(2)),
+                        studentAverages: studentAverages,
+                        students: studentsInSection
+                    });
+                });
+                
+                // Sort by average score (highest first) for ranking
+                sectionRankings.sort((a, b) => b.averageScore - a.averageScore);
+                
+                // Add rank numbers
+                sectionRankings = sectionRankings.map((section, index) => ({
+                    ...section,
+                    rank: index + 1
+                }));
+                
+                filteredRankings = [...sectionRankings];
+                displayRankings(filteredRankings);
+                updateStats();
+                
+                console.log('✅ Rankings calculated:', sectionRankings);
+                
+            } catch (error) {
+                console.error('Error calculating rankings:', error);
+            }
+        }
+
+        function displayRankings(rankings) {
+            const tableBody = document.getElementById('rankTableBody');
+            
+            if (rankings.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-icon">📊</div>
+                                <div class="empty-title">No Sections Found</div>
+                                <div class="empty-text">You don't have any sections assigned yet.</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            rankings.forEach((section, index) => {
+                const rankClass = getRankClass(section.rank);
+                const performanceBadge = getPerformanceBadge(section.averageScore);
+                
+                html += `
+                    <tr>
+                        <td data-label="Rank">
+                            <div class="rank-badge ${rankClass}">${section.rank}</div>
+                        </td>
+                        <td data-label="Section Name">
+                            <strong>${section.name}</strong>
+                            <br><small class="text-gray-500">${section.courseCode} • ${section.yearLevel}</small>
+                        </td>
+                        <td data-label="Total Students">
+                            <strong>${section.totalStudents}</strong>
+                        </td>
+                        <td data-label="Students with Grades">
+                            <strong>${section.studentsWithGrades}</strong>
+                            <br><small class="text-gray-500">${section.completionRate}%</small>
+                        </td>
+                        <td data-label="Completion Rate">
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${section.completionRate}%"></div>
+                            </div>
+                            <span class="text-xs font-medium">${section.completionRate}%</span>
+                        </td>
+                        <td data-label="Average Score">
+                            <span class="font-bold text-lg">${section.averageScore}%</span>
+                        </td>
+                        <td data-label="Performance">
+                            <span class="badge ${performanceBadge.class}">${performanceBadge.text}</span>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = html;
+        }
+
+        function updateStats() {
+            if (sectionRankings.length === 0) return;
+            
+            document.getElementById('totalSections').textContent = sectionRankings.length;
+            
+            const topSection = sectionRankings[0];
+            if (topSection) {
+                document.getElementById('topSectionName').textContent = topSection.name;
+                document.getElementById('topSectionScore').textContent = `${topSection.averageScore}% average`;
+            }
+            
+            const totalStudents = sectionRankings.reduce((sum, s) => sum + s.totalStudents, 0);
+            document.getElementById('totalStudents').textContent = totalStudents;
+            
+            const overallAvg = sectionRankings.reduce((sum, s) => sum + s.averageScore, 0) / sectionRankings.length;
+            document.getElementById('overallAvg').textContent = `${overallAvg.toFixed(2)}%`;
+        }
+
+        window.applyFilters = function() {
+            const sortBy = document.getElementById('sortBy').value;
+            
+            let sorted = [...sectionRankings];
+            
+            switch(sortBy) {
+                case 'rank':
+                    sorted.sort((a, b) => a.rank - b.rank);
+                    break;
+                case 'average-desc':
+                    sorted.sort((a, b) => b.averageScore - a.averageScore);
+                    break;
+                case 'average-asc':
+                    sorted.sort((a, b) => a.averageScore - b.averageScore);
+                    break;
+                case 'students-desc':
+                    sorted.sort((a, b) => b.totalStudents - a.totalStudents);
+                    break;
+                case 'students-asc':
+                    sorted.sort((a, b) => a.totalStudents - b.totalStudents);
+                    break;
+                case 'name-asc':
+                    sorted.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'name-desc':
+                    sorted.sort((a, b) => b.name.localeCompare(a.name));
+                    break;
+            }
+            
+            // Reassign ranks based on new sort order
+            if (sortBy !== 'rank') {
+                sorted = sorted.map((item, index) => ({
+                    ...item,
+                    rank: index + 1
+                }));
+            }
+            
+            filteredRankings = sorted;
+            displayRankings(filteredRankings);
+        };
+
+        window.refreshData = async function() {
+            const refreshBtn = event?.target?.closest('button');
+            if (refreshBtn) {
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i>';
+            }
+            
+            await loadProfessorSections();
+            await loadTestResults();
+            calculateSectionRankings();
+            
+            if (refreshBtn) {
+                setTimeout(() => {
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> <span class="hidden sm:inline">Refresh</span>';
+                }, 500);
+            }
+        };
+    </script>
+</body>
+</html>
