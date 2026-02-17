@@ -765,17 +765,47 @@
         }
 
         async function checkSecretaryStatus(user) {
-            try {
-                const secretaryRef = window.doc(window.db, 'secretaries', user.uid);
-                const secretarySnap = await window.getDoc(secretaryRef);
-                if (secretarySnap.exists()) return secretarySnap.data();
-                
-                const secretariesQuery = window.query(window.collection(window.db, 'secretaries'), window.where('email', '==', user.email.toLowerCase()));
-                const secretariesSnapshot = await window.getDocs(secretariesQuery);
-                if (!secretariesSnapshot.empty) return secretariesSnapshot.docs[0].data();
-            } catch (error) {}
-            return null;
+    try {
+        // First check secretaries collection by UID
+        const secretaryRef = window.doc(window.db, 'secretaries', user.uid);
+        const secretarySnap = await window.getDoc(secretaryRef);
+        if (secretarySnap.exists()) return secretarySnap.data();
+        
+        // Then check secretaries collection by email
+        const secretariesQuery = window.query(window.collection(window.db, 'secretaries'), window.where('email', '==', user.email.toLowerCase()));
+        const secretariesSnapshot = await window.getDocs(secretariesQuery);
+        if (!secretariesSnapshot.empty) return secretariesSnapshot.docs[0].data();
+        
+        // NEW: Check users collection for role = 'secretary'
+        const userEmailKey = user.email.toLowerCase().replace(/\./g, '_');
+        const userDocRef = window.doc(window.db, 'users', userEmailKey);
+        const userDocSnap = await window.getDoc(userDocRef);
+        
+        if (userDocSnap.exists() && userDocSnap.data().role === 'secretary') {
+            return {
+                id: user.uid,
+                email: user.email.toLowerCase(),
+                role: 'secretary',
+                ...userDocSnap.data()
+            };
         }
+        
+        // Also check users collection by email field query
+        const usersQuery = window.query(
+            window.collection(window.db, 'users'), 
+            window.where('email', '==', user.email.toLowerCase()),
+            window.where('role', '==', 'secretary')
+        );
+        const usersSnapshot = await window.getDocs(usersQuery);
+        if (!usersSnapshot.empty) {
+            return usersSnapshot.docs[0].data();
+        }
+        
+    } catch (error) {
+        console.log('Error checking secretary status:', error);
+    }
+    return null;
+}
 
         async function checkDeanStatus(user) {
             try {
