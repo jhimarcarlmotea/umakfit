@@ -1094,27 +1094,33 @@
                         </button>
                     </div>
                     
-                    <!-- Search + Filter Row -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-search text-gray-400"></i>
-                            </div>
-                            <input type="text" id="searchSchedule" 
-                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                                placeholder="Search by Test Name or Section" 
-                                onkeyup="filterScheduleTable()">
-                        </div>
-                        <select id="filterTestType" onchange="filterScheduleTable()"
-                                class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-700">
-                            <option value="">All Test Types</option>
-                            <option value="3-Minute Step Test">3-Minute Step Test</option>
-                            <option value="Curl-Up Test">Curl-Up Test</option>
-                            <option value="Push-Up Test">Push-Up Test</option>
-                            <option value="Sit-and-Reach">Sit-and-Reach Test</option>
-                            <option value="Skinfold Caliper">Skinfold Caliper</option>
-                        </select>
-                    </div>
+<!-- Search + Filter Row + NEW Section Sort Dropdown with Test Count -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-search text-gray-400"></i>
+        </div>
+        <input type="text" id="searchSchedule" 
+            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+            placeholder="Search by Test Name or Section" 
+            onkeyup="filterScheduleTable()">
+    </div>
+    <select id="filterTestType" onchange="filterScheduleTable()"
+            class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-700">
+        <option value="">All Test Types</option>
+        <option value="3-Minute Step Test">3-Minute Step Test</option>
+        <option value="Curl-Up Test">Curl-Up Test</option>
+        <option value="Push-Up Test">Push-Up Test</option>
+        <option value="Sit-and-Reach">Sit-and-Reach Test</option>
+        <option value="Skinfold Caliper">Skinfold Caliper</option>
+    </select>
+    <!-- NEW: Sort by Section Dropdown with test count -->
+    <select id="sortBySection" onchange="filterScheduleTable()" 
+            class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-700">
+        <option value="">All Sections (sorted by section)</option>
+        <!-- Options will be populated dynamically via JavaScript with test count badges -->
+    </select>
+</div>
                     
                     <!-- Schedule Table -->
                     <div class="table-responsive" style="max-height: 420px; overflow-y: auto; border-radius: 8px; border: 1px solid #e2e8f0;">
@@ -1778,6 +1784,8 @@
         window.selectedStudentEmails = new Set();
         window.currentManagingTestId = null;
         window.studentResultsMap = new Map();
+        // Store all loaded tests for filtering/sorting
+window.allScheduledTests = [];
 
         onAuthStateChanged(auth, async (user) => {
             const loadingScreen = document.getElementById('loadingScreen');
@@ -1806,7 +1814,32 @@
                 window.location.href = '/login/index.html';
             }
         });
-
+// NEW: Populate the "Sort by Section" dropdown with test counts
+function populateSectionSortDropdown() {
+    const select = document.getElementById('sortBySection');
+    if (!select) return;
+    
+    // Count tests per section
+    const sectionCount = new Map();
+    window.allScheduledTests.forEach(test => {
+        const sec = test.section;
+        if (sec) sectionCount.set(sec, (sectionCount.get(sec) || 0) + 1);
+    });
+    
+    // Get all unique sections from assigned sections (or from tests)
+    const sectionsSet = new Set();
+    window.assignedSections.forEach(s => sectionsSet.add(s.section));
+    window.allScheduledTests.forEach(t => { if (t.section) sectionsSet.add(t.section); });
+    
+    const sortedSections = Array.from(sectionsSet).sort();
+    
+    let options = '<option value="">All Sections (sorted by section)</option>';
+    sortedSections.forEach(section => {
+        const count = sectionCount.get(section) || 0;
+        options += `<option value="${section}">${section} (${count} test${count !== 1 ? 's' : ''})</option>`;
+    });
+    select.innerHTML = options;
+}
         // Function to get rating based on score
         function getRating(score) {
             if (score >= 90) return { text: 'Excellent', class: 'rating-excellent' };
@@ -1822,306 +1855,256 @@
             return 'score-poor';
         }
         
-        async function loadScheduledTests(userEmail, userId) {
-            try {
-                console.log('=== LOADING SCHEDULED TESTS ===');
-                console.log('Professor email:', userEmail);
-                console.log('Professor UID:', userId);
-                
-                // STEP 1: Get professor's name
-                console.log('Step 1: Checking professors collection...');
-                let professorName = '';
-                
-                const professorsQuery = query(
-                    collection(db, 'professors'),
-                    where('email', '==', userEmail)
-                );
-                const professorsSnapshot = await getDocs(professorsQuery);
-                
-                if (!professorsSnapshot.empty) {
-                    const professorData = professorsSnapshot.docs[0].data();
-                    professorName = professorData.name || '';
-                    console.log('✓ Professor found:', professorName);
-                }
-                
-                // If not found in professors collection, try users collection
-                if (!professorName) {
-                    console.log('Checking users collection...');
-                    const usersQuery = query(
-                        collection(db, 'users'),
-                        where('email', '==', userEmail)
-                    );
-                    const usersSnapshot = await getDocs(usersQuery);
-                    
-                    if (!usersSnapshot.empty) {
-                        const userData = usersSnapshot.docs[0].data();
-                        professorName = userData.name || '';
-                        console.log('✓ Professor found in users:', professorName);
-                    }
-                }
-                
-                window.assignedSections = [];
-                
-                // STEP 2: Find all sections where this professor is assigned
-                console.log('Step 2: Checking sections collection...');
-                const sectionsQuery = query(collection(db, 'sections'));
-                const sectionsSnapshot = await getDocs(sectionsQuery);
-                
-                console.log('Total sections in database:', sectionsSnapshot.size);
-                
-                // Use a Set to track unique section names
-                const seenSections = new Set();
-                
-                for (const docSnap of sectionsSnapshot.docs) {
-                    const sectionData = docSnap.data();
-                    
-                    // Check if this professor teaches this section (match by name or email)
-                    const isProfessorAssigned = 
-                        sectionData.professor === professorName ||
-                        sectionData.professorEmail === userEmail ||
-                        (sectionData.professor && professorName && 
-                         sectionData.professor.toLowerCase() === professorName.toLowerCase());
-                    
-                    if (isProfessorAssigned) {
-                        // Skip if we've already added this section
-                        if (seenSections.has(sectionData.name)) {
-                            console.log(`⚠️ Skipping duplicate section: ${sectionData.name}`);
-                            continue;
-                        }
-                        
-                        console.log(`✓ Found assigned section: ${sectionData.name}`);
-                        seenSections.add(sectionData.name);
-                        
-                        // Get student count from the section's students array
-                        const actualStudentCount = sectionData.students ? sectionData.students.length : 0;
-                        
-                        window.assignedSections.push({
-                            section: sectionData.name,
-                            students: actualStudentCount,
-                            courseCode: sectionData.courseCode || 'PE 3',
-                            time: sectionData.time || 'Not Set',
-                            day: sectionData.day || 'Not Set',
-                            room: sectionData.room || 'Not Set'
-                        });
-                        
-                        console.log(`  - ${sectionData.name}: ${actualStudentCount} students`);
-                        console.log(`  - Schedule: ${sectionData.time || 'N/A'} / ${sectionData.day || 'N/A'} / ${sectionData.room || 'N/A'}`);
-                    }
-                }
-                
-                console.log('=== FINAL ASSIGNED SECTIONS ===');
-                console.log('Total unique sections:', window.assignedSections.length);
-                console.log('Sections:', window.assignedSections);
-                
-                // STEP 3: Load scheduled tests
-                console.log('Step 3: Loading scheduled tests...');
-                
-                let testsQuery;
+        // Render schedule table with filtering and sorting
+function renderScheduleTable(tests, enabledTestsMap) {
+    const tableBody = document.getElementById('scheduleTableBody');
+    if (!tests.length) {
+        if (window.assignedSections.length > 0) {
+            let sectionsInfo = window.assignedSections.map(s => `${s.section} (${s.students} students)`).join(', ');
+            tableBody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No Active Test Schedules</div><div class="empty-text">You have been assigned: <strong>${sectionsInfo}</strong><br><br>All scheduled tests have expired or you haven't created any tests yet.<br>Click "Schedule New Test" to create a fitness test for your assigned section(s).</div></div></td></tr>`;
+        } else {
+            tableBody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">No Sections Assigned</div><div class="empty-text">You have not been assigned to any sections yet.<br><br>Please contact the Secretary to assign you to a section.</div></div></td></tr>`;
+        }
+        return;
+    }
 
-                if (window.assignedSections.length > 0) {
-                    const sectionNames = window.assignedSections.map(s => s.section);
-                    // Firestore 'in' operator has a limit of 10 items
-                    const limitedSections = sectionNames.slice(0, 10);
-                    
-                    testsQuery = query(
-                        collection(db, 'scheduledTests'),
-                        where('professorEmail', '==', userEmail),
-                        where('section', 'in', limitedSections)
-                    );
-                } else {
-                    testsQuery = query(
-                        collection(db, 'scheduledTests'),
-                        where('professorEmail', '==', userEmail)
-                    );
-                }
-                
-                let testsSnapshot = await getDocs(testsQuery);
-                
-                if (testsSnapshot.empty) {
-                    console.log('No tests by email, trying userId...');
-                    testsQuery = query(
-                        collection(db, 'scheduledTests'),
-                        where('professorId', '==', userId)
-                    );
-                    testsSnapshot = await getDocs(testsQuery);
-                }
-                
-                // Load enabled test permissions
-                const permissionsQuery = query(
-                    collection(db, 'testPermissions'),
-                    where('grantedBy', '==', userEmail)
-                );
-                const permissionsSnapshot = await getDocs(permissionsQuery);
-                const enabledTestsMap = new Map();
-                
-                permissionsSnapshot.forEach(doc => {
-                    const perm = doc.data();
-                    if (!enabledTestsMap.has(perm.testId)) {
-                        enabledTestsMap.set(perm.testId, []);
-                    }
-                    enabledTestsMap.get(perm.testId).push(perm.studentEmail);
-                });
-                
-                const tableBody = document.getElementById('scheduleTableBody');
+    // Get filter values
+    const searchValue = (document.getElementById('searchSchedule')?.value || '').toUpperCase();
+    const typeFilter = (document.getElementById('filterTestType')?.value || '').toUpperCase();
+    const sectionFilter = (document.getElementById('sortBySection')?.value || ''); // selected section value
 
-                if (!testsSnapshot.empty) {
-                let html = '';
-                let hasVisibleTests = false;
+    // Filter tests
+    let filteredTests = tests.filter(test => {
+        let show = true;
+        if (searchValue) {
+            const testName = (test.testName || '').toUpperCase();
+            const section = (test.section || '').toUpperCase();
+            if (!testName.includes(searchValue) && !section.includes(searchValue)) show = false;
+        }
+        if (show && typeFilter) {
+            const testName = (test.testName || '').toUpperCase();
+            if (!testName.includes(typeFilter)) show = false;
+        }
+        if (show && sectionFilter) {
+            if (test.section !== sectionFilter) show = false;
+        }
+        return show;
+    });
 
-                const sortedDocs = [...testsSnapshot.docs].sort((a, b) => {
-                    const aTime = a.data().createdAt?.seconds || 0;
-                    const bTime = b.data().createdAt?.seconds || 0;
-                    return bTime - aTime;
-                });
+    // Sort by section name (ascending)
+    filteredTests.sort((a, b) => (a.section || '').localeCompare(b.section || ''));
 
-                sortedDocs.forEach((docSnap) => {
-                    const test = docSnap.data();
-                        
-                        const deadlineDateTime = new Date(test.deadlineDateTime);
-                        const now = new Date();
-                        
-                        // Show test if it's either not overdue OR enabled for students
-                        const isOverdue = deadlineDateTime < now;
-                        const isEnabled = enabledTestsMap.has(docSnap.id);
-                        const enabledCount = isEnabled ? enabledTestsMap.get(docSnap.id).length : 0;
-                        
-                        // Show if: not overdue, OR is enabled
-                        if (!isOverdue || isEnabled) {
-                            hasVisibleTests = true;
-                            
-                            const status = test.status || 'scheduled';
-                            const statusClass = status === 'active' ? 'status-active' : 
-                                               status === 'completed' ? 'status-completed' : 
-                                               'status-scheduled';
-                            
-                            const totalStudents = test.totalStudents || 0;
-                            const completedStudents = test.completedStudents || 0;
-                            const progress = totalStudents > 0 ? `${completedStudents}/${totalStudents}` : '0/0';
-                            
-                            // Get section schedule info if available
-                            const sectionInfo = window.assignedSections.find(s => s.section === test.section);
-                            const scheduleInfo = sectionInfo ? 
-                                `${sectionInfo.time} / ${sectionInfo.day} / ${sectionInfo.room}` : 
-                                'Not Set';
-                            
-                            html += `
-                            <tr style="${isEnabled && isOverdue ? 'background-color: #f0f9ff;' : ''}">
-                                <td data-label="Test Name">
-                                    ${test.testName || 'Unnamed Test'}
-                                    ${isEnabled && isOverdue ? `<br><small style="color: #3b82f6; font-weight: 600;">✓ Enabled for ${enabledCount} student${enabledCount > 1 ? 's' : ''}</small>` : ''}
-                                </td>
-                                <td data-label="Section">
-                                    ${test.section || 'N/A'}<br>
-                                    <small style="color: #64748b; font-size: 12px;">${scheduleInfo}</small>
-                                </td>
-                                <td data-label="Date">${test.date || 'N/A'}</td>
-                                <td data-label="Deadline">${test.deadline || 'N/A'} ${test.deadlineTime || ''}</td>
-                                <td data-label="Progress" class="progress-cell">${progress}</td>
-                                <td data-label="Attempts">${test.attemptsAllowed || '1'}</td>
-                                <td data-label="Status">
-                                    <span class="status-badge ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
-                                    ${isOverdue ? '<br><small style="color: #ef4444;">⚠️ Overdue</small>' : ''}
-                                </td>
-                                <td data-label="Action">
-                                    <div class="action-buttons">
-                                        <button class="btn-action btn-edit" onclick="editTest('${docSnap.id}')">
-                                            <i class="fas fa-pencil-alt"></i> Edit
-                                        </button>
-                                        <button class="btn-action btn-view" onclick="manageStudents('${docSnap.id}', '${test.testName}', '${test.section}')">
-                                            <i class="fas fa-users"></i> Manage
-                                        </button>
-                                        <button class="btn-action btn-delete" onclick="deleteTest('${docSnap.id}')">
-                                            <i class="fas fa-trash-alt"></i> Delete
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                         }
-                    });
-                    
-                   if (!hasVisibleTests) {
-                    if (window.assignedSections.length > 0) {
-                        let sectionsInfo = window.assignedSections.map(s => `${s.section} (${s.students} students)`).join(', ');
-                        tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="8">
-                                    <div class="empty-state">
-                                        <div class="empty-icon">📅</div>
-                                        <div class="empty-title">No Active Test Schedules</div>
-                                        <div class="empty-text">
-                                            You have been assigned: <strong>${sectionsInfo}</strong><br><br>
-                                            All scheduled tests have expired or you haven't created any tests yet.<br>
-                                            Click "Schedule New Test" to create a fitness test for your assigned section(s).
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    } else {
-                        tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="8">
-                                    <div class="empty-state">
-                                        <div class="empty-icon">⚠️</div>
-                                        <div class="empty-title">No Sections Assigned</div>
-                                        <div class="empty-text">
-                                            You have not been assigned to any sections yet.<br><br>
-                                            Please contact the Secretary to assign you to a section.
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    }
-                } else {
-                    tableBody.innerHTML = html;  
-                }
-                    
-                    console.log('✓ Loaded', testsSnapshot.size, 'scheduled tests');
-                } else {
-                    if (window.assignedSections.length > 0) {
-                        let sectionsInfo = window.assignedSections.map(s => `${s.section} (${s.students} students)`).join(', ');
-                        tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="8">
-                                    <div class="empty-state">
-                                        <div class="empty-icon">📅</div>
-                                        <div class="empty-title">No Test Schedules</div>
-                                        <div class="empty-text">
-                                            You have been assigned: <strong>${sectionsInfo}</strong><br><br>
-                                            You haven't scheduled any tests yet.<br>
-                                            Click "Schedule New Test" to create a fitness test for your assigned section(s).
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    } else {
-                        tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="8">
-                                    <div class="empty-state">
-                                        <div class="empty-icon">⚠️</div>
-                                        <div class="empty-title">No Sections Assigned</div>
-                                        <div class="empty-text">
-                                            You have not been assigned to any sections yet.<br><br>
-                                            Please contact the Secretary to assign you to a section.
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    }
-                }
-                
-                console.log('=== LOAD COMPLETE ===');
-                
-            } catch (error) {
-                console.error('=== ERROR LOADING SCHEDULED TESTS ===');
-                console.error('Error:', error);
+    let html = '';
+    filteredTests.forEach(test => {
+        const deadlineDateTime = new Date(test.deadlineDateTime);
+        const now = new Date();
+        const isOverdue = deadlineDateTime < now;
+        const isEnabled = enabledTestsMap?.has(test.id);
+        const enabledCount = isEnabled ? enabledTestsMap.get(test.id).length : 0;
+        
+        const status = test.status || 'scheduled';
+        const statusClass = status === 'active' ? 'status-active' : status === 'completed' ? 'status-completed' : 'status-scheduled';
+        const totalStudents = test.totalStudents || 0;
+        const completedStudents = test.completedStudents || 0;
+        const progress = totalStudents > 0 ? `${completedStudents}/${totalStudents}` : '0/0';
+        const sectionInfo = window.assignedSections.find(s => s.section === test.section);
+        const scheduleInfo = sectionInfo ? `${sectionInfo.time} / ${sectionInfo.day} / ${sectionInfo.room}` : 'Not Set';
+        
+        html += `<tr style="${isEnabled && isOverdue ? 'background-color: #f0f9ff;' : ''}">
+            <td data-label="Test Name">${test.testName || 'Unnamed Test'}${isEnabled && isOverdue ? `<br><small style="color: #3b82f6; font-weight: 600;">✓ Enabled for ${enabledCount} student${enabledCount > 1 ? 's' : ''}</small>` : ''}</td>
+            <td data-label="Section">${test.section || 'N/A'}<br><small style="color: #64748b; font-size: 12px;">${scheduleInfo}</small></td>
+            <td data-label="Date">${test.date || 'N/A'}</td>
+            <td data-label="Deadline">${test.deadline || 'N/A'} ${test.deadlineTime || ''}</td>
+            <td data-label="Progress" class="progress-cell">${progress}</td>
+            <td data-label="Attempts">${test.attemptsAllowed || '1'}</td>
+            <td data-label="Status"><span class="status-badge ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>${isOverdue ? '<br><small style="color: #ef4444;">⚠️ Overdue</small>' : ''}</td>
+            <td data-label="Action"><div class="action-buttons"><button class="btn-action btn-edit" onclick="editTest('${test.id}')"><i class="fas fa-pencil-alt"></i> Edit</button><button class="btn-action btn-view" onclick="manageStudents('${test.id}', '${test.testName}', '${test.section}')"><i class="fas fa-users"></i> Manage</button><button class="btn-action btn-delete" onclick="deleteTest('${test.id}')"><i class="fas fa-trash-alt"></i> Delete</button></div></td>
+        </tr>`;
+    });
+
+    if (html === '') {
+        html = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No Tests Match Filters</div><div class="empty-text">Try adjusting your search or filter criteria.</div></div></td></tr>`;
+    }
+    tableBody.innerHTML = html;
+}
+ async function loadScheduledTests(userEmail, userId) {
+    try {
+        console.log('=== LOADING SCHEDULED TESTS ===');
+        console.log('Professor email:', userEmail);
+        console.log('Professor UID:', userId);
+        
+        // STEP 1: Get professor's name
+        console.log('Step 1: Checking professors collection...');
+        let professorName = '';
+        
+        const professorsQuery = query(
+            collection(db, 'professors'),
+            where('email', '==', userEmail)
+        );
+        const professorsSnapshot = await getDocs(professorsQuery);
+        
+        if (!professorsSnapshot.empty) {
+            const professorData = professorsSnapshot.docs[0].data();
+            professorName = professorData.name || '';
+            console.log('✓ Professor found:', professorName);
+        }
+        
+        // If not found in professors collection, try users collection
+        if (!professorName) {
+            console.log('Checking users collection...');
+            const usersQuery = query(
+                collection(db, 'users'),
+                where('email', '==', userEmail)
+            );
+            const usersSnapshot = await getDocs(usersQuery);
+            
+            if (!usersSnapshot.empty) {
+                const userData = usersSnapshot.docs[0].data();
+                professorName = userData.name || '';
+                console.log('✓ Professor found in users:', professorName);
             }
         }
+        
+        window.assignedSections = [];
+        
+        // STEP 2: Find all sections where this professor is assigned
+        console.log('Step 2: Checking sections collection...');
+        const sectionsQuery = query(collection(db, 'sections'));
+        const sectionsSnapshot = await getDocs(sectionsQuery);
+        
+        console.log('Total sections in database:', sectionsSnapshot.size);
+        
+        // Use a Set to track unique section names
+        const seenSections = new Set();
+        
+        for (const docSnap of sectionsSnapshot.docs) {
+            const sectionData = docSnap.data();
+            
+            // Check if this professor teaches this section (match by name or email)
+            const isProfessorAssigned = 
+                sectionData.professor === professorName ||
+                sectionData.professorEmail === userEmail ||
+                (sectionData.professor && professorName && 
+                 sectionData.professor.toLowerCase() === professorName.toLowerCase());
+            
+            if (isProfessorAssigned) {
+                // Skip if we've already added this section
+                if (seenSections.has(sectionData.name)) {
+                    console.log(`⚠️ Skipping duplicate section: ${sectionData.name}`);
+                    continue;
+                }
+                
+                console.log(`✓ Found assigned section: ${sectionData.name}`);
+                seenSections.add(sectionData.name);
+                
+                // Get student count from the section's students array
+                const actualStudentCount = sectionData.students ? sectionData.students.length : 0;
+                
+                window.assignedSections.push({
+                    section: sectionData.name,
+                    students: actualStudentCount,
+                    courseCode: sectionData.courseCode || 'PE 3',
+                    time: sectionData.time || 'Not Set',
+                    day: sectionData.day || 'Not Set',
+                    room: sectionData.room || 'Not Set'
+                });
+                
+                console.log(`  - ${sectionData.name}: ${actualStudentCount} students`);
+                console.log(`  - Schedule: ${sectionData.time || 'N/A'} / ${sectionData.day || 'N/A'} / ${sectionData.room || 'N/A'}`);
+            }
+        }
+        
+        console.log('=== FINAL ASSIGNED SECTIONS ===');
+        console.log('Total unique sections:', window.assignedSections.length);
+        console.log('Sections:', window.assignedSections);
+        
+        // STEP 3: Load scheduled tests
+        console.log('Step 3: Loading scheduled tests...');
+        
+        let testsQuery;
+        let testsSnapshot;
+
+        if (window.assignedSections.length > 0) {
+            const sectionNames = window.assignedSections.map(s => s.section);
+            // Firestore 'in' operator has a limit of 10 items
+            const limitedSections = sectionNames.slice(0, 10);
+            
+            testsQuery = query(
+                collection(db, 'scheduledTests'),
+                where('professorEmail', '==', userEmail),
+                where('section', 'in', limitedSections)
+            );
+            testsSnapshot = await getDocs(testsQuery);
+        } else {
+            testsQuery = query(
+                collection(db, 'scheduledTests'),
+                where('professorEmail', '==', userEmail)
+            );
+            testsSnapshot = await getDocs(testsQuery);
+        }
+        
+        if (testsSnapshot.empty) {
+            console.log('No tests by email, trying userId...');
+            testsQuery = query(
+                collection(db, 'scheduledTests'),
+                where('professorId', '==', userId)
+            );
+            testsSnapshot = await getDocs(testsQuery);
+        }
+        
+        // Load enabled test permissions
+        const permissionsQuery = query(
+            collection(db, 'testPermissions'),
+            where('grantedBy', '==', userEmail)
+        );
+        const permissionsSnapshot = await getDocs(permissionsQuery);
+        const enabledTestsMap = new Map();
+        
+        permissionsSnapshot.forEach(doc => {
+            const perm = doc.data();
+            if (!enabledTestsMap.has(perm.testId)) {
+                enabledTestsMap.set(perm.testId, []);
+            }
+            enabledTestsMap.get(perm.testId).push(perm.studentEmail);
+        });
+        
+        // ===== NEW: Store tests globally and populate dropdown =====
+        window.allScheduledTests = [];
+        testsSnapshot.forEach(docSnap => {
+            window.allScheduledTests.push({ 
+                id: docSnap.id, 
+                ...docSnap.data() 
+            });
+        });
+        
+        // Populate section dropdown with test counts
+        populateSectionSortDropdown();
+        
+        // Render table with all tests
+        renderScheduleTable(window.allScheduledTests, enabledTestsMap);
+        
+        console.log('=== LOAD COMPLETE ===');
+        console.log('✓ Loaded', testsSnapshot.size, 'scheduled tests');
+        
+    } catch (error) {
+        console.error('=== ERROR LOADING SCHEDULED TESTS ===');
+        console.error('Error:', error);
+        
+        // Show error in table
+        const tableBody = document.getElementById('scheduleTableBody');
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="8">
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <div class="empty-title">Error Loading Tests</div>
+                        <div class="empty-text">${error.message}</div>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+}
 
         // Load Test Results - Grouped by Student
         async function loadTestResults(userEmail, userId) {
@@ -3775,6 +3758,10 @@
         function generateReports() {
             alert('Report generation feature coming soon!');
         }
+        window.filterScheduleTable = function() {
+    if (window.allScheduledTests.length === 0) return;
+    renderScheduleTable(window.allScheduledTests, new Map()); 
+};
     </script>
 </body>
 </html>

@@ -649,7 +649,7 @@
             white-space: pre-line;
             z-index: 1000;
             width: max-content;
-            max-width: 200px;
+            max-width: 300px;
             text-align: center;
             margin-bottom: 5px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -976,46 +976,47 @@
                     </div>
                 </div>
             </div>
-        </nav>
-            
-        <!-- Mobile Drawer Overlay -->
-        <div class="drawer-overlay" id="drawerOverlay"></div>
-
-        <!-- Mobile Drawer -->
-        <div class="mobile-drawer" id="mobileDrawer">
-            <div class="p-6 pt-8">
-                <!-- Drawer Header -->
-                <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
-                    <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
-                         alt="UMak Logo" class="h-12 w-auto object-contain">
-                    <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                        UMakFIT
-                    </span>
-                </div>
-
-                <!-- Navigation Links -->
-                <nav class="space-y-2">
-                    <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-speedometer2 mr-3"></i>Dashboard
-                    </a>
-                    <a href="./test.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-clipboard-check mr-3"></i>Test
-                    </a>
-                    <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-book mr-3"></i>Lesson
-                    </a>
-                    <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-award mr-3"></i>Grades
-                    </a>
-                    <a href="./progress.html" class="mobile-nav-link block text-white bg-white/10 font-semibold py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-graph-up mr-3"></i>Progress
-                    </a>
-                    <a href="./achievements.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-trophy mr-3"></i>Achievements
-                    </a>
-                </nav>
-            </div>
         </div>
+    </nav>
+        
+    <!-- Mobile Drawer Overlay -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-drawer" id="mobileDrawer">
+        <div class="p-6 pt-8">
+            <!-- Drawer Header -->
+            <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
+                <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
+                     alt="UMak Logo" class="h-12 w-auto object-contain">
+                <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                    UMakFIT
+                </span>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="space-y-2">
+                <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                    <i class="bi bi-speedometer2 mr-3"></i>Dashboard
+                </a>
+                <a href="./test.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                    <i class="bi bi-clipboard-check mr-3"></i>Test
+                </a>
+                <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                    <i class="bi bi-book mr-3"></i>Lesson
+                </a>
+                <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                    <i class="bi bi-award mr-3"></i>Grades
+                </a>
+                <a href="./progress.html" class="mobile-nav-link block text-white bg-white/10 font-semibold py-3 px-4 rounded-lg transition-all">
+                    <i class="bi bi-graph-up mr-3"></i>Progress
+                </a>
+                <a href="./achievements.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                    <i class="bi bi-trophy mr-3"></i>Achievements
+                </a>
+            </nav>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <div class="container">
@@ -1166,6 +1167,7 @@
         // Global variables
         let currentUser = null;
         let studentData = null;
+        const OVERDUE_PENALTY = 0.10;
 
         // ========== NOTIFICATION SYSTEM ==========
         
@@ -1465,20 +1467,35 @@
             return 'Cardiorespiratory Endurance';
         }
 
-        function calculateTestScore(testName, result, testTarget = null) {
+        // ========== SCORE CALCULATION (SAME AS GRADES PAGE) ==========
+        function calculateScore(testName, result, testTarget = null) {
             const normalized = testName.toLowerCase().trim();
             
-            // Always 100 for completion-based tests
+            // Always return 100 for completion-based tests
             if (normalized.includes('skinfold') || 
                 normalized.includes('step test') || 
                 normalized.includes('3-minute')) {
                 return 100;
             }
             
+            // Check if professor already set a final score
+            if (result && typeof result === 'object' && result !== null) {
+                if (result.score !== undefined && result.score !== null) {
+                    const score = parseFloat(result.score);
+                    if (!isNaN(score) && score >= 0 && score <= 100) {
+                        console.log(`✅ Using stored professor score: ${score} for ${testName}`);
+                        return score;
+                    }
+                }
+            }
+            
+            // Extract numeric value from result
             let numericValue = 0;
             
             if (typeof result === 'object' && result !== null) {
-                numericValue = result.repetitions || result.time || result.distance || result.value || result.score || 0;
+                numericValue = result.repetitions || result.time || result.distance || 
+                              result.value || result.result || result.count || 
+                              result.score || 0;
             } else if (typeof result === 'string') {
                 const match = result.match(/(\d+\.?\d*)/);
                 if (match) {
@@ -1490,11 +1507,17 @@
                 numericValue = parseFloat(result) || 0;
             }
             
+            console.log(`🎯 Calculating: ${testName} | Value: ${numericValue} | Target: ${testTarget}`);
+            
+            // Use test target if available
             if (testTarget && testTarget > 0) {
                 if (normalized.includes('push-up') || normalized.includes('pushup') || 
                     normalized.includes('sit-up') || normalized.includes('situp') ||
                     normalized.includes('curl-up')) {
+                    
                     const reps = numericValue;
+                    if (reps >= testTarget) return 100;
+                    
                     const percentage = (reps / testTarget) * 100;
                     let score = Math.min(100, Math.max(50, percentage));
                     
@@ -1506,15 +1529,11 @@
                     else if (percentage >= 50) score = 75;
                     
                     return Math.round(score);
-                    
-                } else if (normalized.includes('plank')) {
-                    let seconds = 0;
-                    if (typeof result === 'string' && result.includes(':')) {
-                        const [mins, secs] = result.split(':').map(Number);
-                        seconds = (mins * 60) + (secs || 0);
-                    } else {
-                        seconds = numericValue;
-                    }
+                }
+                
+                if (normalized.includes('plank')) {
+                    let seconds = numericValue;
+                    if (seconds >= testTarget) return 100;
                     
                     const percentage = (seconds / testTarget) * 100;
                     let score = Math.min(100, Math.max(50, percentage));
@@ -1527,9 +1546,12 @@
                     else if (percentage >= 50) score = 75;
                     
                     return Math.round(score);
-                    
-                } else if (normalized.includes('sit-and-reach')) {
+                }
+                
+                if (normalized.includes('sit-and-reach')) {
                     const distance = numericValue;
+                    if (distance >= testTarget) return 100;
+                    
                     const percentage = (distance / testTarget) * 100;
                     let score = Math.min(100, Math.max(50, percentage));
                     
@@ -1542,125 +1564,97 @@
                     
                     return Math.round(score);
                 }
+                
+                if (normalized.includes('grip')) {
+                    if (numericValue >= testTarget) return 100;
+                    
+                    const percentage = (numericValue / testTarget) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('mile') || normalized.includes('run')) {
+                    if (numericValue <= testTarget) return 100;
+                    
+                    const percentage = (testTarget / numericValue) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
+                
+                if (normalized.includes('step test') || normalized.includes('3-minute')) {
+                    if (numericValue <= testTarget) return 100;
+                    
+                    const percentage = (testTarget / numericValue) * 100;
+                    let score = Math.min(100, Math.max(50, percentage));
+                    
+                    if (percentage >= 90) score = 95;
+                    else if (percentage >= 80) score = 90;
+                    else if (percentage >= 70) score = 85;
+                    else if (percentage >= 60) score = 80;
+                    else if (percentage >= 50) score = 75;
+                    
+                    return Math.round(score);
+                }
             }
             
+            // Fallback scoring
             if (normalized.includes('push-up') || normalized.includes('pushup')) {
-                const reps = numericValue;
-                if (reps >= 40) return 100;
-                if (reps >= 35) return 95;
-                if (reps >= 30) return 90;
-                if (reps >= 25) return 85;
-                if (reps >= 20) return 80;
-                if (reps >= 15) return 75;
-                if (reps >= 10) return 70;
-                if (reps >= 5) return 65;
+                if (numericValue >= 40) return 100;
+                if (numericValue >= 30) return 90;
+                if (numericValue >= 20) return 80;
+                if (numericValue >= 15) return 70;
                 return 60;
-                
-            } else if (normalized.includes('sit-up') || normalized.includes('situp')) {
-                const reps = numericValue;
-                if (reps >= 50) return 100;
-                if (reps >= 45) return 95;
-                if (reps >= 40) return 90;
-                if (reps >= 35) return 85;
-                if (reps >= 30) return 80;
-                if (reps >= 25) return 75;
-                if (reps >= 20) return 70;
-                if (reps >= 15) return 65;
+            }
+            
+            if (normalized.includes('curl-up') || normalized.includes('curl up')) {
+                if (numericValue >= 75) return 100;
+                if (numericValue >= 50) return 90;
+                if (numericValue >= 30) return 80;
+                if (numericValue >= 20) return 70;
                 return 60;
-                
-            } else if (normalized.includes('curl-up')) {
-                const reps = numericValue;
-                if (reps >= 75) return 100;
-                if (reps >= 60) return 95;
-                if (reps >= 50) return 90;
-                if (reps >= 40) return 85;
-                if (reps >= 30) return 80;
-                if (reps >= 25) return 75;
-                if (reps >= 20) return 70;
-                return 65;
-                
-            } else if (normalized.includes('plank')) {
-                let seconds = 0;
-                if (typeof result === 'string' && result.includes(':')) {
-                    const [mins, secs] = result.split(':').map(Number);
-                    seconds = (mins * 60) + (secs || 0);
-                } else {
-                    seconds = numericValue;
-                }
-                
-                if (seconds >= 180) return 100;
-                if (seconds >= 150) return 95;
-                if (seconds >= 120) return 90;
-                if (seconds >= 100) return 85;
-                if (seconds >= 80) return 80;
-                if (seconds >= 60) return 75;
-                if (seconds >= 45) return 70;
-                if (seconds >= 30) return 65;
+            }
+            
+            if (normalized.includes('plank')) {
+                if (numericValue >= 120) return 100;
+                if (numericValue >= 90) return 90;
+                if (numericValue >= 60) return 80;
+                if (numericValue >= 45) return 70;
                 return 60;
-                
-            } else if (normalized.includes('step test') || normalized.includes('3-minute')) {
-                const heartRate = numericValue;
-                if (heartRate <= 70) return 100;
-                if (heartRate <= 80) return 95;
-                if (heartRate <= 90) return 90;
-                if (heartRate <= 100) return 85;
-                if (heartRate <= 110) return 80;
-                if (heartRate <= 120) return 75;
-                if (heartRate <= 130) return 70;
-                return 65;
-                
-            } else if (normalized.includes('mile') || normalized.includes('run')) {
-                let totalSeconds = 0;
-                if (typeof result === 'string' && result.includes(':')) {
-                    const [minutes, seconds] = result.split(':').map(Number);
-                    totalSeconds = (minutes * 60) + (seconds || 0);
-                } else {
-                    totalSeconds = numericValue;
-                }
-                
-                if (totalSeconds <= 360) return 100;
-                if (totalSeconds <= 420) return 95;
-                if (totalSeconds <= 480) return 90;
-                if (totalSeconds <= 540) return 85;
-                if (totalSeconds <= 600) return 80;
-                if (totalSeconds <= 660) return 75;
-                if (totalSeconds <= 720) return 70;
-                if (totalSeconds <= 780) return 65;
+            }
+            
+            if (normalized.includes('grip')) {
+                if (numericValue >= 60) return 100;
+                if (numericValue >= 50) return 90;
+                if (numericValue >= 40) return 80;
+                if (numericValue >= 30) return 70;
                 return 60;
-                
-            } else if (normalized.includes('sit-and-reach')) {
-                const distance = numericValue;
-                if (distance >= 25) return 100;
-                if (distance >= 20) return 95;
-                if (distance >= 15) return 90;
-                if (distance >= 10) return 85;
-                if (distance >= 5) return 80;
-                if (distance >= 0) return 75;
-                if (distance >= -5) return 70;
-                return 65;
-                
-            } else if (normalized.includes('grip')) {
-                const strength = numericValue;
-                if (strength >= 60) return 100;
-                if (strength >= 55) return 95;
-                if (strength >= 50) return 90;
-                if (strength >= 45) return 85;
-                if (strength >= 40) return 80;
-                if (strength >= 35) return 75;
-                if (strength >= 30) return 70;
-                return 65;
-            } else if (normalized.includes('bmi')) {
-                const bmi = numericValue;
-                if (bmi >= 18.5 && bmi <= 24.9) return 100;
-                if (bmi >= 17.5 && bmi < 18.5) return 85;
-                if (bmi >= 25 && bmi <= 27) return 85;
-                if (bmi >= 15 && bmi < 17.5) return 70;
-                if (bmi > 27 && bmi <= 30) return 70;
+            }
+            
+            if (normalized.includes('sit-and-reach')) {
+                if (numericValue >= 20) return 100;
+                if (numericValue >= 15) return 90;
+                if (numericValue >= 10) return 80;
+                if (numericValue >= 5) return 70;
                 return 60;
             }
             
             return 75;
         }
+        // ========== END SCORE CALCULATION ==========
 
         function renderEmptyState(containerId, category) {
             const container = document.getElementById(containerId);
@@ -1782,7 +1776,9 @@
                                         return 'Score: ' + context.parsed.y + '/100';
                                     },
                                     afterLabel: function(context) {
-                                        return 'Result: ' + data[context.dataIndex].result;
+                                        const result = data[context.dataIndex].result;
+                                        const status = data[context.dataIndex].isOverdue ? '⚠️ Overdue (-10%)' : '';
+                                        return result + (status ? ' ' + status : '');
                                     }
                                 }
                             }
@@ -1850,7 +1846,8 @@
                 
                 const resultsQuery = query(
                     collection(db, 'testResults'),
-                    where('studentEmail', '==', userEmail)
+                    where('studentEmail', '==', userEmail),
+                    where('status', 'in', ['completed', 'overdue', 'late'])
                 );
                 
                 const resultsSnapshot = await getDocs(resultsQuery);
@@ -1885,97 +1882,153 @@
                     'Body Composition': []
                 };
                 
-                let allTestResults = [];
+                // Group by test ID to handle retakes
+                const testGroups = {};
                 
                 resultsSnapshot.forEach((doc) => {
                     const result = doc.data();
-                    console.log('Processing result:', result.testName, result.result);
+                    const testId = result.testId || doc.id;
                     
-                    const category = getCategoryForTest(result.testName);
+                    // Calculate score first
+                    let score = calculateScore(
+                        result.testName, 
+                        result.result || result.resultData, 
+                        result.testTarget
+                    );
                     
-                    if (category) {
-                        const score = calculateTestScore(result.testName, result.result, result.testTarget);
-                        
-                        let testDate;
-                        let timestamp;
-                        
-                        if (result.submittedAt) {
-                            if (result.submittedAt.toDate) {
-                                testDate = result.submittedAt.toDate();
-                            } else if (result.submittedAt.seconds) {
-                                testDate = new Date(result.submittedAt.seconds * 1000);
-                            } else {
-                                testDate = new Date(result.submittedAt);
-                            }
-                        } else {
-                            testDate = new Date();
-                        }
-                        
-                        timestamp = testDate.getTime();
-                        const formattedDate = testDate.toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric',
-                            year: 'numeric'
-                        });
-                        
-                        const testData = {
-                            testName: result.testName,
-                            score: score,
-                            result: result.result,
-                            date: formattedDate,
-                            timestamp: timestamp,
-                            category: category
+                    // Apply overdue penalty if applicable
+                    const isProfessorOverride = result.isProfessorOverride === true;
+                    const isOverdue = (result.status === 'overdue' || result.status === 'late');
+                    const testNorm = result.testName.toLowerCase();
+                    const isCompletionBased = testNorm.includes('skinfold') || 
+                                              testNorm.includes('step test') || 
+                                              testNorm.includes('3-minute');
+                    
+                    if (isOverdue && !isProfessorOverride && !isCompletionBased) {
+                        const penalty = score * OVERDUE_PENALTY;
+                        score = Math.max(0, score - penalty);
+                    }
+                    
+                    score = Math.max(0, Math.min(100, score));
+                    
+                    // If we have multiple submissions for the same test, keep the one with highest score
+                    if (!testGroups[testId] || score > testGroups[testId].score) {
+                        testGroups[testId] = {
+                            ...result,
+                            score: Math.round(score),
+                            isOverdue: isOverdue && !isProfessorOverride && !isCompletionBased
                         };
-                        
-                        categoryData[category].push(testData);
-                        categoryScores[category].push(score);
-                        allTestResults.push(testData);
-                        
-                        console.log(`Added ${result.testName} to ${category}: score=${score}, date=${formattedDate}`);
-                    } else {
-                        console.warn('No category found for test:', result.testName);
                     }
                 });
                 
+                // Process grouped results
+                Object.values(testGroups).forEach((result) => {
+                    console.log('Processing result:', result.testName, 'Score:', result.score);
+                    
+                    const category = getCategoryForTest(result.testName);
+                    
+                    let testDate;
+                    let timestamp;
+                    
+                    if (result.submittedAt) {
+                        if (result.submittedAt.toDate) {
+                            testDate = result.submittedAt.toDate();
+                        } else if (result.submittedAt.seconds) {
+                            testDate = new Date(result.submittedAt.seconds * 1000);
+                        } else {
+                            testDate = new Date(result.submittedAt);
+                        }
+                    } else {
+                        testDate = new Date();
+                    }
+                    
+                    timestamp = testDate.getTime();
+                    const formattedDate = testDate.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+                    
+                    const testData = {
+                        testName: result.testName,
+                        score: result.score,
+                        result: result.result || result.resultData,
+                        date: formattedDate,
+                        timestamp: timestamp,
+                        category: category,
+                        isOverdue: result.isOverdue
+                    };
+                    
+                    categoryData[category].push(testData);
+                    categoryScores[category].push(result.score);
+                });
+                
+                // Sort by date within each category
                 Object.keys(categoryData).forEach(category => {
                     categoryData[category].sort((a, b) => a.timestamp - b.timestamp);
                     console.log(`${category} has ${categoryData[category].length} tests`);
                 });
                 
+                // Calculate overall stats
+                const totalTests = Object.keys(testGroups).length; // Use grouped count, not raw snapshot size
+                
+                // Get all test results sorted by date for improvement calculation
+                const allTestResults = [];
+                Object.values(categoryData).forEach(categoryTests => {
+                    allTestResults.push(...categoryTests);
+                });
                 allTestResults.sort((a, b) => a.timestamp - b.timestamp);
                 
-                const totalTests = resultsSnapshot.size;
                 let overallImprovement = 0;
-                
                 let previousTest = null;
                 let latestTest = null;
                 
                 if (allTestResults.length >= 2) {
-                    const sortedTests = [...allTestResults].sort((a, b) => a.timestamp - b.timestamp);
-                    const lastTwoTests = sortedTests.slice(-2);
+                    // For improvement, we need to compare two different tests
+                    // Find the last two distinct tests by timestamp
+                    const uniqueTests = [];
+                    const seenTests = new Set();
                     
-                    previousTest = lastTwoTests[0];
-                    latestTest = lastTwoTests[1];
+                    // Sort by timestamp descending to get latest first
+                    const sortedDesc = [...allTestResults].sort((a, b) => b.timestamp - a.timestamp);
                     
-                    console.log('📅 Previous test:', previousTest.testName, previousTest.score, previousTest.date);
-                    console.log('📅 Latest test:', latestTest.testName, latestTest.score, latestTest.date);
-                    
-                    if (previousTest.score > 0) {
-                        const scoreDifference = latestTest.score - previousTest.score;
-                        
-                        if (scoreDifference >= 0) {
-                            overallImprovement = Math.round((scoreDifference / previousTest.score) * 100);
+                    for (const test of sortedDesc) {
+                        // Use test name + category as key to consider retakes of same test type
+                        const testKey = test.testName;
+                        if (!seenTests.has(testKey)) {
+                            seenTests.add(testKey);
+                            uniqueTests.push(test);
                         }
+                        if (uniqueTests.length >= 2) break;
+                    }
+                    
+                    if (uniqueTests.length >= 2) {
+                        latestTest = uniqueTests[0]; // Most recent
+                        previousTest = uniqueTests[1]; // Previous distinct test
                         
-                        overallImprovement = Math.min(100, Math.max(0, overallImprovement));
+                        console.log('📅 Previous test:', previousTest.testName, previousTest.score, previousTest.date);
+                        console.log('📅 Latest test:', latestTest.testName, latestTest.score, latestTest.date);
                         
-                        console.log(`📈 Last 2 test comparison: ${previousTest.score} → ${latestTest.score} = +${overallImprovement}%`);
+                        if (previousTest.score > 0) {
+                            const scoreDifference = latestTest.score - previousTest.score;
+                            
+                            if (scoreDifference > 0) {
+                                overallImprovement = Math.round((scoreDifference / previousTest.score) * 100);
+                            } else {
+                                overallImprovement = 0;
+                            }
+                            
+                            overallImprovement = Math.min(100, Math.max(0, overallImprovement));
+                            
+                            console.log(`📈 Test comparison: ${previousTest.score} → ${latestTest.score} = ${scoreDifference > 0 ? '+' : ''}${scoreDifference} (${overallImprovement}% improvement)`);
+                        }
                     }
                 } else if (allTestResults.length === 1) {
                     latestTest = allTestResults[0];
                     overallImprovement = 0;
                 }
                 
+                // Calculate best category by average score
                 let bestCategory = '--';
                 let bestScore = 0;
                 Object.entries(categoryScores).forEach(([category, scores]) => {
@@ -1988,6 +2041,7 @@
                     }
                 });
                 
+                // Last test info
                 let lastTestDate = '--';
                 let lastTestNameText = 'No tests taken';
                 
@@ -1997,75 +2051,72 @@
                     lastTestNameText = lastTest.testName;
                 }
                 
+                // Update UI
                 document.getElementById('totalTests').textContent = totalTests;
                 document.getElementById('totalTestsTrend').innerHTML = totalTests > 0 
                     ? `<i class="bi bi-check-circle-fill"></i><span>${totalTests} completed</span>`
                     : `<i class="bi bi-dash"></i><span>No data yet</span>`;
                 
-                document.getElementById('overallImprovement').textContent = `+${overallImprovement}%`;
-                
-                const improvementTrend = document.getElementById('improvementTrend');
-                
-                let tooltipText = "";
+                // Display improvement
                 if (allTestResults.length >= 2 && previousTest && latestTest) {
-                    tooltipText = `Last 2 test comparison:\n\n`;
+                    const scoreDiff = latestTest.score - previousTest.score;
+                    const displayImprovement = scoreDiff > 0 ? `+${overallImprovement}%` : '0%';
+                    document.getElementById('overallImprovement').textContent = displayImprovement;
+                    
+                    const improvementTrend = document.getElementById('improvementTrend');
+                    
+                    let tooltipText = `Last 2 different tests:\n\n`;
                     tooltipText += `📅 ${previousTest.date}: ${previousTest.testName}\n`;
                     tooltipText += `Score: ${previousTest.score}/100\n\n`;
                     tooltipText += `📅 ${latestTest.date}: ${latestTest.testName}\n`;
                     tooltipText += `Score: ${latestTest.score}/100\n\n`;
                     
-                    const scoreDiff = latestTest.score - previousTest.score;
                     if (scoreDiff > 0) {
                         tooltipText += `📈 Improved by: +${scoreDiff} points\n`;
                         tooltipText += `(${previousTest.score} → ${latestTest.score})`;
+                        
+                        improvementTrend.className = 'stat-trend positive improvement-tooltip';
+                        improvementTrend.innerHTML = `<i class="bi bi-arrow-up-circle-fill"></i><span>+${overallImprovement}% better</span><br><small style="font-size: 0.8em; color: #64748b;">${previousTest.score} → ${latestTest.score} (+${scoreDiff})</small>`;
                     } else if (scoreDiff === 0) {
                         tooltipText += `➡️ Same score: ${previousTest.score} points\n`;
                         tooltipText += `No change`;
+                        
+                        improvementTrend.className = 'stat-trend neutral improvement-tooltip';
+                        improvementTrend.innerHTML = `<i class="bi bi-dash-circle"></i><span>No change</span><br><small style="font-size: 0.8em; color: #64748b;">${previousTest.score} → ${latestTest.score} (±0)</small>`;
                     } else {
                         tooltipText += `↘️ Decreased by: ${Math.abs(scoreDiff)} points\n`;
                         tooltipText += `(${previousTest.score} → ${latestTest.score})`;
-                    }
-                    
-                } else if (allTestResults.length === 1 && latestTest) {
-                    tooltipText = `Latest test:\n`;
-                    tooltipText += `📅 ${latestTest.date}: ${latestTest.testName}\n`;
-                    tooltipText += `Score: ${latestTest.score}/100\n\n`;
-                    tooltipText += `Take another test to see improvement`;
-                } else {
-                    tooltipText = "Take your first test to start tracking";
-                }
-                
-                improvementTrend.setAttribute('data-tooltip', tooltipText);
-                improvementTrend.classList.add('improvement-tooltip');
-                
-                if (allTestResults.length >= 2 && previousTest && latestTest) {
-                    const scoreDiff = latestTest.score - previousTest.score;
-                    
-                    if (overallImprovement > 15) {
-                        improvementTrend.className = 'stat-trend positive improvement-tooltip';
-                        improvementTrend.innerHTML = `<i class="bi bi-rocket-takeoff-fill"></i><span>+${overallImprovement}% improvement</span><br><small style="font-size: 0.8em; color: #64748b;">${previousTest.score} → ${latestTest.score} (+${scoreDiff})</small>`;
-                    } else if (overallImprovement > 5) {
-                        improvementTrend.className = 'stat-trend positive improvement-tooltip';
-                        improvementTrend.innerHTML = `<i class="bi bi-arrow-up-circle-fill"></i><span>+${overallImprovement}% better</span><br><small style="font-size: 0.8em; color: #64748b;">${previousTest.score} → ${latestTest.score} (+${scoreDiff})</small>`;
-                    } else if (overallImprovement > 0) {
-                        improvementTrend.className = 'stat-trend positive improvement-tooltip';
-                        improvementTrend.innerHTML = `<i class="bi bi-arrow-up-right-circle"></i><span>+${overallImprovement}% improved</span><br><small style="font-size: 0.8em; color: #64748b;">${previousTest.score} → ${latestTest.score} (+${scoreDiff})</small>`;
-                    } else {
+                        
                         improvementTrend.className = 'stat-trend neutral improvement-tooltip';
-                        if (scoreDiff < 0) {
-                            improvementTrend.innerHTML = `<i class="bi bi-shield-check"></i><span>Score maintained</span><br><small style="font-size: 0.8em; color: #64748b;">${previousTest.score} → ${latestTest.score} (${scoreDiff})</small>`;
-                        } else if (scoreDiff === 0) {
-                            improvementTrend.innerHTML = `<i class="bi bi-dash-circle"></i><span>No change</span><br><small style="font-size: 0.8em; color: #64748b;">${previousTest.score} → ${latestTest.score} (±0)</small>`;
-                        } else {
-                            improvementTrend.innerHTML = `<i class="bi bi-dash-circle"></i><span>No change</span><br><small style="font-size: 0.8em; color: #64748b;">${previousTest.score} → ${latestTest.score} (+${scoreDiff})</small>`;
-                        }
+                        improvementTrend.innerHTML = `<i class="bi bi-shield-check"></i><span>Score maintained</span><br><small style="font-size: 0.8em; color: #64748b;">${previousTest.score} → ${latestTest.score} (${scoreDiff})</small>`;
                     }
+                    
+                    improvementTrend.setAttribute('data-tooltip', tooltipText);
+                    improvementTrend.classList.add('improvement-tooltip');
+                    
                 } else if (allTestResults.length === 1 && latestTest) {
+                    document.getElementById('overallImprovement').textContent = '0%';
+                    
+                    const improvementTrend = document.getElementById('improvementTrend');
                     improvementTrend.className = 'stat-trend neutral improvement-tooltip';
-                    improvementTrend.innerHTML = `<i class="bi bi-flag-fill"></i><span>Latest test</span><br><small style="font-size: 0.8em; color: #64748b;">${latestTest.testName}: ${latestTest.score}/100</small>`;
+                    improvementTrend.innerHTML = `<i class="bi bi-flag-fill"></i><span>First test</span><br><small style="font-size: 0.8em; color: #64748b;">${latestTest.testName}: ${latestTest.score}/100</small>`;
+                    improvementTrend.setAttribute('data-tooltip', `Latest test:\n📅 ${latestTest.date}: ${latestTest.testName}\nScore: ${latestTest.score}/100\n\nTake another test to see improvement`);
                 } else {
+                    document.getElementById('overallImprovement').textContent = '0%';
+                    
+                    const improvementTrend = document.getElementById('improvementTrend');
                     improvementTrend.className = 'stat-trend neutral improvement-tooltip';
                     improvementTrend.innerHTML = `<i class="bi bi-dash"></i><span>Take more tests</span>`;
+                    improvementTrend.setAttribute('data-tooltip', "Take your first test to start tracking");
+                }
+                
+                // Display the 100 → 100 (±0) format in the small text under improvement
+                if (allTestResults.length >= 2 && previousTest && latestTest) {
+                    const scoreDiff = latestTest.score - previousTest.score;
+                    const smallTextElement = document.querySelector('#improvementTrend small');
+                    if (smallTextElement) {
+                        smallTextElement.textContent = `${previousTest.score} → ${latestTest.score} (${scoreDiff > 0 ? '+' : ''}${scoreDiff})`;
+                    }
                 }
                 
                 document.getElementById('bestCategory').textContent = bestCategory;
@@ -2077,13 +2128,15 @@
                 document.getElementById('lastTestDate').textContent = lastTestDate;
                 document.getElementById('lastTestName').innerHTML = `<i class="bi bi-clock-history"></i><span>${lastTestNameText}</span>`;
                 
+                // Create charts
                 createProgressChart('cardioChart', categoryData['Cardiorespiratory Endurance'], 'Cardiorespiratory Endurance');
                 createProgressChart('muscularChart', categoryData['Muscular Strength and Endurance'], 'Muscular Strength and Endurance');
                 createProgressChart('flexibilityChart', categoryData['Flexibility'], 'Flexibility');
                 createProgressChart('bodyCompChart', categoryData['Body Composition'], 'Body Composition');
                 
                 console.log('Progress data loaded successfully');
-                console.log(`Last 2 test comparison: Previous: ${previousTest?.score || 0}, Latest: ${latestTest?.score || 0}, Improvement: +${overallImprovement}%`);
+                console.log(`Total distinct tests: ${totalTests}`);
+                console.log(`Last 2 test comparison: Previous: ${previousTest?.score || 0}, Latest: ${latestTest?.score || 0}, Improvement: ${overallImprovement}%`);
                 
             } catch (error) {
                 console.error('Error loading progress data:', error);
