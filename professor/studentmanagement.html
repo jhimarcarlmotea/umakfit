@@ -38,6 +38,14 @@
             0% { transform: rotate(0deg); } 
             100% { transform: rotate(360deg); } 
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
         @keyframes dropdownSlide {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -67,6 +75,11 @@
             50% { transform: translateY(-10px); }
         }
         
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .animate-fade-in-up { animation: fadeInUp 1s ease-out; }
         .animate-slide-in-left { animation: slideInLeft 1s ease-out; }
         .animate-slide-in-right { animation: slideInRight 1s ease-out; }
@@ -75,9 +88,154 @@
         .animate-bounce-slow { animation: bounceSlow 2s ease-in-out infinite; }
         .slide-down { animation: slideDown 0.3s ease; }
         
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* ============ DASHBOARD-STYLE ALERT MODALS ============ */
+        .alert-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 1rem;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .alert-popup-card {
+            background: #fff;
+            border-radius: 28px;
+            padding: 2.5rem 2rem 2rem;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
+            animation: slideUp 0.35s cubic-bezier(.4,0,.2,1);
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .alert-icon-circle {
+            width: 72px; 
+            height: 72px;
+            background: #fce8e6;
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+        }
+        
+        .alert-icon-circle.success {
+            background: #d1fae5;
+        }
+        
+        .alert-icon-circle.info {
+            background: #dbeafe;
+        }
+        
+        .alert-icon-circle.warning {
+            background: #fef3c7;
+        }
+        
+        .alert-icon-circle.error {
+            background: #fee2e2;
+        }
+        
+        .alert-title {
+            font-size: 1.375rem;
+            font-weight: 600;
+            color: #202124;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.01em;
+        }
+        
+        .alert-message {
+            font-size: 0.875rem;
+            color: #5f6368;
+            margin-bottom: 1.75rem;
+        }
+        
+        .alert-divider {
+            height: 1px;
+            background: #e8eaed;
+            margin: 0 -2rem 1.5rem;
+        }
+        
+        .alert-btn-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .alert-btn-cancel {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 100px;
+            border: 1px solid #dadce0;
+            background: #fff;
+            color: #3c4043;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s;
+        }
+        
+        .alert-btn-cancel:hover { 
+            background: #f8f9fa; 
+        }
+        
+        .alert-btn-confirm {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 100px;
+            border: none;
+            background: #3b82f6;
+            color: #fff;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s, box-shadow 0.15s;
+        }
+        
+        .alert-btn-confirm.success {
+            background: #10b981;
+        }
+        
+        .alert-btn-confirm.success:hover {
+            background: #059669;
+        }
+        
+        .alert-btn-confirm.error {
+            background: #ef4444;
+        }
+        
+        .alert-btn-confirm.error:hover {
+            background: #dc2626;
+        }
+        
+        .alert-btn-confirm.warning {
+            background: #f59e0b;
+        }
+        
+        .alert-btn-confirm.warning:hover {
+            background: #d97706;
+        }
+        
+        .alert-btn-confirm.info {
+            background: #3b82f6;
+        }
+        
+        .alert-btn-confirm.info:hover {
+            background: #2563eb;
+        }
+        
+        .alert-btn-confirm:hover {
+            box-shadow: 0 2px 8px rgba(59,130,246,0.35);
+        }
+        
+        .alert-btn-confirm:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         
         /* Hamburger Menu Styles */
@@ -1101,6 +1259,101 @@
         <div class="loading-text">Loading Student Management...</div>
     </div>
     
+    <!-- ============ DASHBOARD-STYLE ALERT MODALS ============ -->
+    <!-- Success Modal -->
+    <div class="alert-modal-overlay" id="successModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle success">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#10b981" stroke-width="3" fill="none"/>
+                    <path d="M16 24L22 30L32 18" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="successTitle">Success</div>
+            <div class="alert-message" id="successMessage">Operation completed successfully.</div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm success" id="successOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="alert-modal-overlay" id="infoModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle info">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#3b82f6" stroke-width="3" fill="none"/>
+                    <path d="M24 16V24M24 32V32.5" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="infoTitle">Information</div>
+            <div class="alert-message" id="infoMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm info" id="infoOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="alert-modal-overlay" id="warningModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle warning">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <path d="M24 4L4 40H44L24 4Z" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                    <circle cx="24" cy="32" r="2" fill="#f59e0b"/>
+                    <path d="M24 16V24" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="warningTitle">Warning</div>
+            <div class="alert-message" id="warningMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-cancel" id="warningCancelBtn">Cancel</button>
+                <button class="alert-btn-confirm warning" id="warningConfirmBtn">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="alert-modal-overlay" id="errorModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle error">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#ef4444" stroke-width="3" fill="none"/>
+                    <line x1="16" y1="16" x2="32" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+                    <line x1="32" y1="16" x2="16" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="errorTitle">Error</div>
+            <div class="alert-message" id="errorMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm error" id="errorOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal (Yes/No) -->
+    <div class="alert-modal-overlay" id="confirmModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle warning">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                    <path d="M24 16V24M24 32V32.5" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title">Confirm Action</div>
+            <div class="alert-message" id="confirmMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-cancel" id="confirmNoBtn">No</button>
+                <button class="alert-btn-confirm warning" id="confirmYesBtn">Yes</button>
+            </div>
+        </div>
+    </div>
+    
     <div id="mainContent" class="hidden overflow-x-hidden">
         <!-- COMPACT NAVIGATION BANNER -->
         <header class="shadow-lg fixed w-full top-0 z-50" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
@@ -1173,7 +1426,7 @@
                                     <span class="font-medium text-gray-700">View Profile</span>
                                 </a>
                                 <div class="h-px bg-gray-200 my-1"></div>
-                                <div onclick="handleLogout(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
+                                <div onclick="showLogoutModal(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
                                     <i class="fas fa-sign-out-alt text-base"></i>
                                     <span class="font-medium">Logout</span>
                                 </div>
@@ -1200,7 +1453,7 @@
                                         <span class="font-medium text-gray-700">View Profile</span>
                                     </a>
                                     <div class="h-px bg-gray-200 my-1"></div>
-                                    <div onclick="handleLogout(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
+                                    <div onclick="showLogoutModal(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
                                         <i class="fas fa-sign-out-alt text-base"></i>
                                         <span class="font-medium">Logout</span>
                                     </div>
@@ -1919,6 +2172,113 @@
         window.auth = auth;
         window.signOut = signOut;
 
+        // ============ DASHBOARD-STYLE ALERT FUNCTIONS ============
+        function showSuccessModal(message, onOk) {
+            const modal = document.getElementById('successModal');
+            const messageEl = document.getElementById('successMessage');
+            const okBtn = document.getElementById('successOkBtn');
+            
+            messageEl.textContent = message;
+            
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showInfoModal(message, onOk) {
+            const modal = document.getElementById('infoModal');
+            const messageEl = document.getElementById('infoMessage');
+            const okBtn = document.getElementById('infoOkBtn');
+            
+            messageEl.textContent = message;
+            
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showWarningModal(message, onConfirm, onCancel) {
+            const modal = document.getElementById('warningModal');
+            const messageEl = document.getElementById('warningMessage');
+            const confirmBtn = document.getElementById('warningConfirmBtn');
+            const cancelBtn = document.getElementById('warningCancelBtn');
+            
+            messageEl.textContent = message;
+            
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+            
+            newConfirmBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onConfirm) onConfirm();
+            });
+            
+            newCancelBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onCancel) onCancel();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showErrorModal(message, onOk) {
+            const modal = document.getElementById('errorModal');
+            const messageEl = document.getElementById('errorMessage');
+            const okBtn = document.getElementById('errorOkBtn');
+            
+            messageEl.textContent = message;
+            
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showConfirmModal(message, onYes, onNo) {
+            const modal = document.getElementById('confirmModal');
+            const messageEl = document.getElementById('confirmMessage');
+            const yesBtn = document.getElementById('confirmYesBtn');
+            const noBtn = document.getElementById('confirmNoBtn');
+            
+            messageEl.textContent = message;
+            
+            const newYesBtn = yesBtn.cloneNode(true);
+            const newNoBtn = noBtn.cloneNode(true);
+            yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+            noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+            
+            newYesBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onYes) onYes();
+            });
+            
+            newNoBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onNo) onNo();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
         // ============ ⭐ EXACT SCORING FUNCTION FROM GRADES PAGE ============
         function calculateActivityScore(testName, result, testTarget = null) {
             const normalized = testName.toLowerCase().trim();
@@ -2265,19 +2625,20 @@
             }
         }
 
-        window.handleLogout = async function(event) {
+        // --- MODAL LOGOUT HANDLING ---
+        window.showLogoutModal = function(event) {
             if (event) event.preventDefault();
             closeProfileDropdown();
             
-            if (confirm('Are you sure you want to logout?')) {
+            showConfirmModal('Are you sure you want to logout?', async () => {
                 try {
                     await signOut(auth);
                     window.location.href = '/login/index.html';
                 } catch (error) {
                     console.error('Error logging out:', error);
-                    window.location.href = '/login/index.html';
+                    showErrorModal('Error logging out. Please try again.');
                 }
-            }
+            });
         };
 
         function updateProfilePicture(photoURL, userName) {
@@ -2377,18 +2738,7 @@
             loadingScreen.style.display = 'none';
             mainContent.classList.remove('hidden');
             
-            // Show error message in sections table
-            document.getElementById('sectionsTableBody').innerHTML = `
-                <tr>
-                    <td colspan="7">
-                        <div class="empty-state">
-                            <div class="empty-icon">❌</div>
-                            <div class="empty-title">Error Loading Data</div>
-                            <div class="empty-text">${error.message}</div>
-                        </div>
-                    </td>
-                </tr>
-            `;
+            showErrorModal('Error loading data: ' + error.message);
         }
     } else {
         console.log('No user, redirecting to login...');
@@ -2612,6 +2962,7 @@
                 </td>
             </tr>
         `;
+        showErrorModal('Error loading sections: ' + error.message);
     }
 }
 
@@ -2789,6 +3140,7 @@
             } catch (error) {
                 console.error('Error loading students:', error);
                 updateStudentsTable([]);
+                showErrorModal('Error loading students: ' + error.message);
             }
         };
 
@@ -3175,7 +3527,7 @@
                 const sectionDoc = await getDoc(sectionRef);
                 
                 if (!sectionDoc.exists()) {
-                    alert('Section not found!');
+                    showErrorModal('Section not found!');
                     return;
                 }
                 
@@ -3349,7 +3701,7 @@
                 
             } catch (error) {
                 console.error('Error viewing section details:', error);
-                alert('Error: ' + error.message);
+                showErrorModal('Error: ' + error.message);
             }
         };
 
@@ -3363,7 +3715,7 @@
                 window.currentStudentId = studentId;
                 const student = window.students.find(s => s.id === studentId);
                 if (!student) {
-                    alert('Student not found!');
+                    showErrorModal('Student not found!');
                     return;
                 }
 
@@ -3598,7 +3950,7 @@
                 
             } catch (error) {
                 console.error('Error viewing student details:', error);
-                alert('Error: ' + error.message);
+                showErrorModal('Error: ' + error.message);
             }
         };
 
@@ -3610,7 +3962,7 @@ window.viewAttemptDetails = async function(attemptId) {
         const attemptDoc = await getDoc(attemptRef);
         
         if (!attemptDoc.exists()) {
-            alert('Attempt not found!');
+            showErrorModal('Attempt not found!');
             return;
         }
         
@@ -3786,7 +4138,7 @@ window.viewAttemptDetails = async function(attemptId) {
         
     } catch (error) {
         console.error('Error viewing attempt details:', error);
-        alert('Error: ' + error.message);
+        showErrorModal('Error: ' + error.message);
     }
 };
 
@@ -3889,7 +4241,7 @@ document.addEventListener('click', function(event) {
 
         window.exportStudents = function() {
             if (window.filteredStudents.length === 0) {
-                alert('No students to export.');
+                showWarningModal('No students to export.', () => {}, () => {});
                 return;
             }
 
@@ -3919,6 +4271,8 @@ document.addEventListener('click', function(event) {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            
+            showSuccessModal('✅ Students exported successfully!');
         };
 
         window.refreshData = async function(event) {
@@ -3941,10 +4295,11 @@ document.addEventListener('click', function(event) {
                 }
                 
                 console.log('✓ Data refreshed successfully');
+                showSuccessModal('Data refreshed successfully!');
                 
             } catch (error) {
                 console.error('Error refreshing data:', error);
-                alert('Error refreshing data. Please try again.');
+                showErrorModal('Error refreshing data. Please try again.');
             }
         };
 
@@ -4082,6 +4437,7 @@ document.addEventListener('click', function(event) {
                 
             } catch (error) {
                 console.error('Error loading overdue students:', error);
+                showErrorModal('Error loading overdue students: ' + error.message);
             }
         };
 
@@ -4277,41 +4633,39 @@ document.addEventListener('click', function(event) {
         };
 
         window.enableOverdueTest = async function(studentEmail, testId, testName) {
-            if (!confirm(`Enable "${testName}" for this student? They will be able to take this test even though it's overdue.`)) {
-                return;
-            }
-            
-            try {
-                const existingPermissionQuery = query(
-                    collection(db, 'testPermissions'),
-                    where('studentEmail', '==', studentEmail),
-                    where('testId', '==', testId)
-                );
-                const existingSnapshot = await getDocs(existingPermissionQuery);
-                
-                if (!existingSnapshot.empty) {
-                    alert('⚠️ This test is already enabled for this student!');
-                    return;
+            showConfirmModal(`Enable "${testName}" for this student? They will be able to take this test even though it's overdue.`, async () => {
+                try {
+                    const existingPermissionQuery = query(
+                        collection(db, 'testPermissions'),
+                        where('studentEmail', '==', studentEmail),
+                        where('testId', '==', testId)
+                    );
+                    const existingSnapshot = await getDocs(existingPermissionQuery);
+                    
+                    if (!existingSnapshot.empty) {
+                        showWarningModal('This test is already enabled for this student!', () => {}, () => {});
+                        return;
+                    }
+                    
+                    await addDoc(collection(db, 'testPermissions'), {
+                        studentEmail: studentEmail,
+                        testId: testId,
+                        testName: testName,
+                        grantedBy: window.currentUser.email,
+                        grantedByName: window.currentUser.displayName || window.currentUser.email,
+                        grantedAt: serverTimestamp(),
+                        reason: 'Overdue test enabled by professor',
+                        status: 'active'
+                    });
+                    
+                    showSuccessModal('Test enabled successfully! Student can now take this test.');
+                    await loadOverdueStudents();
+                    
+                } catch (error) {
+                    console.error('Error enabling test:', error);
+                    showErrorModal('Error: ' + error.message);
                 }
-                
-                await addDoc(collection(db, 'testPermissions'), {
-                    studentEmail: studentEmail,
-                    testId: testId,
-                    testName: testName,
-                    grantedBy: window.currentUser.email,
-                    grantedByName: window.currentUser.displayName || window.currentUser.email,
-                    grantedAt: serverTimestamp(),
-                    reason: 'Overdue test enabled by professor',
-                    status: 'active'
-                });
-                
-                alert('✅ Test enabled successfully! Student can now take this test.');
-                await loadOverdueStudents();
-                
-            } catch (error) {
-                console.error('Error enabling test:', error);
-                alert('Error: ' + error.message);
-            }
+            });
         };
 
         window.setOverdueScore = function(studentEmail, testId, testName, testTarget, testUnit, studentName, currentScore = 0, currentResult = '', resultId = '') {
@@ -4437,7 +4791,7 @@ document.addEventListener('click', function(event) {
             const newResult = parseFloat(document.getElementById('newResult').value);
             
             if (isNaN(newResult) || newResult < 0) {
-                alert('Please enter a valid result');
+                showWarningModal('Please enter a valid result', () => {}, () => {});
                 return;
             }
             
@@ -4449,22 +4803,22 @@ document.addEventListener('click', function(event) {
                     testName.includes('sit-up') || testName.includes('situp') ||
                     testName.includes('curl-up')) {
                     if (newResult > testTarget) {
-                        alert(`❌ Error: Maximum repetitions for this test is ${testTarget}. Please enter a value between 0 and ${testTarget}.`);
+                        showWarningModal(`Maximum repetitions for this test is ${testTarget}. Please enter a value between 0 and ${testTarget}.`, () => {}, () => {});
                         return;
                     }
                 } else if (testName.includes('plank')) {
                     if (newResult > testTarget) {
-                        alert(`❌ Error: Maximum time for this test is ${testTarget} seconds. Please enter a value between 0 and ${testTarget}.`);
+                        showWarningModal(`Maximum time for this test is ${testTarget} seconds. Please enter a value between 0 and ${testTarget}.`, () => {}, () => {});
                         return;
                     }
                 } else if (testName.includes('sit-and-reach')) {
                     if (newResult > testTarget) {
-                        alert(`❌ Error: Maximum distance for this test is ${testTarget} cm. Please enter a value between 0 and ${testTarget}.`);
+                        showWarningModal(`Maximum distance for this test is ${testTarget} cm. Please enter a value between 0 and ${testTarget}.`, () => {}, () => {});
                         return;
                     }
                 } else if (testName.includes('grip')) {
                     if (newResult > testTarget) {
-                        alert(`❌ Error: Maximum grip strength for this test is ${testTarget} kg. Please enter a value between 0 and ${testTarget}.`);
+                        showWarningModal(`Maximum grip strength for this test is ${testTarget} kg. Please enter a value between 0 and ${testTarget}.`, () => {}, () => {});
                         return;
                     }
                 }
@@ -4530,7 +4884,7 @@ document.addEventListener('click', function(event) {
                     await addDoc(collection(db, 'testResults'), resultData);
                 }
                 
-                alert(`✅ Score saved: ${finalScore}/100\n📅 Original submission date preserved`);
+                showSuccessModal(`Score saved: ${finalScore}/100`);
                 closeEditScoreModal();
                 
                 if (window.loadOverdueStudents) await window.loadOverdueStudents();
@@ -4538,7 +4892,7 @@ document.addEventListener('click', function(event) {
                 
             } catch (error) {
                 console.error('❌ Error saving score:', error);
-                alert('Error: ' + error.message);
+                showErrorModal('Error: ' + error.message);
                 
                 const submitBtn = document.getElementById('btnSubmit');
                 if (submitBtn) {

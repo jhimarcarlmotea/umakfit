@@ -84,6 +84,24 @@
             }
         }
         
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
         .animate-fade-in-up {
             animation: fadeInUp 1s ease-out;
         }
@@ -409,6 +427,156 @@
             color: #991b1b;
         }
         
+        /* ============ DASHBOARD-STYLE ALERT MODALS ============ */
+        .alert-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 1rem;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .alert-popup-card {
+            background: #fff;
+            border-radius: 28px;
+            padding: 2.5rem 2rem 2rem;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
+            animation: slideUp 0.35s cubic-bezier(.4,0,.2,1);
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .alert-icon-circle {
+            width: 72px; 
+            height: 72px;
+            background: #fce8e6;
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+        }
+        
+        .alert-icon-circle.success {
+            background: #d1fae5;
+        }
+        
+        .alert-icon-circle.info {
+            background: #dbeafe;
+        }
+        
+        .alert-icon-circle.warning {
+            background: #fef3c7;
+        }
+        
+        .alert-icon-circle.error {
+            background: #fee2e2;
+        }
+        
+        .alert-title {
+            font-size: 1.375rem;
+            font-weight: 600;
+            color: #202124;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.01em;
+        }
+        
+        .alert-message {
+            font-size: 0.875rem;
+            color: #5f6368;
+            margin-bottom: 1.75rem;
+        }
+        
+        .alert-divider {
+            height: 1px;
+            background: #e8eaed;
+            margin: 0 -2rem 1.5rem;
+        }
+        
+        .alert-btn-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .alert-btn-cancel {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 100px;
+            border: 1px solid #dadce0;
+            background: #fff;
+            color: #3c4043;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s;
+        }
+        
+        .alert-btn-cancel:hover { 
+            background: #f8f9fa; 
+        }
+        
+        .alert-btn-confirm {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 100px;
+            border: none;
+            background: #3b82f6;
+            color: #fff;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s, box-shadow 0.15s;
+        }
+        
+        .alert-btn-confirm.success {
+            background: #10b981;
+        }
+        
+        .alert-btn-confirm.success:hover {
+            background: #059669;
+        }
+        
+        .alert-btn-confirm.error {
+            background: #ef4444;
+        }
+        
+        .alert-btn-confirm.error:hover {
+            background: #dc2626;
+        }
+        
+        .alert-btn-confirm.warning {
+            background: #f59e0b;
+        }
+        
+        .alert-btn-confirm.warning:hover {
+            background: #d97706;
+        }
+        
+        .alert-btn-confirm.info {
+            background: #3b82f6;
+        }
+        
+        .alert-btn-confirm.info:hover {
+            background: #2563eb;
+        }
+        
+        .alert-btn-confirm:hover {
+            box-shadow: 0 2px 8px rgba(59,130,246,0.35);
+        }
+        
+        .alert-btn-confirm:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
         /* ============ FIXED MODAL STYLES ============ */
         .modal-overlay {
             position: fixed;
@@ -700,6 +868,101 @@
     <div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
         <div class="spinner"></div>
         <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Grades Management...</div>
+    </div>
+    
+    <!-- ============ DASHBOARD-STYLE ALERT MODALS ============ -->
+    <!-- Success Modal -->
+    <div class="alert-modal-overlay" id="successModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle success">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#10b981" stroke-width="3" fill="none"/>
+                    <path d="M16 24L22 30L32 18" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="successTitle">Success</div>
+            <div class="alert-message" id="successMessage">Operation completed successfully.</div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm success" id="successOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="alert-modal-overlay" id="infoModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle info">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#3b82f6" stroke-width="3" fill="none"/>
+                    <path d="M24 16V24M24 32V32.5" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="infoTitle">Information</div>
+            <div class="alert-message" id="infoMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm info" id="infoOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="alert-modal-overlay" id="warningModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle warning">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <path d="M24 4L4 40H44L24 4Z" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                    <circle cx="24" cy="32" r="2" fill="#f59e0b"/>
+                    <path d="M24 16V24" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="warningTitle">Warning</div>
+            <div class="alert-message" id="warningMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-cancel" id="warningCancelBtn">Cancel</button>
+                <button class="alert-btn-confirm warning" id="warningConfirmBtn">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="alert-modal-overlay" id="errorModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle error">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#ef4444" stroke-width="3" fill="none"/>
+                    <line x1="16" y1="16" x2="32" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+                    <line x1="32" y1="16" x2="16" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="errorTitle">Error</div>
+            <div class="alert-message" id="errorMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm error" id="errorOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal (Yes/No) -->
+    <div class="alert-modal-overlay" id="confirmModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle warning">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                    <path d="M24 16V24M24 32V32.5" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title">Confirm Action</div>
+            <div class="alert-message" id="confirmMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-cancel" id="confirmNoBtn">No</button>
+                <button class="alert-btn-confirm warning" id="confirmYesBtn">Yes</button>
+            </div>
+        </div>
     </div>
     
     <div id="mainContent" class="hidden">
@@ -1270,6 +1533,114 @@
         const profileDropdown = document.getElementById('profileDropdown');
         const profileDropdownMobile = document.getElementById('profileDropdownMobile');
 
+        // ============ DASHBOARD-STYLE ALERT FUNCTIONS ============
+        function showSuccessModal(message, onOk) {
+            const modal = document.getElementById('successModal');
+            const messageEl = document.getElementById('successMessage');
+            const okBtn = document.getElementById('successOkBtn');
+            
+            messageEl.textContent = message;
+            
+            // Clone button to remove previous listeners
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showInfoModal(message, onOk) {
+            const modal = document.getElementById('infoModal');
+            const messageEl = document.getElementById('infoMessage');
+            const okBtn = document.getElementById('infoOkBtn');
+            
+            messageEl.textContent = message;
+            
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showWarningModal(message, onConfirm, onCancel) {
+            const modal = document.getElementById('warningModal');
+            const messageEl = document.getElementById('warningMessage');
+            const confirmBtn = document.getElementById('warningConfirmBtn');
+            const cancelBtn = document.getElementById('warningCancelBtn');
+            
+            messageEl.textContent = message;
+            
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+            
+            newConfirmBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onConfirm) onConfirm();
+            });
+            
+            newCancelBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onCancel) onCancel();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showErrorModal(message, onOk) {
+            const modal = document.getElementById('errorModal');
+            const messageEl = document.getElementById('errorMessage');
+            const okBtn = document.getElementById('errorOkBtn');
+            
+            messageEl.textContent = message;
+            
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showConfirmModal(message, onYes, onNo) {
+            const modal = document.getElementById('confirmModal');
+            const messageEl = document.getElementById('confirmMessage');
+            const yesBtn = document.getElementById('confirmYesBtn');
+            const noBtn = document.getElementById('confirmNoBtn');
+            
+            messageEl.textContent = message;
+            
+            const newYesBtn = yesBtn.cloneNode(true);
+            const newNoBtn = noBtn.cloneNode(true);
+            yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+            noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+            
+            newYesBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onYes) onYes();
+            });
+            
+            newNoBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onNo) onNo();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
         // ============ ⭐ EXACT SCORING FUNCTION FROM STUDENT GRADES PAGE ============
         function calculateActivityScore(testName, result, testTarget = null) {
             const normalized = testName.toLowerCase().trim();
@@ -1605,7 +1976,7 @@
             if (event) event.preventDefault();
             closeProfileDropdown();
             
-            if (confirm('Are you sure you want to logout?')) {
+            showConfirmModal('Are you sure you want to logout?', async () => {
                 try {
                     await signOut(auth);
                     window.location.href = '/login/index.html';
@@ -1613,7 +1984,7 @@
                     console.error('Error logging out:', error);
                     window.location.href = '/login/index.html';
                 }
-            }
+            });
         };
 
         function updateProfilePicture(photoURL, userName) {
@@ -1663,7 +2034,7 @@
                     console.error('Error loading grades:', error);
                     loadingScreen.style.display = 'none';
                     mainContent.classList.remove('hidden');
-                    alert('Error loading grades data: ' + error.message);
+                    showErrorModal('Error loading grades data: ' + error.message);
                 }
             } else {
                 window.location.href = '/login/index.html';
@@ -2371,22 +2742,22 @@
         window.calculateFinalGrades = function() {
             try {
                 if (allGrades.length === 0) {
-                    alert('No grades available to calculate final grades.');
+                    showWarningModal('No grades available to calculate final grades.', () => {}, () => {});
                     return;
                 }
 
                 calculateAndDisplayFinalGrades();
-                alert(`✅ Successfully calculated final grades for ${currentFinalGrades.length} students using BEST scores!`);
+                showSuccessModal(`✅ Successfully calculated final grades for ${currentFinalGrades.length} students using BEST scores!`);
 
             } catch (error) {
                 console.error('Error calculating final grades:', error);
-                alert('Error calculating final grades: ' + error.message);
+                showErrorModal('Error calculating final grades: ' + error.message);
             }
         }
 
         window.exportGrades = function() {
             if (filteredFinalGrades.length === 0) {
-                alert('No final grades to export');
+                showWarningModal('No final grades to export', () => {}, () => {});
                 return;
             }
             
@@ -2406,11 +2777,11 @@
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
             
-            alert('✅ Final grades exported successfully!');
+            showSuccessModal('✅ Final grades exported successfully!');
         }
 
         window.saveFinalGradesToPDF = function() {
-            alert('PDF export feature would be implemented here.\nFor now, you can use the browser\'s Print function (Ctrl+P) and save as PDF.');
+            showInfoModal('PDF export feature would be implemented here.\nFor now, you can use the browser\'s Print function (Ctrl+P) and save as PDF.');
         }
 
         window.editGrade = editGrade;
@@ -2425,7 +2796,7 @@
         function editGrade(gradeId) {
             const grade = allGrades.find(g => g.id === gradeId);
             if (!grade) {
-                alert('Grade not found');
+                showErrorModal('Grade not found');
                 return;
             }
             
@@ -2448,7 +2819,7 @@
             const remarks = document.getElementById('editRemarks').value;
             
             if (isNaN(newScore) || newScore < 0 || newScore > 100) {
-                alert('Please enter a valid score between 0 and 100');
+                showWarningModal('Please enter a valid score between 0 and 100', () => {}, () => {});
                 return;
             }
             
@@ -2461,13 +2832,13 @@
                     updatedAt: new Date()
                 });
                 
-                alert('✅ Grade updated successfully!');
+                showSuccessModal('✅ Grade updated successfully!');
                 closeEditModal();
                 await loadGrades();
                 
             } catch (error) {
                 console.error('Error updating grade:', error);
-                alert('Error updating grade: ' + error.message);
+                showErrorModal('Error updating grade: ' + error.message);
             }
         }
     </script>

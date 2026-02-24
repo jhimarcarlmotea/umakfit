@@ -84,6 +84,24 @@
             }
         }
         
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
         .animate-fade-in-up {
             animation: fadeInUp 1s ease-out;
         }
@@ -447,7 +465,7 @@
             width: 1%;
         }
         
-        /* ============ FIXED MODAL STYLES - NO VERTICAL SCROLL ON MODAL ITSELF ============ */
+        /* ============ FIXED MODAL STYLES ============ */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -536,6 +554,156 @@
         .modal-close-btn:hover {
             background-color: #e5e7eb;
             color: #111827;
+        }
+        
+        /* ============ DASHBOARD-STYLE ALERT MODALS ============ */
+        .alert-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 1rem;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .alert-popup-card {
+            background: #fff;
+            border-radius: 28px;
+            padding: 2.5rem 2rem 2rem;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
+            animation: slideUp 0.35s cubic-bezier(.4,0,.2,1);
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .alert-icon-circle {
+            width: 72px; 
+            height: 72px;
+            background: #fce8e6;
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+        }
+        
+        .alert-icon-circle.success {
+            background: #d1fae5;
+        }
+        
+        .alert-icon-circle.info {
+            background: #dbeafe;
+        }
+        
+        .alert-icon-circle.warning {
+            background: #fef3c7;
+        }
+        
+        .alert-icon-circle.error {
+            background: #fee2e2;
+        }
+        
+        .alert-title {
+            font-size: 1.375rem;
+            font-weight: 600;
+            color: #202124;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.01em;
+        }
+        
+        .alert-message {
+            font-size: 0.875rem;
+            color: #5f6368;
+            margin-bottom: 1.75rem;
+        }
+        
+        .alert-divider {
+            height: 1px;
+            background: #e8eaed;
+            margin: 0 -2rem 1.5rem;
+        }
+        
+        .alert-btn-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .alert-btn-cancel {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 100px;
+            border: 1px solid #dadce0;
+            background: #fff;
+            color: #3c4043;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s;
+        }
+        
+        .alert-btn-cancel:hover { 
+            background: #f8f9fa; 
+        }
+        
+        .alert-btn-confirm {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 100px;
+            border: none;
+            background: #3b82f6;
+            color: #fff;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s, box-shadow 0.15s;
+        }
+        
+        .alert-btn-confirm.success {
+            background: #10b981;
+        }
+        
+        .alert-btn-confirm.success:hover {
+            background: #059669;
+        }
+        
+        .alert-btn-confirm.error {
+            background: #ef4444;
+        }
+        
+        .alert-btn-confirm.error:hover {
+            background: #dc2626;
+        }
+        
+        .alert-btn-confirm.warning {
+            background: #f59e0b;
+        }
+        
+        .alert-btn-confirm.warning:hover {
+            background: #d97706;
+        }
+        
+        .alert-btn-confirm.info {
+            background: #3b82f6;
+        }
+        
+        .alert-btn-confirm.info:hover {
+            background: #2563eb;
+        }
+        
+        .alert-btn-confirm:hover {
+            box-shadow: 0 2px 8px rgba(59,130,246,0.35);
+        }
+        
+        .alert-btn-confirm:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         
         /* Form styles */
@@ -916,8 +1084,104 @@
 <body class="bg-gray-50">
     <!-- Loading Screen -->
     <div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
+        <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
         <div class="spinner"></div>
         <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Test Management...</div>
+    </div>
+    
+    <!-- ============ DASHBOARD-STYLE ALERT MODALS ============ -->
+    <!-- Success Modal -->
+    <div class="alert-modal-overlay" id="successModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle success">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#10b981" stroke-width="3" fill="none"/>
+                    <path d="M16 24L22 30L32 18" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="successTitle">Success</div>
+            <div class="alert-message" id="successMessage">Operation completed successfully.</div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm success" id="successOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="alert-modal-overlay" id="infoModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle info">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#3b82f6" stroke-width="3" fill="none"/>
+                    <path d="M24 16V24M24 32V32.5" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="infoTitle">Information</div>
+            <div class="alert-message" id="infoMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm info" id="infoOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="alert-modal-overlay" id="warningModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle warning">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <path d="M24 4L4 40H44L24 4Z" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                    <circle cx="24" cy="32" r="2" fill="#f59e0b"/>
+                    <path d="M24 16V24" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="warningTitle">Warning</div>
+            <div class="alert-message" id="warningMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-cancel" id="warningCancelBtn">Cancel</button>
+                <button class="alert-btn-confirm warning" id="warningConfirmBtn">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="alert-modal-overlay" id="errorModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle error">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#ef4444" stroke-width="3" fill="none"/>
+                    <line x1="16" y1="16" x2="32" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+                    <line x1="32" y1="16" x2="16" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="errorTitle">Error</div>
+            <div class="alert-message" id="errorMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm error" id="errorOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal (Yes/No) -->
+    <div class="alert-modal-overlay" id="confirmModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle warning">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                    <path d="M24 16V24M24 32V32.5" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title">Confirm Action</div>
+            <div class="alert-message" id="confirmMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-cancel" id="confirmNoBtn">No</button>
+                <button class="alert-btn-confirm warning" id="confirmYesBtn">Yes</button>
+            </div>
+        </div>
     </div>
     
     <div id="mainContent" class="hidden">
@@ -1375,7 +1639,7 @@
         </footer>
     </div>
 
-    <!-- ============ ⭐ FIXED STUDENT TEST RESULTS MODAL - NO VERTICAL SCROLL ON MODAL ITSELF ============ -->
+    <!-- ============ ⭐ FIXED STUDENT TEST RESULTS MODAL ============ -->
     <div id="studentTestResultsModal" class="modal-overlay" style="display: none;" onclick="closeStudentTestResultsModal()">
         <div class="modal-content large" onclick="event.stopPropagation()">
             <div class="modal-header">
@@ -1681,6 +1945,114 @@
         const profileDropdown = document.getElementById('profileDropdown');
         const profileDropdownMobile = document.getElementById('profileDropdownMobile');
 
+        // ============ DASHBOARD-STYLE ALERT FUNCTIONS ============
+        function showSuccessModal(message, onOk) {
+            const modal = document.getElementById('successModal');
+            const messageEl = document.getElementById('successMessage');
+            const okBtn = document.getElementById('successOkBtn');
+            
+            messageEl.textContent = message;
+            
+            // Clone button to remove previous listeners
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showInfoModal(message, onOk) {
+            const modal = document.getElementById('infoModal');
+            const messageEl = document.getElementById('infoMessage');
+            const okBtn = document.getElementById('infoOkBtn');
+            
+            messageEl.textContent = message;
+            
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showWarningModal(message, onConfirm, onCancel) {
+            const modal = document.getElementById('warningModal');
+            const messageEl = document.getElementById('warningMessage');
+            const confirmBtn = document.getElementById('warningConfirmBtn');
+            const cancelBtn = document.getElementById('warningCancelBtn');
+            
+            messageEl.textContent = message;
+            
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+            
+            newConfirmBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onConfirm) onConfirm();
+            });
+            
+            newCancelBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onCancel) onCancel();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showErrorModal(message, onOk) {
+            const modal = document.getElementById('errorModal');
+            const messageEl = document.getElementById('errorMessage');
+            const okBtn = document.getElementById('errorOkBtn');
+            
+            messageEl.textContent = message;
+            
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showConfirmModal(message, onYes, onNo) {
+            const modal = document.getElementById('confirmModal');
+            const messageEl = document.getElementById('confirmMessage');
+            const yesBtn = document.getElementById('confirmYesBtn');
+            const noBtn = document.getElementById('confirmNoBtn');
+            
+            messageEl.textContent = message;
+            
+            const newYesBtn = yesBtn.cloneNode(true);
+            const newNoBtn = noBtn.cloneNode(true);
+            yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+            noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+            
+            newYesBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onYes) onYes();
+            });
+            
+            newNoBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onNo) onNo();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
         // Hamburger Menu Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
             if (hamburger && mobileDrawer && drawerOverlay) {
@@ -1747,13 +2119,11 @@
             }
         }
 
-       
-
         window.handleLogout = async function(event) {
             if (event) event.preventDefault();
             closeProfileDropdown();
             
-            if (confirm('Are you sure you want to logout?')) {
+            showConfirmModal('Are you sure you want to logout?', async () => {
                 try {
                     await signOut(auth);
                     window.location.href = '/login/index.html';
@@ -1761,7 +2131,7 @@
                     console.error('Error logging out:', error);
                     window.location.href = '/login/index.html';
                 }
-            }
+            });
         };
 
         // Function to update profile picture
@@ -1800,7 +2170,7 @@
         window.currentManagingTestId = null;
         window.studentResultsMap = new Map();
         // Store all loaded tests for filtering/sorting
-window.allScheduledTests = [];
+        window.allScheduledTests = [];
 
         onAuthStateChanged(auth, async (user) => {
             const loadingScreen = document.getElementById('loadingScreen');
@@ -1824,37 +2194,40 @@ window.allScheduledTests = [];
                     console.error('Error loading data:', error);
                     loadingScreen.style.display = 'none';
                     mainContent.classList.remove('hidden');
+                    showErrorModal('Error loading data: ' + error.message);
                 }
             } else {
                 window.location.href = '/login/index.html';
             }
         });
-// NEW: Populate the "Sort by Section" dropdown with test counts
-function populateSectionSortDropdown() {
-    const select = document.getElementById('sortBySection');
-    if (!select) return;
-    
-    // Count tests per section
-    const sectionCount = new Map();
-    window.allScheduledTests.forEach(test => {
-        const sec = test.section;
-        if (sec) sectionCount.set(sec, (sectionCount.get(sec) || 0) + 1);
-    });
-    
-    // Get all unique sections from assigned sections (or from tests)
-    const sectionsSet = new Set();
-    window.assignedSections.forEach(s => sectionsSet.add(s.section));
-    window.allScheduledTests.forEach(t => { if (t.section) sectionsSet.add(t.section); });
-    
-    const sortedSections = Array.from(sectionsSet).sort();
-    
-    let options = '<option value="">All Sections (sorted by section)</option>';
-    sortedSections.forEach(section => {
-        const count = sectionCount.get(section) || 0;
-        options += `<option value="${section}">${section} (${count} test${count !== 1 ? 's' : ''})</option>`;
-    });
-    select.innerHTML = options;
-}
+
+        // NEW: Populate the "Sort by Section" dropdown with test counts
+        function populateSectionSortDropdown() {
+            const select = document.getElementById('sortBySection');
+            if (!select) return;
+            
+            // Count tests per section
+            const sectionCount = new Map();
+            window.allScheduledTests.forEach(test => {
+                const sec = test.section;
+                if (sec) sectionCount.set(sec, (sectionCount.get(sec) || 0) + 1);
+            });
+            
+            // Get all unique sections from assigned sections (or from tests)
+            const sectionsSet = new Set();
+            window.assignedSections.forEach(s => sectionsSet.add(s.section));
+            window.allScheduledTests.forEach(t => { if (t.section) sectionsSet.add(t.section); });
+            
+            const sortedSections = Array.from(sectionsSet).sort();
+            
+            let options = '<option value="">All Sections (sorted by section)</option>';
+            sortedSections.forEach(section => {
+                const count = sectionCount.get(section) || 0;
+                options += `<option value="${section}">${section} (${count} test${count !== 1 ? 's' : ''})</option>`;
+            });
+            select.innerHTML = options;
+        }
+        
         // Function to get rating based on score
         function getRating(score) {
             if (score >= 90) return { text: 'Excellent', class: 'rating-excellent' };
@@ -1871,302 +2244,303 @@ function populateSectionSortDropdown() {
         }
         
         // Render schedule table with filtering and sorting
-function renderScheduleTable(tests, enabledTestsMap) {
-    const tableBody = document.getElementById('scheduleTableBody');
-    if (!tests.length) {
-        if (window.assignedSections.length > 0) {
-            let sectionsInfo = window.assignedSections.map(s => `${s.section} (${s.students} students)`).join(', ');
-            tableBody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No Active Test Schedules</div><div class="empty-text">You have been assigned: <strong>${sectionsInfo}</strong><br><br>All scheduled tests have expired or you haven't created any tests yet.<br>Click "Schedule New Test" to create a fitness test for your assigned section(s).</div></div></td></tr>`;
-        } else {
-            tableBody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">No Sections Assigned</div><div class="empty-text">You have not been assigned to any sections yet.<br><br>Please contact the Secretary to assign you to a section.</div></div></td></tr>`;
-        }
-        return;
-    }
-
-    // Get filter values
-    const searchValue = (document.getElementById('searchSchedule')?.value || '').toUpperCase();
-    const typeFilter = (document.getElementById('filterTestType')?.value || '').toUpperCase();
-    const sectionFilter = (document.getElementById('sortBySection')?.value || ''); // selected section value
-
-    // Filter tests
-    let filteredTests = tests.filter(test => {
-        let show = true;
-        if (searchValue) {
-            const testName = (test.testName || '').toUpperCase();
-            const section = (test.section || '').toUpperCase();
-            if (!testName.includes(searchValue) && !section.includes(searchValue)) show = false;
-        }
-        if (show && typeFilter) {
-            const testName = (test.testName || '').toUpperCase();
-            if (!testName.includes(typeFilter)) show = false;
-        }
-        if (show && sectionFilter) {
-            if (test.section !== sectionFilter) show = false;
-        }
-        return show;
-    });
-
-    // Sort by section name (ascending)
-    filteredTests.sort((a, b) => (a.section || '').localeCompare(b.section || ''));
-
-    let html = '';
-    filteredTests.forEach(test => {
-        const deadlineDateTime = new Date(test.deadlineDateTime);
-        const now = new Date();
-        const isOverdue = deadlineDateTime < now;
-        const isEnabled = enabledTestsMap?.has(test.id);
-        const enabledCount = isEnabled ? enabledTestsMap.get(test.id).length : 0;
-        
-        const status = test.status || 'scheduled';
-        const statusClass = status === 'active' ? 'status-active' : status === 'completed' ? 'status-completed' : 'status-scheduled';
-        const totalStudents = test.totalStudents || 0;
-        const completedStudents = test.completedStudents || 0;
-        const progress = totalStudents > 0 ? `${completedStudents}/${totalStudents}` : '0/0';
-        const sectionInfo = window.assignedSections.find(s => s.section === test.section);
-        const scheduleInfo = sectionInfo ? `${sectionInfo.time} / ${sectionInfo.day} / ${sectionInfo.room}` : 'Not Set';
-        
-        html += `<tr style="${isEnabled && isOverdue ? 'background-color: #f0f9ff;' : ''}">
-            <td data-label="Test Name">${test.testName || 'Unnamed Test'}${isEnabled && isOverdue ? `<br><small style="color: #3b82f6; font-weight: 600;">✓ Enabled for ${enabledCount} student${enabledCount > 1 ? 's' : ''}</small>` : ''}</td>
-            <td data-label="Section">${test.section || 'N/A'}<br><small style="color: #64748b; font-size: 12px;">${scheduleInfo}</small></td>
-            <td data-label="Date">${test.date || 'N/A'}</td>
-            <td data-label="Deadline">${test.deadline || 'N/A'} ${test.deadlineTime || ''}</td>
-            <td data-label="Progress" class="progress-cell">${progress}</td>
-            <td data-label="Attempts">${test.attemptsAllowed || '1'}</td>
-            <td data-label="Status"><span class="status-badge ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>${isOverdue ? '<br><small style="color: #ef4444;">⚠️ Overdue</small>' : ''}</td>
-            <td data-label="Action"><div class="action-buttons"><button class="btn-action btn-edit" onclick="editTest('${test.id}')"><i class="fas fa-pencil-alt"></i> Edit</button><button class="btn-action btn-view" onclick="manageStudents('${test.id}', '${test.testName}', '${test.section}')"><i class="fas fa-users"></i> Manage</button><button class="btn-action btn-delete" onclick="deleteTest('${test.id}')"><i class="fas fa-trash-alt"></i> Delete</button></div></td>
-        </tr>`;
-    });
-
-    if (html === '') {
-        html = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No Tests Match Filters</div><div class="empty-text">Try adjusting your search or filter criteria.</div></div></td></tr>`;
-    }
-    tableBody.innerHTML = html;
-}
- async function loadScheduledTests(userEmail, userId) {
-    try {
-        console.log('=== LOADING SCHEDULED TESTS ===');
-        console.log('Professor email:', userEmail);
-        console.log('Professor UID:', userId);
-        
-        // STEP 1: Get professor's name
-        console.log('Step 1: Checking professors collection...');
-        let professorName = '';
-        
-        const professorsQuery = query(
-            collection(db, 'professors'),
-            where('email', '==', userEmail)
-        );
-        const professorsSnapshot = await getDocs(professorsQuery);
-        
-        if (!professorsSnapshot.empty) {
-            const professorData = professorsSnapshot.docs[0].data();
-            professorName = professorData.name || '';
-            console.log('✓ Professor found:', professorName);
-        }
-        
-        // If not found in professors collection, try users collection
-        if (!professorName) {
-            console.log('Checking users collection...');
-            const usersQuery = query(
-                collection(db, 'users'),
-                where('email', '==', userEmail)
-            );
-            const usersSnapshot = await getDocs(usersQuery);
-            
-            if (!usersSnapshot.empty) {
-                const userData = usersSnapshot.docs[0].data();
-                professorName = userData.name || '';
-                console.log('✓ Professor found in users:', professorName);
+        function renderScheduleTable(tests, enabledTestsMap) {
+            const tableBody = document.getElementById('scheduleTableBody');
+            if (!tests.length) {
+                if (window.assignedSections.length > 0) {
+                    let sectionsInfo = window.assignedSections.map(s => `${s.section} (${s.students} students)`).join(', ');
+                    tableBody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No Active Test Schedules</div><div class="empty-text">You have been assigned: <strong>${sectionsInfo}</strong><br><br>All scheduled tests have expired or you haven't created any tests yet.<br>Click "Schedule New Test" to create a fitness test for your assigned section(s).</div></div></td></tr>`;
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">No Sections Assigned</div><div class="empty-text">You have not been assigned to any sections yet.<br><br>Please contact the Secretary to assign you to a section.</div></div></td></tr>`;
+                }
+                return;
             }
+
+            // Get filter values
+            const searchValue = (document.getElementById('searchSchedule')?.value || '').toUpperCase();
+            const typeFilter = (document.getElementById('filterTestType')?.value || '').toUpperCase();
+            const sectionFilter = (document.getElementById('sortBySection')?.value || ''); // selected section value
+
+            // Filter tests
+            let filteredTests = tests.filter(test => {
+                let show = true;
+                if (searchValue) {
+                    const testName = (test.testName || '').toUpperCase();
+                    const section = (test.section || '').toUpperCase();
+                    if (!testName.includes(searchValue) && !section.includes(searchValue)) show = false;
+                }
+                if (show && typeFilter) {
+                    const testName = (test.testName || '').toUpperCase();
+                    if (!testName.includes(typeFilter)) show = false;
+                }
+                if (show && sectionFilter) {
+                    if (test.section !== sectionFilter) show = false;
+                }
+                return show;
+            });
+
+            // Sort by section name (ascending)
+            filteredTests.sort((a, b) => (a.section || '').localeCompare(b.section || ''));
+
+            let html = '';
+            filteredTests.forEach(test => {
+                const deadlineDateTime = new Date(test.deadlineDateTime);
+                const now = new Date();
+                const isOverdue = deadlineDateTime < now;
+                const isEnabled = enabledTestsMap?.has(test.id);
+                const enabledCount = isEnabled ? enabledTestsMap.get(test.id).length : 0;
+                
+                const status = test.status || 'scheduled';
+                const statusClass = status === 'active' ? 'status-active' : status === 'completed' ? 'status-completed' : 'status-scheduled';
+                const totalStudents = test.totalStudents || 0;
+                const completedStudents = test.completedStudents || 0;
+                const progress = totalStudents > 0 ? `${completedStudents}/${totalStudents}` : '0/0';
+                const sectionInfo = window.assignedSections.find(s => s.section === test.section);
+                const scheduleInfo = sectionInfo ? `${sectionInfo.time} / ${sectionInfo.day} / ${sectionInfo.room}` : 'Not Set';
+                
+                html += `<tr style="${isEnabled && isOverdue ? 'background-color: #f0f9ff;' : ''}">
+                    <td data-label="Test Name">${test.testName || 'Unnamed Test'}${isEnabled && isOverdue ? `<br><small style="color: #3b82f6; font-weight: 600;">✓ Enabled for ${enabledCount} student${enabledCount > 1 ? 's' : ''}</small>` : ''}</td>
+                    <td data-label="Section">${test.section || 'N/A'}<br><small style="color: #64748b; font-size: 12px;">${scheduleInfo}</small></td>
+                    <td data-label="Date">${test.date || 'N/A'}</td>
+                    <td data-label="Deadline">${test.deadline || 'N/A'} ${test.deadlineTime || ''}</td>
+                    <td data-label="Progress" class="progress-cell">${progress}</td>
+                    <td data-label="Attempts">${test.attemptsAllowed || '1'}</td>
+                    <td data-label="Status"><span class="status-badge ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>${isOverdue ? '<br><small style="color: #ef4444;">⚠️ Overdue</small>' : ''}</td>
+                    <td data-label="Action"><div class="action-buttons"><button class="btn-action btn-edit" onclick="editTest('${test.id}')"><i class="fas fa-pencil-alt"></i> Edit</button><button class="btn-action btn-view" onclick="manageStudents('${test.id}', '${test.testName}', '${test.section}')"><i class="fas fa-users"></i> Manage</button><button class="btn-action btn-delete" onclick="deleteTest('${test.id}')"><i class="fas fa-trash-alt"></i> Delete</button></div></td>
+                </tr>`;
+            });
+
+            if (html === '') {
+                html = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No Tests Match Filters</div><div class="empty-text">Try adjusting your search or filter criteria.</div></div></td></tr>`;
+            }
+            tableBody.innerHTML = html;
         }
-        
-        window.assignedSections = [];
-        
-         // STEP 2: Find all sections where this professor is assigned
-        console.log('Step 2: Checking sections collection...');
-        const sectionsSnapshot = await getDocs(collection(db, 'sections'));
-        
-        console.log('Total sections in database:', sectionsSnapshot.size);
-        
-        // Build a list of all possible name variants to match against
-        const profNameLower = (professorName || '').toLowerCase().trim();
-        const profEmailLower = (userEmail || '').toLowerCase().trim();
-        
-        // Also collect all name aliases stored in the professors collection
-        const allProfNameVariants = new Set();
-        if (profNameLower) allProfNameVariants.add(profNameLower);
-        
-        // Fetch all records from professors collection for this email to get every possible name stored
-        const profAliasQuery = query(collection(db, 'professors'), where('email', '==', userEmail));
-        const profAliasSnap = await getDocs(profAliasQuery);
-        profAliasSnap.forEach(d => {
-            const n = (d.data().name || '').toLowerCase().trim();
-            if (n) allProfNameVariants.add(n);
-        });
 
-        // Also check users collection
-        const userAliasQuery = query(collection(db, 'users'), where('email', '==', userEmail));
-        const userAliasSnap = await getDocs(userAliasQuery);
-        userAliasSnap.forEach(d => {
-            const n = (d.data().name || '').toLowerCase().trim();
-            if (n) allProfNameVariants.add(n);
-        });
-
-        console.log('Professor name variants:', Array.from(allProfNameVariants));
-
-        // Use a Set to track unique section names
-        const seenSections = new Set();
-
-        for (const docSnap of sectionsSnapshot.docs) {
-            const sectionData = docSnap.data();
-            const sectionProfRaw = (sectionData.professor || '').trim();
-            const sectionProfLower = sectionProfRaw.toLowerCase();
-            const sectionProfEmailLower = (sectionData.professorEmail || '').toLowerCase().trim();
-
-            // Match by email (most reliable)
-            let isProfessorAssigned = sectionProfEmailLower === profEmailLower;
-
-            // Match by name variants
-            if (!isProfessorAssigned && sectionProfLower) {
-                for (const variant of allProfNameVariants) {
-                    if (!variant) continue;
-                    if (
-                        sectionProfLower === variant ||
-                        sectionProfLower.includes(variant) ||
-                        variant.includes(sectionProfLower)
-                    ) {
-                        isProfessorAssigned = true;
-                        break;
+        async function loadScheduledTests(userEmail, userId) {
+            try {
+                console.log('=== LOADING SCHEDULED TESTS ===');
+                console.log('Professor email:', userEmail);
+                console.log('Professor UID:', userId);
+                
+                // STEP 1: Get professor's name
+                console.log('Step 1: Checking professors collection...');
+                let professorName = '';
+                
+                const professorsQuery = query(
+                    collection(db, 'professors'),
+                    where('email', '==', userEmail)
+                );
+                const professorsSnapshot = await getDocs(professorsQuery);
+                
+                if (!professorsSnapshot.empty) {
+                    const professorData = professorsSnapshot.docs[0].data();
+                    professorName = professorData.name || '';
+                    console.log('✓ Professor found:', professorName);
+                }
+                
+                // If not found in professors collection, try users collection
+                if (!professorName) {
+                    console.log('Checking users collection...');
+                    const usersQuery = query(
+                        collection(db, 'users'),
+                        where('email', '==', userEmail)
+                    );
+                    const usersSnapshot = await getDocs(usersQuery);
+                    
+                    if (!usersSnapshot.empty) {
+                        const userData = usersSnapshot.docs[0].data();
+                        professorName = userData.name || '';
+                        console.log('✓ Professor found in users:', professorName);
                     }
                 }
-            }
-
-            // NEW: Also check if any part of the professor's email username
-            // matches something in the section professor field
-            // e.g. email "doribiana@umak.edu.ph" → username "doribiana"
-            if (!isProfessorAssigned && profEmailLower) {
-                const emailUsername = profEmailLower.split('@')[0].toLowerCase();
-                if (emailUsername.length > 3 && sectionProfLower.includes(emailUsername)) {
-                    isProfessorAssigned = true;
-                }
-            }
-
-            if (isProfessorAssigned) {
-                if (seenSections.has(sectionData.name)) {
-                    console.log(`⚠️ Skipping duplicate section: ${sectionData.name}`);
-                    continue;
-                }
-
-                console.log(`✓ Found assigned section: ${sectionData.name}`);
-                seenSections.add(sectionData.name);
-
-                const actualStudentCount = sectionData.students ? sectionData.students.length : 0;
-
-                window.assignedSections.push({
-                    section: sectionData.name,
-                    students: actualStudentCount,
-                    courseCode: sectionData.courseCode || 'PE 3',
-                    time: sectionData.time || 'Not Set',
-                    day: sectionData.day || 'Not Set',
-                    room: sectionData.room || 'Not Set'
+                
+                window.assignedSections = [];
+                
+                 // STEP 2: Find all sections where this professor is assigned
+                console.log('Step 2: Checking sections collection...');
+                const sectionsSnapshot = await getDocs(collection(db, 'sections'));
+                
+                console.log('Total sections in database:', sectionsSnapshot.size);
+                
+                // Build a list of all possible name variants to match against
+                const profNameLower = (professorName || '').toLowerCase().trim();
+                const profEmailLower = (userEmail || '').toLowerCase().trim();
+                
+                // Also collect all name aliases stored in the professors collection
+                const allProfNameVariants = new Set();
+                if (profNameLower) allProfNameVariants.add(profNameLower);
+                
+                // Fetch all records from professors collection for this email to get every possible name stored
+                const profAliasQuery = query(collection(db, 'professors'), where('email', '==', userEmail));
+                const profAliasSnap = await getDocs(profAliasQuery);
+                profAliasSnap.forEach(d => {
+                    const n = (d.data().name || '').toLowerCase().trim();
+                    if (n) allProfNameVariants.add(n);
                 });
 
-                console.log(`  - ${sectionData.name}: ${actualStudentCount} students`);
-                console.log(`  - Schedule: ${sectionData.time || 'N/A'} / ${sectionData.day || 'N/A'} / ${sectionData.room || 'N/A'}`);
-            }
-        }
-        
-        console.log('=== FINAL ASSIGNED SECTIONS ===');
-        console.log('Total unique sections:', window.assignedSections.length);
-        console.log('Sections:', window.assignedSections);
-        
-        // STEP 3: Load scheduled tests
-        console.log('Step 3: Loading scheduled tests...');
-        
-        let testsQuery;
-        let testsSnapshot;
+                // Also check users collection
+                const userAliasQuery = query(collection(db, 'users'), where('email', '==', userEmail));
+                const userAliasSnap = await getDocs(userAliasQuery);
+                userAliasSnap.forEach(d => {
+                    const n = (d.data().name || '').toLowerCase().trim();
+                    if (n) allProfNameVariants.add(n);
+                });
 
-        if (window.assignedSections.length > 0) {
-            const sectionNames = window.assignedSections.map(s => s.section);
-            // Firestore 'in' operator has a limit of 10 items
-            const limitedSections = sectionNames.slice(0, 10);
-            
-            testsQuery = query(
-                collection(db, 'scheduledTests'),
-                where('professorEmail', '==', userEmail),
-                where('section', 'in', limitedSections)
-            );
-            testsSnapshot = await getDocs(testsQuery);
-        } else {
-            testsQuery = query(
-                collection(db, 'scheduledTests'),
-                where('professorEmail', '==', userEmail)
-            );
-            testsSnapshot = await getDocs(testsQuery);
-        }
-        
-        if (testsSnapshot.empty) {
-            console.log('No tests by email, trying userId...');
-            testsQuery = query(
-                collection(db, 'scheduledTests'),
-                where('professorId', '==', userId)
-            );
-            testsSnapshot = await getDocs(testsQuery);
-        }
-        
-        // Load enabled test permissions
-        const permissionsQuery = query(
-            collection(db, 'testPermissions'),
-            where('grantedBy', '==', userEmail)
-        );
-        const permissionsSnapshot = await getDocs(permissionsQuery);
-        const enabledTestsMap = new Map();
-        
-        permissionsSnapshot.forEach(doc => {
-            const perm = doc.data();
-            if (!enabledTestsMap.has(perm.testId)) {
-                enabledTestsMap.set(perm.testId, []);
+                console.log('Professor name variants:', Array.from(allProfNameVariants));
+
+                // Use a Set to track unique section names
+                const seenSections = new Set();
+
+                for (const docSnap of sectionsSnapshot.docs) {
+                    const sectionData = docSnap.data();
+                    const sectionProfRaw = (sectionData.professor || '').trim();
+                    const sectionProfLower = sectionProfRaw.toLowerCase();
+                    const sectionProfEmailLower = (sectionData.professorEmail || '').toLowerCase().trim();
+
+                    // Match by email (most reliable)
+                    let isProfessorAssigned = sectionProfEmailLower === profEmailLower;
+
+                    // Match by name variants
+                    if (!isProfessorAssigned && sectionProfLower) {
+                        for (const variant of allProfNameVariants) {
+                            if (!variant) continue;
+                            if (
+                                sectionProfLower === variant ||
+                                sectionProfLower.includes(variant) ||
+                                variant.includes(sectionProfLower)
+                            ) {
+                                isProfessorAssigned = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // NEW: Also check if any part of the professor's email username
+                    // matches something in the section professor field
+                    // e.g. email "doribiana@umak.edu.ph" → username "doribiana"
+                    if (!isProfessorAssigned && profEmailLower) {
+                        const emailUsername = profEmailLower.split('@')[0].toLowerCase();
+                        if (emailUsername.length > 3 && sectionProfLower.includes(emailUsername)) {
+                            isProfessorAssigned = true;
+                        }
+                    }
+
+                    if (isProfessorAssigned) {
+                        if (seenSections.has(sectionData.name)) {
+                            console.log(`⚠️ Skipping duplicate section: ${sectionData.name}`);
+                            continue;
+                        }
+
+                        console.log(`✓ Found assigned section: ${sectionData.name}`);
+                        seenSections.add(sectionData.name);
+
+                        const actualStudentCount = sectionData.students ? sectionData.students.length : 0;
+
+                        window.assignedSections.push({
+                            section: sectionData.name,
+                            students: actualStudentCount,
+                            courseCode: sectionData.courseCode || 'PE 3',
+                            time: sectionData.time || 'Not Set',
+                            day: sectionData.day || 'Not Set',
+                            room: sectionData.room || 'Not Set'
+                        });
+
+                        console.log(`  - ${sectionData.name}: ${actualStudentCount} students`);
+                        console.log(`  - Schedule: ${sectionData.time || 'N/A'} / ${sectionData.day || 'N/A'} / ${sectionData.room || 'N/A'}`);
+                    }
+                }
+                
+                console.log('=== FINAL ASSIGNED SECTIONS ===');
+                console.log('Total unique sections:', window.assignedSections.length);
+                console.log('Sections:', window.assignedSections);
+                
+                // STEP 3: Load scheduled tests
+                console.log('Step 3: Loading scheduled tests...');
+                
+                let testsQuery;
+                let testsSnapshot;
+
+                if (window.assignedSections.length > 0) {
+                    const sectionNames = window.assignedSections.map(s => s.section);
+                    // Firestore 'in' operator has a limit of 10 items
+                    const limitedSections = sectionNames.slice(0, 10);
+                    
+                    testsQuery = query(
+                        collection(db, 'scheduledTests'),
+                        where('professorEmail', '==', userEmail),
+                        where('section', 'in', limitedSections)
+                    );
+                    testsSnapshot = await getDocs(testsQuery);
+                } else {
+                    testsQuery = query(
+                        collection(db, 'scheduledTests'),
+                        where('professorEmail', '==', userEmail)
+                    );
+                    testsSnapshot = await getDocs(testsQuery);
+                }
+                
+                if (testsSnapshot.empty) {
+                    console.log('No tests by email, trying userId...');
+                    testsQuery = query(
+                        collection(db, 'scheduledTests'),
+                        where('professorId', '==', userId)
+                    );
+                    testsSnapshot = await getDocs(testsQuery);
+                }
+                
+                // Load enabled test permissions
+                const permissionsQuery = query(
+                    collection(db, 'testPermissions'),
+                    where('grantedBy', '==', userEmail)
+                );
+                const permissionsSnapshot = await getDocs(permissionsQuery);
+                const enabledTestsMap = new Map();
+                
+                permissionsSnapshot.forEach(doc => {
+                    const perm = doc.data();
+                    if (!enabledTestsMap.has(perm.testId)) {
+                        enabledTestsMap.set(perm.testId, []);
+                    }
+                    enabledTestsMap.get(perm.testId).push(perm.studentEmail);
+                });
+                
+                // ===== NEW: Store tests globally and populate dropdown =====
+                window.allScheduledTests = [];
+                testsSnapshot.forEach(docSnap => {
+                    window.allScheduledTests.push({ 
+                        id: docSnap.id, 
+                        ...docSnap.data() 
+                    });
+                });
+                
+                // Populate section dropdown with test counts
+                populateSectionSortDropdown();
+                
+                // Render table with all tests
+                renderScheduleTable(window.allScheduledTests, enabledTestsMap);
+                
+                console.log('=== LOAD COMPLETE ===');
+                console.log('✓ Loaded', testsSnapshot.size, 'scheduled tests');
+                
+            } catch (error) {
+                console.error('=== ERROR LOADING SCHEDULED TESTS ===');
+                console.error('Error:', error);
+                
+                // Show error in table
+                const tableBody = document.getElementById('scheduleTableBody');
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-icon">❌</div>
+                                <div class="empty-title">Error Loading Tests</div>
+                                <div class="empty-text">${error.message}</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
             }
-            enabledTestsMap.get(perm.testId).push(perm.studentEmail);
-        });
-        
-        // ===== NEW: Store tests globally and populate dropdown =====
-        window.allScheduledTests = [];
-        testsSnapshot.forEach(docSnap => {
-            window.allScheduledTests.push({ 
-                id: docSnap.id, 
-                ...docSnap.data() 
-            });
-        });
-        
-        // Populate section dropdown with test counts
-        populateSectionSortDropdown();
-        
-        // Render table with all tests
-        renderScheduleTable(window.allScheduledTests, enabledTestsMap);
-        
-        console.log('=== LOAD COMPLETE ===');
-        console.log('✓ Loaded', testsSnapshot.size, 'scheduled tests');
-        
-    } catch (error) {
-        console.error('=== ERROR LOADING SCHEDULED TESTS ===');
-        console.error('Error:', error);
-        
-        // Show error in table
-        const tableBody = document.getElementById('scheduleTableBody');
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="8">
-                    <div class="empty-state">
-                        <div class="empty-icon">❌</div>
-                        <div class="empty-title">Error Loading Tests</div>
-                        <div class="empty-text">${error.message}</div>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }
-}
+        }
 
         // Load Test Results - Grouped by Student
         async function loadTestResults(userEmail, userId) {
@@ -2795,7 +3169,7 @@ function renderScheduleTable(tests, enabledTestsMap) {
                 
             } catch (error) {
                 console.error('Error opening student management:', error);
-                alert('Error loading students: ' + error.message);
+                showErrorModal('Error loading students: ' + error.message);
                 
                 const saveBtn = document.querySelector('#manageStudentsModal .modal-footer button:last-child');
                 const cancelBtn = document.querySelector('#manageStudentsModal .modal-footer button:first-child');
@@ -2999,11 +3373,19 @@ function renderScheduleTable(tests, enabledTestsMap) {
             const testId = document.getElementById('currentTestId').value;
             
             if (window.selectedStudentEmails.size === 0) {
-                if (!confirm('No students selected. This means no one will be able to take this test. Continue?')) {
-                    return;
-                }
+                showWarningModal('No students selected. This means no one will be able to take this test. Continue?', 
+                    async () => {
+                        await proceedSaveStudentSelection(testId);
+                    },
+                    () => {}
+                );
+                return;
             }
             
+            await proceedSaveStudentSelection(testId);
+        };
+        
+        async function proceedSaveStudentSelection(testId) {
             const saveBtn = document.querySelector('#manageStudentsModal .modal-footer button:last-child');
             const cancelBtn = document.querySelector('#manageStudentsModal .modal-footer button:first-child');
             const originalText = saveBtn ? saveBtn.innerHTML : '<i class="fas fa-save"></i> Save Selection';
@@ -3089,14 +3471,14 @@ function renderScheduleTable(tests, enabledTestsMap) {
                 closeManageStudentsModal();
                 
                 // Show success message
-                alert(`✅ Successfully assigned test to ${selectedStudentsArray.length} student(s)!`);
+                showSuccessModal(`✅ Successfully assigned test to ${selectedStudentsArray.length} student(s)!`);
                 
                 // Reload the schedule
                 await loadScheduledTests(window.currentUser.email, window.currentUser.uid);
                 
             } catch (error) {
                 console.error('❌ Error saving student selection:', error);
-                alert('Error saving: ' + error.message);
+                showErrorModal('Error saving: ' + error.message);
                 
                 // Reset button state on error
                 if (saveBtn) {
@@ -3107,7 +3489,7 @@ function renderScheduleTable(tests, enabledTestsMap) {
                     cancelBtn.disabled = false;
                 }
             }
-        };
+        }
 
         // Close modal
         window.closeManageStudentsModal = function() {
@@ -3300,7 +3682,7 @@ function renderScheduleTable(tests, enabledTestsMap) {
             });
 
             if (!testType || !testSection || !testDate || !testTime || !testDeadline || !testDeadlineTime) {
-                alert('Please fill in all required fields.');
+                showWarningModal('Please fill in all required fields.', () => {}, () => {});
                 return;
             }
 
@@ -3310,22 +3692,22 @@ function renderScheduleTable(tests, enabledTestsMap) {
             const today = now.toISOString().split('T')[0];
 
             if (testDate < today) {
-                alert('❌ Error: Test date cannot be in the past.\n\nPlease select today or a future date.');
+                showErrorModal('❌ Error: Test date cannot be in the past.\n\nPlease select today or a future date.');
                 return;
             }
 
             if (deadlineDateTime <= testDateTime) {
-                alert('❌ Error: Deadline must be after the test date and time.');
+                showErrorModal('❌ Error: Deadline must be after the test date and time.');
                 return;
             }
 
             if (testSection === "no-sections") {
-                alert('You need to be assigned to a section before scheduling tests.');
+                showWarningModal('You need to be assigned to a section before scheduling tests.', () => {}, () => {});
                 return;
             }
 
             if (videoURL && !videoURL.includes('youtube.com') && !videoURL.includes('youtu.be')) {
-                alert('Please provide a valid YouTube URL or leave it empty');
+                showWarningModal('Please provide a valid YouTube URL or leave it empty', () => {}, () => {});
                 return;
             }
 
@@ -3439,13 +3821,13 @@ function renderScheduleTable(tests, enabledTestsMap) {
                 console.log(`✅ Created ${notificationPromises.length} notifications`);
                 
                 closeScheduleTestModal();
-                alert(`✅ Test scheduled successfully!\n\nAutomatically assigned to ${allStudentEmails.length} student(s) in ${testSection}.`);
+                showSuccessModal(`✅ Test scheduled successfully!\n\nAutomatically assigned to ${allStudentEmails.length} student(s) in ${testSection}.`);
                 
                 await loadScheduledTests(window.currentUser.email, window.currentUser.uid);
                 
             } catch (error) {
                 console.error('❌ Error scheduling test:', error);
-                alert('Error scheduling test: ' + error.message);
+                showErrorModal('Error scheduling test: ' + error.message);
                 
                 if (submitBtn) {
                     submitBtn.disabled = false;
@@ -3459,16 +3841,16 @@ function renderScheduleTable(tests, enabledTestsMap) {
 
         // Delete test function
         window.deleteTest = async function(testId) {
-            if (confirm('Are you sure you want to delete this test? This action cannot be undone.')) {
+            showConfirmModal('Are you sure you want to delete this test? This action cannot be undone.', async () => {
                 try {
                     await deleteDoc(doc(db, 'scheduledTests', testId));
-                    alert('Test deleted successfully!');
+                    showSuccessModal('Test deleted successfully!');
                     await loadScheduledTests(window.currentUser.email, window.currentUser.uid);
                 } catch (error) {
                     console.error('❌ Error deleting test:', error);
-                    alert('Error deleting test: ' + error.message);
+                    showErrorModal('Error deleting test: ' + error.message);
                 }
-            }
+            });
         };
 
         // Edit test function
@@ -3484,7 +3866,7 @@ function renderScheduleTable(tests, enabledTestsMap) {
                 const modal = document.getElementById('editTestModal');
                 if (!modal) {
                     console.error('Edit modal not found!');
-                    alert('Error: Modal not found. Please refresh the page.');
+                    showErrorModal('Error: Modal not found. Please refresh the page.');
                     return;
                 }
                 
@@ -3493,7 +3875,7 @@ function renderScheduleTable(tests, enabledTestsMap) {
                 const testDoc = await getDoc(doc(db, 'scheduledTests', testId));
                 
                 if (!testDoc.exists()) {
-                    alert('Test not found');
+                    showErrorModal('Test not found');
                     return;
                 }
                 
@@ -3590,7 +3972,7 @@ function renderScheduleTable(tests, enabledTestsMap) {
                 
             } catch (error) {
                 console.error('❌ Error loading test:', error);
-                alert('Error loading test data: ' + error.message);
+                showErrorModal('Error loading test data: ' + error.message);
             }
         };
 
@@ -3607,7 +3989,7 @@ function renderScheduleTable(tests, enabledTestsMap) {
             const newTarget = document.getElementById('editTestTarget').value;
             
             if (!newDate || !newTime || !newDeadline || !newDeadlineTime) {
-                alert('Please fill in all required fields');
+                showWarningModal('Please fill in all required fields', () => {}, () => {});
                 return;
             }
             
@@ -3615,7 +3997,7 @@ function renderScheduleTable(tests, enabledTestsMap) {
             const deadlineDateTime = new Date(`${newDeadline}T${newDeadlineTime}`);
             
             if (deadlineDateTime <= testDateTime) {
-                alert('❌ Error: Deadline must be after the test date and time.');
+                showErrorModal('❌ Error: Deadline must be after the test date and time.');
                 return;
             }
             
@@ -3659,12 +4041,12 @@ function renderScheduleTable(tests, enabledTestsMap) {
                 }
                 
                 closeEditTestModal();
-                alert('✅ Test updated successfully!');
+                showSuccessModal('✅ Test updated successfully!');
                 await loadScheduledTests(window.currentUser.email, window.currentUser.uid);
                 
             } catch (error) {
                 console.error('❌ Error:', error);
-                alert('Error updating test: ' + error.message);
+                showErrorModal('Error updating test: ' + error.message);
                 
                 if (saveBtn) {
                     saveBtn.disabled = false;
@@ -3798,8 +4180,9 @@ function renderScheduleTable(tests, enabledTestsMap) {
            
         // Generate reports function
         function generateReports() {
-            alert('Report generation feature coming soon!');
+            showInfoModal('Report generation feature coming soon!');
         }
+        
         window.filterScheduleTable = function() {
             if (!window.allScheduledTests || window.allScheduledTests.length === 0) return;
             if (window.renderScheduleTable) {

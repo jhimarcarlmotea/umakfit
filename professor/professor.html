@@ -34,12 +34,23 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
-        .pulse-animation { animation: pulse 2s infinite; }
-        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
         @keyframes spin { 
             0% { transform: rotate(0deg); } 
             100% { transform: rotate(360deg); } 
         }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .spinner {
             border: 4px solid #e5e7eb;
             border-top: 4px solid #3b82f6;
@@ -49,7 +60,161 @@
             animation: spin 1s linear infinite;
         }
         
-        /* Hamburger Menu Styles */
+        .slide-down {
+            animation: slideDown 0.3s ease;
+        }
+        
+        /* ============ DASHBOARD-STYLE ALERT MODALS ============ */
+        .alert-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 1rem;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .alert-popup-card {
+            background: #fff;
+            border-radius: 28px;
+            padding: 2.5rem 2rem 2rem;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
+            animation: slideUp 0.35s cubic-bezier(.4,0,.2,1);
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .alert-icon-circle {
+            width: 72px; 
+            height: 72px;
+            background: #fce8e6;
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+        }
+        
+        .alert-icon-circle.success {
+            background: #d1fae5;
+        }
+        
+        .alert-icon-circle.info {
+            background: #dbeafe;
+        }
+        
+        .alert-icon-circle.warning {
+            background: #fef3c7;
+        }
+        
+        .alert-icon-circle.error {
+            background: #fee2e2;
+        }
+        
+        .alert-title {
+            font-size: 1.375rem;
+            font-weight: 600;
+            color: #202124;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.01em;
+        }
+        
+        .alert-message {
+            font-size: 0.875rem;
+            color: #5f6368;
+            margin-bottom: 1.75rem;
+        }
+        
+        .alert-divider {
+            height: 1px;
+            background: #e8eaed;
+            margin: 0 -2rem 1.5rem;
+        }
+        
+        .alert-btn-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .alert-btn-cancel {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 100px;
+            border: 1px solid #dadce0;
+            background: #fff;
+            color: #3c4043;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s;
+        }
+        
+        .alert-btn-cancel:hover { 
+            background: #f8f9fa; 
+        }
+        
+        .alert-btn-confirm {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 100px;
+            border: none;
+            background: #3b82f6;
+            color: #fff;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s, box-shadow 0.15s;
+        }
+        
+        .alert-btn-confirm.success {
+            background: #10b981;
+        }
+        
+        .alert-btn-confirm.success:hover {
+            background: #059669;
+        }
+        
+        .alert-btn-confirm.error {
+            background: #ef4444;
+        }
+        
+        .alert-btn-confirm.error:hover {
+            background: #dc2626;
+        }
+        
+        .alert-btn-confirm.warning {
+            background: #f59e0b;
+        }
+        
+        .alert-btn-confirm.warning:hover {
+            background: #d97706;
+        }
+        
+        .alert-btn-confirm.info {
+            background: #3b82f6;
+        }
+        
+        .alert-btn-confirm.info:hover {
+            background: #2563eb;
+        }
+        
+        .alert-btn-confirm:hover {
+            box-shadow: 0 2px 8px rgba(59,130,246,0.35);
+        }
+        
+        .alert-btn-confirm:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        /* Hamburger Menu Styles - RESTORED */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -78,7 +243,7 @@
             transform: rotate(-45deg) translate(7px, -6px);
         }
 
-        /* Mobile Drawer */
+        /* Mobile Drawer - RESTORED */
         .mobile-drawer {
             position: fixed;
             top: 0;
@@ -92,7 +257,10 @@
             overflow-y: auto;
         }
 
-        .mobile-drawer.active { right: 0; }
+        .mobile-drawer.active { 
+            right: 0; 
+        }
+        
         .drawer-overlay {
             position: fixed;
             top: 0;
@@ -105,31 +273,22 @@
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-        .drawer-overlay.active { opacity: 1; visibility: visible; }
+        
+        .drawer-overlay.active { 
+            opacity: 1; 
+            visibility: visible; 
+        }
 
         @media (max-width: 768px) {
-            .hamburger { display: flex; }
-            .desktop-nav { display: none; }
+            .hamburger { 
+                display: flex; 
+            }
+            .desktop-nav { 
+                display: none; 
+            }
         }
         
-        /* Gradient text */
-        .gradient-text {
-            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .slide-down {
-            animation: slideDown 0.3s ease;
-        }
-        
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .live-dot { animation: pulse 2s infinite; }
+        .pulse-animation { animation: pulse 2s infinite; }
         .card-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
         /* Section card - clickable filter */
@@ -228,8 +387,20 @@
             margin: 0 auto;
         }
         
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
         /* COMPACT NAVIGATION STYLES */
-        header nav .flex {
+        .logo-compact {
+            margin-right: 0.75rem;
+        }
+        
+        .nav-group {
             gap: 0.25rem;
         }
         
@@ -239,16 +410,8 @@
             white-space: nowrap;
         }
         
-        .logo-compact {
-            margin-right: 0.75rem;
-        }
-        
         .profile-compact {
             margin-left: 0.75rem;
-        }
-        
-        .nav-group {
-            gap: 0.25rem;
         }
         
         @media (min-width: 1280px) {
@@ -265,6 +428,101 @@
     <div id="loadingScreen" class="fixed inset-0 bg-white bg-opacity-95 flex flex-col justify-center items-center z-50">
         <div class="w-12 h-12 border-4 border-gray-100 border-t-blue-500 rounded-full spinner"></div>
         <div class="mt-5 text-gray-600 font-medium">Loading Dashboard...</div>
+    </div>
+    
+    <!-- ============ DASHBOARD-STYLE ALERT MODALS ============ -->
+    <!-- Success Modal -->
+    <div class="alert-modal-overlay" id="successModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle success">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#10b981" stroke-width="3" fill="none"/>
+                    <path d="M16 24L22 30L32 18" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="successTitle">Success</div>
+            <div class="alert-message" id="successMessage">Operation completed successfully.</div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm success" id="successOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="alert-modal-overlay" id="infoModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle info">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#3b82f6" stroke-width="3" fill="none"/>
+                    <path d="M24 16V24M24 32V32.5" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="infoTitle">Information</div>
+            <div class="alert-message" id="infoMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm info" id="infoOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="alert-modal-overlay" id="warningModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle warning">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <path d="M24 4L4 40H44L24 4Z" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                    <circle cx="24" cy="32" r="2" fill="#f59e0b"/>
+                    <path d="M24 16V24" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="warningTitle">Warning</div>
+            <div class="alert-message" id="warningMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-cancel" id="warningCancelBtn">Cancel</button>
+                <button class="alert-btn-confirm warning" id="warningConfirmBtn">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="alert-modal-overlay" id="errorModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle error">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#ef4444" stroke-width="3" fill="none"/>
+                    <line x1="16" y1="16" x2="32" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+                    <line x1="32" y1="16" x2="16" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="errorTitle">Error</div>
+            <div class="alert-message" id="errorMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm error" id="errorOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal (Yes/No) -->
+    <div class="alert-modal-overlay" id="confirmModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle warning">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                    <path d="M24 16V24M24 32V32.5" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title">Confirm Action</div>
+            <div class="alert-message" id="confirmMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-cancel" id="confirmNoBtn">No</button>
+                <button class="alert-btn-confirm warning" id="confirmYesBtn">Yes</button>
+            </div>
+        </div>
     </div>
     
     <div id="dashboardContent" class="hidden overflow-x-hidden">
@@ -339,7 +597,7 @@
                                     <span class="font-medium text-gray-700">View Profile</span>
                                 </a>
                                 <div class="h-px bg-gray-200 my-1"></div>
-                                <div onclick="handleLogout(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
+                                <div onclick="showLogoutModal(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
                                     <i class="fas fa-sign-out-alt text-base"></i>
                                     <span class="font-medium">Logout</span>
                                 </div>
@@ -366,7 +624,7 @@
                                         <span class="font-medium text-gray-700">View Profile</span>
                                     </a>
                                     <div class="h-px bg-gray-200 my-1"></div>
-                                    <div onclick="handleLogout(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
+                                    <div onclick="showLogoutModal(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
                                         <i class="fas fa-sign-out-alt text-base"></i>
                                         <span class="font-medium">Logout</span>
                                     </div>
@@ -374,7 +632,7 @@
                             </div>
                         </div>
                         
-                        <!-- Hamburger Menu -->
+                        <!-- Hamburger Menu - RESTORED -->
                         <div class="hamburger" id="hamburger">
                             <span></span>
                             <span></span>
@@ -384,10 +642,10 @@
                 </div>
             </nav>
 
-            <!-- Mobile Drawer Overlay -->
+            <!-- Mobile Drawer Overlay - RESTORED -->
             <div class="drawer-overlay" id="drawerOverlay"></div>
 
-            <!-- Mobile Drawer -->
+            <!-- Mobile Drawer - RESTORED -->
             <div class="mobile-drawer" id="mobileDrawer">
                 <div class="p-5 pt-6">
                     <!-- Drawer Header -->
@@ -599,6 +857,113 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // ============ DASHBOARD-STYLE ALERT FUNCTIONS ============
+        function showSuccessModal(message, onOk) {
+            const modal = document.getElementById('successModal');
+            const messageEl = document.getElementById('successMessage');
+            const okBtn = document.getElementById('successOkBtn');
+            
+            messageEl.textContent = message;
+            
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showInfoModal(message, onOk) {
+            const modal = document.getElementById('infoModal');
+            const messageEl = document.getElementById('infoMessage');
+            const okBtn = document.getElementById('infoOkBtn');
+            
+            messageEl.textContent = message;
+            
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showWarningModal(message, onConfirm, onCancel) {
+            const modal = document.getElementById('warningModal');
+            const messageEl = document.getElementById('warningMessage');
+            const confirmBtn = document.getElementById('warningConfirmBtn');
+            const cancelBtn = document.getElementById('warningCancelBtn');
+            
+            messageEl.textContent = message;
+            
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+            
+            newConfirmBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onConfirm) onConfirm();
+            });
+            
+            newCancelBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onCancel) onCancel();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showErrorModal(message, onOk) {
+            const modal = document.getElementById('errorModal');
+            const messageEl = document.getElementById('errorMessage');
+            const okBtn = document.getElementById('errorOkBtn');
+            
+            messageEl.textContent = message;
+            
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showConfirmModal(message, onYes, onNo) {
+            const modal = document.getElementById('confirmModal');
+            const messageEl = document.getElementById('confirmMessage');
+            const yesBtn = document.getElementById('confirmYesBtn');
+            const noBtn = document.getElementById('confirmNoBtn');
+            
+            messageEl.textContent = message;
+            
+            const newYesBtn = yesBtn.cloneNode(true);
+            const newNoBtn = noBtn.cloneNode(true);
+            yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+            noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+            
+            newYesBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onYes) onYes();
+            });
+            
+            newNoBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onNo) onNo();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
         let currentProfessor = null;
         let professorSections = [];
         let professorStudents = [];
@@ -619,98 +984,7 @@
             }
         }
 
-        // ── SECTION FILTER FUNCTIONS ──
-        window.selectSectionFilter = function(sectionId) {
-            if (activeSectionFilter === sectionId) {
-                clearSectionFilter();
-                return;
-            }
-            activeSectionFilter = sectionId;
-            const section = professorSections.find(s => s.id === sectionId);
-            const sectionName = section?.name || 'Section';
-
-            document.querySelectorAll('.section-card').forEach(card => {
-                card.classList.remove('active-section');
-            });
-            const activeCard = document.querySelector(`.section-card[data-section-id="${sectionId}"]`);
-            if (activeCard) activeCard.classList.add('active-section');
-
-            document.getElementById('activeFilterBadge').classList.remove('hidden');
-            document.getElementById('activeFilterName').textContent = sectionName;
-            document.getElementById('filterHint').classList.add('hidden');
-
-            updateStatsForSection(sectionId, sectionName);
-        };
-
-        window.clearSectionFilter = function() {
-            activeSectionFilter = null;
-
-            document.querySelectorAll('.section-card').forEach(card => {
-                card.classList.remove('active-section');
-            });
-
-            document.getElementById('activeFilterBadge').classList.add('hidden');
-            document.getElementById('filterHint').classList.remove('hidden');
-
-            // Reset stats to overall totals
-            document.getElementById('statSections').textContent = professorSections.length;
-            document.getElementById('statStudents').textContent = professorStudents.length;
-            document.getElementById('statActivities').textContent = totalActivitiesPosted;
-
-            // Hide filter labels
-            ['statSectionFilterLabel', 'statStudentsFilterLabel', 'statActivitiesFilterLabel'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) { 
-                    el.classList.add('hidden'); 
-                    el.textContent = ''; 
-                }
-            });
-
-            document.getElementById('studentsFilterBadge')?.classList.add('hidden');
-            document.getElementById('activitiesFilterBadge')?.classList.add('hidden');
-        };
-
-        function updateStatsForSection(sectionId, sectionName) {
-            const section = professorSections.find(s => s.id === sectionId);
-            if (!section) return;
-
-            // Update sections count (still shows total sections)
-            document.getElementById('statSections').textContent = professorSections.length;
-            
-            // Update students count for this section
-            const studentsInSection = section.students || [];
-            const studentCount = studentsInSection.length;
-            document.getElementById('statStudents').textContent = studentCount;
-            document.getElementById('studentsFilterBadge')?.classList.remove('hidden');
-
-            const labelEl = document.getElementById('statStudentsFilterLabel');
-            if (labelEl) {
-                labelEl.textContent = `in ${sectionName}`;
-                labelEl.classList.remove('hidden');
-            }
-
-            // Update activities count for this section
-            const sectionActivities = allActivitiesData.filter(a => 
-                a.section === section.name
-            );
-            document.getElementById('statActivities').textContent = sectionActivities.length;
-            document.getElementById('activitiesFilterBadge')?.classList.remove('hidden');
-
-            const actLabel = document.getElementById('statActivitiesFilterLabel');
-            if (actLabel) {
-                actLabel.textContent = `in ${sectionName}`;
-                actLabel.classList.remove('hidden');
-            }
-
-            // Update section filter label
-            const sectionLabel = document.getElementById('statSectionFilterLabel');
-            if (sectionLabel) {
-                sectionLabel.textContent = `showing ${sectionName}`;
-                sectionLabel.classList.remove('hidden');
-            }
-        }
-
-        // ── NAV SETUP ──
+        // ── NAV SETUP - RESTORED hamburger functionality ──
         const hamburger = document.getElementById('hamburger');
         const mobileDrawer = document.getElementById('mobileDrawer');
         const drawerOverlay = document.getElementById('drawerOverlay');
@@ -720,10 +994,11 @@
         const profileDropdown = document.getElementById('profileDropdown');
         const profileDropdownMobile = document.getElementById('profileDropdownMobile');
 
-        // Hamburger Menu Event Listeners
+        // Hamburger Menu Event Listeners - RESTORED
         document.addEventListener('DOMContentLoaded', () => {
             if (hamburger && mobileDrawer && drawerOverlay) {
-                hamburger.addEventListener('click', () => {
+                hamburger.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     hamburger.classList.toggle('active');
                     mobileDrawer.classList.toggle('active');
                     drawerOverlay.classList.toggle('active');
@@ -784,20 +1059,106 @@
             profileDropdownMobile?.classList.add('hidden');
         };
 
-        window.handleLogout = async function(event) {
+        // --- SECTION FILTER FUNCTIONS ---
+        window.selectSectionFilter = function(sectionId) {
+            if (activeSectionFilter === sectionId) {
+                clearSectionFilter();
+                return;
+            }
+            activeSectionFilter = sectionId;
+            const section = professorSections.find(s => s.id === sectionId);
+            const sectionName = section?.name || 'Section';
+
+            document.querySelectorAll('.section-card').forEach(card => {
+                card.classList.remove('active-section');
+            });
+            const activeCard = document.querySelector(`.section-card[data-section-id="${sectionId}"]`);
+            if (activeCard) activeCard.classList.add('active-section');
+
+            document.getElementById('activeFilterBadge').classList.remove('hidden');
+            document.getElementById('activeFilterName').textContent = sectionName;
+            document.getElementById('filterHint').classList.add('hidden');
+
+            updateStatsForSection(sectionId, sectionName);
+        };
+
+        window.clearSectionFilter = function() {
+            activeSectionFilter = null;
+
+            document.querySelectorAll('.section-card').forEach(card => {
+                card.classList.remove('active-section');
+            });
+
+            document.getElementById('activeFilterBadge').classList.add('hidden');
+            document.getElementById('filterHint').classList.remove('hidden');
+
+            document.getElementById('statSections').textContent = professorSections.length;
+            document.getElementById('statStudents').textContent = professorStudents.length;
+            document.getElementById('statActivities').textContent = totalActivitiesPosted;
+
+            ['statSectionFilterLabel', 'statStudentsFilterLabel', 'statActivitiesFilterLabel'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { 
+                    el.classList.add('hidden'); 
+                    el.textContent = ''; 
+                }
+            });
+
+            document.getElementById('studentsFilterBadge')?.classList.add('hidden');
+            document.getElementById('activitiesFilterBadge')?.classList.add('hidden');
+        };
+
+        function updateStatsForSection(sectionId, sectionName) {
+            const section = professorSections.find(s => s.id === sectionId);
+            if (!section) return;
+
+            document.getElementById('statSections').textContent = professorSections.length;
+            
+            const studentsInSection = section.students || [];
+            const studentCount = studentsInSection.length;
+            document.getElementById('statStudents').textContent = studentCount;
+            document.getElementById('studentsFilterBadge')?.classList.remove('hidden');
+
+            const labelEl = document.getElementById('statStudentsFilterLabel');
+            if (labelEl) {
+                labelEl.textContent = `in ${sectionName}`;
+                labelEl.classList.remove('hidden');
+            }
+
+            const sectionActivities = allActivitiesData.filter(a => 
+                a.section === section.name
+            );
+            document.getElementById('statActivities').textContent = sectionActivities.length;
+            document.getElementById('activitiesFilterBadge')?.classList.remove('hidden');
+
+            const actLabel = document.getElementById('statActivitiesFilterLabel');
+            if (actLabel) {
+                actLabel.textContent = `in ${sectionName}`;
+                actLabel.classList.remove('hidden');
+            }
+
+            const sectionLabel = document.getElementById('statSectionFilterLabel');
+            if (sectionLabel) {
+                sectionLabel.textContent = `showing ${sectionName}`;
+                sectionLabel.classList.remove('hidden');
+            }
+        }
+
+        // --- MODAL LOGOUT HANDLING ---
+        window.showLogoutModal = function(event) {
             if (event) event.preventDefault();
             profileDropdown?.classList.add('hidden');
             profileDropdownMobile?.classList.add('hidden');
             
-            // Clean up listeners before logout
-            cleanupListeners();
-            
-            if (confirm('Are you sure you want to logout?')) {
+            showConfirmModal('Are you sure you want to logout?', async () => {
+                cleanupListeners();
                 try { 
                     await signOut(auth); 
-                } catch(e) {}
-                window.location.href = '/login/index.html';
-            }
+                    window.location.href = '/login/index.html';
+                } catch(e) {
+                    showErrorModal('Error logging out. Please try again.');
+                }
+            });
         };
 
         function updateProfilePicture(photoURL, userName) {
@@ -893,7 +1254,6 @@
             }
         }
 
-        // Fallback method if real-time fails
         async function loadActivitiesFallback() {
             try {
                 const activitiesRef = collection(db, 'scheduledTests');
@@ -963,16 +1323,17 @@
 
                 } catch (error) {
                     loadingScreen.style.display = 'none';
-                    alert(error.message || 'Error loading dashboard. Please try again.');
-                    await signOut(auth);
-                    window.location.href = '/login/index.html';
+                    showErrorModal(error.message || 'Error loading dashboard. Please try again.');
+                    setTimeout(() => {
+                        signOut(auth);
+                        window.location.href = '/login/index.html';
+                    }, 2000);
                 }
             } else {
                 window.location.href = '/login/index.html';
             }
         });
 
-        // ==================== LOAD ONLY PROFESSOR'S SECTIONS ====================
         async function loadProfessorSections() {
             try {
                 professorSections = [];
@@ -989,20 +1350,16 @@
                     const sectionData = doc.data();
                     const sectionProfessor = (sectionData.professor || '').toString().trim();
                     
-                    // EXACT MATCHING LOGIC
                     let isMatch = false;
                     
-                    // Check exact match with professorName
                     if (professorName && sectionProfessor.toUpperCase() === professorName.toUpperCase()) {
                         isMatch = true;
                     }
                     
-                    // Check if professorEmail matches
                     if (!isMatch && sectionData.professorEmail === professorEmail) {
                         isMatch = true;
                     }
                     
-                    // Check if section professor contains professor's last name
                     if (!isMatch && professorName) {
                         const nameParts = professorName.toUpperCase().split(',');
                         if (nameParts.length > 1) {
@@ -1050,10 +1407,10 @@
 
             } catch (error) {
                 console.error('Error loading sections:', error);
+                showErrorModal('Error loading sections: ' + error.message);
             }
         }
 
-        // ── DISPLAY SECTIONS ──
         function displaySections() {
             const sectionsGrid = document.getElementById('sectionsGrid');
 
@@ -1116,21 +1473,6 @@
             });
 
             sectionsGrid.innerHTML = html;
-        }
-
-        function getInitials(name) {
-            if (!name) return '??';
-            const parts = name.split(' ');
-            if (parts.length >= 2) return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-            return name.substring(0, 2).toUpperCase();
-        }
-
-        function formatDate(timestamp) {
-            if (!timestamp) return 'Unknown';
-            try {
-                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            } catch { return 'Invalid date'; }
         }
     </script>
 </body>

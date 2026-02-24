@@ -34,8 +34,14 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
-        .pulse-animation { animation: pulse 2s infinite; }
-        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
         @keyframes spin { 
             0% { transform: rotate(0deg); } 
             100% { transform: rotate(360deg); } 
@@ -47,6 +53,156 @@
             width: 50px;
             height: 50px;
             animation: spin 1s linear infinite;
+        }
+        
+        /* ============ DASHBOARD-STYLE ALERT MODALS ============ */
+        .alert-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 1rem;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .alert-popup-card {
+            background: #fff;
+            border-radius: 28px;
+            padding: 2.5rem 2rem 2rem;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
+            animation: slideUp 0.35s cubic-bezier(.4,0,.2,1);
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .alert-icon-circle {
+            width: 72px; 
+            height: 72px;
+            background: #fce8e6;
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+        }
+        
+        .alert-icon-circle.success {
+            background: #d1fae5;
+        }
+        
+        .alert-icon-circle.info {
+            background: #dbeafe;
+        }
+        
+        .alert-icon-circle.warning {
+            background: #fef3c7;
+        }
+        
+        .alert-icon-circle.error {
+            background: #fee2e2;
+        }
+        
+        .alert-title {
+            font-size: 1.375rem;
+            font-weight: 600;
+            color: #202124;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.01em;
+        }
+        
+        .alert-message {
+            font-size: 0.875rem;
+            color: #5f6368;
+            margin-bottom: 1.75rem;
+        }
+        
+        .alert-divider {
+            height: 1px;
+            background: #e8eaed;
+            margin: 0 -2rem 1.5rem;
+        }
+        
+        .alert-btn-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .alert-btn-cancel {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 100px;
+            border: 1px solid #dadce0;
+            background: #fff;
+            color: #3c4043;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s;
+        }
+        
+        .alert-btn-cancel:hover { 
+            background: #f8f9fa; 
+        }
+        
+        .alert-btn-confirm {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 100px;
+            border: none;
+            background: #3b82f6;
+            color: #fff;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s, box-shadow 0.15s;
+        }
+        
+        .alert-btn-confirm.success {
+            background: #10b981;
+        }
+        
+        .alert-btn-confirm.success:hover {
+            background: #059669;
+        }
+        
+        .alert-btn-confirm.error {
+            background: #ef4444;
+        }
+        
+        .alert-btn-confirm.error:hover {
+            background: #dc2626;
+        }
+        
+        .alert-btn-confirm.warning {
+            background: #f59e0b;
+        }
+        
+        .alert-btn-confirm.warning:hover {
+            background: #d97706;
+        }
+        
+        .alert-btn-confirm.info {
+            background: #3b82f6;
+        }
+        
+        .alert-btn-confirm.info:hover {
+            background: #2563eb;
+        }
+        
+        .alert-btn-confirm:hover {
+            box-shadow: 0 2px 8px rgba(59,130,246,0.35);
+        }
+        
+        .alert-btn-confirm:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         
         /* Hamburger Menu Styles */
@@ -131,11 +287,6 @@
         
         .fade-in {
             animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
         
         /* Custom scrollbar */
@@ -376,6 +527,101 @@
     <div id="loadingScreen" class="fixed inset-0 bg-white bg-opacity-95 flex flex-col justify-center items-center z-50">
         <div class="w-12 h-12 border-4 border-gray-100 border-t-blue-500 rounded-full spinner"></div>
         <div class="mt-5 text-gray-600 font-medium">Loading Profile...</div>
+    </div>
+    
+    <!-- ============ DASHBOARD-STYLE ALERT MODALS ============ -->
+    <!-- Success Modal -->
+    <div class="alert-modal-overlay" id="successModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle success">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#10b981" stroke-width="3" fill="none"/>
+                    <path d="M16 24L22 30L32 18" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="successTitle">Success</div>
+            <div class="alert-message" id="successMessage">Operation completed successfully.</div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm success" id="successOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="alert-modal-overlay" id="infoModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle info">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#3b82f6" stroke-width="3" fill="none"/>
+                    <path d="M24 16V24M24 32V32.5" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="infoTitle">Information</div>
+            <div class="alert-message" id="infoMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm info" id="infoOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="alert-modal-overlay" id="warningModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle warning">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <path d="M24 4L4 40H44L24 4Z" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                    <circle cx="24" cy="32" r="2" fill="#f59e0b"/>
+                    <path d="M24 16V24" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="warningTitle">Warning</div>
+            <div class="alert-message" id="warningMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-cancel" id="warningCancelBtn">Cancel</button>
+                <button class="alert-btn-confirm warning" id="warningConfirmBtn">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="alert-modal-overlay" id="errorModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle error">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#ef4444" stroke-width="3" fill="none"/>
+                    <line x1="16" y1="16" x2="32" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+                    <line x1="32" y1="16" x2="16" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title" id="errorTitle">Error</div>
+            <div class="alert-message" id="errorMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-confirm error" id="errorOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal (Yes/No) -->
+    <div class="alert-modal-overlay" id="confirmModal">
+        <div class="alert-popup-card">
+            <div class="alert-icon-circle warning">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="18" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                    <path d="M24 16V24M24 32V32.5" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="alert-title">Confirm Action</div>
+            <div class="alert-message" id="confirmMessage"></div>
+            <div class="alert-divider"></div>
+            <div class="alert-btn-row">
+                <button class="alert-btn-cancel" id="confirmNoBtn">No</button>
+                <button class="alert-btn-confirm warning" id="confirmYesBtn">Yes</button>
+            </div>
+        </div>
     </div>
     
     <div id="profileContent" class="hidden overflow-x-hidden">
@@ -999,6 +1245,114 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // ============ DASHBOARD-STYLE ALERT FUNCTIONS ============
+        function showSuccessModal(message, onOk) {
+            const modal = document.getElementById('successModal');
+            const messageEl = document.getElementById('successMessage');
+            const okBtn = document.getElementById('successOkBtn');
+            
+            messageEl.textContent = message;
+            
+            // Clone button to remove previous listeners
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showInfoModal(message, onOk) {
+            const modal = document.getElementById('infoModal');
+            const messageEl = document.getElementById('infoMessage');
+            const okBtn = document.getElementById('infoOkBtn');
+            
+            messageEl.textContent = message;
+            
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showWarningModal(message, onConfirm, onCancel) {
+            const modal = document.getElementById('warningModal');
+            const messageEl = document.getElementById('warningMessage');
+            const confirmBtn = document.getElementById('warningConfirmBtn');
+            const cancelBtn = document.getElementById('warningCancelBtn');
+            
+            messageEl.textContent = message;
+            
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+            
+            newConfirmBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onConfirm) onConfirm();
+            });
+            
+            newCancelBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onCancel) onCancel();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showErrorModal(message, onOk) {
+            const modal = document.getElementById('errorModal');
+            const messageEl = document.getElementById('errorMessage');
+            const okBtn = document.getElementById('errorOkBtn');
+            
+            messageEl.textContent = message;
+            
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onOk) onOk();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function showConfirmModal(message, onYes, onNo) {
+            const modal = document.getElementById('confirmModal');
+            const messageEl = document.getElementById('confirmMessage');
+            const yesBtn = document.getElementById('confirmYesBtn');
+            const noBtn = document.getElementById('confirmNoBtn');
+            
+            messageEl.textContent = message;
+            
+            const newYesBtn = yesBtn.cloneNode(true);
+            const newNoBtn = noBtn.cloneNode(true);
+            yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+            noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+            
+            newYesBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onYes) onYes();
+            });
+            
+            newNoBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onNo) onNo();
+            });
+            
+            modal.style.display = 'flex';
+        }
+
         let currentProfessor = null;
         let professorSections = [];
         let professorStudents = [];
@@ -1151,7 +1505,7 @@
 
         // Export students function
         window.exportStudents = function() {
-            alert('Export functionality would be implemented here. CSV/Excel download.');
+            showInfoModal('Export functionality would be implemented here. CSV/Excel download.');
         };
 
         // View profile function
@@ -1165,17 +1519,16 @@
             if (event) event.preventDefault();
             closeProfileDropdown();
             
-            if (confirm('Are you sure you want to logout?')) {
+            showConfirmModal('Are you sure you want to logout?', async () => {
                 try {
                     await signOut(auth);
                     window.location.href = '/login/index.html';
                 } catch (error) {
                     console.error('Error logging out:', error);
-                    window.location.href = '/login/index.html';
+                    showErrorModal('Error logging out. Please try again.');
                 }
-            }
+            });
         };
-
 
         // Refresh profile function
         window.refreshProfile = async function() {
@@ -1191,87 +1544,89 @@
                 loadingScreen.style.display = 'none';
                 profileContent.classList.remove('hidden');
                 profileContent.style.display = 'block';
+                
+                showSuccessModal('Profile refreshed successfully!');
             }
         };
 
         // View full history function
-window.viewFullHistory = function() {
-    const modal = document.getElementById('activityHistoryModal');
-    if (!modal) return;
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    renderFullHistoryModal();
-};
+        window.viewFullHistory = function() {
+            const modal = document.getElementById('activityHistoryModal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            renderFullHistoryModal();
+        };
 
-window.closeActivityHistoryModal = function() {
-    const modal = document.getElementById('activityHistoryModal');
-    if (modal) modal.classList.add('hidden');
-    document.body.style.overflow = 'auto';
-};
+        window.closeActivityHistoryModal = function() {
+            const modal = document.getElementById('activityHistoryModal');
+            if (modal) modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        };
 
-function renderFullHistoryModal() {
-    const items = window.allActivityItems || [];
-    const container = document.getElementById('fullHistoryList');
-    const countEl = document.getElementById('fullHistoryCount');
-    
-    if (countEl) countEl.textContent = items.length;
-    
-    if (!container) return;
-    
-    if (items.length === 0) {
-        container.innerHTML = `
-            <div class="text-center py-12">
-                <div class="text-5xl mb-3 opacity-40">📝</div>
-                <div class="text-gray-700 font-semibold">No activity history found</div>
-                <div class="text-gray-500 text-sm mt-1">Schedule tests or add lessons to see activity here</div>
-            </div>
-        `;
-        return;
-    }
-    
-    let html = '';
-    items.forEach((item, index) => {
-        const isActivity = item.testName !== undefined;
-        const icon = isActivity ? 'fa-dumbbell' : 'fa-book-open';
-        const color = isActivity ? 'text-green-500' : 'text-blue-500';
-        const bgColor = isActivity ? 'bg-green-50' : 'bg-blue-50';
-        const type = isActivity ? 'Test Activity' : 'Lesson';
-        const title = item.testName || item.title || 'Untitled';
-        const date = item.createdAt ? formatDate(item.createdAt) : 'Unknown date';
-        const statusBadge = isActivity ? getStatusBadge(item.status) : '';
-        
-        html += `
-            <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-white hover:border-gray-200 hover:shadow-sm transition-all duration-200">
-                <div class="w-10 h-10 rounded-full ${bgColor} flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <i class="fas ${icon} ${color}"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="font-semibold text-gray-900">${title}</div>
-                        <div class="flex flex-col items-end gap-1 flex-shrink-0">
-                           <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${isActivity ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">
-                                ${type}
-                            </span>
-                            ${statusBadge}
+        function renderFullHistoryModal() {
+            const items = window.allActivityItems || [];
+            const container = document.getElementById('fullHistoryList');
+            const countEl = document.getElementById('fullHistoryCount');
+            
+            if (countEl) countEl.textContent = items.length;
+            
+            if (!container) return;
+            
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="text-5xl mb-3 opacity-40">📝</div>
+                        <div class="text-gray-700 font-semibold">No activity history found</div>
+                        <div class="text-gray-500 text-sm mt-1">Schedule tests or add lessons to see activity here</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            items.forEach((item, index) => {
+                const isActivity = item.testName !== undefined;
+                const icon = isActivity ? 'fa-dumbbell' : 'fa-book-open';
+                const color = isActivity ? 'text-green-500' : 'text-blue-500';
+                const bgColor = isActivity ? 'bg-green-50' : 'bg-blue-50';
+                const type = isActivity ? 'Test Activity' : 'Lesson';
+                const title = item.testName || item.title || 'Untitled';
+                const date = item.createdAt ? formatDate(item.createdAt) : 'Unknown date';
+                const statusBadge = isActivity ? getStatusBadge(item.status) : '';
+                
+                html += `
+                    <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-white hover:border-gray-200 hover:shadow-sm transition-all duration-200">
+                        <div class="w-10 h-10 rounded-full ${bgColor} flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas ${icon} ${color}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="font-semibold text-gray-900">${title}</div>
+                                <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                                   <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${isActivity ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">
+                                        ${type}
+                                    </span>
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-2">
+                                <span class="flex items-center gap-1">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Created: ${date}
+                                </span>
+                                ${item.section ? `<span class="flex items-center gap-1"><i class="fas fa-users"></i>${item.section}</span>` : ''}
+                                ${isActivity && item.date ? `<span class="flex items-center gap-1"><i class="fas fa-calendar-check"></i>Test date: ${item.date}</span>` : ''}
+                                ${isActivity && item.deadline ? `<span class="flex items-center gap-1"><i class="fas fa-clock text-red-400"></i>Deadline: ${item.deadline} ${item.deadlineTime || ''}</span>` : ''}
+                                ${isActivity && item.attemptsAllowed ? `<span class="flex items-center gap-1"><i class="fas fa-redo"></i>${item.attemptsAllowed} attempt(s)</span>` : ''}
+                            </div>
                         </div>
                     </div>
-                    <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-2">
-                        <span class="flex items-center gap-1">
-                            <i class="fas fa-calendar-alt"></i>
-                            Created: ${date}
-                        </span>
-                        ${item.section ? `<span class="flex items-center gap-1"><i class="fas fa-users"></i>${item.section}</span>` : ''}
-                        ${isActivity && item.date ? `<span class="flex items-center gap-1"><i class="fas fa-calendar-check"></i>Test date: ${item.date}</span>` : ''}
-                        ${isActivity && item.deadline ? `<span class="flex items-center gap-1"><i class="fas fa-clock text-red-400"></i>Deadline: ${item.deadline} ${item.deadlineTime || ''}</span>` : ''}
-                        ${isActivity && item.attemptsAllowed ? `<span class="flex items-center gap-1"><i class="fas fa-redo"></i>${item.attemptsAllowed} attempt(s)</span>` : ''}
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
-    container.innerHTML = html;
-}
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
 
         // Update profile picture in navigation
         function updateProfilePicture(photoURL, userName) {
@@ -1371,9 +1726,11 @@ function renderFullHistoryModal() {
                     console.error('Error:', error);
                     
                     loadingScreen.style.display = 'none';
-                    alert(error.message || 'Error loading profile. Please try again.');
-                    await signOut(auth);
-                    window.location.href = '/login/index.html';
+                    showErrorModal(error.message || 'Error loading profile. Please try again.');
+                    setTimeout(() => {
+                        signOut(auth);
+                        window.location.href = '/login/index.html';
+                    }, 2000);
                 }
             } else {
                 console.log('No user authenticated, redirecting to login...');
@@ -1412,6 +1769,7 @@ function renderFullHistoryModal() {
                 
             } catch (error) {
                 console.error('Error loading professor profile:', error);
+                showErrorModal('Error loading profile data: ' + error.message);
             }
         }
 
@@ -1494,6 +1852,7 @@ function renderFullHistoryModal() {
                 
             } catch (error) {
                 console.error('Error loading sections:', error);
+                showErrorModal('Error loading sections: ' + error.message);
             }
         }
 
@@ -1571,7 +1930,7 @@ function renderFullHistoryModal() {
                                     <ul class="space-y-2 text-sm">
                                         <li class="flex items-center">
                                             <i class="fas fa-calendar-alt text-gray-400 w-5 mr-2"></i>
-                                            <span>Schedule: ${section.days || sectionData?.day || 'Not specified'}</span>
+                                            <span>Schedule: ${section.days || section.day || 'Not specified'}</span>
                                         </li>
                                         <li class="flex items-center">
                                             <i class="fas fa-clock text-gray-400 w-5 mr-2"></i>
@@ -2064,7 +2423,7 @@ function renderFullHistoryModal() {
         }
     }
 
-async function loadActivityHistory() {
+        async function loadActivityHistory() {
     try {
         const activityHistory = document.getElementById('activityHistory');
         
@@ -2135,17 +2494,17 @@ async function loadActivityHistory() {
     }
 }
 
-function getStatusBadge(status) {
-    if (!status) return '';
-    const map = {
-        active:    'bg-green-100 text-green-700',
-        scheduled: 'bg-yellow-100 text-yellow-700',
-        completed: 'bg-blue-100 text-blue-700'
-    };
-    const cls = map[status] || 'bg-gray-100 text-gray-600';
-    const label = status.charAt(0).toUpperCase() + status.slice(1);
-    return `<span class="text-xs font-medium px-2 py-0.5 rounded-full ${cls}">${label}</span>`;
-}
+        function getStatusBadge(status) {
+            if (!status) return '';
+            const map = {
+                active:    'bg-green-100 text-green-700',
+                scheduled: 'bg-yellow-100 text-yellow-700',
+                completed: 'bg-blue-100 text-blue-700'
+            };
+            const cls = map[status] || 'bg-gray-100 text-gray-600';
+            const label = status.charAt(0).toUpperCase() + status.slice(1);
+            return `<span class="text-xs font-medium px-2 py-0.5 rounded-full ${cls}">${label}</span>`;
+        }
 
         // Utility functions
         window.toggleSectionDetails = function(sectionId) {
