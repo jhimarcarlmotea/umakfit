@@ -3,1275 +3,579 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UmakFit - Professor Management</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Manrope:600,800|Inter:300,500,400,700" rel="stylesheet">
+    <title>UMakFit - Professor Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
-        body { font-family: 'Inter', Helvetica, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
-        
-        .header-top { 
-            background-color: #ffffff; 
-            padding: 15px 0; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08); 
-            position: fixed; 
-            top: 0; 
-            width: 100%; 
-            z-index: 1000; 
-            border-bottom: 1px solid #e2e8f0;
+        * {
+            -webkit-font-smoothing: antialiased;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
-        .header-top .container { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        .logo-text { 
-            font-family: "Inter", Helvetica; 
-            font-weight: 700; 
-            color: #1e3a8a; 
-            font-size: 24px; 
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .logo-text i {
-            color: #9333ea;
-            font-size: 26px;
-        }
-        .header-actions { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-        }
-        .logout-btn { 
-            padding: 8px 20px; 
-            background: linear-gradient(90deg, #9333ea 0%, #7c3aed 100%); 
-            border: none; 
-            border-radius: 8px; 
-            color: white; 
-            font-weight: 600; 
-            font-size: 14px; 
-            cursor: pointer; 
-            transition: all 0.3s; 
-            box-shadow: 0 2px 4px rgba(147, 51, 234, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .logout-btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 8px rgba(147, 51, 234, 0.4); 
-        }
-        .account-circle { 
-            width: 44px; 
-            height: 44px; 
-            cursor: pointer; 
-            border-radius: 50%;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s;
-        }
-        .account-circle:hover {
-            border-color: #9333ea;
-        }
-        
-        .nav-section { 
-            background: linear-gradient(180deg, #4c1d95 0%, #7c3aed 100%); 
-            padding: 20px 0; 
-            margin-top: 74px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .nav-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .nav-brand { 
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-family: "Manrope", Helvetica; 
-            font-weight: 800; 
-            font-size: 28px; 
-            background: linear-gradient(90deg, #f0abfc 0%, #d946ef 100%); 
-            -webkit-background-clip: text; 
-            background-clip: text; 
-            -webkit-text-fill-color: transparent;
-            margin: 0;
-        }
-        .nav-brand-logo {
-            height: 60px;
-            width: auto;
-        }
-        .nav-pills-custom { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 8px; 
-            padding: 0; 
-            margin: 0;
-        }
-        .nav-pills-custom .nav-link { 
-            font-family: "Manrope", Helvetica; 
-            font-weight: 600; 
-            color: #000000; 
-            font-size: 14px; 
-            padding: 12px 18px;
-            border-radius: 8px; 
-            background-color: #ffffff; 
-            transition: all 0.3s; 
-            border: none; 
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .nav-pills-custom .nav-link.active { 
-            background: linear-gradient(90deg, #f0abfc 0%, #d946ef 100%); 
-            box-shadow: 0 4px 8px rgba(233, 213, 255, 0.3);
-        }
-        .nav-pills-custom .nav-link:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15); 
-        }
-        
-        .main-content { 
-            background: linear-gradient(180deg, rgba(248, 250, 252, 1) 0%, rgba(241, 245, 249, 1) 100%); 
-            padding: 40px 0 80px 0; 
-            min-height: calc(100vh - 200px); 
-        }
-        
-        /* Profile Section */
-        .profile-section { 
-            background: white; 
-            border-radius: 16px; 
-            padding: 30px; 
-            margin-bottom: 40px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
-            border: 1px solid #e2e8f0;
-        }
-        .profile-header { 
-            display: flex; 
-            align-items: center; 
-            gap: 20px; 
-            margin-bottom: 20px; 
-        }
-        .profile-title { 
-            font-family: "Inter", Helvetica; 
-            font-weight: 700; 
-            color: #4c1d95; 
-            font-size: 32px; 
-        }
-        .profile-divider { 
-            width: 100%; 
-            height: 2px; 
-            background: linear-gradient(90deg, transparent, #e5e7eb, transparent); 
-            margin: 20px 0; 
-        }
-        .profile-content { 
-            display: flex; 
-            align-items: center; 
-            gap: 30px; 
-            padding: 25px; 
-            background: #f9fafb; 
-            border-radius: 12px; 
-            border: 1px solid #f1f5f9;
-        }
-        .profile-photo { 
-            width: 60px; 
-            height: 60px; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            border: 3px solid #e2e8f0;
-        }
-        .profile-info { 
-            display: flex; 
-            gap: 80px; 
-            flex: 1; 
-            flex-wrap: wrap; 
-        }
-        .profile-field { 
-            flex: 1; 
-            min-width: 150px; 
-        }
-        .profile-label { 
-            font-family: "Inter", Helvetica; 
-            font-weight: 500; 
-            color: #64748b; 
-            font-size: 13px; 
-            margin-bottom: 5px; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .profile-value { 
-            font-family: "Inter", Helvetica; 
-            font-weight: 700; 
-            color: #4c1d95; 
-            font-size: 16px; 
-        }
-        .profile-value.email { 
-            font-weight: 500; 
-            color: #475569; 
-        }
-        
-        /* Stats Cards */
-        .stats-row { 
-            margin-bottom: 40px; 
-        }
-        .stat-card { 
-            border-radius: 16px; 
-            padding: 25px; 
-            color: white; 
-            transition: all 0.3s; 
-            border: none;
-            height: 100%; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 80px;
-            height: 80px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            transform: translate(30px, -30px);
-        }
-        .stat-card:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
-        }
-        .stat-card.purple { background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%); }
-        .stat-card.blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
-        .stat-card.green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        .stat-label { 
-            font-family: "Inter", Helvetica; 
-            font-weight: 600; 
-            font-size: 14px; 
-            margin-bottom: 10px; 
-            opacity: 0.95; 
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .stat-value { 
-            font-family: "Inter", Helvetica; 
-            font-weight: 800; 
-            font-size: 32px; 
-        }
-        
-        /* Form Section */
-        .form-section { 
-            background: white; 
-            border-radius: 16px; 
-            padding: 30px; 
-            margin-bottom: 40px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
-            border: 1px solid #e2e8f0;
-        }
-        .form-header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-        .form-title { 
-            font-family: "Inter", Helvetica; 
-            font-weight: 700; 
-            color: #1f2937; 
-            font-size: 22px; 
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .form-subtitle {
-            font-family: "Inter", Helvetica;
-            font-weight: 400;
-            color: #64748b;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-        
-        /* Form Styles */
-        .professor-form {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .form-group {
-            margin-bottom: 25px;
-        }
-        .form-label {
-            font-family: "Inter", Helvetica;
-            font-weight: 600;
-            color: #374151;
-            font-size: 14px;
-            margin-bottom: 8px;
-            display: block;
-        }
-        .form-label .required {
-            color: #ef4444;
-        }
-        .form-control, .form-select {
+        body {
+            margin: 0; padding: 0;
+            background-color: #f6f6f6;
+            overflow-x: hidden;
             width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-family: "Inter", Helvetica;
-            font-size: 14px;
-            color: #374151;
-            background-color: #ffffff;
-            transition: all 0.3s;
         }
-        .form-control:focus, .form-select:focus {
-            outline: none;
-            border-color: #9333ea;
-            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+        .font-montserrat { font-family: 'Montserrat', sans-serif; }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .form-control:disabled, .form-select:disabled {
-            background-color: #f9fafb;
-            color: #9ca3af;
-            cursor: not-allowed;
+
+        @keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+        .spinner {
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #7c3aed;
+            border-radius: 50%; width: 50px; height: 50px;
+            animation: spin 1s linear infinite;
         }
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+        @keyframes slideDown {
+            from { opacity:0; transform:translateY(-10px); }
+            to   { opacity:1; transform:translateY(0); }
         }
-        
-        /* Sections List Section (New) */
-        .sections-list-section {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: 1px solid #e2e8f0;
+        .slide-down { animation: slideDown 0.3s ease; }
+        @keyframes fadeIn {
+            from { opacity:0; transform:translateY(16px); }
+            to   { opacity:1; transform:translateY(0); }
         }
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
+        .fade-in { animation: fadeIn 0.4s ease both; }
+
+        /* Hamburger */
+        .hamburger { display:none; flex-direction:column; gap:4px; cursor:pointer; z-index:60; }
+        .hamburger span {
+            width:25px; height:3px;
+            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
+            border-radius:2px; transition:all 0.3s ease;
         }
-        .section-title {
-            font-family: "Inter", Helvetica;
-            font-weight: 700;
-            color: #1f2937;
-            font-size: 22px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .hamburger.active span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+        .hamburger.active span:nth-child(2) { opacity:0; }
+        .hamburger.active span:nth-child(3) { transform:rotate(-45deg) translate(7px,-6px); }
+
+        .mobile-drawer {
+            position:fixed; top:0; right:-100%; width:280px; height:100vh;
+            background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%);
+            z-index:55; transition:right 0.3s ease;
+            box-shadow:-5px 0 15px rgba(0,0,0,0.3); overflow-y:auto;
         }
-        .filter-controls {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+        .mobile-drawer.active { right:0; }
+        .drawer-overlay {
+            position:fixed; top:0; left:0; width:100%; height:100vh;
+            background:rgba(0,0,0,0.5); z-index:50;
+            opacity:0; visibility:hidden;
+            transition:opacity 0.3s ease,visibility 0.3s ease;
         }
-        .filter-input {
-            padding: 10px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-family: "Inter", Helvetica;
-            font-size: 14px;
-            min-width: 250px;
-            transition: all 0.3s;
+        .drawer-overlay.active { opacity:1; visibility:visible; }
+
+        @media (max-width:768px) {
+            .hamburger { display:flex; }
+            .desktop-nav { display:none; }
         }
-        .filter-input:focus {
-            outline: none;
-            border-color: #9333ea;
-            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
-        }
-        .filter-select {
-            padding: 10px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-family: "Inter", Helvetica;
-            font-size: 14px;
-            background-color: white;
-            min-width: 150px;
-            cursor: pointer;
-        }
-        .filter-select:focus {
-            outline: none;
-            border-color: #9333ea;
-        }
-        
-        .sections-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
+
+        .card-shadow { box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+
+        /* Stat cards */
+        .stat-card { transition:all 0.3s ease; }
+        .stat-card:hover { transform:translateY(-4px); box-shadow:0 12px 28px rgba(0,0,0,0.15); }
+
+        /* Section / professor cards */
         .section-item {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.3s;
+            transition:all 0.25s ease;
+            border:2px solid transparent;
         }
         .section-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-color: #9333ea;
+            transform:translateY(-3px);
+            box-shadow:0 8px 20px rgba(0,0,0,0.10);
+            border-color:#7c3aed !important;
         }
-        .section-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-        .section-name {
-            font-family: "Inter", Helvetica;
-            font-weight: 700;
-            color: #4c1d95;
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-        .section-code {
-            font-size: 14px;
-            color: #64748b;
-            background: #e2e8f0;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-        .section-details {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .detail-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: #475569;
-        }
-        .detail-row i {
-            width: 20px;
-            color: #9333ea;
-        }
-        .students-count {
-            font-weight: 600;
-            color: #10b981;
-        }
-        .professor-name {
-            font-weight: 500;
-            color: #7c3aed;
-            background: #f3e8ff;
-            padding: 4px 8px;
-            border-radius: 6px;
-            display: inline-block;
-            font-size: 13px;
-        }
-        .no-professor {
-            color: #94a3b8;
-            font-style: italic;
-        }
-        .badge-student-count {
-            background: #10b981;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        /* Professors List Section */
-        .professors-section {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: 1px solid #e2e8f0;
-            margin-bottom: 40px;
-        }
-        .professors-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .professors-title {
-            font-family: "Inter", Helvetica;
-            font-weight: 700;
-            color: #1f2937;
-            font-size: 22px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .search-box {
-            display: flex;
-            gap: 10px;
-        }
-        .search-input {
-            padding: 10px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-family: "Inter", Helvetica;
-            font-size: 14px;
-            width: 250px;
-            transition: all 0.3s;
-        }
-        .search-input:focus {
-            outline: none;
-            border-color: #9333ea;
-            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
-        }
-        
-        /* Table Styles */
+
+        /* Table */
         .professors-table-container {
-            overflow-x: auto;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            overflow-x:auto;
+            border:1px solid #e5e7eb;
+            border-radius:12px;
         }
-        .professors-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: "Inter", Helvetica;
-            min-width: 900px;
-        }
+        .professors-table { width:100%; border-collapse:collapse; min-width:900px; }
         .professors-table th {
-            background: #f8fafc;
-            font-weight: 600;
-            color: #4c1d95;
-            font-size: 12px;
-            text-transform: uppercase;
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 2px solid #e2e8f0;
+            background:#f8fafc; font-weight:700; color:#4c1d95;
+            font-size:11px; text-transform:uppercase; letter-spacing:0.5px;
+            padding:14px 16px; text-align:left;
+            border-bottom:2px solid #e5e7eb;
         }
         .professors-table td {
-            padding: 16px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 14px;
-            color: #475569;
-            vertical-align: middle;
+            padding:16px; border-bottom:1px solid #f1f5f9;
+            font-size:14px; color:#475569; vertical-align:middle;
         }
-        .professors-table tr:hover {
-            background-color: #f8fafc;
-        }
-        .professor-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .professors-table tbody tr { transition:background 0.2s; }
+        .professors-table tbody tr:hover td { background:#f8fafc; }
         .professor-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
+            width:40px; height:40px; border-radius:50%;
+            background:linear-gradient(135deg,#7c3aed 0%,#4c1d95 100%);
+            display:flex; align-items:center; justify-content:center;
+            color:white; font-weight:700; font-size:16px; flex-shrink:0;
         }
-        .professor-details {
-            display: flex;
-            flex-direction: column;
-        }
-        .professor-name {
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 2px;
-        }
-        .professor-email {
-            font-size: 12px;
-            color: #64748b;
-        }
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            gap: 4px;
-        }
-        .status-active {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        .status-inactive {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
+
+        /* Status badges */
+        .status-active   { background:#d1fae5; color:#065f46; }
+        .status-inactive { background:#fee2e2; color:#991b1b; }
+
+        /* Action buttons */
         .btn-action {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 6px;
-            font-family: "Inter", Helvetica;
-            font-weight: 500;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            padding:6px 12px; border:none; border-radius:8px;
+            font-weight:600; font-size:12px; cursor:pointer;
+            transition:all 0.2s; display:flex; align-items:center; gap:4px;
         }
-        .btn-edit {
-            background-color: #dbeafe;
-            color: #1e40af;
+        .btn-edit   { background:#dbeafe; color:#1e40af; }
+        .btn-edit:hover   { background:#bfdbfe; transform:translateY(-1px); }
+        .btn-delete { background:#fee2e2; color:#dc2626; }
+        .btn-delete:hover { background:#fecaca; transform:translateY(-1px); }
+        .btn-convert { background:#fef9c3; color:#92400e; }
+        .btn-convert:hover { background:#fef08a; transform:translateY(-1px); }
+
+        /* Form inputs */
+        .form-input {
+            width:100%; padding:11px 14px;
+            border:1px solid #d1d5db; border-radius:10px;
+            font-size:14px; color:#374151;
+            background:#fff; transition:all 0.3s;
         }
-        .btn-edit:hover {
-            background-color: #bfdbfe;
-            transform: translateY(-1px);
+        .form-input:focus {
+            outline:none; border-color:#7c3aed;
+            box-shadow:0 0 0 3px rgba(124,58,237,0.12);
         }
-        .btn-delete {
-            background-color: #fee2e2;
-            color: #dc2626;
+        .form-input:disabled {
+            background:#f9fafb; color:#9ca3af; cursor:not-allowed;
         }
-        .btn-delete:hover {
-            background-color: #fecaca;
-            transform: translateY(-1px);
+        .form-input.error {
+            border-color:#ef4444;
+            box-shadow:0 0 0 3px rgba(239,68,68,0.1);
         }
-        
-        /* Empty State */
-        .empty-state {
-            padding: 60px 40px;
-            text-align: center;
+        .form-input.success {
+            border-color:#10b981;
+            box-shadow:0 0 0 3px rgba(16,185,129,0.1);
         }
-        .empty-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.4;
-            color: #9333ea;
+
+        /* Filter input */
+        .filter-input {
+            padding:10px 14px;
+            border:1px solid #d1d5db; border-radius:10px;
+            font-size:14px; transition:all 0.3s;
         }
-        .empty-title {
-            font-family: "Inter", Helvetica;
-            font-weight: 700;
-            color: #1f2937;
-            font-size: 20px;
-            margin-bottom: 12px;
+        .filter-input:focus {
+            outline:none; border-color:#7c3aed;
+            box-shadow:0 0 0 3px rgba(124,58,237,0.12);
         }
-        .empty-text {
-            font-family: "Inter", Helvetica;
-            font-weight: 400;
-            color: #64748b;
-            font-size: 14px;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        /* Loading */
-        .loading { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(255,255,255,0.95); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 9999; 
-            flex-direction: column;
-            gap: 20px;
-        }
-        .loading-text {
-            font-family: "Inter", Helvetica;
-            font-weight: 500;
-            color: #475569;
-            font-size: 16px;
-        }
-        .spinner { 
-            border: 4px solid #f1f5f9; 
-            border-top: 4px solid #9333ea; 
-            border-radius: 50%; 
-            width: 50px; 
-            height: 50px; 
-            animation: spin 1s linear infinite; 
-        }
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
-        
-        /* Toast Notification */
+
+        /* Toast */
         .toast-container {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            z-index: 99999;
+            position:fixed; top:100px; right:20px; z-index:99999;
+            display:flex; flex-direction:column; gap:10px;
         }
         .toast {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border-left: 4px solid;
-            margin-bottom: 10px;
-            min-width: 300px;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
+            background:white; border-radius:12px;
+            padding:16px 20px; box-shadow:0 8px 24px rgba(0,0,0,0.15);
+            border-left:4px solid; min-width:300px;
+            transform:translateX(400px); transition:transform 0.3s ease;
         }
-        .toast.show {
-            transform: translateX(0);
-        }
-        .toast-success {
-            border-left-color: #10b981;
-        }
-        .toast-error {
-            border-left-color: #ef4444;
-        }
-        .toast-info {
-            border-left-color: #3b82f6;
-        }
-        .toast-warning {
-            border-left-color: #f59e0b;
-        }
-        .toast-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-        .toast-title {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        .toast-message {
-            font-size: 13px;
-            color: #475569;
-        }
-        
-        /* Modal */
+        .toast.show { transform:translateX(0); }
+        .toast-success { border-left-color:#10b981; }
+        .toast-error   { border-left-color:#ef4444; }
+        .toast-info    { border-left-color:#3b82f6; }
+        .toast-warning { border-left-color:#f59e0b; }
+
+        /* Modals */
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            padding: 20px;
+            position:fixed; inset:0;
+            background:rgba(0,0,0,0.55);
+            display:none; justify-content:center; align-items:center;
+            z-index:10000; backdrop-filter:blur(4px); padding:20px;
         }
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
+        .modal-overlay.open { display:flex; }
+        .modal-box {
+            background:white; border-radius:20px; padding:36px;
+            max-width:500px; width:100%; max-height:90vh; overflow-y:auto;
+            box-shadow:0 20px 60px rgba(0,0,0,0.2);
+            animation:slideDown 0.3s ease;
         }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+
+        /* Sections grid */
+        .sections-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(320px,1fr));
+            gap:20px;
         }
-        .modal-title {
-            font-family: "Inter", Helvetica;
-            font-weight: 700;
-            color: #1f2937;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        @media (max-width:640px) {
+            .sections-grid { grid-template-columns:1fr; }
         }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #6b7280;
-            cursor: pointer;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.3s;
+
+        .professor-tag {
+            background:#f3e8ff; color:#7c3aed;
+            font-size:12px; font-weight:600;
+            padding:3px 10px; border-radius:6px; display:inline-block;
         }
-        .modal-close:hover {
-            background: #f3f4f6;
-            color: #374151;
+        .student-badge {
+            background:linear-gradient(135deg,#10b981,#059669);
+            color:white; font-size:11px; font-weight:700;
+            padding:4px 10px; border-radius:999px;
         }
-        .modal-body {
-            margin-bottom: 30px;
+
+        #loadingScreen {
+            position:fixed; inset:0; background:white;
+            display:flex; flex-direction:column;
+            justify-content:center; align-items:center; z-index:9999;
         }
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
+
+        /* Radio custom */
+        .radio-group { display:flex; gap:20px; }
+        .radio-label {
+            display:flex; align-items:center; gap:8px;
+            cursor:pointer; font-size:14px; color:#374151; font-weight:500;
         }
-        .btn-confirm {
-            padding: 10px 24px;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-family: "Inter", Helvetica;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn-confirm:hover {
-            background: #dc2626;
-            transform: translateY(-1px);
-        }
-        .btn-cancel-modal {
-            padding: 10px 24px;
-            background: #6b7280;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-family: "Inter", Helvetica;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn-cancel-modal:hover {
-            background: #4b5563;
-            transform: translateY(-1px);
-        }
-        
-        /* Footer */
-        .footer { 
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); 
-            padding: 40px 0; 
-            margin-top: 40px; 
-        }
-        .footer-title { 
-            font-family: "Inter", Helvetica; 
-            font-weight: 700; 
-            color: #f0abfc; 
-            font-size: 18px; 
-            text-align: center; 
-            margin-bottom: 20px; 
-        }
-        .footer-text { 
-            font-family: "Inter", Helvetica; 
-            font-weight: 400; 
-            color: #cbd5e1; 
-            font-size: 13px; 
-            line-height: 1.6; 
-        }
-        
-        @media (max-width: 768px) {
-            .header-top .container { padding: 0 15px; }
-            .logo-text { font-size: 20px; }
-            .profile-content { flex-direction: column; align-items: flex-start; }
-            .profile-info { gap: 20px; }
-            .professors-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .search-box {
-                width: 100%;
-            }
-            .search-input {
-                width: 100%;
-            }
-            .form-actions {
-                flex-direction: column;
-            }
-            .btn-submit, .btn-reset {
-                width: 100%;
-            }
-            .nav-pills-custom {
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                padding-bottom: 5px;
-            }
-            .sections-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        .umak-logo {
-            height: 40px;
-            width: auto;
-        }
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid #e5e7eb;
-        }
-        .btn-submit {
-            padding: 12px 30px;
-            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-family: "Inter", Helvetica;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
-        }
-        .btn-reset {
-            padding: 12px 30px;
-            background: #6b7280;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-family: "Inter", Helvetica;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-reset:hover {
-            background: #4b5563;
-            transform: translateY(-2px);
-        }
+        .radio-label input[type="radio"] { accent-color:#7c3aed; width:16px; height:16px; cursor:pointer; }
     </style>
 </head>
-<body>
-    <div id="loadingScreen" class="loading">
+<body class="bg-gray-50 overflow-x-hidden">
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen">
         <div class="spinner"></div>
-        <div class="loading-text">Loading Professor Management...</div>
+        <div class="mt-5 text-gray-600 font-medium text-base">Loading Professor Management...</div>
     </div>
-    
+
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
-    
+
     <!-- Delete Confirmation Modal -->
     <div class="modal-overlay" id="deleteModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
-                    Confirm Deletion
+        <div class="modal-box">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
                 </div>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <h3 class="font-bold text-gray-900 text-xl">Confirm Deletion</h3>
+                <button onclick="closeModal()" class="ml-auto text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
             </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete professor <strong id="professorToDeleteName"></strong>?</p>
-                <p class="text-muted">This action cannot be undone. The professor will lose access to the system.</p>
+            <div class="bg-red-50 border border-red-100 rounded-xl p-4 mb-6 text-sm text-red-700 leading-relaxed">
+                <p class="mb-1">Are you sure you want to delete professor <strong id="professorToDeleteName"></strong>?</p>
+                <p class="font-semibold">⚠️ This action cannot be undone. The professor will lose access to the system.</p>
             </div>
-            <div class="modal-footer">
-                <button class="btn-cancel-modal" onclick="closeModal()">Cancel</button>
-                <button class="btn-confirm" onclick="confirmDelete()">Delete Professor</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Edit Professor Modal -->
-    <div class="modal-overlay" id="editModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <i class="fas fa-edit"></i>
-                    Edit Professor
-                </div>
-                <button class="modal-close" onclick="closeEditModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="editProfessorForm">
-                    <div class="form-group">
-                        <label class="form-label" for="editLastName">
-                            Last Name <span class="required">*</span>
-                        </label>
-                        <input type="text" 
-                               id="editLastName" 
-                               class="form-control" 
-                               placeholder="Enter last name"
-                               required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="editFirstName">
-                            First Name <span class="required">*</span>
-                        </label>
-                        <input type="text" 
-                               id="editFirstName" 
-                               class="form-control" 
-                               placeholder="Enter first name"
-                               required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="editMiddleInitial">
-                            Middle Initial
-                        </label>
-                        <input type="text" 
-                               id="editMiddleInitial" 
-                               class="form-control" 
-                               placeholder="Enter middle initial"
-                               maxlength="1">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="editEmail">
-                            UMak Email <span class="required">*</span>
-                        </label>
-                        <input type="email" 
-                               id="editEmail" 
-                               class="form-control" 
-                               placeholder="professor@umak.edu.ph"
-                               required>
-                        <div class="form-text" style="font-size: 12px; color: #6b7280; margin-top: 4px;">
-                            Must be a valid UMak email address (@umak.edu.ph)
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="editCollege">
-                            College
-                        </label>
-                        <input type="text" 
-                               id="editCollege" 
-                               class="form-control" 
-                               value="College of Human Kinetics"
-                               disabled>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">
-                            Status
-                        </label>
-                        <div class="d-flex gap-3">
-                            <label class="d-flex align-items-center gap-2">
-                                <input type="radio" name="editStatus" value="active" checked>
-                                <span>Active</span>
-                            </label>
-                            <label class="d-flex align-items-center gap-2">
-                                <input type="radio" name="editStatus" value="inactive">
-                                <span>Inactive</span>
-                            </label>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancel-modal" onclick="closeEditModal()">Cancel</button>
-                <button class="btn-submit" onclick="saveProfessorEdit()">
-                    <i class="fas fa-save"></i> Save Changes
+            <div class="flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors">
+                    Cancel
+                </button>
+                <button onclick="confirmDelete()" class="px-5 py-2.5 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors flex items-center gap-2">
+                    <i class="fas fa-trash-alt text-sm"></i> Delete Professor
                 </button>
             </div>
         </div>
     </div>
-    
-    <div id="dashboardContent" style="display: none;">
-        <div class="header-top">
-            <div class="container">
-                <div class="logo-text">
-                    <img class="umak-logo" src="umaklogo.png" alt="University of Makati">
-                    University of Makati
+
+    <!-- Edit Professor Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-edit text-purple-600 text-lg"></i>
                 </div>
-                <div class="header-actions">
-                    <button class="logout-btn" onclick="handleLogout()">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                    <img class="account-circle" id="userProfilePhoto" src="https://c.animaapp.com/tzMzyNnw/img/image-13@2x.png" alt="Account">
+                <h3 class="font-bold text-gray-900 text-xl">Edit Professor</h3>
+                <button onclick="closeEditModal()" class="ml-auto text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+
+            <form id="editProfessorForm" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                        Last Name <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="editLastName" class="form-input" placeholder="Enter last name" required>
                 </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                        First Name <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="editFirstName" class="form-input" placeholder="Enter first name" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Middle Initial</label>
+                    <input type="text" id="editMiddleInitial" class="form-input" placeholder="Enter middle initial" maxlength="1">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                        UMak Email <span class="text-red-500">*</span>
+                    </label>
+                    <input type="email" id="editEmail" class="form-input" placeholder="professor@umak.edu.ph" required>
+                    <p class="mt-1.5 text-xs text-gray-400">Must be a valid UMak email address (@umak.edu.ph)</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">College</label>
+                    <input type="text" class="form-input" value="College of Human Kinetics" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="editStatus" value="active" checked> Active
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="editStatus" value="inactive"> Inactive
+                        </label>
+                    </div>
+                </div>
+            </form>
+
+            <div class="flex justify-end gap-3 mt-7 pt-5 border-t border-gray-100">
+                <button onclick="closeEditModal()" class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors">
+                    Cancel
+                </button>
+                <button onclick="saveProfessorEdit()" class="px-5 py-2.5 rounded-xl text-white font-semibold transition-all hover:-translate-y-0.5 hover:shadow-lg flex items-center gap-2"
+                        style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);">
+                    <i class="fas fa-save text-sm"></i> Save Changes
+                </button>
             </div>
         </div>
-        
-        <div class="nav-section">
-            <div class="container">
-                <div class="nav-container">
-                    <div class="nav-brand">
-                        <img class="nav-brand-logo" src="logo.png" alt="UMakFit">
-                        UMakFit Professor Management
-                    </div>
-                    <ul class="nav nav-pills-custom">
-                        <li class="nav-item">
-                            <a class="nav-link" href="secretary.html">
-                                <i class="fas fa-tachometer-alt"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#">
-                                <i class="fas fa-chalkboard-teacher"></i> Professor Management
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <div class="main-content">
-            <div class="container">
-                <!-- Profile Section -->
-                <div class="profile-section">
-                    <div class="profile-header">
-                        <div class="profile-title">Professor Management</div>
-                    </div>
-                    <div class="profile-divider"></div>
-                    <div class="profile-content">
-                        <img class="profile-photo" id="userPhoto" src="https://c.animaapp.com/tzMzyNnw/img/image-13@2x.png" alt="Profile">
-                        <div class="profile-info">
-                            <div class="profile-field">
-                                <div class="profile-label">Name</div>
-                                <div class="profile-value" id="userName">Loading...</div>
-                            </div>
-                            <div class="profile-field">
-                                <div class="profile-label">College</div>
-                                <div class="profile-value">College of Human Kinetics</div>
-                            </div>
-                            <div class="profile-field">
-                                <div class="profile-label">Email</div>
-                                <div class="profile-value email" id="userEmail">Loading...</div>
-                            </div>
-                            <div class="profile-field">
-                                <div class="profile-label">Role</div>
-                                <div class="profile-value">College Secretary</div>
-                            </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div id="dashboardContent" class="hidden overflow-x-hidden">
+
+        <!-- ── HEADER ── -->
+        <header class="shadow-lg fixed w-full top-0 z-50" style="background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%);">
+            <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+
+                    <!-- Logo -->
+                    <div class="flex items-center gap-3">
+                        <div class="w-16 h-16 flex items-center justify-center overflow-visible">
+                            <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-20 h-20 object-contain">
                         </div>
+                        <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-montserrat gradient-text">
+                            UMakFIT
+                        </span>
                     </div>
-                </div>
-                
-                <!-- Stats Section -->
-                <div class="row stats-row g-3">
-                    <div class="col-12 col-sm-6 col-lg-6">
-                        <div class="stat-card purple">
-                            <div class="stat-label">
-                                <i class="fas fa-chalkboard-teacher"></i> Total Professors
-                            </div>
-                            <div class="stat-value" id="statProfessors">0</div>
-                        </div>
+
+                    <!-- Desktop Nav -->
+                    <div class="desktop-nav hidden md:flex items-center gap-8">
+                        <a href="secretary.html" class="text-white/80 hover:text-white font-medium transition-colors">
+                            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                        </a>
+                        <a href="import-professors.html" class="text-white font-medium px-3 py-2 rounded-lg" style="background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%);">
+                            <i class="fas fa-chalkboard-teacher mr-2"></i>Professor Management
+                        </a>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-6">
-                        <div class="stat-card green">
-                            <div class="stat-label">
-                                <i class="fas fa-layer-group"></i> Total Sections
+
+                    <!-- Desktop Profile -->
+                    <div class="hidden md:block relative">
+                        <img src="" alt="Profile" id="profilePictureBtn"
+                             class="w-10 h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
+                        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                            <div class="p-6 border-b-2 border-gray-200 text-center">
+                                <img src="" alt="Profile" id="profileDropdownPicture" class="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-purple-500 object-cover">
+                                <h6 id="profileDropdownName" class="font-bold text-gray-900 text-lg">Loading...</h6>
+                                <p id="profileDropdownEmail" class="text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
+                                <span class="inline-block mt-2 text-xs font-semibold text-purple-700 bg-purple-100 px-3 py-1 rounded-full">College Secretary</span>
                             </div>
-                            <div class="stat-value" id="statSections">0</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Add Professor Form -->
-                <div class="form-section">
-                    <div class="form-header">
-                        <div class="form-title">
-                            <i class="fas fa-user-plus"></i> Add New Professor
-                        </div>
-                    </div>
-                    <div class="form-subtitle">
-                        Add a new professor to the system. All fields are required.
-                    </div>
-                    
-                    <form class="professor-form" id="professorForm" onsubmit="handleSubmit(event)">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label" for="lastName">
-                                    Last Name <span class="required">*</span>
-                                </label>
-                                <input type="text" 
-                                       id="lastName" 
-                                       class="form-control" 
-                                       placeholder="Enter last name"
-                                       required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="firstName">
-                                    First Name <span class="required">*</span>
-                                </label>
-                                <input type="text" 
-                                       id="firstName" 
-                                       class="form-control" 
-                                       placeholder="Enter first name"
-                                       required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="middleInitial">
-                                    Middle Initial
-                                </label>
-                                <input type="text" 
-                                       id="middleInitial" 
-                                       class="form-control" 
-                                       placeholder="Enter middle initial"
-                                       maxlength="1">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label" for="email">
-                                    UMak Email <span class="required">*</span>
-                                </label>
-                                <input type="email" 
-                                       id="email" 
-                                       class="form-control" 
-                                       placeholder="professor@umak.edu.ph"
-                                       required
-                                       onblur="validateEmail(this)">
-                                <div class="form-text" style="font-size: 12px; color: #6b7280; margin-top: 4px;">
-                                    Must be a valid UMak email address (@umak.edu.ph)
+                            <div class="p-2">
+                                <div class="h-px bg-gray-200 my-1"></div>
+                                <div onclick="handleLogout(event)" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                    <i class="fas fa-sign-out-alt text-xl"></i>
+                                    <span class="font-medium text-base">Logout</span>
                                 </div>
                             </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="college">
-                                    College
-                                </label>
-                                <input type="text" 
-                                       id="college" 
-                                       class="form-control" 
-                                       value="College of Human Kinetics"
-                                       disabled>
+                        </div>
+                    </div>
+
+                    <!-- Mobile right icons -->
+                    <div class="flex md:hidden items-center gap-3">
+                        <div class="relative">
+                            <img src="" alt="Profile" id="profilePictureBtnMobile"
+                                 class="w-9 h-9 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
+                            <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                                <div class="p-4 border-b-2 border-gray-200 text-center">
+                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-purple-500 object-cover">
+                                    <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base">Loading...</h6>
+                                    <p id="profileDropdownEmailMobile" class="text-xs text-gray-500 mt-1 truncate px-2">Loading...</p>
+                                    <span class="inline-block mt-2 text-xs font-semibold text-purple-700 bg-purple-100 px-3 py-1 rounded-full">College Secretary</span>
+                                </div>
+                                <div class="p-2">
+                                    <div class="h-px bg-gray-200 my-1"></div>
+                                    <div onclick="handleLogout(event)" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                        <i class="fas fa-sign-out-alt text-lg"></i>
+                                        <span class="font-medium text-sm">Logout</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="form-actions">
-                            <button type="reset" class="btn-reset" onclick="resetForm()">
-                                <i class="fas fa-redo"></i> Reset Form
+                        <div class="hamburger" id="hamburger">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+
+                </div>
+            </nav>
+
+            <div class="drawer-overlay" id="drawerOverlay"></div>
+            <div class="mobile-drawer" id="mobileDrawer">
+                <div class="p-6 pt-8">
+                    <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
+                        <div class="w-12 h-12 flex items-center justify-center overflow-visible">
+                            <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-14 h-14 object-contain">
+                        </div>
+                        <span class="text-2xl font-extrabold font-montserrat gradient-text">UMakFIT</span>
+                    </div>
+                    <nav class="space-y-2">
+                        <a href="secretary.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
+                            <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                        </a>
+                        <a href="import-professors.html" class="mobile-nav-link block text-white font-medium py-3 px-4 rounded-lg" style="background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%);">
+                            <i class="fas fa-chalkboard-teacher mr-3"></i>Professor Management
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- ── MAIN CONTENT ── -->
+        <div class="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen pt-32 pb-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <!-- Profile / Page Header -->
+                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-8 mb-10 fade-in">
+                    <h2 class="text-purple-900 font-bold text-3xl mb-5">Professor Management</h2>
+                    <div class="w-full h-0.5 bg-gradient-to-r from-transparent via-gray-200 to-transparent my-5"></div>
+                    <div class="bg-gray-50 rounded-xl border border-gray-100 p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                        <img class="w-16 h-16 rounded-full object-cover border-2 border-gray-200 flex-shrink-0"
+                             id="userPhoto" src="https://c.animaapp.com/tzMzyNnw/img/image-13@2x.png" alt="Profile">
+                        <div class="flex-1 flex flex-wrap gap-x-16 gap-y-5">
+                            <div class="min-w-[140px]">
+                                <div class="text-gray-500 font-medium text-xs uppercase tracking-wider mb-1">Name</div>
+                                <div class="text-purple-900 font-bold text-base" id="userName">Loading...</div>
+                            </div>
+                            <div class="min-w-[140px]">
+                                <div class="text-gray-500 font-medium text-xs uppercase tracking-wider mb-1">College</div>
+                                <div class="text-gray-700 font-medium text-base">College of Human Kinetics</div>
+                            </div>
+                            <div class="min-w-[200px]">
+                                <div class="text-gray-500 font-medium text-xs uppercase tracking-wider mb-1">Email</div>
+                                <div class="text-gray-700 font-medium text-base" id="userEmail">Loading...</div>
+                            </div>
+                            <div class="min-w-[120px]">
+                                <div class="text-gray-500 font-medium text-xs uppercase tracking-wider mb-1">Role</div>
+                                <div class="inline-flex items-center gap-1.5 text-purple-700 font-bold text-sm bg-purple-100 px-3 py-1 rounded-full">College Secretary</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── STAT CARDS ── -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+                    <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl text-white p-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-chalkboard-teacher text-base"></i>
+                            <span class="font-semibold text-sm">Total Professors</span>
+                        </div>
+                        <div class="font-extrabold text-3xl" id="statProfessors">0</div>
+                        <div class="mt-2 text-xs text-white/70">Registered faculty members</div>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl text-white p-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full translate-x-10 -translate-y-10"></div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-layer-group text-base"></i>
+                            <span class="font-semibold text-sm">Total Sections</span>
+                        </div>
+                        <div class="font-extrabold text-3xl" id="statSections">0</div>
+                        <div class="mt-2 text-xs text-white/70">Active class sections</div>
+                    </div>
+                </div>
+
+                <!-- ── ADD PROFESSOR FORM ── -->
+                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-8 mb-8 fade-in">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-user-plus text-purple-600 text-lg"></i>
+                        </div>
+                        <h3 class="text-gray-900 font-bold text-xl">Add New Professor</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-7 ml-13 pl-1">Add a new professor to the system. All starred fields are required.</p>
+
+                    <form id="professorForm" onsubmit="handleSubmit(event)" class="max-w-3xl">
+                        <!-- Row 1 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                                    Last Name <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="lastName" class="form-input" placeholder="Enter last name" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                                    First Name <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="firstName" class="form-input" placeholder="Enter first name" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Middle Initial</label>
+                                <input type="text" id="middleInitial" class="form-input" placeholder="e.g. M" maxlength="1">
+                            </div>
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                                    UMak Email <span class="text-red-500">*</span>
+                                </label>
+                                <input type="email" id="email" class="form-input"
+                                       placeholder="professor@umak.edu.ph"
+                                       required onblur="validateEmail(this)">
+                                <p class="mt-1.5 text-xs text-gray-400">Must be a valid UMak email (@umak.edu.ph)</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">College</label>
+                                <input type="text" id="college" class="form-input"
+                                       value="College of Human Kinetics" disabled>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-100">
+                            <button type="reset" onclick="resetForm()"
+                                    class="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors text-sm">
+                                <i class="fas fa-redo text-xs"></i> Reset Form
                             </button>
-                            <button type="submit" class="btn-submit" id="submitBtn">
-                                <i class="fas fa-plus"></i> Add Professor
+                            <button type="submit" id="submitBtn"
+                                    class="flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-white font-semibold transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm"
+                                    style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);">
+                                <i class="fas fa-plus text-sm"></i> Add Professor
                             </button>
                         </div>
                     </form>
                 </div>
-                
-                <!-- Sections List Section (Separate) -->
-                <div class="sections-list-section">
-                    <div class="section-header">
-                        <div class="section-title">
-                            <i class="fas fa-layer-group"></i> Class Sections
-                            <span class="badge bg-primary" id="sectionsCount">0</span>
+
+                <!-- ── CLASS SECTIONS ── -->
+                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-8 mb-8 fade-in">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-7">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-layer-group text-emerald-600 text-lg"></i>
+                            </div>
+                            <h3 class="text-gray-900 font-bold text-xl">
+                                Class Sections
+                                <span class="ml-2 bg-purple-100 text-purple-700 text-sm font-bold px-2.5 py-0.5 rounded-full" id="sectionsCount">0</span>
+                            </h3>
                         </div>
-                        <div class="filter-controls">
-                            <input type="text" 
-                                   class="filter-input" 
-                                   id="sectionSearchInput" 
-                                   placeholder="Search by section name or course code..."
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <input type="text" class="filter-input bg-gray-50 min-w-[220px]"
+                                   id="sectionSearchInput" placeholder="Search sections, courses..."
                                    oninput="filterSections()">
-                            <select class="filter-select" id="yearFilter" onchange="filterSections()">
+                            <select class="filter-input bg-gray-50 cursor-pointer" id="yearFilter" onchange="filterSections()">
                                 <option value="">All Years</option>
                                 <option value="1">1st Year</option>
                                 <option value="2">2nd Year</option>
@@ -1279,41 +583,39 @@
                             </select>
                         </div>
                     </div>
-                    
-                    <div id="sectionsList" class="sections-grid">
-                        <!-- Sections will be loaded here -->
-                    </div>
-                    
-                    <div id="noSectionsMessage" class="empty-state" style="display: none;">
-                        <div class="empty-icon">
-                            <i class="fas fa-folder-open"></i>
-                        </div>
-                        <div class="empty-title">No Sections Found</div>
-                        <div class="empty-text">
-                            Import student classlists to see sections here. Sections will appear after you import CSV files.
-                        </div>
+
+                    <div class="sections-grid" id="sectionsList"></div>
+
+                    <div id="noSectionsMessage" class="hidden py-16 text-center">
+                        <div class="text-6xl mb-4 opacity-30">📚</div>
+                        <div class="text-gray-700 font-semibold text-lg mb-1">No Sections Found</div>
+                        <div class="text-gray-400 text-sm">Import student classlists to see sections here.</div>
                     </div>
                 </div>
-                
-                <!-- Professors List -->
-                <div class="professors-section">
-                    <div class="professors-header">
-                        <div class="professors-title">
-                            <i class="fas fa-list"></i> Current Professors
-                            <span class="badge bg-primary" id="professorCount">0</span>
+
+                <!-- ── PROFESSORS TABLE ── -->
+                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-8 fade-in">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-list text-blue-600 text-lg"></i>
+                            </div>
+                            <h3 class="text-gray-900 font-bold text-xl">
+                                Current Professors
+                                <span class="ml-2 bg-purple-100 text-purple-700 text-sm font-bold px-2.5 py-0.5 rounded-full" id="professorCount">0</span>
+                            </h3>
                         </div>
-                        <div class="search-box">
-                            <input type="text" 
-                                   id="searchInput" 
-                                   class="search-input" 
+                        <div class="flex gap-3">
+                            <input type="text" id="searchInput" class="filter-input bg-gray-50 min-w-[220px]"
                                    placeholder="Search professors..."
                                    oninput="searchProfessors(this.value)">
-                            <button class="btn btn-outline-primary" onclick="refreshProfessors()">
+                            <button onclick="refreshProfessors()"
+                                    class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 font-semibold hover:bg-gray-100 transition-colors text-sm">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="professors-table-container">
                         <table class="professors-table" id="professorsTable">
                             <thead>
@@ -1326,49 +628,124 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="professorsTableBody">
-                                <!-- Professors will be loaded here -->
-                            </tbody>
+                            <tbody id="professorsTableBody"></tbody>
                         </table>
-                        
-                        <div id="emptyState" class="empty-state">
-                            <div class="empty-icon">
-                                <i class="fas fa-chalkboard-teacher"></i>
+
+                        <div id="emptyState" class="py-16 text-center">
+                            <div class="text-6xl mb-4 opacity-30">👨‍🏫</div>
+                            <div class="text-gray-700 font-semibold text-lg mb-1">No Professors Found</div>
+                            <div class="text-gray-400 text-sm">Add your first professor using the form above.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── FOOTER — identical to professor page ── -->
+        <footer class="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 sm:py-12">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
+                    <div>
+                        <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                            <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
+                            <div>
+                                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
+                                <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
                             </div>
-                            <div class="empty-title">No Professors Found</div>
-                            <div class="empty-text">
-                                Add your first professor using the form above. Professors will appear here once added.
+                        </div>
+                        <p class="text-sm lg:text-base leading-relaxed text-blue-100">
+                            UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati.
+                            Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
+                        </p>
+                        <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
+                            <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Fitness Tracking</span>
+                            <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Performance Assessment</span>
+                            <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Health & Wellness</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
+                        <div class="grid grid-cols-2 gap-4 lg:gap-6">
+                            <div class="space-y-3">
+                                <a href="secretary.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                                    <i class="bi bi-tachometer mr-2"></i>Dashboard
+                                </a>
+                                <a href="import-professors.html" class="block text-yellow-300 hover:text-yellow-200 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base font-semibold">
+                                    <i class="bi bi-person-badge mr-2"></i>Professors
+                                </a>
+                            </div>
+                            <div class="space-y-3">
+                                <a href="professor.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                                    <i class="bi bi-people mr-2"></i>Students
+                                </a>
+                                <a href="grades.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
+                                    <i class="bi bi-mortarboard mr-2"></i>Grades
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
+                        <div class="space-y-4 lg:space-y-5">
+                            <div class="flex items-start gap-3">
+                                <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
+                                <p class="text-sm lg:text-base text-blue-100">
+                                    College of Human Kinetics<br>
+                                    University of Makati<br>
+                                    3rd floor, Administration Building, University of Makati,
+                                    JP Rizal Ext., West Rembo, Taguig City
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
+                                <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">
+                                    chk@umak.edu.ph
+                                </a>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
+                                <span class="text-blue-100 text-sm lg:text-base">+63 933 189 7230</span>
+                            </div>
+                            <div class="flex items-center gap-4 pt-3 justify-center lg:justify-start">
+                                <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
+                                    <i class="bi bi-facebook text-white text-lg lg:text-xl"></i>
+                                </a>
+                                <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
+                                    <i class="bi bi-twitter text-white text-lg lg:text-xl"></i>
+                                </a>
+                                <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
+                                    <i class="bi bi-instagram text-white text-lg lg:text-xl"></i>
+                                </a>
+                                <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
+                                    <i class="bi bi-youtube text-white text-lg lg:text-xl"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <div class="container">
-                <div class="footer-title">Professor Management</div>
-                <div class="row g-4">
-                    <div class="col-12 col-md-4">
-                        <div class="footer-text">
-                            Add and manage professors in the UMakFit system. Assign sections and monitor their status.
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <div class="footer-text">
-                            Professors can be edited or deleted. Changes will reflect across all assigned sections.
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <div class="footer-text">
-                            All professor accounts are created automatically and can log in using their UMak email.
+
+                <div class="border-t border-blue-600/50 mt-8 lg:mt-12 pt-6 lg:pt-8">
+                    <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+                        <p class="text-xs lg:text-sm text-blue-200 text-center lg:text-left">
+                            © 2025 University of Makati - College of Human Kinetics. All Rights Reserved.
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-3 lg:gap-4">
+                            <a href="https://umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">University of Makati</a>
+                            <span class="text-blue-400">•</span>
+                            <a href="https://library.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">UMak Online Library</a>
+                            <span class="text-blue-400">•</span>
+                            <a href="https://tbl.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">TBL Hub</a>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
+        </footer>
+
+    </div><!-- end dashboardContent -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -1395,47 +772,101 @@
         let professorToDelete = null;
         let professorToEdit = null;
 
+        // ── NAV SETUP ──
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger        = document.getElementById('hamburger');
+            const mobileDrawer     = document.getElementById('mobileDrawer');
+            const drawerOverlay    = document.getElementById('drawerOverlay');
+            const mobileNavLinks   = document.querySelectorAll('.mobile-nav-link');
+            const profileBtn       = document.getElementById('profilePictureBtn');
+            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
+            const dropdown         = document.getElementById('profileDropdown');
+            const dropdownMobile   = document.getElementById('profileDropdownMobile');
+
+            hamburger?.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileDrawer.classList.toggle('active');
+                drawerOverlay.classList.toggle('active');
+                document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+            });
+            drawerOverlay?.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                mobileDrawer.classList.remove('active');
+                drawerOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+            mobileNavLinks.forEach(link => link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                mobileDrawer.classList.remove('active');
+                drawerOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }));
+
+            profileBtn?.addEventListener('click', e => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+                dropdownMobile.classList.add('hidden');
+            });
+            profileBtnMobile?.addEventListener('click', e => {
+                e.stopPropagation();
+                dropdownMobile.classList.toggle('hidden');
+                dropdown.classList.add('hidden');
+            });
+            document.addEventListener('click', e => {
+                if (!e.target.closest('#profilePictureBtn') && !e.target.closest('#profileDropdown'))
+                    dropdown?.classList.add('hidden');
+                if (!e.target.closest('#profilePictureBtnMobile') && !e.target.closest('#profileDropdownMobile'))
+                    dropdownMobile?.classList.add('hidden');
+            });
+        });
+
+        // ── AUTH ──
         onAuthStateChanged(auth, async (user) => {
-            const loadingScreen = document.getElementById('loadingScreen');
+            const loadingScreen   = document.getElementById('loadingScreen');
             const dashboardContent = document.getElementById('dashboardContent');
-            
+
             if (user) {
                 try {
-                    console.log('=== PROFESSOR MANAGEMENT AUTHENTICATION ===');
-                    console.log('User authenticated:', user.email);
-                    
-                    const usersQuery = query(
-                        collection(db, 'users'),
-                        where('email', '==', user.email)
-                    );
+                    const usersQuery    = query(collection(db, 'users'), where('email', '==', user.email));
                     const usersSnapshot = await getDocs(usersQuery);
-                    
-                    if (usersSnapshot.empty) {
-                        throw new Error('Access denied. Secretary account required.');
-                    }
-                    
+
+                    if (usersSnapshot.empty) throw new Error('Access denied. Secretary account required.');
+
                     const userData = usersSnapshot.docs[0].data();
                     if (userData.role !== 'secretary' && userData.role !== 'college_secretary') {
                         throw new Error('Access denied. Secretary account required.');
                     }
-                    
-                    currentSecretary = { 
-                        id: usersSnapshot.docs[0].id, 
-                        ...userData,
-                        name: userData.name || userData.email || 'Secretary'
-                    };
-                    
-                    document.getElementById('userName').textContent = currentSecretary.name;
-                    document.getElementById('userEmail').textContent = currentSecretary.email;
-                    
+
+                    const rawName = userData.name || userData.displayName || user.displayName || user.email || 'Secretary';
+                    const secretaryName = rawName.includes('@') 
+                        ? rawName.split('@')[0].replace(/\./g, ' ').replace(/[a-z0-9]+/gi, w => w.charAt(0).toUpperCase() + w.slice(1)).trim()
+                        : rawName;
+                    currentSecretary = { id: usersSnapshot.docs[0].id, ...userData, name: secretaryName };
+
+                    const displayName = currentSecretary.name;
+                    const email       = currentSecretary.email;
+                    const photoURL    = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=7c3aed&color=fff&size=128`;
+
+                    ['profilePictureBtn','profilePictureBtnMobile','profileDropdownPicture','profileDropdownPictureMobile','userPhoto'].forEach(id => {
+                        const el = document.getElementById(id); if (el) el.src = photoURL;
+                    });
+                    ['profileDropdownName','profileDropdownNameMobile'].forEach(id => {
+                        const el = document.getElementById(id); if (el) el.textContent = displayName;
+                    });
+                    ['profileDropdownEmail','profileDropdownEmailMobile'].forEach(id => {
+                        const el = document.getElementById(id); if (el) el.textContent = email;
+                    });
+                    document.getElementById('userName').textContent  = displayName;
+                    document.getElementById('userEmail').textContent  = email;
+
                     await loadSections();
                     await loadProfessors();
-                    
+
                     loadingScreen.style.display = 'none';
+                    dashboardContent.classList.remove('hidden');
                     dashboardContent.style.display = 'block';
-                    
+
                 } catch (error) {
-                    console.error('Authentication error:', error);
                     loadingScreen.style.display = 'none';
                     alert(error.message || 'Error loading professor management. Please try again.');
                     await signOut(auth);
@@ -1446,51 +877,40 @@
             }
         });
 
+        // ── LOAD SECTIONS ──
         async function loadSections() {
             try {
-                console.log('Loading sections...');
-                const sectionsQuery = query(
-                    collection(db, 'sections'),
-                    orderBy('name', 'asc')
-                );
+                const sectionsQuery    = query(collection(db, 'sections'), orderBy('name', 'asc'));
                 const sectionsSnapshot = await getDocs(sectionsQuery);
-                
                 allSections = [];
+
                 sectionsSnapshot.forEach(doc => {
-                    const sectionData = doc.data();
-                    const studentCount = sectionData.students ? sectionData.students.length : 0;
-                    
+                    const d = doc.data();
                     allSections.push({
                         id: doc.id,
-                        name: sectionData.name || 'N/A',
-                        courseCode: sectionData.courseCode || 'N/A',
-                        courseTitle: sectionData.courseTitle || '',
-                        professor: sectionData.professor || '',
-                        time: sectionData.time || '',
-                        day: sectionData.day || '',
-                        room: sectionData.room || '',
-                        yearLevel: sectionData.yearLevel || '',
-                        academicYear: sectionData.academicYear || '',
-                        studentCount: studentCount,
-                        students: sectionData.students || []
+                        name: d.name || 'N/A',
+                        courseCode: d.courseCode || 'N/A',
+                        courseTitle: d.courseTitle || '',
+                        professor: d.professor || '',
+                        time: d.time || '', day: d.day || '', room: d.room || '',
+                        yearLevel: d.yearLevel || '', academicYear: d.academicYear || '',
+                        studentCount: d.students ? d.students.length : 0,
+                        students: d.students || []
                     });
                 });
-                
-                console.log(`Loaded ${allSections.length} sections`);
+
                 document.getElementById('sectionsCount').textContent = allSections.length;
-                document.getElementById('statSections').textContent = allSections.length;
-                
+                document.getElementById('statSections').textContent  = allSections.length;
                 filteredSections = [...allSections];
                 displaySections(filteredSections);
-                
+
                 if (allSections.length === 0) {
-                    document.getElementById('noSectionsMessage').style.display = 'block';
+                    document.getElementById('noSectionsMessage').classList.remove('hidden');
                     document.getElementById('sectionsList').style.display = 'none';
                 } else {
-                    document.getElementById('noSectionsMessage').style.display = 'none';
+                    document.getElementById('noSectionsMessage').classList.add('hidden');
                     document.getElementById('sectionsList').style.display = 'grid';
                 }
-                
             } catch (error) {
                 console.error('Error loading sections:', error);
                 showToast('Error', 'Failed to load sections', 'error');
@@ -1498,677 +918,447 @@
         }
 
         function filterSections() {
-            const searchTerm = document.getElementById('sectionSearchInput').value.toLowerCase();
-            const yearFilter = document.getElementById('yearFilter').value;
-            
-            filteredSections = allSections.filter(section => {
-                const matchesSearch = searchTerm === '' || 
-                    (section.name && section.name.toLowerCase().includes(searchTerm)) ||
-                    (section.courseCode && section.courseCode.toLowerCase().includes(searchTerm));
-                
-                const matchesYear = yearFilter === '' || 
-                    (section.yearLevel && section.yearLevel.toString() === yearFilter);
-                
+            const searchTerm  = document.getElementById('sectionSearchInput').value.toLowerCase();
+            const yearFilter  = document.getElementById('yearFilter').value;
+
+            filteredSections = allSections.filter(s => {
+                const matchesSearch = !searchTerm ||
+                    (s.name && s.name.toLowerCase().includes(searchTerm)) ||
+                    (s.courseCode && s.courseCode.toLowerCase().includes(searchTerm));
+                const matchesYear = !yearFilter || (s.yearLevel && s.yearLevel.toString() === yearFilter);
                 return matchesSearch && matchesYear;
             });
-            
             displaySections(filteredSections);
         }
 
         function displaySections(sections) {
             const sectionsList = document.getElementById('sectionsList');
-            
+
             if (sections.length === 0) {
                 sectionsList.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
-                        <div class="empty-icon">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <div class="empty-title">No Matching Sections</div>
-                        <div class="empty-text">
-                            Try adjusting your filters to see more sections.
-                        </div>
-                    </div>
-                `;
+                    <div class="col-span-3 py-14 text-center">
+                        <div class="text-5xl mb-3 opacity-30">🔍</div>
+                        <div class="text-gray-700 font-semibold mb-1">No Matching Sections</div>
+                        <div class="text-gray-400 text-sm">Try adjusting your filters.</div>
+                    </div>`;
                 return;
             }
-            
+
             let html = '';
-            
             sections.forEach(section => {
-                const studentCount = section.studentCount || 0;
                 const hasProfessor = section.professor && section.professor.trim() !== '';
-                
+                const schedule = [section.time, section.day, section.room].filter(Boolean).join(' / ');
+
                 html += `
-                    <div class="section-item">
-                        <div class="section-item-header">
+                    <div class="section-item bg-gray-50 rounded-xl border border-gray-200 p-5">
+                        <div class="flex justify-between items-start mb-4">
                             <div>
-                                <div class="section-name">${section.name}</div>
-                                <div class="section-code">${section.courseCode}</div>
+                                <div class="text-purple-900 font-bold text-lg">${section.name}</div>
+                                <div class="inline-block mt-1 text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded font-medium">${section.courseCode}</div>
                             </div>
-                            <div class="badge-student-count">
-                                <i class="fas fa-user-graduate"></i>
-                                ${studentCount} ${studentCount === 1 ? 'Student' : 'Students'}
+                            <div class="student-badge flex-shrink-0">
+                                <i class="fas fa-user-graduate text-xs mr-1"></i>${section.studentCount} ${section.studentCount === 1 ? 'Student' : 'Students'}
                             </div>
                         </div>
-                        
-                        <div class="section-details">
-                            <div class="detail-row">
-                                <i class="fas fa-book"></i>
-                                <span>${section.courseTitle || 'No course title'}</span>
+                        <div class="space-y-2.5">
+                            ${section.courseTitle ? `
+                            <div class="flex items-start gap-2 text-gray-600 text-sm">
+                                <i class="fas fa-book mt-0.5 w-4 flex-shrink-0 text-purple-400"></i>
+                                <span>${section.courseTitle}</span>
+                            </div>` : ''}
+                            <div class="flex items-center gap-2 text-sm">
+                                <i class="fas fa-user-tie w-4 flex-shrink-0 text-purple-400"></i>
+                                ${hasProfessor
+                                    ? `<span class="professor-tag">${section.professor}</span>`
+                                    : `<span class="text-gray-400 italic text-xs">No professor assigned</span>`}
                             </div>
-                            
-                            <div class="detail-row">
-                                <i class="fas fa-user-tie"></i>
-                                ${hasProfessor ? 
-                                    `<span class="professor-name">${section.professor}</span>` : 
-                                    `<span class="no-professor">No professor assigned</span>`
-                                }
-                            </div>
-                            
-                            ${section.time || section.day || section.room ? `
-                                <div class="detail-row">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <span>${section.time || '--'} / ${section.day || '--'} / ${section.room || '--'}</span>
-                                </div>
-                            ` : ''}
-                            
+                            ${schedule ? `
+                            <div class="flex items-center gap-2 text-gray-600 text-sm">
+                                <i class="fas fa-calendar-alt w-4 flex-shrink-0 text-purple-400"></i>
+                                <span class="bg-gray-200 text-gray-600 text-xs px-2 py-0.5 rounded">${schedule}</span>
+                            </div>` : ''}
                             ${section.yearLevel ? `
-                                <div class="detail-row">
-                                    <i class="fas fa-graduation-cap"></i>
-                                    <span>Year ${section.yearLevel}</span>
-                                </div>
-                            ` : ''}
+                            <div class="flex items-center gap-2 text-gray-600 text-sm">
+                                <i class="fas fa-graduation-cap w-4 flex-shrink-0 text-purple-400"></i>
+                                <span>Year ${section.yearLevel}</span>
+                            </div>` : ''}
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
-            
             sectionsList.innerHTML = html;
         }
 
+        // ── LOAD PROFESSORS ──
         async function loadProfessors() {
-    try {
-        showLoading('Loading professors...');
-        
-        // 1. Load professors from professors collection
-        const professorsQuery = query(
-            collection(db, 'professors'),
-            orderBy('name', 'asc')
-        );
-        const professorsSnapshot = await getDocs(professorsQuery);
-        
-        allProfessors = [];
-        const professorMap = new Map(); // To track unique professors by name
-        
-        // Add professors from professors collection
-        professorsSnapshot.forEach(doc => {
-            const professorData = doc.data();
-            const professorKey = professorData.name ? professorData.name.trim().toLowerCase() : '';
-            const professorEmail = professorData.email ? professorData.email.trim().toLowerCase() : '';
-            
-            if (professorKey) {
-                professorMap.set(professorKey, {
-                    id: doc.id,
-                    ...professorData,
-                    source: 'professors_collection'
-                });
-            } else if (professorEmail) {
-                professorMap.set(professorEmail, {
-                    id: doc.id,
-                    ...professorData,
-                    source: 'professors_collection'
-                });
-            }
-        });
-        
-        // 2. Also load professors from sections collection
-        const sectionsQuery = query(
-            collection(db, 'sections')
-        );
-        const sectionsSnapshot = await getDocs(sectionsQuery);
-        
-        sectionsSnapshot.forEach(doc => {
-            const sectionData = doc.data();
-            const professorName = sectionData.professor;
-            
-            if (professorName && professorName.trim()) {
-                const professorKey = professorName.trim().toLowerCase();
-                
-                // If professor not already in map (not in professors collection), add them
-                if (!professorMap.has(professorKey)) {
-                    // Extract email from professor name (assume format: LASTNAME, FIRSTNAME)
-                    const nameParts = professorName.split(',');
-                    const lastName = nameParts[0]?.trim() || '';
-                    const firstName = nameParts[1]?.trim().split(' ')[0] || '';
-                    
-                    // Generate email (first letter of first name + last name)
-                    let email = '';
-                    if (firstName && lastName) {
-                        const emailPrefix = firstName.charAt(0).toLowerCase() + lastName.toLowerCase().replace(/\s+/g, '');
-                        email = `${emailPrefix}@umak.edu.ph`;
-                    }
-                    
-                    professorMap.set(professorKey, {
-                        id: `section_prof_${professorKey.replace(/[^a-zA-Z0-9]/g, '_')}`,
-                        name: professorName.trim(),
-                        email: email,
-                        source: 'sections_collection',
-                        isFromSection: true,
-                        // Get all sections for this professor
-                        sectionsFromSections: [{
-                            name: sectionData.name,
-                            courseCode: sectionData.courseCode
-                        }]
-                    });
-                } else {
-                    // Professor already exists, add section info
-                    const existingProfessor = professorMap.get(professorKey);
-                    if (!existingProfessor.sectionsFromSections) {
-                        existingProfessor.sectionsFromSections = [];
-                    }
-                    existingProfessor.sectionsFromSections.push({
-                        name: sectionData.name,
-                        courseCode: sectionData.courseCode
-                    });
-                }
-            }
-        });
-        
-        // Convert map to array
-        allProfessors = Array.from(professorMap.values());
-        
-        // Sort by name
-        allProfessors.sort((a, b) => {
-            const nameA = a.name || '';
-            const nameB = b.name || '';
-            return nameA.localeCompare(nameB);
-        });
-        document.getElementById('statProfessors').textContent = allProfessors.length;
+            try {
+                showLoading('Loading professors...');
+                const professorsQuery    = query(collection(db, 'professors'), orderBy('name', 'asc'));
+                const professorsSnapshot = await getDocs(professorsQuery);
 
-        updateProfessorsTable(allProfessors);
-        hideLoading();
-        
-    } catch (error) {
-        console.error('Error loading professors:', error);
-        hideLoading();
-        showToast('Error', 'Failed to load professors list', 'error');
-    }
-}
+                allProfessors = [];
+                const professorMap = new Map();
 
-function updateProfessorsTable(professors) {
-    const tableBody = document.getElementById('professorsTableBody');
-    const emptyState = document.getElementById('emptyState');
-    const professorCount = document.getElementById('professorCount');
-    
-    professorCount.textContent = professors.length;
-    
-    if (professors.length === 0) {
-        tableBody.innerHTML = '';
-        emptyState.style.display = 'block';
-        return;
-    }
-    
-    emptyState.style.display = 'none';
-    
-    let html = '';
-    professors.forEach(professor => {
-        const nameParts = professor.name ? professor.name.split(',') : ['', ''];
-        const lastName = nameParts[0]?.trim() || '';
-        const firstName = nameParts[1]?.trim() || professor.name || '';
-        const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
-        
-        // Get professor's sections from both sources
-        let professorSections = [];
-        
-        // 1. Sections where professor is assigned (from sections collection)
-        const sectionsFromSections = allSections.filter(section => 
-            section.professor && section.professor.trim() === professor.name
-        );
-        
-        // 2. Sections stored in professor object (from sections collection import)
-        if (professor.sectionsFromSections) {
-            professor.sectionsFromSections.forEach(sectionInfo => {
-                professorSections.push({
-                    name: sectionInfo.name,
-                    courseCode: sectionInfo.courseCode
+                professorsSnapshot.forEach(doc => {
+                    const d = doc.data();
+                    const key = d.name ? d.name.trim().toLowerCase() : (d.email ? d.email.trim().toLowerCase() : '');
+                    if (key) professorMap.set(key, { id: doc.id, ...d, source: 'professors_collection' });
                 });
-            });
-        }
-        
-        // 3. Add sections from filtered list
-        sectionsFromSections.forEach(section => {
-            if (!professorSections.some(s => s.name === section.name)) {
-                professorSections.push({
-                    name: section.name,
-                    courseCode: section.courseCode
-                });
-            }
-        });
-        
-        // Determine status
-        const status = professor.status || 
-                      (professor.isFromSection ? 'active' : 
-                      professor.isActive === false ? 'inactive' : 'active');
-        
-        // Source badge
-        const sourceBadge = professor.source === 'sections_collection' ? 
-            '<span class="badge bg-warning text-dark ms-1" title="Imported from sections">Imported</span>' : 
-            '<span class="badge bg-info text-dark ms-1" title="Added via form">Manual</span>';
-        
-        html += `
-            <tr>
-                <td>
-                    <div class="professor-info">
-                        <div class="professor-avatar">${initials}</div>
-                        <div class="professor-details">
-                            <div class="professor-name">
-                                ${professor.name || 'N/A'}
-                                ${sourceBadge}
-                            </div>
-                            <div class="professor-email">${professor.email || 'No email'}</div>
-                        </div>
-                    </div>
-                </td>
-                <td>${professor.email || 'No email'}</td>
-                <td>${professor.college || 'College of Human Kinetics'}</td>
-                <td>
-                    ${professorSections.length > 0 ? 
-                      professorSections.map(s => `
-                        <div class="mb-1">
-                            <span class="badge bg-light text-dark">${s.name}</span>
-                            <small class="text-muted ms-1">${s.courseCode || ''}</small>
-                        </div>
-                      `).join('') : 
-                      'No sections assigned'}
-                </td>
-                <td>
-                    <span class="status-badge ${status === 'inactive' ? 'status-inactive' : 'status-active'}">
-                        <i class="fas fa-circle" style="font-size: 8px;"></i>
-                        ${status === 'inactive' ? 'Inactive' : 'Active'}
-                    </span>
-                </td>
-                <td>
-                    <div class="action-buttons">
-                        ${professor.source === 'sections_collection' ? 
-                          `<button class="btn-action btn-edit" onclick="convertImportedProfessor('${professor.id}', '${professor.name.replace(/'/g, "\\'")}')">
-                            <i class="fas fa-user-plus"></i> Convert
-                          </button>` : 
-                          `<button class="btn-action btn-edit" onclick="editProfessor('${professor.id}')">
-                            <i class="fas fa-edit"></i> Edit
-                          </button>`
+
+                const sectionsSnapshot = await getDocs(collection(db, 'sections'));
+                sectionsSnapshot.forEach(doc => {
+                    const d = doc.data();
+                    const pName = d.professor;
+                    if (pName && pName.trim()) {
+                        const key = pName.trim().toLowerCase();
+                        if (!professorMap.has(key)) {
+                            const nameParts = pName.split(',');
+                            const lastName  = nameParts[0]?.trim() || '';
+                            const firstName = nameParts[1]?.trim().split(' ')[0] || '';
+                            let email = '';
+                            if (firstName && lastName) {
+                                email = `${firstName.charAt(0).toLowerCase()}${lastName.toLowerCase().replace(/\s+/g,'')}@umak.edu.ph`;
+                            }
+                            professorMap.set(key, {
+                                id: `section_prof_${key.replace(/[^a-zA-Z0-9]/g,'_')}`,
+                                name: pName.trim(), email, source: 'sections_collection', isFromSection: true,
+                                sectionsFromSections: [{ name: d.name, courseCode: d.courseCode }]
+                            });
+                        } else {
+                            const ep = professorMap.get(key);
+                            if (!ep.sectionsFromSections) ep.sectionsFromSections = [];
+                            ep.sectionsFromSections.push({ name: d.name, courseCode: d.courseCode });
                         }
-                        <button class="btn-action btn-delete" onclick="showDeleteModal('${professor.id}', '${professor.name.replace(/'/g, "\\'")}')">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
-    
-    tableBody.innerHTML = html;
-}
+                    }
+                });
+
+                allProfessors = Array.from(professorMap.values())
+                    .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+                document.getElementById('statProfessors').textContent = allProfessors.length;
+                updateProfessorsTable(allProfessors);
+                hideLoading();
+
+            } catch (error) {
+                console.error('Error loading professors:', error);
+                hideLoading();
+                showToast('Error', 'Failed to load professors list', 'error');
+            }
+        }
+
+        function updateProfessorsTable(professors) {
+            const tableBody      = document.getElementById('professorsTableBody');
+            const emptyState     = document.getElementById('emptyState');
+            const professorCount = document.getElementById('professorCount');
+
+            professorCount.textContent = professors.length;
+
+            if (professors.length === 0) {
+                tableBody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            emptyState.style.display = 'none';
+
+            let html = '';
+            professors.forEach(professor => {
+                const nameParts  = professor.name ? professor.name.split(',') : ['',''];
+                const lastName   = nameParts[0]?.trim() || '';
+                const firstName  = nameParts[1]?.trim() || professor.name || '';
+                const initials   = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+
+                let professorSections = [];
+                const fromSections = allSections.filter(s => s.professor && s.professor.trim() === professor.name);
+                if (professor.sectionsFromSections) {
+                    professor.sectionsFromSections.forEach(si => professorSections.push({ name: si.name, courseCode: si.courseCode }));
+                }
+                fromSections.forEach(s => {
+                    if (!professorSections.some(ps => ps.name === s.name))
+                        professorSections.push({ name: s.name, courseCode: s.courseCode });
+                });
+
+                const status = professor.status || (professor.isFromSection ? 'active' : professor.isActive === false ? 'inactive' : 'active');
+
+                const sourceBadge = professor.source === 'sections_collection'
+                    ? `<span class="inline-block text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full ml-1">Imported</span>`
+                    : `<span class="inline-block text-xs bg-blue-100 text-blue-700 font-semibold px-2 py-0.5 rounded-full ml-1">Manual</span>`;
+
+                html += `
+                    <tr>
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div class="professor-avatar">${initials}</div>
+                                <div>
+                                    <div class="font-semibold text-gray-800 text-sm">
+                                        ${professor.name || 'N/A'} ${sourceBadge}
+                                    </div>
+                                    <div class="text-xs text-gray-400 mt-0.5">${professor.email || 'No email'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-sm">${professor.email || 'No email'}</td>
+                        <td class="text-sm">${professor.college || 'College of Human Kinetics'}</td>
+                        <td>
+                            ${professorSections.length > 0
+                                ? professorSections.map(s => `
+                                    <div class="mb-1 flex items-center gap-1.5">
+                                        <span class="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-2 py-0.5 rounded">${s.name}</span>
+                                        <span class="text-xs text-gray-400">${s.courseCode || ''}</span>
+                                    </div>`).join('')
+                                : '<span class="text-gray-400 text-xs italic">No sections assigned</span>'}
+                        </td>
+                        <td>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${status === 'inactive' ? 'status-inactive' : 'status-active'}">
+                                <span class="w-1.5 h-1.5 rounded-full ${status === 'inactive' ? 'bg-red-500' : 'bg-green-500'}"></span>
+                                ${status === 'inactive' ? 'Inactive' : 'Active'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="flex gap-2 flex-wrap">
+                                ${professor.source === 'sections_collection'
+                                    ? `<button class="btn-action btn-convert" onclick="convertImportedProfessor('${professor.id}', '${professor.name.replace(/'/g,"\\'")}')">
+                                           <i class="fas fa-user-plus"></i> Convert
+                                       </button>`
+                                    : `<button class="btn-action btn-edit" onclick="editProfessor('${professor.id}')">
+                                           <i class="fas fa-edit"></i> Edit
+                                       </button>`}
+                                <button class="btn-action btn-delete" onclick="showDeleteModal('${professor.id}', '${professor.name.replace(/'/g,"\\'")}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+            tableBody.innerHTML = html;
+        }
+
         function editProfessor(professorId) {
             const professor = allProfessors.find(p => p.id === professorId);
             if (!professor) return;
-            
             professorToEdit = professor;
-            
-            const nameParts = professor.name ? professor.name.split(',') : ['', ''];
-            const lastName = nameParts[0]?.trim() || '';
-            const firstNameMiddle = nameParts[1]?.trim() || '';
-            const firstNameParts = firstNameMiddle.split(' ');
-            const firstName = firstNameParts[0] || '';
-            const middleInitial = firstNameParts.length > 1 ? firstNameParts[1] : '';
-            
-            document.getElementById('editLastName').value = lastName;
-            document.getElementById('editFirstName').value = firstName;
+
+            const nameParts        = professor.name ? professor.name.split(',') : ['',''];
+            const lastName         = nameParts[0]?.trim() || '';
+            const firstNameMiddle  = nameParts[1]?.trim() || '';
+            const firstNameParts   = firstNameMiddle.split(' ');
+            const firstName        = firstNameParts[0] || '';
+            const middleInitial    = firstNameParts.length > 1 ? firstNameParts[1] : '';
+
+            document.getElementById('editLastName').value      = lastName;
+            document.getElementById('editFirstName').value     = firstName;
             document.getElementById('editMiddleInitial').value = middleInitial;
-            document.getElementById('editEmail').value = professor.email || '';
-            
+            document.getElementById('editEmail').value         = professor.email || '';
+
             const statusRadio = document.querySelector(`input[name="editStatus"][value="${professor.status || 'active'}"]`);
             if (statusRadio) statusRadio.checked = true;
-            
-            document.getElementById('editModal').style.display = 'flex';
+
+            document.getElementById('editModal').classList.add('open');
         }
 
         async function saveProfessorEdit() {
             if (!professorToEdit) return;
-            
-            const lastName = document.getElementById('editLastName').value.trim();
-            const firstName = document.getElementById('editFirstName').value.trim();
-            const middleInitial = document.getElementById('editMiddleInitial').value.trim();
-            const email = document.getElementById('editEmail').value.trim().toLowerCase();
-            const status = document.querySelector('input[name="editStatus"]:checked').value;
-            
-            if (!lastName || !firstName) {
-                showToast('Error', 'Please fill in all required fields', 'error');
-                return;
-            }
-            
-            if (!email.endsWith('@umak.edu.ph')) {
-                showToast('Error', 'Please enter a valid UMak email address', 'error');
-                return;
-            }
-            
+            const lastName     = document.getElementById('editLastName').value.trim();
+            const firstName    = document.getElementById('editFirstName').value.trim();
+            const middleInitial= document.getElementById('editMiddleInitial').value.trim();
+            const email        = document.getElementById('editEmail').value.trim().toLowerCase();
+            const status       = document.querySelector('input[name="editStatus"]:checked').value;
+
+            if (!lastName || !firstName) { showToast('Error','Please fill in all required fields','error'); return; }
+            if (!email.endsWith('@umak.edu.ph')) { showToast('Error','Please enter a valid UMak email address','error'); return; }
+
             const fullName = `${lastName}, ${firstName} ${middleInitial}`.trim();
-            
+
             try {
                 showLoading('Updating professor...');
-                
                 const professorRef = doc(db, 'professors', professorToEdit.id);
-                await updateDoc(professorRef, {
-                    name: fullName,
-                    email: email,
-                    lastName: lastName,
-                    firstName: firstName,
-                    middleInitial: middleInitial,
-                    status: status,
-                    updatedAt: serverTimestamp()
-                });
-                
-                const sectionsWithOldProfessor = allSections.filter(section => 
-                    section.professor && section.professor.trim() === professorToEdit.name
-                );
-                
+                await updateDoc(professorRef, { name: fullName, email, lastName, firstName, middleInitial, status, updatedAt: serverTimestamp() });
+
+                const sectionsWithOldProfessor = allSections.filter(s => s.professor && s.professor.trim() === professorToEdit.name);
                 for (const section of sectionsWithOldProfessor) {
-                    const sectionRef = doc(db, 'sections', section.id);
-                    await updateDoc(sectionRef, {
-                        professor: fullName,
-                        lastUpdated: serverTimestamp()
-                    });
+                    await updateDoc(doc(db, 'sections', section.id), { professor: fullName, lastUpdated: serverTimestamp() });
                 }
-                
-                const userEmailKey = email.replace(/\./g, '_');
-                const userRef = doc(db, 'users', userEmailKey);
-                await setDoc(userRef, {
-                    uid: professorToEdit.id,
-                    email: email,
-                    role: 'professor',
-                    name: fullName,
-                    status: status,
-                    updatedAt: serverTimestamp()
+                await setDoc(doc(db, 'users', email.replace(/\./g,'_')), {
+                    uid: professorToEdit.id, email, role: 'professor', name: fullName, status, updatedAt: serverTimestamp()
                 }, { merge: true });
-                
+
                 hideLoading();
                 closeEditModal();
-                showToast('Success', 'Professor updated successfully', 'success');
-                
+                showToast('Success','Professor updated successfully','success');
                 await loadSections();
                 await loadProfessors();
-                
             } catch (error) {
                 console.error('Error updating professor:', error);
                 hideLoading();
-                showToast('Error', 'Failed to update professor: ' + error.message, 'error');
+                showToast('Error','Failed to update professor: ' + error.message,'error');
             }
         }
 
         function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
+            document.getElementById('editModal').classList.remove('open');
             professorToEdit = null;
         }
 
         function searchProfessors(searchTerm) {
             const term = searchTerm.toLowerCase().trim();
-            
-            if (!term) {
-                updateProfessorsTable(allProfessors);
-                return;
-            }
-            
-            const filteredProfessors = allProfessors.filter(professor => {
-                return (
-                    (professor.name && professor.name.toLowerCase().includes(term)) ||
-                    (professor.email && professor.email.toLowerCase().includes(term))
-                );
-            });
-            
-            updateProfessorsTable(filteredProfessors);
+            if (!term) { updateProfessorsTable(allProfessors); return; }
+            const filtered = allProfessors.filter(p =>
+                (p.name && p.name.toLowerCase().includes(term)) ||
+                (p.email && p.email.toLowerCase().includes(term))
+            );
+            updateProfessorsTable(filtered);
         }
 
         function refreshProfessors() {
             loadProfessors();
-            showToast('Refreshing', 'Refreshing professors list...', 'info');
+            showToast('Refreshing','Refreshing professors list...','info');
         }
 
         function validateEmail(input) {
-            const email = input.value.trim();
+            const email     = input.value.trim();
             const submitBtn = document.getElementById('submitBtn');
-            
             if (!email.endsWith('@umak.edu.ph')) {
-                input.style.borderColor = '#ef4444';
-                input.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
-                submitBtn.disabled = true;
-                return false;
+                input.classList.add('error'); input.classList.remove('success');
+                submitBtn.disabled = true; return false;
             } else {
-                input.style.borderColor = '#10b981';
-                input.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
-                submitBtn.disabled = false;
-                return true;
+                input.classList.add('success'); input.classList.remove('error');
+                submitBtn.disabled = false; return true;
             }
         }
 
         async function handleSubmit(event) {
             event.preventDefault();
-            
-            const lastName = document.getElementById('lastName').value.trim();
-            const firstName = document.getElementById('firstName').value.trim();
+            const lastName      = document.getElementById('lastName').value.trim();
+            const firstName     = document.getElementById('firstName').value.trim();
             const middleInitial = document.getElementById('middleInitial').value.trim();
-            const email = document.getElementById('email').value.trim().toLowerCase();
-            
-            if (!lastName || !firstName) {
-                showToast('Error', 'Please fill in all required fields', 'error');
-                return;
-            }
-            
-            if (!email.endsWith('@umak.edu.ph')) {
-                showToast('Error', 'Please enter a valid UMak email address', 'error');
-                return;
-            }
-            
+            const email         = document.getElementById('email').value.trim().toLowerCase();
+
+            if (!lastName || !firstName) { showToast('Error','Please fill in all required fields','error'); return; }
+            if (!email.endsWith('@umak.edu.ph')) { showToast('Error','Please enter a valid UMak email address','error'); return; }
+
             const fullName = `${lastName}, ${firstName} ${middleInitial}`.trim();
-            
-            const existingProfessorQuery = query(
-                collection(db, 'professors'),
-                where('email', '==', email.toLowerCase())
-            );
-            const existingProfessorSnap = await getDocs(existingProfessorQuery);
-            
-            if (!existingProfessorSnap.empty) {
-                showToast('Error', 'A professor with this email already exists', 'error');
-                return;
-            }
-            
+            const existingSnap = await getDocs(query(collection(db, 'professors'), where('email', '==', email)));
+            if (!existingSnap.empty) { showToast('Error','A professor with this email already exists','error'); return; }
+
             const professorData = {
-                name: fullName,
-                email: email,
-                lastName: lastName,
-                firstName: firstName,
-                middleInitial: middleInitial || '',
-                college: 'College of Human Kinetics',
-                status: 'active',
-                role: 'professor',
-                createdBy: currentSecretary.id,
-                createdByName: currentSecretary.name || 'System',
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp(),
-                isActive: true
+                name: fullName, email, lastName, firstName, middleInitial: middleInitial || '',
+                college: 'College of Human Kinetics', status: 'active', role: 'professor',
+                createdBy: currentSecretary.id, createdByName: currentSecretary.name || 'System',
+                createdAt: serverTimestamp(), updatedAt: serverTimestamp(), isActive: true
             };
-            
+
             try {
                 showLoading('Adding professor...');
-                
-                const professorId = email.toLowerCase().replace(/\./g, '_');
-                
-                const professorRef = doc(db, 'professors', professorId);
-                await setDoc(professorRef, professorData);
-                
-                const userRef = doc(db, 'users', professorId);
-                await setDoc(userRef, {
-                    uid: professorId,
-                    email: email,
-                    role: 'professor',
-                    name: fullName,
-                    college: 'College of Human Kinetics',
-                    status: 'active',
-                    createdAt: serverTimestamp()
+                const professorId  = email.replace(/\./g,'_');
+                await setDoc(doc(db, 'professors', professorId), professorData);
+                await setDoc(doc(db, 'users', professorId), {
+                    uid: professorId, email, role: 'professor', name: fullName,
+                    college: 'College of Human Kinetics', status: 'active', createdAt: serverTimestamp()
                 }, { merge: true });
-                
                 hideLoading();
-                showToast('Success', `Professor ${fullName} added successfully`, 'success');
-                
+                showToast('Success',`Professor ${fullName} added successfully`,'success');
                 resetForm();
                 await loadProfessors();
-                
             } catch (error) {
                 console.error('Error adding professor:', error);
                 hideLoading();
-                showToast('Error', 'Failed to add professor: ' + error.message, 'error');
+                showToast('Error','Failed to add professor: ' + error.message,'error');
             }
         }
 
         function resetForm() {
             document.getElementById('professorForm').reset();
             document.getElementById('submitBtn').disabled = false;
-            
-            const inputs = document.querySelectorAll('.form-control');
-            inputs.forEach(input => {
-                input.style.borderColor = '#d1d5db';
-                input.style.boxShadow = 'none';
+            document.querySelectorAll('.form-input').forEach(el => {
+                el.classList.remove('error','success');
             });
         }
 
         function showDeleteModal(professorId, professorName) {
             professorToDelete = professorId;
             document.getElementById('professorToDeleteName').textContent = professorName;
-            document.getElementById('deleteModal').style.display = 'flex';
+            document.getElementById('deleteModal').classList.add('open');
         }
 
         function closeModal() {
-            document.getElementById('deleteModal').style.display = 'none';
+            document.getElementById('deleteModal').classList.remove('open');
             professorToDelete = null;
         }
 
         async function confirmDelete() {
             if (!professorToDelete) return;
-            
             try {
                 showLoading('Deleting professor...');
-                
-                const professorRef = doc(db, 'professors', professorToDelete);
-                const professorSnap = await getDoc(professorRef);
-                
-                if (!professorSnap.exists()) {
-                    throw new Error('Professor not found');
+                const professorSnap = await getDoc(doc(db, 'professors', professorToDelete));
+                if (!professorSnap.exists()) throw new Error('Professor not found');
+
+                const pData       = professorSnap.data();
+                const pEmail      = pData.email;
+                const pName       = pData.name;
+                const withProf    = allSections.filter(s => s.professor && s.professor.trim() === pName);
+                for (const section of withProf) {
+                    await updateDoc(doc(db, 'sections', section.id), { professor: '', lastUpdated: serverTimestamp() });
                 }
-                
-                const professorData = professorSnap.data();
-                const professorEmail = professorData.email;
-                const professorName = professorData.name;
-                
-                const sectionsWithProfessor = allSections.filter(section => 
-                    section.professor && section.professor.trim() === professorName
-                );
-                
-                for (const section of sectionsWithProfessor) {
-                    const sectionRef = doc(db, 'sections', section.id);
-                    await updateDoc(sectionRef, {
-                        professor: '',
-                        lastUpdated: serverTimestamp()
-                    });
-                }
-                
-                await deleteDoc(professorRef);
-                
-                if (professorEmail) {
-                    const userRef = doc(db, 'users', professorEmail.replace(/\./g, '_'));
-                    await deleteDoc(userRef).catch(() => {});
-                }
-                
+                await deleteDoc(doc(db, 'professors', professorToDelete));
+                if (pEmail) await deleteDoc(doc(db, 'users', pEmail.replace(/\./g,'_'))).catch(() => {});
+
                 hideLoading();
                 closeModal();
-                showToast('Success', 'Professor removed successfully', 'success');
-                
+                showToast('Success','Professor removed successfully','success');
                 await loadSections();
                 await loadProfessors();
-                
             } catch (error) {
                 console.error('Error deleting professor:', error);
-                hideLoading();
-                closeModal();
-                showToast('Error', 'Failed to delete professor', 'error');
+                hideLoading(); closeModal();
+                showToast('Error','Failed to delete professor','error');
             }
         }
 
-        async function handleLogout() {
+        async function handleLogout(event) {
+            if (event) event.preventDefault();
+            document.getElementById('profileDropdown')?.classList.add('hidden');
+            document.getElementById('profileDropdownMobile')?.classList.add('hidden');
             if (confirm('Are you sure you want to logout?')) {
-                try {
-                    await signOut(auth);
-                    window.location.href = '/login/index.html';
-                } catch (error) {
-                    console.error('Error logging out:', error);
-                    showToast('Logout Failed', 'Error logging out. Please try again.', 'error');
-                }
+                try { await signOut(auth); } catch(e) {}
+                window.location.href = '/login/index.html';
             }
-        }
-
-        function showToast(title, message, type = 'info') {
-            const toastContainer = document.getElementById('toastContainer');
-            const toastId = 'toast-' + Date.now();
-            
-            const iconMap = {
-                'success': 'check-circle',
-                'error': 'exclamation-circle',
-                'info': 'info-circle',
-                'warning': 'exclamation-triangle'
-            };
-            
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.id = toastId;
-            toast.innerHTML = `
-                <div class="toast-header">
-                    <i class="fas fa-${iconMap[type] || 'info-circle'}"></i>
-                    <div class="toast-title">${title}</div>
-                </div>
-                <div class="toast-message">${message}</div>
-            `;
-            
-            toastContainer.appendChild(toast);
-            
-            setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 300);
-            }, 5000);
         }
 
         function showLoading(message = 'Processing...') {
-            const loadingScreen = document.getElementById('loadingScreen');
-            const loadingText = loadingScreen.querySelector('.loading-text');
-            loadingText.textContent = message;
-            loadingScreen.style.display = 'flex';
+            const ls = document.getElementById('loadingScreen');
+            ls.querySelector('.mt-5').textContent = message;
+            ls.style.display = 'flex';
+        }
+        function hideLoading() { document.getElementById('loadingScreen').style.display = 'none'; }
+
+        function showToast(title, message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const iconMap   = { success:'check-circle', error:'exclamation-circle', info:'info-circle', warning:'exclamation-triangle' };
+            const toast     = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-${iconMap[type]||'info-circle'} text-sm" style="color:${type==='success'?'#10b981':type==='error'?'#ef4444':type==='warning'?'#f59e0b':'#3b82f6'}"></i>
+                    <span class="font-bold text-gray-800 text-sm">${title}</span>
+                </div>
+                <div class="text-gray-500 text-xs leading-relaxed">${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 5000);
         }
 
-        function hideLoading() {
-            document.getElementById('loadingScreen').style.display = 'none';
-        }
-
-        window.handleLogout = handleLogout;
-        window.handleSubmit = handleSubmit;
-        window.resetForm = resetForm;
-        window.validateEmail = validateEmail;
-        window.searchProfessors = searchProfessors;
-        window.refreshProfessors = refreshProfessors;
-        window.editProfessor = editProfessor;
-        window.saveProfessorEdit = saveProfessorEdit;
-        window.closeEditModal = closeEditModal;
-        window.showDeleteModal = showDeleteModal;
-        window.closeModal = closeModal;
-        window.confirmDelete = confirmDelete;
-        window.filterSections = filterSections;
+        // Expose globals
+        window.handleLogout          = handleLogout;
+        window.handleSubmit          = handleSubmit;
+        window.resetForm             = resetForm;
+        window.validateEmail         = validateEmail;
+        window.searchProfessors      = searchProfessors;
+        window.refreshProfessors     = refreshProfessors;
+        window.editProfessor         = editProfessor;
+        window.saveProfessorEdit     = saveProfessorEdit;
+        window.closeEditModal        = closeEditModal;
+        window.showDeleteModal       = showDeleteModal;
+        window.closeModal            = closeModal;
+        window.confirmDelete         = confirmDelete;
+        window.filterSections        = filterSections;
     </script>
 </body>
 </html>

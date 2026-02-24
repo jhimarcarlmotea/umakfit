@@ -1982,39 +1982,86 @@ function renderScheduleTable(tests, enabledTestsMap) {
         
         window.assignedSections = [];
         
-        // STEP 2: Find all sections where this professor is assigned
+         // STEP 2: Find all sections where this professor is assigned
         console.log('Step 2: Checking sections collection...');
-        const sectionsQuery = query(collection(db, 'sections'));
-        const sectionsSnapshot = await getDocs(sectionsQuery);
+        const sectionsSnapshot = await getDocs(collection(db, 'sections'));
         
         console.log('Total sections in database:', sectionsSnapshot.size);
         
+        // Build a list of all possible name variants to match against
+        const profNameLower = (professorName || '').toLowerCase().trim();
+        const profEmailLower = (userEmail || '').toLowerCase().trim();
+        
+        // Also collect all name aliases stored in the professors collection
+        const allProfNameVariants = new Set();
+        if (profNameLower) allProfNameVariants.add(profNameLower);
+        
+        // Fetch all records from professors collection for this email to get every possible name stored
+        const profAliasQuery = query(collection(db, 'professors'), where('email', '==', userEmail));
+        const profAliasSnap = await getDocs(profAliasQuery);
+        profAliasSnap.forEach(d => {
+            const n = (d.data().name || '').toLowerCase().trim();
+            if (n) allProfNameVariants.add(n);
+        });
+
+        // Also check users collection
+        const userAliasQuery = query(collection(db, 'users'), where('email', '==', userEmail));
+        const userAliasSnap = await getDocs(userAliasQuery);
+        userAliasSnap.forEach(d => {
+            const n = (d.data().name || '').toLowerCase().trim();
+            if (n) allProfNameVariants.add(n);
+        });
+
+        console.log('Professor name variants:', Array.from(allProfNameVariants));
+
         // Use a Set to track unique section names
         const seenSections = new Set();
-        
+
         for (const docSnap of sectionsSnapshot.docs) {
             const sectionData = docSnap.data();
-            
-            // Check if this professor teaches this section (match by name or email)
-            const isProfessorAssigned = 
-                sectionData.professor === professorName ||
-                sectionData.professorEmail === userEmail ||
-                (sectionData.professor && professorName && 
-                 sectionData.professor.toLowerCase() === professorName.toLowerCase());
-            
+            const sectionProfRaw = (sectionData.professor || '').trim();
+            const sectionProfLower = sectionProfRaw.toLowerCase();
+            const sectionProfEmailLower = (sectionData.professorEmail || '').toLowerCase().trim();
+
+            // Match by email (most reliable)
+            let isProfessorAssigned = sectionProfEmailLower === profEmailLower;
+
+            // Match by name variants
+            if (!isProfessorAssigned && sectionProfLower) {
+                for (const variant of allProfNameVariants) {
+                    if (!variant) continue;
+                    if (
+                        sectionProfLower === variant ||
+                        sectionProfLower.includes(variant) ||
+                        variant.includes(sectionProfLower)
+                    ) {
+                        isProfessorAssigned = true;
+                        break;
+                    }
+                }
+            }
+
+            // NEW: Also check if any part of the professor's email username
+            // matches something in the section professor field
+            // e.g. email "doribiana@umak.edu.ph" → username "doribiana"
+            if (!isProfessorAssigned && profEmailLower) {
+                const emailUsername = profEmailLower.split('@')[0].toLowerCase();
+                if (emailUsername.length > 3 && sectionProfLower.includes(emailUsername)) {
+                    isProfessorAssigned = true;
+                }
+            }
+
             if (isProfessorAssigned) {
-                // Skip if we've already added this section
                 if (seenSections.has(sectionData.name)) {
                     console.log(`⚠️ Skipping duplicate section: ${sectionData.name}`);
                     continue;
                 }
-                
+
                 console.log(`✓ Found assigned section: ${sectionData.name}`);
                 seenSections.add(sectionData.name);
-                
-                // Get student count from the section's students array
+
                 const actualStudentCount = sectionData.students ? sectionData.students.length : 0;
-                
+
                 window.assignedSections.push({
                     section: sectionData.name,
                     students: actualStudentCount,
@@ -2023,7 +2070,7 @@ function renderScheduleTable(tests, enabledTestsMap) {
                     day: sectionData.day || 'Not Set',
                     room: sectionData.room || 'Not Set'
                 });
-                
+
                 console.log(`  - ${sectionData.name}: ${actualStudentCount} students`);
                 console.log(`  - Schedule: ${sectionData.time || 'N/A'} / ${sectionData.day || 'N/A'} / ${sectionData.room || 'N/A'}`);
             }
@@ -2128,7 +2175,7 @@ function renderScheduleTable(tests, enabledTestsMap) {
                 
                 // Populate section filter
                 const filterSection = document.getElementById('filterSection');
-                filterSection.innerHTML = '<option value="">All Sections</option>';
+                filterSection.innerHTML = '';
 
                 if (window.assignedSections && window.assignedSections.length > 0) {
                     const uniqueSections = new Set();
@@ -2141,6 +2188,18 @@ function renderScheduleTable(tests, enabledTestsMap) {
                             filterSection.appendChild(option);
                         }
                     });
+
+                    // Auto-filter to first section
+                    if (filterSection.options.length > 0) {
+                        filterSection.value = filterSection.options[0].value;
+                        filterResultsTable();
+                    }
+                } else {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'No sections assigned';
+                    option.disabled = true;
+                    filterSection.appendChild(option);
                 }
                 
                 // Query test results
@@ -3618,46 +3677,14 @@ function renderScheduleTable(tests, enabledTestsMap) {
         };
 
         // Export functions to window
-        window.loadScheduledTests = loadScheduledTests;
+           window.loadScheduledTests = loadScheduledTests;
         window.loadTestResults = loadTestResults;
+        window.renderScheduleTable = renderScheduleTable;
     </script>
 
     <script>
         // Filter functions
-        function filterScheduleTable() {
-            const searchInput = document.getElementById('searchSchedule');
-            const typeFilter = document.getElementById('filterTestType');
-            
-            const searchValue = (searchInput?.value || '').toUpperCase();
-            const typeValue = (typeFilter?.value || '').toUpperCase();
-            
-            const table = document.getElementById('scheduleTable');
-            const tr = table.getElementsByTagName('tr');
-            
-            for (let i = 1; i < tr.length; i++) {
-                const td = tr[i].getElementsByTagName('td');
-                if (td.length <= 1) continue;
-                
-                let showRow = true;
-                
-                if (searchValue) {
-                    const testName = (td[0]?.textContent || '').toUpperCase();
-                    const section  = (td[1]?.textContent || '').toUpperCase();
-                    if (!testName.includes(searchValue) && !section.includes(searchValue)) {
-                        showRow = false;
-                    }
-                }
-                
-                if (showRow && typeValue) {
-                    const testName = (td[0]?.textContent || '').toUpperCase();
-                    if (!testName.includes(typeValue)) {
-                        showRow = false;
-                    }
-                }
-                
-                tr[i].style.display = showRow ? '' : 'none';
-            }
-        }
+        
         
         function filterResultsTable() {
             const searchInput = document.getElementById('searchResults');
@@ -3768,15 +3795,18 @@ function renderScheduleTable(tests, enabledTestsMap) {
                 loadScheduledTests(window.currentUser.email, window.currentUser.uid);
             }
         };
-        
+           
         // Generate reports function
         function generateReports() {
             alert('Report generation feature coming soon!');
         }
         window.filterScheduleTable = function() {
-    if (window.allScheduledTests.length === 0) return;
-    renderScheduleTable(window.allScheduledTests, new Map()); 
-};
+            if (!window.allScheduledTests || window.allScheduledTests.length === 0) return;
+            if (window.renderScheduleTable) {
+                window.renderScheduleTable(window.allScheduledTests, new Map());
+            }
+        };
+
     </script>
 </body>
 </html>
