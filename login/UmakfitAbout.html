@@ -3,562 +3,1039 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - UMakFIT</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>About — UMakFIT</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --navy: #0A1628;
+            --navy-mid: #142240;
+            --navy-light: #1E3358;
+            --gold: #C8992A;
+            --gold-light: #E8BA4A;
+            --gold-pale: #F5E4A8;
+            --cream: #FAF6EE;
+            --white: #FFFFFF;
+            --gray-border: rgba(255,255,255,0.1);
+            --text-dark: #0A1628;
+            --text-mid: #3A4A5C;
+            --text-soft: #6B7A8D;
         }
-            .font-montserrat {
-    font-family: 'Montserrat', sans-serif;
-}
-        .gradient-text {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--navy);
+            color: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* ─── NAV (identical to landing page) ─── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 0 clamp(1.5rem, 5vw, 4rem);
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10,22,40,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--gray-border);
+            transition: all 0.3s;
+        }
+        nav.scrolled {
+            background: rgba(10,22,40,0.98);
+            box-shadow: 0 4px 40px rgba(0,0,0,0.4);
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .logo-mark {
+            width: 48px; height: 48px;
+            display: flex; align-items: center; justify-content: center;
+            overflow: visible;
+        }
+        .logo-mark img {
+            width: 54px; height: 54px;
+            object-fit: contain;
+        }
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            font-size: 1.35rem;
+            background: linear-gradient(135deg, var(--gold-pale) 0%, var(--gold) 60%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        
-        .card-hover {
-            transition: all 0.3s ease;
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            list-style: none;
         }
-        
-        .card-hover:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(30, 58, 138, 0.15);
+        .nav-links a {
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            transition: color 0.2s;
+            position: relative;
         }
-        
-        .section-divider {
-            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
-            height: 2px;
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 1px;
+            background: var(--gold-light);
+            transition: width 0.3s;
         }
-            /* Hamburger Menu Styles */
+        .nav-links a:hover { color: var(--white); }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active { color: var(--gold-light); }
+        .nav-links a.active::after { width: 100%; }
+        .nav-cta {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--navy) !important;
+            padding: 0.55rem 1.4rem;
+            border-radius: 8px;
+            font-weight: 600 !important;
+            font-size: 0.85rem !important;
+            letter-spacing: 0.03em;
+            text-decoration: none;
+            transition: all 0.25s !important;
+            box-shadow: 0 4px 16px rgba(200,153,42,0.3);
+        }
+        .nav-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(200,153,42,0.45) !important;
+        }
+        .nav-cta::after { display: none !important; }
+
+        /* Hamburger */
         .hamburger {
             display: none;
             flex-direction: column;
-            gap: 4px;
+            gap: 5px;
             cursor: pointer;
-            z-index: 60;
+            padding: 4px;
         }
-
         .hamburger span {
-            width: 25px;
-            height: 3px;
-            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
+            display: block;
+            width: 24px; height: 2px;
+            background: var(--gold-light);
             border-radius: 2px;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
+        .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
 
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
+        /* Drawer */
+        .drawer-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 98;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
         }
+        .drawer-overlay.open { opacity: 1; visibility: visible; }
 
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -6px);
-        }
-
-        /* Mobile Drawer */
-        .mobile-drawer {
+        .mobile-menu {
             position: fixed;
-            top: 0;
-            right: -100%;
-            width: 280px;
-            height: 100vh;
-            background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
-            z-index: 55;
-            transition: right 0.3s ease;
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+            top: 0; left: 0;
+            width: 285px; height: 100vh;
+            background: linear-gradient(170deg, #0A1628 0%, #142240 60%, #1B2F50 100%);
+            border-right: 1px solid rgba(255,255,255,0.08);
+            z-index: 99;
+            display: flex; flex-direction: column;
+            transform: translateX(-100%);
+            transition: transform 0.38s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 12px 0 50px rgba(0,0,0,0.45);
             overflow-y: auto;
         }
-
-        .mobile-drawer.active {
-            right: 0;
+        .mobile-menu.open { transform: translateX(0); }
+        .drawer-top {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 1.25rem; height: 72px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
         }
-
-        .drawer-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+        .drawer-close-btn {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: rgba(255,255,255,0.55);
+            font-size: 1.1rem; line-height: 1;
+            transition: all 0.2s;
         }
-
-        .drawer-overlay.active {
-            opacity: 1;
-            visibility: visible;
+        .drawer-close-btn:hover { background: rgba(255,255,255,0.13); color: white; }
+        .drawer-nav-section { padding: 1.25rem 1rem; flex: 1; }
+        .drawer-section-label {
+            font-size: 0.62rem; text-transform: uppercase;
+            letter-spacing: 0.14em; color: rgba(255,255,255,0.22);
+            font-weight: 700; padding: 0.5rem 0.75rem 0.4rem;
+        }
+        .mobile-menu a {
+            color: rgba(255,255,255,0.68);
+            text-decoration: none;
+            padding: 0.72rem 0.9rem;
+            border-radius: 10px; font-weight: 500; font-size: 0.95rem;
+            display: flex; align-items: center; gap: 0.85rem;
+            transition: all 0.2s; margin-bottom: 2px;
+        }
+        .mobile-menu a .d-icon {
+            width: 34px; height: 34px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; flex-shrink: 0; transition: all 0.2s;
+        }
+        .mobile-menu a:hover { background: rgba(255,255,255,0.07); color: white; }
+        .mobile-menu a:hover .d-icon { background: rgba(200,153,42,0.15); }
+        .mobile-menu a.active-link { background: rgba(200,153,42,0.1); color: var(--gold-light); }
+        .drawer-footer-area {
+            padding: 1rem 1rem 2.5rem;
+            border-top: 1px solid rgba(255,255,255,0.07); flex-shrink: 0;
+        }
+        .mobile-menu .nav-cta {
+            display: flex !important; align-items: center; justify-content: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%) !important;
+            color: var(--navy) !important;
+            padding: 0.9rem 1rem !important;
+            border-radius: 11px !important; font-weight: 700 !important;
+            font-size: 0.92rem !important;
+            box-shadow: 0 4px 20px rgba(200,153,42,0.28);
+        }
+        .drawer-app-info {
+            text-align: center; font-size: 0.68rem;
+            color: rgba(255,255,255,0.18); margin-top: 1rem; letter-spacing: 0.04em;
         }
 
         @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-            
-            .desktop-nav {
-                display: none;
-            }
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
         }
-        
+
+        /* ─── PAGE HERO ─── */
+        .page-hero {
+            padding: 9rem clamp(1.5rem, 5vw, 4rem) 6rem;
+            position: relative;
+            overflow: hidden;
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+        }
+        .page-hero-bg {
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 60% 80% at 80% 50%, rgba(200,153,42,0.07) 0%, transparent 60%),
+                linear-gradient(160deg, #0A1628 0%, #142240 60%, #0E1E38 100%);
+        }
+        .page-hero-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(200,153,42,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200,153,42,0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 10%, transparent 75%);
+        }
+        .page-hero-content {
+            position: relative; z-index: 2;
+            max-width: 1200px; margin: 0 auto; width: 100%;
+        }
+        .page-breadcrumb {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.78rem; color: rgba(255,255,255,0.4);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+        .page-breadcrumb a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
+        .page-breadcrumb a:hover { color: var(--gold-light); }
+        .page-breadcrumb span { color: var(--gold-light); }
+        .page-hero-label {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(200,153,42,0.12);
+            border: 1px solid rgba(200,153,42,0.3);
+            color: var(--gold-light);
+            padding: 6px 14px; border-radius: 100px;
+            font-size: 0.78rem; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+        .page-hero-label::before {
+            content: ''; width: 6px; height: 6px;
+            background: var(--gold-light); border-radius: 50%;
+        }
+        .page-hero-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: clamp(2.8rem, 5vw, 4.2rem);
+            line-height: 1.08;
+            max-width: 700px;
+        }
+        .page-hero-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--gold-pale) 0%, var(--gold) 50%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .page-hero-sub {
+            color: rgba(255,255,255,0.55);
+            font-size: 1.05rem; line-height: 1.75;
+            max-width: 560px; margin-top: 1.2rem;
+            font-weight: 300;
+        }
+        .hero-stat-row {
+            display: flex; gap: 2.5rem; flex-wrap: wrap;
+            margin-top: 3rem; padding-top: 2.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .h-stat-num {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700; font-size: 1.4rem;
+            color: var(--gold-light); display: block;
+        }
+        .h-stat-label {
+            font-size: 0.72rem; color: rgba(255,255,255,0.4);
+            text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px;
+        }
+
+        /* ─── SECTION SHARED ─── */
+        .section-label {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: var(--gold); font-size: 0.78rem; font-weight: 700;
+            letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1rem;
+        }
+        .section-label::before { content: ''; width: 20px; height: 2px; background: var(--gold); }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+            font-weight: 900; line-height: 1.1;
+        }
+
+        /* ─── MISSION / VISION ─── */
+        .mv-section {
+            background: var(--cream); color: var(--text-dark);
+            padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem);
+        }
+        .mv-inner { max-width: 1200px; margin: 0 auto; }
+        .mv-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 5rem; align-items: center;
+        }
+        .mv-grid.reverse { direction: rtl; }
+        .mv-grid.reverse > * { direction: ltr; }
+
+        .mv-text .section-title { color: var(--navy); }
+        .mv-text p {
+            font-size: 1rem; color: var(--text-mid);
+            line-height: 1.8; margin-top: 1.2rem;
+            font-weight: 300;
+        }
+        .mv-rule {
+            display: flex; align-items: center; gap: 8px;
+            margin-top: 2rem;
+        }
+        .mv-rule span:nth-child(1) { width: 48px; height: 2px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 2px; }
+        .mv-rule span:nth-child(2) { width: 20px; height: 2px; background: rgba(200,153,42,0.4); border-radius: 2px; }
+        .mv-rule span:nth-child(3) { width: 8px; height: 2px; background: rgba(200,153,42,0.2); border-radius: 2px; }
+
+        .mv-image-wrap {
+            border-radius: 24px; overflow: hidden;
+            background: linear-gradient(135deg, rgba(200,153,42,0.08), rgba(200,153,42,0.03));
+            border: 1px solid rgba(200,153,42,0.15);
+            padding: 3rem;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 320px;
+        }
+        .mv-image-wrap img { width: 100%; max-width: 280px; object-fit: contain; }
+
+        /* divider between sections */
+        .mv-divider {
+            max-width: 1200px; margin: 0 auto;
+            height: 1px; background: linear-gradient(90deg, transparent, rgba(200,153,42,0.2), transparent);
+        }
+
+        @media (max-width: 860px) {
+            .mv-grid, .mv-grid.reverse { grid-template-columns: 1fr; direction: ltr; gap: 3rem; }
+            .mv-grid.reverse .mv-image-wrap { order: -1; }
+        }
+
+        /* ─── STORY ─── */
+        .story-section {
+            background: var(--navy);
+            padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem);
+            position: relative; overflow: hidden;
+        }
+        .story-section::before {
+            content: '';
+            position: absolute; bottom: -100px; left: -100px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(200,153,42,0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .story-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
+        .story-grid {
+            display: grid; grid-template-columns: 1fr 2fr;
+            gap: 4rem; align-items: start; margin-top: 3.5rem;
+        }
+        .story-sidebar { position: sticky; top: 100px; }
+        .story-quote-block {
+            background: linear-gradient(135deg, rgba(200,153,42,0.1), rgba(200,153,42,0.04));
+            border: 1px solid rgba(200,153,42,0.2);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+        .story-quote-mark {
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem; line-height: 1;
+            color: var(--gold); opacity: 0.4;
+            margin-bottom: 0.5rem;
+        }
+        .story-quote-text {
+            font-size: 0.95rem; color: rgba(255,255,255,0.7);
+            line-height: 1.7; font-style: italic; font-weight: 300;
+        }
+        .story-quote-author {
+            margin-top: 1.2rem;
+            font-size: 0.75rem; font-weight: 600;
+            color: var(--gold-light); text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .story-content { display: flex; flex-direction: column; gap: 2rem; }
+        .story-paragraph {
+            padding: 2rem 2.2rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            font-size: 0.975rem; color: rgba(255,255,255,0.7);
+            line-height: 1.85; font-weight: 300;
+            position: relative; overflow: hidden;
+        }
+        .story-paragraph::before {
+            content: '';
+            position: absolute; top: 0; left: 0;
+            width: 3px; height: 0;
+            background: linear-gradient(180deg, var(--gold), var(--gold-light));
+            border-radius: 0 0 2px 2px;
+            transition: height 0.6s ease;
+        }
+        .story-paragraph.visible::before { height: 100%; }
+        .drop-cap {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem; font-weight: 900;
+            float: left; line-height: 0.75;
+            margin: 0.15em 0.1em 0 0;
+            background: linear-gradient(135deg, var(--gold-pale), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @media (max-width: 860px) {
+            .story-grid { grid-template-columns: 1fr; }
+            .story-sidebar { position: static; }
+        }
+
+        /* ─── VALUES ─── */
+        .values-section {
+            background: var(--cream); color: var(--text-dark);
+            padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem);
+            position: relative; overflow: hidden;
+        }
+        .values-section::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image: radial-gradient(rgba(200,153,42,0.07) 1.5px, transparent 1.5px);
+            background-size: 36px 36px;
+        }
+        .values-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
+        .values-header {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 2rem; align-items: end; margin-bottom: 4rem;
+        }
+        .values-header .section-title { color: var(--navy); }
+        .values-header p { font-size: 0.95rem; color: var(--text-soft); line-height: 1.75; font-weight: 300; }
+
+        .values-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 1.5px;
+            background: rgba(0,0,0,0.07);
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.07);
+        }
+        .value-card {
+            background: white; padding: 2.2rem 1.8rem;
+            transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .value-card::after {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            transform: scaleX(0); transform-origin: left;
+            transition: transform 0.35s;
+        }
+        .value-card:hover::after { transform: scaleX(1); }
+        .value-card:hover { background: #FEFAF3; }
+        .value-num {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem; color: rgba(0,0,0,0.18);
+            font-weight: 700; margin-bottom: 1.2rem;
+            letter-spacing: 0.05em;
+        }
+        .value-icon {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            background: var(--cream);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 1.2rem;
+            transition: all 0.3s;
+        }
+        .value-card:hover .value-icon {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        }
+        .value-title { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 0.6rem; }
+        .value-desc { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; font-weight: 300; }
+
+        @media (max-width: 900px) {
+            .values-grid { grid-template-columns: repeat(2,1fr); }
+            .values-header { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 560px) {
+            .values-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ─── WHO WE SERVE ─── */
+        .serve-section {
+            background: var(--navy);
+            padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem);
+        }
+        .serve-inner { max-width: 1200px; margin: 0 auto; }
+        .serve-header { max-width: 640px; margin-bottom: 4rem; }
+        .serve-header .section-title { color: white; margin-top: 0.5rem; }
+        .serve-header p { font-size: 0.95rem; color: rgba(255,255,255,0.5); line-height: 1.75; margin-top: 1rem; font-weight: 300; }
+
+        .serve-grid {
+            display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem;
+        }
+        .serve-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px; padding: 2.2rem;
+            transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .serve-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: linear-gradient(180deg, var(--gold), var(--gold-light));
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .serve-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(200,153,42,0.25); transform: translateY(-4px); }
+        .serve-card:hover::before { opacity: 1; }
+        .serve-card-icon {
+            width: 52px; height: 52px;
+            background: rgba(200,153,42,0.1);
+            border: 1px solid rgba(200,153,42,0.2);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; margin-bottom: 1.5rem;
+        }
+        .serve-card-title { font-size: 1.05rem; font-weight: 700; color: white; margin-bottom: 4px; }
+        .serve-card-sub { font-size: 0.75rem; color: var(--gold-light); font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1rem; }
+        .serve-card-desc { font-size: 0.875rem; color: rgba(255,255,255,0.55); line-height: 1.75; font-weight: 300; }
+
+        @media (max-width: 860px) { .serve-grid { grid-template-columns: 1fr; } }
+
+        /* ─── CTA ─── */
+        .cta-section {
+            background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 100%);
+            padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem);
+            text-align: center; position: relative; overflow: hidden;
+        }
+        .cta-section::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 50% 100%, rgba(200,153,42,0.1) 0%, transparent 70%);
+        }
+        .cta-content { position: relative; z-index: 2; max-width: 640px; margin: 0 auto; }
+        .cta-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4.5vw, 3.2rem);
+            font-weight: 900; line-height: 1.1; margin-bottom: 1.2rem;
+        }
+        .cta-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--gold-pale), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .cta-sub { color: rgba(255,255,255,0.55); font-size: 1rem; line-height: 1.7; margin-bottom: 2.5rem; font-weight: 300; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--navy); padding: 0.9rem 2.2rem;
+            border-radius: 10px; font-weight: 700; font-size: 0.98rem;
+            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.25s;
+            box-shadow: 0 6px 24px rgba(200,153,42,0.35);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(200,153,42,0.5); }
+
+        /* ─── FOOTER ─── */
+        footer {
+            background: #060E1A;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem) 2rem;
+        }
+        .footer-grid {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 1.4fr 1fr 1fr;
+            gap: 4rem; margin-bottom: 3rem;
+        }
+        .footer-logo-area { margin-bottom: 1.2rem; }
+        .footer-desc { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.8; font-weight: 300; max-width: 300px; }
+        .footer-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1.2rem; }
+        .footer-tag { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); font-size: 0.7rem; padding: 4px 10px; border-radius: 100px; font-weight: 500; }
+        .footer-heading { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; color: var(--gold); margin-bottom: 1.2rem; }
+        .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+        .footer-links a { color: rgba(255,255,255,0.45); text-decoration: none; font-size: 0.875rem; transition: color 0.2s; display: flex; align-items: center; gap: 6px; }
+        .footer-links a:hover { color: rgba(255,255,255,0.85); }
+        .footer-links a::before { content: '→'; font-size: 0.75rem; color: var(--gold); opacity: 0; transform: translateX(-4px); transition: all 0.2s; }
+        .footer-links a:hover::before { opacity: 1; transform: translateX(0); }
+        .contact-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 0.8rem; }
+        .contact-icon { width: 28px; height: 28px; background: rgba(200,153,42,0.12); border: 1px solid rgba(200,153,42,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; flex-shrink: 0; margin-top: 2px; }
+        .contact-text { font-size: 0.82rem; color: rgba(255,255,255,0.45); line-height: 1.5; }
+        .contact-text a { color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s; }
+        .contact-text a:hover { color: var(--gold-light); }
+        .social-row { display: flex; gap: 8px; margin-top: 1rem; }
+        .social-btn { width: 34px; height: 34px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.8rem; transition: all 0.2s; }
+        .social-btn:hover { background: rgba(200,153,42,0.15); border-color: rgba(200,153,42,0.3); color: var(--gold-light); }
+        .footer-bottom { max-width: 1200px; margin: 0 auto; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+        .footer-copy { font-size: 0.78rem; color: rgba(255,255,255,0.25); }
+        .footer-bottom-links { display: flex; gap: 1.5rem; }
+        .footer-bottom-links a { font-size: 0.78rem; color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.2s; }
+        .footer-bottom-links a:hover { color: rgba(255,255,255,0.6); }
+
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 580px) { .footer-grid { grid-template-columns: 1fr; gap: 2rem; } }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        .hero-animate { animation: fadeUp 0.8s ease both; }
+        .hero-animate-1 { animation: fadeUp 0.8s 0.1s ease both; }
+        .hero-animate-2 { animation: fadeUp 0.8s 0.2s ease both; }
+        .hero-animate-3 { animation: fadeUp 0.8s 0.3s ease both; }
+
+        .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.65s ease, transform 0.65s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-delay { transition-delay: 0.15s; }
+        .reveal-delay-2 { transition-delay: 0.28s; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-blue-50">
-    
-   <!-- Header -->
-<header class="shadow-lg fixed w-full top-0 z-50" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
-    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
-           <!-- Logo -->
-            <div class="flex items-center gap-3">
-                <div class="w-16 h-16 flex items-center justify-center overflow-visible">
-                    <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-20 h-20 object-contain">
-                </div>
-                <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-montserrat" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                    UMakFIT
-                </span>
-            </div>
+<body>
 
-            <!-- Desktop Navigation -->
-            <div class="desktop-nav hidden md:flex items-center gap-8">
-                <a href="./UmakfitLandingpage.html#features" class="text-white/80 hover:text-white font-medium transition-colors">Features</a>
-                <a href="./UmakfitLandingpage.html#benefits" class="text-white/80 hover:text-white font-medium transition-colors">Benefits</a>
-                <a href="./UmakfitAbout.html" class="text-white/80 hover:text-white font-medium transition-colors">About</a>
-               <a href="#footer" class="text-white/80 hover:text-white font-medium transition-colors">Contact</a>
-            </div>
+<!-- ─── NAVIGATION ─── -->
+<nav id="mainNav">
+    <a href="./UmakfitLandingpage.html" class="nav-logo">
+        <div class="logo-mark"><img src="UMakfit Logo (2).png" alt="UMakFIT Logo"></div>
+        <span class="logo-text">UMakFIT</span>
+    </a>
 
-            <!-- Login Button (Desktop) -->
-            <a href="./index.html" class="hidden md:block text-blue-900 px-6 py-2.5 rounded-lg font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);">
-                    Login to UmakFit
-                </a>
+    <ul class="nav-links">
+        <li><a href="./UmakfitLandingpage.html#features">Features</a></li>
+        <li><a href="./UmakfitLandingpage.html#benefits">Benefits</a></li>
+        <li><a href="./UmakfitAbout.html" class="active">About</a></li>
+        <li><a href="#footer">Contact</a></li>
+        <li><a href="./index.html" class="nav-cta">Login to UMakFit</a></li>
+    </ul>
 
-            <!-- Hamburger Menu (Mobile) -->
-            <div class="hamburger" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Mobile Drawer Overlay -->
-    <div class="drawer-overlay" id="drawerOverlay"></div>
-
-    <!-- Mobile Drawer -->
-    <div class="mobile-drawer" id="mobileDrawer">
-        <div class="p-6 pt-8">
-            <!-- Drawer Header -->
-            <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
-                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-900 rounded-xl flex items-center justify-center text-2xl">
-                    🏃
-                </div>
-                <span class="text-2xl font-extrabold font-montserrat" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                    UMakFIT
-                </span>
-            </div>
-
-            <!-- Navigation Links -->
-            <nav class="space-y-2 mb-8">
-                <a href="./UmakfitLandingpage.html#features" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
-                    Features
-                </a>
-                <a href="./UmakfitLandingpage.html#benefits" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
-                    Benefits
-                </a>
-                <a href="./UmakfitAbout.html" class="mobile-nav-link block text-white bg-white/10 font-semibold py-3 px-4 rounded-lg transition-all">
-                    About
-                </a>
-                <a href="#footer" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
-                    Contact
-                </a>
-            </nav>
-
-            <!-- Login Button (Mobile) -->
-           <a href="./index.html" class="block w-full text-center text-blue-900 px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);">
-            Login to UMakFIT
-        </a>
-        </div>
+    <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
     </div>
-</header>
+</nav>
 
-    
-    <section class="py-24 mt-20">
-        <div class="max-w-5xl mx-auto text-center px-4">
-            <h2 class="text-5xl font-bold gradient-text mb-6">About UMakFIT</h2>
-            <p class="text-gray-600 text-xl leading-relaxed max-w-3xl mx-auto">
-                Empowering students and faculty with comprehensive fitness assessment and tracking solutions for a healthier campus community
-            </p>
-        </div>
-    </section>
+<!-- Drawer Overlay -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
 
-    <!-- Mission Section -->
-    <section class="py-20 px-6">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="space-y-6">
-                    <div class="flex items-center space-x-3 mb-6">
-                        
-                        <h3 class="text-4xl font-bold gradient-text">Our Mission</h3>
-                    </div>
-                    <p class="text-gray-700 text-lg leading-relaxed">
-                        To attain its vision, the CHK will provide a comprehensive and cross-disciplinary curriculum that is responsive to the needs of the students and other stakeholders. It shall promote excellence in teaching and management of sports and wellness education.
-                    </p>
-                    <div class="flex items-center space-x-2 pt-4">
-                        <div class="w-20 h-1 bg-gradient-to-r from-blue-900 to-blue-500 rounded-full"></div>
-                        <div class="w-10 h-1 bg-blue-300 rounded-full"></div>
-                        <div class="w-5 h-1 bg-blue-200 rounded-full"></div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-center">
-                    <div class="w-full max-w-md h-96 rounded-2xl overflow-hidden flex items-center justify-center">
-                        <img src="OFFICIAL-CHK-LOGO-College-of-Human-Kinetics.png" alt="Our Mission" class="w-full h-full object-contain">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Vision Section -->
-    <section class="py-20 px-6 bg-gradient-to-br from-blue-50 to-cyan-50">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="flex justify-center order-2 md:order-1">
-                    <div class="w-full max-w-md h-96 rounded-2xl overflow-hidden flex items-center justify-center">
-                        <img src="OFFICIAL-CHK-LOGO-College-of-Human-Kinetics.png" alt="Our Vision" class="w-full h-full object-contain">
-                    </div>
-                </div>
-                
-                <div class="space-y-6 order-1 md:order-2">
-                    <div class="flex items-center space-x-3 mb-6">
-                        <h3 class="text-4xl font-bold gradient-text">Our Vision</h3>
-                    </div>
-                    <p class="text-gray-700 text-lg leading-relaxed">
-                        To become the leading fitness assessment platform in Philippine universities, fostering a culture of health consciousness and evidence-based fitness practices that contribute to the holistic development of students and the advancement of health research in academia.
-                    </p>
-                    <div class="flex items-center space-x-2 pt-4">
-                        <div class="w-20 h-1 bg-gradient-to-r from-blue-900 to-blue-500 rounded-full"></div>
-                        <div class="w-10 h-1 bg-blue-300 rounded-full"></div>
-                        <div class="w-5 h-1 bg-blue-200 rounded-full"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Our Story Section -->
-    <section class="py-20 px-6">
-        <div class="max-w-5xl mx-auto">
-            <div class="text-center mb-12">
-                <h3 class="text-5xl font-bold gradient-text mb-4">Our Story</h3>
-                <div class="section-divider w-32 mx-auto mt-6"></div>
-            </div>
-            
-            <div class="bg-white rounded-3xl shadow-xl p-10 space-y-6">
-                <p class="text-gray-700 text-lg leading-relaxed">
-                    <span class="text-6xl font-bold gradient-text float-left mr-4 leading-none">U</span>
-                    <span class="text-gray-700">MakFIT was born from a simple observation: fitness assessment in universities was often manual, time-consuming, and provided limited insights into student health trends. Faculty members spent countless hours recording data, calculating scores, and generating reports, while students rarely had access to their historical fitness data or personalized improvement recommendations.</span>
-                </p>
-                <p class="text-gray-700 text-lg leading-relaxed">
-                    Recognizing this gap, a team of passionate developers, health professionals, and educators from the University of Makati came together with a shared vision: to create a comprehensive digital platform that would transform how fitness assessment is conducted in academic settings.
-                </p>
-                <p class="text-gray-700 text-lg leading-relaxed">
-                    Today, UMakFIT stands as a testament to innovation in health technology, serving hundreds of students and providing valuable research data that contributes to the understanding of youth fitness in the Philippines. We continue to evolve, incorporating feedback from our community and staying at the forefront of fitness assessment technology.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Core Values Section -->
-<section class="py-20 px-6 relative overflow-hidden" style="background: linear-gradient(to bottom, #f3e5c3 0%, #e8d4a8 100%);">
-    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 50% 50%, white 1px, transparent 1px); background-size: 40px 40px;"></div>
-    
-    <div class="relative max-w-7xl mx-auto">
-        <div class="text-center mb-16">
-            <h3 class="text-5xl font-bold mb-4" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Our Core Values</h3>
-<p class="text-amber-800/80 text-lg">The principles that guide everything we do</p>
-        </div>
+<!-- Left Side Drawer -->
+<div class="mobile-menu" id="mobileMenu">
+    <div class="drawer-top">
+        <a href="./UmakfitLandingpage.html" class="nav-logo">
+            <div class="logo-mark"><img src="UMakfit Logo (2).png" alt="UMakFIT Logo"></div>
+            <span class="logo-text">UMakFIT</span>
+        </a>
         
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <!-- Value 1 -->
-            <div class="bg-white rounded-2xl p-8 shadow-xl card-hover">
-                <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl mb-6 flex items-center justify-center">
-                    <span class="text-5xl">🏅</span>
-                </div>
-                <h4 class="text-2xl font-bold text-blue-900 mb-4">Sports Development</h4>
-                <p class="text-gray-600 leading-relaxed">
-                    Foster the development of sports both in the local and national level through the development of sport extension programs.
-                </p>
-            </div>
+    </div>
+    <div class="drawer-nav-section">
+        <div class="drawer-section-label">Navigation</div>
+        <a href="./UmakfitLandingpage.html#features" class="drawer-link">
+            <span class="d-icon">📋</span> Features
+        </a>
+        <a href="./UmakfitLandingpage.html#benefits" class="drawer-link">
+            <span class="d-icon">⭐</span> Benefits
+        </a>
+        <a href="./UmakfitAbout.html" class="drawer-link active-link">
+            <span class="d-icon">ℹ️</span> About
+        </a>
+        <a href="#footer" class="drawer-link">
+            <span class="d-icon">✉️</span> Contact
+        </a>
+    </div>
+    <div class="drawer-footer-area">
+        <a href="./index.html" class="nav-cta">
+            <span class="d-icon">🔑</span>
+            Login to UMakFit
+        </a>
+        <div class="drawer-app-info">University of Makati — College of Human Kinetics</div>
+    </div>
+</div>
 
-            <!-- Value 2 -->
-            <div class="bg-white rounded-2xl p-8 shadow-xl card-hover">
-                <div class="w-20 h-20 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl mb-6 flex items-center justify-center">
-                    <span class="text-5xl">🤝</span>
-                </div>
-                <h4 class="text-2xl font-bold text-blue-900 mb-4">Inclusive Participation</h4>
-                <p class="text-gray-600 leading-relaxed">
-                    Maximize clients' participation in sports regardless of background and build a culture of goodwill through healthy sports.
-                </p>
-            </div>
+<!-- ─── PAGE HERO ─── -->
+<section class="page-hero">
+    <div class="page-hero-bg"></div>
+    <div class="page-hero-grid"></div>
 
-            <!-- Value 3 -->
-            <div class="bg-white rounded-2xl p-8 shadow-xl card-hover">
-                <div class="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl mb-6 flex items-center justify-center">
-                    <span class="text-5xl">💪</span>
-                </div>
-                <h4 class="text-2xl font-bold text-blue-900 mb-4">Physical Education</h4>
-                <p class="text-gray-600 leading-relaxed">
-                    A physically educated individual who values activity and its contributions to a healthful lifestyle.
-                </p>
+    <div class="page-hero-content">
+        <div class="page-breadcrumb hero-animate">
+            <a href="./UmakfitLandingpage.html">Home</a>
+            <span>›</span>
+            <span>About</span>
+        </div>
+        <div class="page-hero-label hero-animate">College of Human Kinetics</div>
+        <h1 class="page-hero-title hero-animate-1">
+            About <em>UMakFIT</em>
+        </h1>
+        <p class="page-hero-sub hero-animate-2">
+            Empowering students and faculty with comprehensive fitness assessment and tracking solutions — building a healthier, stronger UMak community.
+        </p>
+        <div class="hero-stat-row hero-animate-3">
+            <div>
+                <span class="h-stat-num">6+</span>
+                <div class="h-stat-label">Assessment Types</div>
             </div>
-
-            <!-- Value 4 -->
-            <div class="bg-white rounded-2xl p-8 shadow-xl card-hover">
-                <div class="w-20 h-20 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-2xl mb-6 flex items-center justify-center">
-                    <span class="text-5xl">🌟</span>
-                </div>
-                <h4 class="text-2xl font-bold text-blue-900 mb-4">Health Advocacy</h4>
-                <p class="text-gray-600 leading-relaxed">
-                    Produce Health and wellness advocates who promote the importance of physical activity and the role it plays in the pursuits of life's health and well-being.
-                </p>
+            <div>
+                <span class="h-stat-num">CHK</span>
+                <div class="h-stat-label">Official Platform</div>
+            </div>
+            <div>
+                <span class="h-stat-num">UMak</span>
+                <div class="h-stat-label">University-Wide</div>
             </div>
         </div>
     </div>
 </section>
 
-    <!-- Who We Serve Section -->
-    <section class="py-20 px-6">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-12">
-                <h3 class="text-4xl font-bold gradient-text mb-6">Who We Serve</h3>
-                <p class="text-gray-600 text-lg max-w-4xl mx-auto leading-relaxed">
-                    UMakFIT is built for the entire University of Makati community, bringing together students, faculty, researchers, and health professionals in a collaborative ecosystem focused on wellness and academic excellence.
-                </p>
+<!-- ─── MISSION & VISION ─── -->
+<section class="mv-section">
+    <div class="mv-inner">
+
+        <!-- Mission -->
+        <div class="mv-grid reveal">
+            <div class="mv-text">
+                <div class="section-label">Our Mission</div>
+                <h2 class="section-title">Shaping well-rounded athletes <em style="color:var(--gold); font-style:italic;">and educators</em></h2>
+                <p>To attain its vision, the CHK will provide a comprehensive and cross-disciplinary curriculum that is responsive to the needs of the students and other stakeholders. It shall promote excellence in teaching and management of sports and wellness education.</p>
+                <div class="mv-rule">
+                    <span></span><span></span><span></span>
+                </div>
             </div>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Students -->
-                <div class="relative">
-                    <div class="absolute left-0 top-0 w-2 h-full bg-gradient-to-b from-blue-900 to-amber-500 rounded-full"></div>
-                    <div class="pl-6">
-                        <h4 class="text-2xl font-semibold text-blue-900 mb-2">Students</h4>
-                        <p class="text-amber-500 font-semibold mb-4">All Programs & Year Levels</p>
-                        <p class="text-black/60 leading-relaxed">
-                            Track your fitness journey, access personalized insights, and take control of your health with easy-to-use assessment tools and comprehensive progress reports.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Physical Education Faculty -->
-                <div class="relative">
-                    <div class="absolute left-0 top-0 w-2 h-full bg-gradient-to-b from-blue-900 to-amber-500 rounded-full"></div>
-                    <div class="pl-6">
-                        <h4 class="text-2xl font-semibold text-blue-900 mb-2">Physical Education Faculty</h4>
-                        <p class="text-amber-500 font-semibold mb-4">CHK Department</p>
-                        <p class="text-black/60 leading-relaxed">
-                            Streamline assessment processes, monitor class progress, and generate detailed reports for effective teaching and student health management.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Researchers -->
-                <div class="relative">
-                    <div class="absolute left-0 top-0 w-2 h-full bg-gradient-to-b from-blue-900 to-amber-500 rounded-full"></div>
-                    <div class="pl-6">
-                        <h4 class="text-2xl font-semibold text-blue-900 mb-2">Researchers</h4>
-                        <p class="text-amber-500 font-semibold mb-4">Academic Researchers</p>
-                        <p class="text-black/60 leading-relaxed">
-                            Access aggregated data, perform statistical analysis, and contribute to evidence-based health research with comprehensive analytics tools.
-                        </p>
-                    </div>
-                </div>
+            <div class="mv-image-wrap reveal reveal-delay">
+                <img src="OFFICIAL-CHK-LOGO-College-of-Human-Kinetics.png" alt="College of Human Kinetics Logo">
             </div>
         </div>
-    </section>
 
-    <!-- CTA Section -->
-    <section class="py-20 px-6 bg-gradient-to-r from-blue-900 via-blue-700 to-blue-500 relative overflow-hidden">
-        <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
-        
-        <div class="relative max-w-4xl mx-auto text-center">
-            <h3 class="text-5xl font-bold text-white mb-6">Ready to Transform Fitness Assessment?</h3>
-            <p class="text-white/90 text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
-                Join the UMakFIT community and experience the future of fitness tracking in education
-            </p>
-            <button class="bg-gradient-to-r from-amber-400 to-amber-500 text-blue-900 font-bold px-12 py-4 rounded-2xl hover:from-amber-500 hover:to-amber-600 transition shadow-2xl transform hover:scale-105 text-lg">
-                Get Started Today
-            </button>
-        </div>
-    </section>
+        <div class="mv-divider" style="margin: 4rem auto;"></div>
 
-    <!-- Footer -->
-<footer id="footer" class="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 sm:py-12 mt-16 sm:mt-20">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
-            <!-- About UmakFit & College of Human Kinetics -->
-            <div>
-                <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                    <img src="UMakfit Logo (2).png" 
-                         alt="UMak Logo" class="h-12 w-auto object-contain">
-                    <div>
-                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
-                        <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
-                    </div>
-                </div>
-                <p class="text-sm lg:text-base leading-relaxed text-blue-100">
-                    UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati. 
-                    Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
-                </p>
-                <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
-                    <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Fitness Tracking</span>
-                    <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Performance Assessment</span>
-                    <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Health & Wellness</span>
+        <!-- Vision -->
+        <div class="mv-grid reverse reveal">
+            <div class="mv-text">
+                <div class="section-label">Our Vision</div>
+                <h2 class="section-title">Leading fitness assessment across <em style="color:var(--gold); font-style:italic;">Philippine universities</em></h2>
+                <p>CHK envisions to be recognized as one of the exemplary leading educational institutions in the wellness, sports, and recreation industry. It commits to produce physically educated, health and wellness advocates and service-oriented practitioners who will deliver the competencies of teaching and the demands of the corporate industry.</p>
+                <div class="mv-rule">
+                    <span></span><span></span><span></span>
                 </div>
             </div>
-
-            <!-- Quick Links -->
-            <div>
-                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
-                <div class="grid grid-cols-2 gap-4 lg:gap-6">
-                    <div class="space-y-3">
-                        <a href="#features" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                            <i class="bi bi-list-check mr-2"></i>Features
-                        </a>
-                        <a href="#benefits" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                            <i class="bi bi-star mr-2"></i>Benefits
-                        </a>
-                        <a href="./UmakfitAbout.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                            <i class="bi bi-info-circle mr-2"></i>About
-                        </a>
-                    </div>
-                    <div class="space-y-3">
-                        <a href="#contact" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                            <i class="bi bi-envelope mr-2"></i>Contact
-                        </a>
-                        <a href="#" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                            <i class="bi bi-person-circle mr-2"></i>Student Login
-                        </a>
-                        <a href="#" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                            <i class="bi bi-person-badge mr-2"></i>Faculty Login
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Contact & Social -->
-            <div>
-                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
-                <div class="space-y-4 lg:space-y-5">
-                    <div class="flex items-start gap-3">
-                        <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
-                        <p class="text-sm lg:text-base text-blue-100">
-                            College of Human Kinetics<br>
-                            University of Makati<br>
-                            3rd floor, Administration Building, University of Makati, 
-                            JP Rizal Ext., West Rembo, Taguig City<br>
-                            
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
-                        <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">
-                            chk@umak.edu.ph
-                        </a>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
-                        <span class="text-blue-100 text-sm lg:text-base">+63 933 189 7230</span>
-                    </div>
-                    <div class="flex items-center gap-4 pt-3 justify-center lg:justify-start">
-                        <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                            <i class="bi bi-facebook text-white text-lg lg:text-xl"></i>
-                        </a>
-                        <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                            <i class="bi bi-twitter text-white text-lg lg:text-xl"></i>
-                        </a>
-                        <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                            <i class="bi bi-instagram text-white text-lg lg:text-xl"></i>
-                        </a>
-                        <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                            <i class="bi bi-youtube text-white text-lg lg:text-xl"></i>
-                        </a>
-                    </div>
-                </div>
+            <div class="mv-image-wrap reveal reveal-delay">
+                <img src="OFFICIAL-CHK-LOGO-College-of-Human-Kinetics.png" alt="College of Human Kinetics Logo">
             </div>
         </div>
-        
-        <!-- Divider -->
-        <div class="border-t border-blue-600/50 mt-8 lg:mt-12 pt-6 lg:pt-8">
-            <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
-                <!-- Copyright -->
-                <div class="text-center lg:text-left">
-                    <p class="text-xs lg:text-sm text-blue-200">
-                        © 2025 University of Makati - College of Human Kinetics. All Rights Reserved.
-                    </p>
+
+    </div>
+</section>
+
+<!-- ─── OUR STORY ─── -->
+<section class="story-section">
+    <div class="story-inner">
+        <div class="reveal">
+            <div class="section-label">Our Story</div>
+            <h2 class="section-title" style="color:white; max-width:560px;">How UMakFIT came to <em style="color:var(--gold-light); font-style:italic;">life</em></h2>
+        </div>
+
+        <div class="story-grid">
+            <!-- Sidebar -->
+            <div class="story-sidebar reveal reveal-delay">
+                <div class="story-quote-block">
+                    <div class="story-quote-mark">"</div>
+                    <p class="story-quote-text">We built UMakFIT because fitness data should empower students — not collect dust in a spreadsheet.</p>
+                    <div class="story-quote-author">— UMakFIT Development Team</div>
                 </div>
-                
-                <!-- University Links -->
-                <div class="flex flex-wrap justify-center gap-3 lg:gap-4">
-                    <a href="https://umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                        University of Makati
-                    </a>
-                    <span class="text-blue-400">•</span>
-                    <a href="https://library.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                        UMak Online Library
-                    </a>
-                    <span class="text-blue-400">•</span>
-                    <a href="https://tbl.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                        TBL Hub
-                    </a>
+            </div>
+
+            <!-- Content -->
+            <div class="story-content reveal reveal-delay-2">
+                <div class="story-paragraph">
+                    <span class="drop-cap">U</span>
+                    MakFIT was born from a simple observation: fitness assessment in universities was often manual, time-consuming, and provided limited insights into student health trends. Faculty members spent countless hours recording data, calculating scores, and generating reports, while students rarely had access to their historical fitness data or personalized improvement recommendations.
+                </div>
+                <div class="story-paragraph">
+                    Recognizing this gap, a team of passionate developers, health professionals, and educators from the University of Makati came together with a shared vision: to create a comprehensive digital platform that would transform how fitness assessment is conducted in academic settings.
+                </div>
+                <div class="story-paragraph">
+                    Today, UMakFIT stands as a testament to innovation in health technology, serving students across programs and providing valuable research data that contributes to the understanding of youth fitness in the Philippines. We continue to evolve, incorporating feedback from our community and staying at the forefront of fitness assessment technology.
                 </div>
             </div>
         </div>
     </div>
+</section>
+
+<!-- ─── CORE VALUES ─── -->
+<section class="values-section">
+    <div class="values-inner">
+        <div class="values-header reveal">
+            <div>
+                <div class="section-label">Core Values</div>
+                <h2 class="section-title">The principles behind <em style="color:var(--gold); font-style:italic;">everything we do</em></h2>
+            </div>
+            <p>These values shape how we build UMakFIT and how the platform serves every member of the UMak community.</p>
+        </div>
+
+        <div class="values-grid reveal">
+            <div class="value-card">
+                <div class="value-num">01</div>
+                <div class="value-icon">🏅</div>
+                <div class="value-title">Sports Development</div>
+                <p class="value-desc">Foster the development of sports both in the local and national level through the development of sport extension programs.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-num">02</div>
+                <div class="value-icon">🤝</div>
+                <div class="value-title">Inclusive Participation</div>
+                <p class="value-desc">Maximize clients' participation in sports regardless of background and build a culture of goodwill through healthy sports.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-num">03</div>
+                <div class="value-icon">💪</div>
+                <div class="value-title">Physical Education</div>
+                <p class="value-desc">A physically educated individual who values activity and its contributions to a healthful lifestyle.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-num">04</div>
+                <div class="value-icon">🌟</div>
+                <div class="value-title">Health Advocacy</div>
+                <p class="value-desc">Produce Health and wellness advocates who promote the importance of physical activity and the role it plays in the pursuits of life's health and well-being.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── WHO WE SERVE ─── -->
+<section class="serve-section">
+    <div class="serve-inner">
+        <div class="serve-header reveal">
+            <div class="section-label">Who We Serve</div>
+            <h2 class="section-title">Built for the entire <em style="color:var(--gold-light); font-style:italic;">UMak community</em></h2>
+            <p>UMakFIT brings together students, faculty, researchers, and health professionals in a collaborative ecosystem focused on wellness and academic excellence.</p>
+        </div>
+
+        <div class="serve-grid">
+            <div class="serve-card reveal">
+                <div class="serve-card-icon">🎓</div>
+                <div class="serve-card-title">Students</div>
+                <div class="serve-card-sub">All Programs & Year Levels</div>
+                <p class="serve-card-desc">Track your fitness journey, access personalized insights, and take control of your health with easy-to-use assessment tools and comprehensive progress reports.</p>
+            </div>
+            <div class="serve-card reveal reveal-delay">
+                <div class="serve-card-icon">🏫</div>
+                <div class="serve-card-title">Physical Education Faculty</div>
+                <div class="serve-card-sub">CHK Department</div>
+                <p class="serve-card-desc">Streamline assessment processes, monitor class progress, and generate detailed reports for effective teaching and student health management.</p>
+            </div>
+            <div class="serve-card reveal reveal-delay-2">
+                <div class="serve-card-icon">🔬</div>
+                <div class="serve-card-title">Researchers</div>
+                <div class="serve-card-sub">Academic Researchers</div>
+                <p class="serve-card-desc">Access aggregated data, perform statistical analysis, and contribute to evidence-based health research with comprehensive analytics tools.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section class="cta-section">
+    <div class="cta-content reveal">
+        <h2 class="cta-title">Ready to <em>transform</em> fitness assessment?</h2>
+        <p class="cta-sub">Join the UMakFIT community and experience the future of fitness tracking in education.</p>
+        <a href="./index.html" class="btn-primary">
+            <span>🚀</span> Get Started Today
+        </a>
+    </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer id="footer">
+    <div class="footer-grid">
+        <div>
+            <div class="footer-logo-area">
+                <a href="./UmakfitLandingpage.html" class="nav-logo" style="display:inline-flex; margin-bottom:0.75rem;">
+                    <div class="logo-mark"><img src="UMakfit Logo (2).png" alt="UMakFIT Logo"></div>
+                    <span class="logo-text">UMakFIT</span>
+                </a>
+            </div>
+            <p class="footer-desc">The official fitness assessment and tracking platform of the College of Human Kinetics at the University of Makati. Promoting health, wellness, and physical excellence.</p>
+            <div class="footer-tags">
+                <span class="footer-tag">Fitness Tracking</span>
+                <span class="footer-tag">Performance Assessment</span>
+                <span class="footer-tag">Health & Wellness</span>
+            </div>
+        </div>
+
+        <div>
+            <div class="footer-heading">Quick Links</div>
+            <ul class="footer-links">
+                <li><a href="./UmakfitLandingpage.html#features">Features</a></li>
+                <li><a href="./UmakfitLandingpage.html#benefits">Benefits</a></li>
+                <li><a href="./UmakfitAbout.html">About</a></li>
+                <li><a href="#footer">Contact</a></li>
+                <li><a href="./index.html">Student Login</a></li>
+                <li><a href="./index.html">Faculty Login</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <div class="footer-heading">Get In Touch</div>
+            <div class="contact-item">
+                <div class="contact-icon">📍</div>
+                <div class="contact-text">
+                    College of Human Kinetics<br>
+                    3rd Floor, Admin Building<br>
+                    University of Makati, JP Rizal Ext.<br>
+                    West Rembo, Taguig City
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">✉️</div>
+                <div class="contact-text"><a href="mailto:chk@umak.edu.ph">chk@umak.edu.ph</a></div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">📞</div>
+                <div class="contact-text">+63 933 189 7230</div>
+            </div>
+            <div class="social-row">
+                <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="social-btn" title="Facebook">f</a>
+                <a href="#" class="social-btn" title="Twitter">𝕏</a>
+                <a href="#" class="social-btn" title="Instagram">◎</a>
+                <a href="#" class="social-btn" title="YouTube">▶</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <span class="footer-copy">© 2025 University of Makati — College of Human Kinetics. All rights reserved.</span>
+        <div class="footer-bottom-links">
+            <a href="https://umak.edu.ph" target="_blank">University of Makati</a>
+            <a href="https://library.umak.edu.ph" target="_blank">UMak Library</a>
+            <a href="https://tbl.umak.edu.ph" target="_blank">TBL Hub</a>
+        </div>
+    </div>
 </footer>
-        <script>
-    // Hamburger Menu Toggle
+
+<script>
+    // Nav scroll
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Hamburger / Left Drawer
     const hamburger = document.getElementById('hamburger');
-    const mobileDrawer = document.getElementById('mobileDrawer');
+    const mobileMenu = document.getElementById('mobileMenu');
     const drawerOverlay = document.getElementById('drawerOverlay');
-    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+    
 
-    // Toggle drawer
+    function openDrawer() {
+    mobileMenu.classList.add('open');
+    drawerOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+    mobileMenu.classList.remove('open');
+    drawerOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+}
     hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        mobileDrawer.classList.toggle('active');
-        drawerOverlay.classList.toggle('active');
-        document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-    });
+    if (mobileMenu.classList.contains('open')) {
+        closeDrawer();
+    } else {
+        openDrawer();
+    }
+});
+    drawerOverlay.addEventListener('click', closeDrawer);
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeDrawer));
 
-    // Close drawer when overlay is clicked
-    drawerOverlay.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        mobileDrawer.classList.remove('active');
-        drawerOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    });
-
-    // Close drawer when nav link is clicked
-    mobileNavLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            mobileDrawer.classList.remove('active');
-            drawerOverlay.classList.remove('active');
-            document.body.style.overflow = '';
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+            e.preventDefault();
+            const el = document.querySelector(a.getAttribute('href'));
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     });
+
+    // Reveal on scroll
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+                observer.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    reveals.forEach(r => observer.observe(r));
+
+    // Story paragraph line animation
+    const storyParagraphs = document.querySelectorAll('.story-paragraph');
+    const storyObserver = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) e.target.classList.add('visible');
+        });
+    }, { threshold: 0.3 });
+    storyParagraphs.forEach(p => storyObserver.observe(p));
 </script>
 </body>
 </html>

@@ -3,792 +3,1805 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMakFit - Fitness Assessment Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <title>UMakFit — Fitness Assessment Platform</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Playfair+Display:wght@700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --navy: #0A1628;
+            --navy-mid: #142240;
+            --navy-light: #1E3358;
+            --gold: #C8992A;
+            --gold-light: #E8BA4A;
+            --gold-pale: #F5E4A8;
+            --cream: #FAF6EE;
+            --white: #FFFFFF;
+            --gray-soft: #8A96A8;
+            --gray-border: rgba(255,255,255,0.1);
+            --text-dark: #0A1628;
+            --text-mid: #3A4A5C;
+        }
+
+        html { scroll-behavior: smooth; }
+
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--navy);
+            color: var(--white);
+            overflow-x: hidden;
         }
-        .font-montserrat {
-            font-family: 'Montserrat', sans-serif;
+
+        /* ─── NAV ─── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 0 clamp(1.5rem, 5vw, 4rem);
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10,22,40,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--gray-border);
+            transition: all 0.3s;
         }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+
+        nav.scrolled {
+            background: rgba(10,22,40,0.98);
+            box-shadow: 0 4px 40px rgba(0,0,0,0.4);
         }
-        
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
         }
-        
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+
+        .logo-mark {
+            width: 48px; height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
         }
-        
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
+
+        .logo-mark img {
+            width: 54px; height: 54px;
+            object-fit: contain;
         }
-        
-        @keyframes bounceSlow {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            font-size: 1.35rem;
+            background: linear-gradient(135deg, var(--gold-pale) 0%, var(--gold) 60%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        
-        .animate-fade-in-up {
-            animation: fadeInUp 1s ease-out;
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            list-style: none;
         }
-        
-        .animate-slide-in-left {
-            animation: slideInLeft 1s ease-out;
+
+        .nav-links a {
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            transition: color 0.2s;
+            position: relative;
         }
-        
-        .animate-slide-in-right {
-            animation: slideInRight 1s ease-out;
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 1px;
+            background: var(--gold-light);
+            transition: width 0.3s;
         }
-        
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
+
+        .nav-links a:hover { color: var(--white); }
+        .nav-links a:hover::after { width: 100%; }
+
+        .nav-cta {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--navy) !important;
+            padding: 0.55rem 1.4rem;
+            border-radius: 8px;
+            font-weight: 600 !important;
+            font-size: 0.85rem !important;
+            letter-spacing: 0.03em;
+            text-decoration: none;
+            transition: all 0.25s !important;
+            box-shadow: 0 4px 16px rgba(200,153,42,0.3);
         }
-        
-        .animate-float-delayed {
-            animation: float 6s ease-in-out infinite 3s;
+
+        .nav-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(200,153,42,0.45) !important;
+            color: var(--navy) !important;
         }
-        
-        .animate-bounce-slow {
-            animation: bounceSlow 2s ease-in-out infinite;
-        }
-        
-        /* Hamburger Menu Styles */
+
+        .nav-cta::after { display: none !important; }
+
+        /* Hamburger */
         .hamburger {
             display: none;
             flex-direction: column;
-            gap: 4px;
+            gap: 5px;
             cursor: pointer;
-            z-index: 60;
+            padding: 4px;
         }
-
         .hamburger span {
-            width: 25px;
-            height: 3px;
-            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
+            display: block;
+            width: 24px; height: 2px;
+            background: var(--gold-light);
             border-radius: 2px;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
+        .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
 
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -6px);
-        }
-
-        /* Mobile Drawer */
-        .mobile-drawer {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 280px;
-            height: 100vh;
-            background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
-            z-index: 55;
-            transition: right 0.3s ease;
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-            overflow-y: auto;
-        }
-
-        .mobile-drawer.active {
-            right: 0;
-        }
-
+        /* ── Drawer Overlay ── */
         .drawer-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 50;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 98;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
         }
+        .drawer-overlay.open { opacity: 1; visibility: visible; }
 
-        .drawer-overlay.active {
-            opacity: 1;
-            visibility: visible;
+        /* ── Left Drawer ── */
+        .mobile-menu {
+            position: fixed;
+            top: 0; left: 0;
+            width: 285px;
+            height: 100vh;
+            background: linear-gradient(170deg, #0A1628 0%, #142240 60%, #1B2F50 100%);
+            border-right: 1px solid rgba(255,255,255,0.08);
+            z-index: 99;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(-100%);
+            transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 12px 0 50px rgba(0,0,0,0.45);
+            overflow-y: auto;
+        }
+        .mobile-menu.open { transform: translateX(0); }
+
+        /* Drawer header */
+        .drawer-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.25rem;
+            height: 72px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+        .drawer-close-btn {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            color: rgba(255,255,255,0.55);
+            font-size: 1.1rem;
+            line-height: 1;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .drawer-close-btn:hover { background: rgba(255,255,255,0.13); color: white; }
+
+        /* Nav links inside drawer */
+        .drawer-nav-section {
+            padding: 1.25rem 1rem;
+            flex: 1;
+        }
+        .drawer-section-label {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: rgba(255,255,255,0.22);
+            font-weight: 700;
+            padding: 0.5rem 0.75rem 0.4rem;
+        }
+        .mobile-menu a {
+            color: rgba(255,255,255,0.68);
+            text-decoration: none;
+            padding: 0.72rem 0.9rem;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            transition: all 0.2s;
+            margin-bottom: 2px;
+        }
+        .mobile-menu a .d-icon {
+            width: 34px; height: 34px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .mobile-menu a:hover { background: rgba(255,255,255,0.07); color: white; }
+        .mobile-menu a:hover .d-icon { background: rgba(200,153,42,0.15); }
+
+        /* CTA inside drawer */
+        .drawer-footer-area {
+            padding: 1rem 1rem 2.5rem;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            flex-shrink: 0;
+        }
+        .mobile-menu .nav-cta {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%) !important;
+            color: var(--navy) !important;
+            padding: 0.9rem 1rem !important;
+            border-radius: 11px !important;
+            font-weight: 700 !important;
+            font-size: 0.92rem !important;
+            box-shadow: 0 4px 20px rgba(200,153,42,0.28);
+            text-align: center;
+            transition: all 0.25s !important;
+            margin-bottom: 0 !important;
+        }
+        .mobile-menu .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(200,153,42,0.4) !important; }
+        .mobile-menu .nav-cta .d-icon { background: rgba(10,22,40,0.15) !important; }
+
+        .drawer-app-info {
+            text-align: center;
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.18);
+            margin-top: 1rem;
+            letter-spacing: 0.04em;
         }
 
         @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-            
-            .desktop-nav {
-                display: none;
-            }
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+        }
+
+        /* ─── HERO ─── */
+        .hero {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 70% 50%, rgba(20,34,64,0.7) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 80% at 10% 90%, rgba(200,153,42,0.08) 0%, transparent 60%),
+                linear-gradient(165deg, #0A1628 0%, #142240 50%, #0E1E38 100%);
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(200,153,42,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200,153,42,0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+        }
+
+        .hero-glow {
+            position: absolute;
+            top: 20%; right: 10%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(200,153,42,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: clamp(6rem, 12vw, 8rem) clamp(1.5rem, 5vw, 4rem) clamp(4rem, 8vw, 6rem);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(200,153,42,0.12);
+            border: 1px solid rgba(200,153,42,0.3);
+            color: var(--gold-light);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            animation: fadeUp 0.8s ease both;
+        }
+
+        .hero-label::before {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--gold-light);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.7); }
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: clamp(2.8rem, 5.5vw, 4.5rem);
+            line-height: 1.05;
+            margin-bottom: 1.5rem;
+            animation: fadeUp 0.8s 0.1s ease both;
+        }
+
+        .hero-title em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--gold-pale) 0%, var(--gold) 50%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            color: rgba(255,255,255,0.6);
+            font-size: 1.05rem;
+            line-height: 1.75;
+            max-width: 480px;
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+            animation: fadeUp 0.8s 0.2s ease both;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            animation: fadeUp 0.8s 0.3s ease both;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--navy);
+            padding: 0.85rem 2rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s;
+            box-shadow: 0 6px 24px rgba(200,153,42,0.35);
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(200,153,42,0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: rgba(255,255,255,0.8);
+            padding: 0.85rem 2rem;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s;
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(255,255,255,0.35);
+            color: white;
+        }
+
+        /* Hero stats */
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 3rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            animation: fadeUp 0.8s 0.4s ease both;
+        }
+
+        .stat-item { text-align: left; }
+
+        .stat-num {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--gold-light);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* Hero right side - Phone mockup */
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeRight 0.9s 0.2s ease both;
+            position: relative;
+        }
+
+        .phone-outer {
+            background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 44px;
+            padding: 12px;
+            width: 300px;
+            box-shadow:
+                0 40px 80px rgba(0,0,0,0.5),
+                0 0 0 1px rgba(255,255,255,0.05),
+                inset 0 1px 0 rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-14px); }
+        }
+
+        .phone-screen {
+            background: var(--cream);
+            border-radius: 34px;
+            overflow: hidden;
+        }
+
+        .phone-notch {
+            background: var(--navy);
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notch-pill {
+            width: 80px; height: 8px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 4px;
+        }
+
+        .phone-body { padding: 16px; }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .app-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .app-avatar {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .score-ring {
+            text-align: center;
+            padding: 16px 8px;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+            border-radius: 14px;
+            margin-bottom: 12px;
+        }
+
+        .ring-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gold-light);
+            margin-bottom: 4px;
+        }
+
+        .ring-score {
+            font-family: 'Space Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            display: block;
+        }
+
+        .ring-grade {
+            display: inline-block;
+            background: rgba(200,153,42,0.2);
+            color: var(--gold-light);
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 100px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .mini-tests { display: flex; flex-direction: column; gap: 8px; }
+
+        .mini-test-item {
+            background: white;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .mini-icon {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .mini-info { flex: 1; }
+
+        .mini-name {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--navy);
+            display: block;
+        }
+
+        .mini-bar-track {
+            height: 4px;
+            background: #EEE;
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .mini-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+        }
+
+        .mini-score {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        /* Floating badge */
+        .float-badge {
+            position: absolute;
+            background: white;
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--navy);
+            white-space: nowrap;
+        }
+
+        .float-badge.left {
+            left: -50px;
+            top: 30%;
+            animation: float 7s 1s ease-in-out infinite;
+        }
+
+        .float-badge.right {
+            right: -40px;
+            bottom: 25%;
+            animation: float 5s 2s ease-in-out infinite;
+        }
+
+        .badge-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+        }
+
+        /* ─── MARQUEE ─── */
+        .marquee-section {
+            border-top: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+            overflow: hidden;
+            padding: 1rem 0;
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 3rem;
+            animation: marquee 25s linear infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        .marquee-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: rgba(255,255,255,0.35);
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .marquee-dot {
+            width: 4px; height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+        }
+
+        /* ─── FEATURES ─── */
+        .features-section {
+            background: var(--cream);
+            color: var(--text-dark);
+            padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem);
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gold);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .section-label::before {
+            content: '';
+            width: 20px; height: 2px;
+            background: var(--gold);
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 900;
+            line-height: 1.1;
+            color: var(--navy);
+            max-width: 560px;
+        }
+
+        .section-title em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5px;
+            background: rgba(0,0,0,0.08);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 4rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+        }
+
+        .feat-card {
+            background: white;
+            padding: clamp(2rem, 4vw, 2.5rem);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.35s;
+        }
+
+        .feat-card:hover::before { transform: scaleX(1); }
+        .feat-card:hover { background: #FEFAF3; }
+
+        .feat-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1.2rem;
+            background: var(--cream);
+            transition: all 0.3s;
+        }
+
+        .feat-card:hover .feat-icon {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        }
+
+        .feat-num {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: rgba(0,0,0,0.2);
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            letter-spacing: 0.05em;
+        }
+
+        .feat-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.01em;
+        }
+
+        .feat-desc {
+            font-size: 0.875rem;
+            color: var(--text-mid);
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        @media (max-width: 900px) {
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 560px) {
+            .features-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ─── WHY SECTION ─── */
+        .why-section {
+            background: var(--navy);
+            padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .why-section::before {
+            content: '';
+            position: absolute;
+            top: -200px; right: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(200,153,42,0.07) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .why-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .why-left { position: relative; z-index: 2; }
+
+        .why-list {
+            list-style: none;
+            margin-top: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .why-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.2rem 1.4rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.03);
+            transition: all 0.3s;
+        }
+
+        .why-item:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(200,153,42,0.25);
+            transform: translateX(4px);
+        }
+
+        .why-item-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(200,153,42,0.2), rgba(200,153,42,0.1));
+            border: 1px solid rgba(200,153,42,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .why-item-text {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .why-item-text strong {
+            color: white;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Dashboard card */
+        .dashboard-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .dash-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .dash-badge {
+            background: rgba(200,153,42,0.15);
+            border: 1px solid rgba(200,153,42,0.25);
+            color: var(--gold-light);
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-weight: 600;
+        }
+
+        .chart-area {
+            height: 120px;
+            position: relative;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 100%;
+        }
+
+        .chart-bar {
+            flex: 1;
+            border-radius: 4px 4px 0 0;
+            background: rgba(255,255,255,0.1);
+            transition: background 0.3s;
+            min-height: 8px;
+        }
+
+        .chart-bar.active { background: linear-gradient(0deg, var(--gold), var(--gold-light)); }
+        .chart-bar:hover { background: rgba(200,153,42,0.5); }
+
+        .metric-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .metric-box {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .metric-val {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-top: 4px;
+        }
+
+        .test-list-dash {
+            margin-top: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .test-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .test-row:last-child { border-bottom: none; }
+
+        .test-row-name {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.65);
+        }
+
+        .test-row-score {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--gold-light);
+            font-weight: 700;
+        }
+
+        @media (max-width: 900px) {
+            .why-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ─── CTA ─── */
+        .cta-section {
+            background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 100%);
+            padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 60% at 50% 100%, rgba(200,153,42,0.1) 0%, transparent 70%);
+        }
+
+        .cta-content { position: relative; z-index: 2; max-width: 640px; margin: 0 auto; }
+
+        .cta-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4.5vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.2rem;
+        }
+
+        .cta-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--gold-pale), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-sub {
+            color: rgba(255,255,255,0.55);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+        }
+
+        /* ─── FOOTER ─── */
+        footer {
+            background: #060E1A;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem) 2rem;
+        }
+
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-logo-area { margin-bottom: 1.2rem; }
+
+        .footer-desc {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.4);
+            line-height: 1.8;
+            font-weight: 300;
+            max-width: 300px;
+        }
+
+        .footer-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 1.2rem;
+        }
+
+        .footer-tag {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.5);
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-weight: 500;
+        }
+
+        .footer-heading {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 1.2rem;
+        }
+
+        .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.45);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .footer-links a:hover { color: rgba(255,255,255,0.85); }
+
+        .footer-links a::before {
+            content: '→';
+            font-size: 0.75rem;
+            color: var(--gold);
+            opacity: 0;
+            transform: translateX(-4px);
+            transition: all 0.2s;
+        }
+
+        .footer-links a:hover::before { opacity: 1; transform: translateX(0); }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 0.8rem;
+        }
+
+        .contact-icon {
+            width: 28px; height: 28px;
+            background: rgba(200,153,42,0.12);
+            border: 1px solid rgba(200,153,42,0.2);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .contact-text {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.5;
+        }
+
+        .contact-text a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .contact-text a:hover { color: var(--gold-light); }
+
+        .social-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 1rem;
+        }
+
+        .social-btn {
+            width: 34px; height: 34px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .social-btn:hover {
+            background: rgba(200,153,42,0.15);
+            border-color: rgba(200,153,42,0.3);
+            color: var(--gold-light);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-copy {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.25);
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-bottom-links a {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.3);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-bottom-links a:hover { color: rgba(255,255,255,0.6); }
+
+        @media (max-width: 900px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .hero-content { grid-template-columns: 1fr; }
+            .hero-visual { display: none; }
+            .phone-outer { width: 260px; }
+            .float-badge { display: none; }
+        }
+
+        @media (max-width: 580px) {
+            .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .hero-stats { flex-wrap: wrap; gap: 1.5rem; }
+        }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,0.35);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .scroll-mouse {
+            width: 22px; height: 34px;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            border-radius: 11px;
+            display: flex;
+            justify-content: center;
+            padding-top: 6px;
+        }
+
+        .scroll-dot {
+            width: 3px; height: 6px;
+            background: var(--gold-light);
+            border-radius: 2px;
+            animation: scrollDot 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollDot {
+            0%, 100% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(8px); opacity: 0.4; }
         }
     </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Header -->
-    <header class="shadow-lg fixed w-full top-0 z-50" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <!-- Logo -->
-                <div class="flex items-center gap-3">
-                    <div class="w-16 h-16 flex items-center justify-center overflow-visible">
-                        <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-20 h-20 object-contain">
-                    </div>
-                    <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-montserrat" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                        UMakFIT
-                    </span>
-                </div>
+<body>
 
-                <!-- Desktop Navigation -->
-                <div class="desktop-nav hidden md:flex items-center gap-8">
-                    <a href="#features" class="text-white/80 hover:text-white font-medium transition-colors">Features</a>
-                    <a href="#benefits" class="text-white/80 hover:text-white font-medium transition-colors">Benefits</a>
-                    <a href="./UmakfitAbout.html" class="text-white/80 hover:text-white font-medium transition-colors">About</a>
-                    <a href="#contact" class="text-white/80 hover:text-white font-medium transition-colors">Contact</a>
-                </div>
+<!-- ─── NAVIGATION ─── -->
+<nav id="mainNav">
+    <a href="#" class="nav-logo">
+        <div class="logo-mark"><img src="UMakfit Logo (2).png" alt="UMakFIT Logo"></div>
+        <span class="logo-text">UMakFIT</span>
+    </a>
 
-                <!-- Login Button (Desktop) -->
-                <a href="./index.html" class="hidden md:block text-blue-900 px-6 py-2.5 rounded-lg font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);">
-                    Login to UmakFit
+    <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#benefits">Benefits</a></li>
+        <li><a href="./UmakfitAbout.html">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="./index.html" class="nav-cta">Login to UMakFit</a></li>
+    </ul>
+
+    <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+    </div>
+</nav>
+
+<!-- Drawer Overlay -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+
+<!-- Left Side Drawer -->
+<div class="mobile-menu" id="mobileMenu">
+    <!-- Drawer Header -->
+    <div class="drawer-top">
+    <a href="#" class="nav-logo" style="text-decoration:none;">
+        <div class="logo-mark"><img src="UMakfit Logo (2).png" alt="UMakFIT Logo"></div>
+        <span class="logo-text">UMakFIT</span>
+    </a>
+</div>
+
+    <!-- Nav Links -->
+    <div class="drawer-nav-section">
+        <div class="drawer-section-label">Navigation</div>
+        <a href="#features" class="drawer-link">
+            <span class="d-icon">📋</span> Features
+        </a>
+        <a href="#benefits" class="drawer-link">
+            <span class="d-icon">⭐</span> Benefits
+        </a>
+        <a href="./UmakfitAbout.html" class="drawer-link">
+            <span class="d-icon">ℹ️</span> About
+        </a>
+        <a href="#contact" class="drawer-link">
+            <span class="d-icon">✉️</span> Contact
+        </a>
+    </div>
+
+    <!-- CTA Footer -->
+    <div class="drawer-footer-area">
+        <a href="./index.html" class="nav-cta">
+            <span class="d-icon">🔑</span>
+            Login to UMakFit
+        </a>
+        <div class="drawer-app-info">University of Makati — College of Human Kinetics</div>
+    </div>
+</div>
+
+<!-- ─── HERO ─── -->
+<section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+
+    <div class="hero-content">
+        <!-- Left -->
+        <div>
+            <div class="hero-label">University of Makati — CHK Platform</div>
+            <h1 class="hero-title">
+                Your Fitness.<br>
+                <em>Measured. Tracked.<br>Improved.</em>
+            </h1>
+            <p class="hero-sub">
+                The official fitness assessment and tracking platform of the College of Human Kinetics. Complete standardized tests, visualize progress, and receive personalized insights — all in one place.
+            </p>
+            <div class="hero-actions">
+                <a href="./index.html" class="btn-primary">
+                    <span>⚡</span>
+                    Begin Assessment
                 </a>
-
-                <!-- Hamburger Menu (Mobile) -->
-                <div class="hamburger" id="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Mobile Drawer Overlay -->
-        <div class="drawer-overlay" id="drawerOverlay"></div>
-
-        <!-- Mobile Drawer -->
-        <div class="mobile-drawer" id="mobileDrawer">
-            <div class="p-6 pt-8">
-                <!-- Drawer Header -->
-                <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-900 rounded-xl flex items-center justify-center text-2xl">
-                        🏃
-                    </div>
-                    <span class="text-2xl font-extrabold font-montserrat" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                        UMakFIT
-                    </span>
-                </div>
-
-                <!-- Navigation Links -->
-                <nav class="space-y-2 mb-8">
-                    <a href="#features" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
-                        Features
-                    </a>
-                    <a href="#benefits" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
-                        Benefits
-                    </a>
-                    <a href="./UmakfitAbout.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
-                        About
-                    </a>
-                    <a href="#contact" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all">
-                        Contact
-                    </a>
-                </nav>
-
-                <!-- Login Button (Mobile) -->
-                <a href="./index.html" class="block w-full text-center text-blue-900 px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);">
-                    Login to UmakFit
+                <a href="#features" class="btn-secondary">
+                    Explore Features →
                 </a>
             </div>
-        </div>
-    </header>
 
-    <!-- Hero Section with Background Image Slider - FIXED -->
-    <section class="relative pt-32 pb-20 overflow-hidden mt-20">
-        <!-- Swiper Background Slider -->
-        <div class="swiper heroSwiper absolute inset-0 w-full h-full">
-            <div class="swiper-wrapper">
-                <!-- Slide 1 -->
-                <div class="swiper-slide">
-                    <div class="absolute inset-0 bg-black/30"></div>
-                    <img src="umakschool.jpg" 
-                         alt="Fitness Training" 
-                         class="w-full h-full object-cover">
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-num">6+</span>
+                    <span class="stat-label">Fitness Tests</span>
                 </div>
-                
-                <!-- Slide 2 -->
-                <div class="swiper-slide">
-                    <div class="absolute inset-0 bg-black/30"></div>
-                    <img src="umakgym.jpg" 
-                         alt="Gym" 
-                         class="w-full h-full object-cover">
+                <div class="stat-item">
+                    <span class="stat-num">100%</span>
+                    <span class="stat-label">Science-Backed</span>
                 </div>
-                
-                <!-- Slide 3 -->
-                <div class="swiper-slide">
-                    <div class="absolute inset-0 bg-black/30"></div>
-                    <img src="UmakOval.jpg" 
-                         alt="Healthy Lifestyle" 
-                         class="w-full h-full object-cover">
-                </div>
-            </div>
-            
-            <!-- Navigation Buttons -->
-            <div class="swiper-button-next !text-white after:!text-3xl"></div>
-            <div class="swiper-button-prev !text-white after:!text-3xl"></div>
-            
-            <!-- Pagination -->
-            <div class="swiper-pagination !bottom-8"></div>
-        </div>
-
-        <!-- Content Overlay -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-                <!-- Hero Content -->
-                <div class="text-white space-y-8">
-                    <h1 class="font-montserrat font-black text-5xl lg:text-7xl leading-tight drop-shadow-lg">
-                        Track Your 
-                        <span class="text-yellow-400">Fitness Journey</span> 
-                        with UMakFit
-                    </h1>
-                    
-                    <h2 class="font-semibold text-4xl lg:text-5xl mb-6" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                        Comprehensive Fitness Assessment
-                    </h2>
-
-                    <div class="flex flex-wrap gap-4">
-                        <button class="bg-gradient-to-r from-amber-400 to-amber-500 text-blue-900 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all flex items-center gap-2 shadow-xl">
-                            <span>▶</span>
-                            Start Your Fitness Test
-                        </button>
-                        <button class="border-2 border-white text-white backdrop-blur-sm bg-white/10 px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/20 transition-all shadow-lg">
-                            Learn More
-                        </button>
-                    </div>
+                <div class="stat-item">
+                    <span class="stat-num">UMak</span>
+                    <span class="stat-label">Official Platform</span>
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- Features Introduction -->
-    <section id="features" class="py-20 bg-white relative overflow-hidden">
-        <!-- Decorative wave at top -->
-        <div class="absolute top-0 left-0 w-full">
-            <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full">
-                <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,58.7C1248,53,1344,43,1392,37.3L1440,32L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z" fill="#f59e0b" fill-opacity="0.3"/>
-            </svg>
-        </div>
-        
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <div class="animate-fade-in-up">
-                <div class="flex justify-center mb-6">
-                    <div class="w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-4xl shadow-lg animate-bounce-slow">
-                        📊
-                    </div>
-                </div>
-                <h2 class="font-semibold text-4xl lg:text-5xl text-blue-900 mb-6">
-                    Comprehensive Fitness Assessment
-                </h2>
-                <p class="text-lg text-gray-500 max-w-3xl mx-auto">
-                    Everything you need to complete, track, and analyze your fitness journey in one powerful platform
-                </p>
+        <!-- Right - Phone -->
+        <div class="hero-visual">
+            <div class="float-badge left">
+                <div class="badge-dot" style="background:#22c55e"></div>
+                Assessment Complete
             </div>
-        </div>
-    </section>
 
-    <!-- Feature Cards -->
-    <section class="py-12 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
-                <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                    <div class="w-14 h-14 bg-gradient-to-r from-blue-600 to-blue-900 rounded-xl flex items-center justify-center mb-6 text-2xl">
-                        📋
+            <div class="phone-outer">
+                <div class="phone-screen">
+                    <div class="phone-notch">
+                        <div class="notch-pill"></div>
                     </div>
-                    <h3 class="font-semibold text-xl text-blue-900 mb-4">
-                        Standardized Fitness Tests
-                    </h3>
-                    <p class="text-blue-900/60 leading-relaxed">
-                        Complete scientifically-backed fitness assessments including cardiovascular endurance, strength, flexibility, and body composition tests with built-in timers and calculators.
-                    </p>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                    <div class="w-14 h-14 bg-gradient-to-r from-blue-600 to-blue-900 rounded-xl flex items-center justify-center mb-6 text-2xl">
-                        📈
-                    </div>
-                    <h3 class="font-semibold text-xl text-blue-900 mb-4">
-                        Real-Time Progress Tracking
-                    </h3>
-                    <p class="text-blue-900/60 leading-relaxed">
-                        Monitor your fitness journey with detailed analytics, progress charts, and personalized insights that help you understand your improvement over time.
-                    </p>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                    <div class="w-14 h-14 bg-gradient-to-r from-blue-600 to-blue-900 rounded-xl flex items-center justify-center mb-6 text-2xl">
-                        🎯
-                    </div>
-                    <h3 class="font-semibold text-xl text-blue-900 mb-4">
-                        Personalized Results & Feedback
-                    </h3>
-                    <p class="text-blue-900/60 leading-relaxed">
-                        Get instant feedback on your performance with age and gender-specific norms, percentile rankings, and actionable recommendations for improvement.
-                    </p>
-                </div>
-
-                <!-- Feature 4 -->
-                <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                    <div class="w-14 h-14 bg-gradient-to-r from-blue-600 to-blue-900 rounded-xl flex items-center justify-center mb-6 text-2xl">
-                        💻
-                    </div>
-                    <h3 class="font-semibold text-xl text-blue-900 mb-4">
-                        User-Friendly Interface
-                    </h3>
-                    <p class="text-blue-900/60 leading-relaxed">
-                        Intuitive design with step-by-step instructions, video guides, and easy-to-use tools that make fitness testing accessible for everyone.
-                    </p>
-                </div>
-
-                <!-- Feature 5 -->
-                <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                    <div class="w-14 h-14 bg-gradient-to-r from-blue-600 to-blue-900 rounded-xl flex items-center justify-center mb-6 text-2xl">
-                        📊
-                    </div>
-                    <h3 class="font-semibold text-xl text-blue-900 mb-4">
-                        Advanced Analytics
-                    </h3>
-                    <p class="text-blue-900/60 leading-relaxed">
-                        Comprehensive reporting system for educators and researchers with group comparisons, statistical analysis, and exportable data for academic purposes.
-                    </p>
-                </div>
-
-                <!-- Feature 6 -->
-                <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                    <div class="w-14 h-14 bg-gradient-to-r from-blue-600 to-blue-900 rounded-xl flex items-center justify-center mb-6 text-2xl">
-                        🔒
-                    </div>
-                    <h3 class="font-semibold text-xl text-blue-900 mb-4">
-                        Secure & Private
-                    </h3>
-                    <p class="text-blue-900/60 leading-relaxed">
-                        Your fitness data is protected with enterprise-grade security. Integrated with UMak credentials for seamless and secure access to your fitness profile.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Why Choose Section -->
-    <section id="benefits" class="relative py-20 overflow-hidden" style="background: linear-gradient(to bottom, #f3e5c3 0%, #e8d4a8 100%);">
-        <!-- Decorative wave at top -->
-        <div class="absolute top-0 left-0 w-full transform -translate-y-1">
-            <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full">
-                <path d="M0,64L48,74.7C96,85,192,107,288,112C384,117,480,107,576,90.7C672,75,768,53,864,48C960,43,1056,53,1152,69.3C1248,85,1344,107,1392,117.3L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z" fill="#f9fafb"/>
-            </svg>
-        </div>
-        
-        <!-- Decorative wave at bottom -->
-        <div class="absolute bottom-0 left-0 w-full transform translate-y-1">
-            <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full">
-                <path d="M0,64L48,74.7C96,85,192,107,288,112C384,117,480,107,576,90.7C672,75,768,53,864,48C960,43,1056,53,1152,69.3C1248,85,1344,107,1392,117.3L1440,128L1440,128L1392,128C1344,128,1248,128,1152,128C1056,128,960,128,864,128C768,128,672,128,576,128C480,128,384,128,288,128C192,128,96,128,48,128L0,128Z" fill="#ffffff"/>
-            </svg>
-        </div>
-        
-        <!-- Decorative shapes -->
-        <div class="absolute top-10 left-10 w-32 h-32 bg-amber-400 rounded-full opacity-10 animate-float"></div>
-        <div class="absolute top-40 right-20 w-24 h-24 bg-white rounded-full opacity-10 animate-float-delayed"></div>
-        <div class="absolute bottom-20 left-1/4 w-40 h-40 bg-amber-400 rounded-full opacity-10 animate-float"></div>
-        <div class="absolute bottom-10 right-1/3 w-28 h-28 bg-white rounded-full opacity-10 animate-float-delayed"></div>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-                <!-- Benefits List -->
-                <div class="text-blue-900 space-y-8 animate-slide-in-left">
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="w-16 h-16 bg-amber-400 rounded-full flex items-center justify-center text-3xl shadow-lg">
-                            ⭐
+                    <div class="phone-body">
+                        <div class="app-header">
+                            <span class="app-title">UMakFIT</span>
+                            <div class="app-avatar">JD</div>
                         </div>
-                        <h2 class="font-semibold text-4xl lg:text-5xl">
-                            Why Choose UmakFit?
-                        </h2>
-                    </div>
 
-                    <div class="space-y-6">
-                        <div class="flex items-center gap-4 transform hover:translate-x-2 transition-transform duration-300">
-                            <div class="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
-                                ⚡
-                            </div>
-                            <p class="text-lg">Complete fitness assessments in minutes, not hours</p>
+                        <div class="score-ring">
+                            <div class="ring-label">Overall Score</div>
+                            <span class="ring-score">84</span>
+                            <span class="ring-grade">GOOD FITNESS</span>
                         </div>
-                        <div class="flex items-center gap-4 transform hover:translate-x-2 transition-transform duration-300">
-                            <div class="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
-                                📈
-                            </div>
-                            <p class="text-lg">Track your progress with beautiful, easy-to-understand charts</p>
-                        </div>
-                        <div class="flex items-center gap-4 transform hover:translate-x-2 transition-transform duration-300">
-                            <div class="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
-                                🎯
-                            </div>
-                            <p class="text-lg">Get personalized recommendations based on your results</p>
-                        </div>
-                        <div class="flex items-center gap-4 transform hover:translate-x-2 transition-transform duration-300">
-                            <div class="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
-                                📄
-                            </div>
-                            <p class="text-lg">Export professional reports for academic or personal use</p>
-                        </div>
-                        <div class="flex items-center gap-4 transform hover:translate-x-2 transition-transform duration-300">
-                            <div class="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
-                                📚
-                            </div>
-                            <p class="text-lg">Access educational content to improve your fitness knowledge</p>
-                        </div>
-                    </div>
 
-                    <button class="bg-gradient-to-r from-amber-400 to-amber-500 text-blue-900 px-8 py-4 rounded-full font-semibold hover:shadow-xl transform hover:-translate-y-1 transition-all mt-8">
-                        Get Started Today
-                    </button>
-                </div>
-
-                <!-- Phone Mockup -->
-                <div class="flex justify-center animate-slide-in-right">
-                    <div class="relative">
-                        <div class="bg-black rounded-[3rem] p-3 w-80 shadow-2xl">
-                            <div class="bg-white rounded-[2.5rem] h-[600px] overflow-hidden">
-                                <div class="p-6">
-                                    <h3 class="font-semibold text-xl text-blue-900 text-center mb-4">
-                                        My Fitness Tests
-                                    </h3>
-                                    <div class="border-t border-gray-200 mb-6"></div>
-
-                                    <div class="space-y-3">
-                                        <!-- Test Item 1 -->
-                                        <div class="bg-gray-100 rounded-xl p-4 flex items-center gap-3">
-                                            <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-900 rounded-lg flex-shrink-0 flex items-center justify-center text-xl">
-                                                💓
-                                            </div>
-                                            <div>
-                                                <h4 class="font-semibold text-blue-900 text-sm">Cardio Endurance</h4>
-                                                <p class="text-xs text-blue-900/60">3-Minute Step Test</p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Test Item 2 -->
-                                        <div class="bg-gray-100 rounded-xl p-4 flex items-center gap-3">
-                                            <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-900 rounded-lg flex-shrink-0 flex items-center justify-center text-xl">
-                                                💪
-                                            </div>
-                                            <div>
-                                                <h4 class="font-semibold text-blue-900 text-sm">Push-Up Test</h4>
-                                                <p class="text-xs text-blue-900/60">Muscular Strength</p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Test Item 3 -->
-                                        <div class="bg-gray-100 rounded-xl p-4 flex items-center gap-3">
-                                            <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-900 rounded-lg flex-shrink-0 flex items-center justify-center text-xl">
-                                                🧘
-                                            </div>
-                                            <div>
-                                                <h4 class="font-semibold text-blue-900 text-sm">Flexibility Test</h4>
-                                                <p class="text-xs text-blue-900/60">Sit-and-Reach</p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Test Item 4 -->
-                                        <div class="bg-gray-100 rounded-xl p-4 flex items-center gap-3">
-                                            <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-900 rounded-lg flex-shrink-0 flex items-center justify-center text-xl">
-                                                ⚖️
-                                            </div>
-                                            <div>
-                                                <h4 class="font-semibold text-blue-900 text-sm">BMI Assessment</h4>
-                                                <p class="text-xs text-blue-900/60">Body Composition</p>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <div class="mini-tests">
+                            <div class="mini-test-item">
+                                <div class="mini-icon" style="background:#FEF3C7">💓</div>
+                                <div class="mini-info">
+                                    <span class="mini-name">Cardio Endurance</span>
+                                    <div class="mini-bar-track"><div class="mini-bar-fill" style="width:78%"></div></div>
                                 </div>
+                                <span class="mini-score">78</span>
+                            </div>
+                            <div class="mini-test-item">
+                                <div class="mini-icon" style="background:#DBEAFE">💪</div>
+                                <div class="mini-info">
+                                    <span class="mini-name">Muscular Strength</span>
+                                    <div class="mini-bar-track"><div class="mini-bar-fill" style="width:91%"></div></div>
+                                </div>
+                                <span class="mini-score">91</span>
+                            </div>
+                            <div class="mini-test-item">
+                                <div class="mini-icon" style="background:#D1FAE5">🧘</div>
+                                <div class="mini-info">
+                                    <span class="mini-name">Flexibility</span>
+                                    <div class="mini-bar-track"><div class="mini-bar-fill" style="width:83%"></div></div>
+                                </div>
+                                <span class="mini-score">83</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- CTA Section -->
-    <section class="py-20 bg-white text-center relative overflow-hidden">
-        <!-- Decorative elements -->
-        <div class="absolute top-0 left-0 w-full h-full opacity-5">
-            <div class="absolute top-10 left-10 w-64 h-64 bg-blue-900 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-10 right-10 w-64 h-64 bg-amber-400 rounded-full blur-3xl"></div>
-        </div>
-        
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="animate-fade-in-up">
-                <div class="flex justify-center mb-6">
-                    <div class="w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-900 rounded-full flex items-center justify-center text-4xl shadow-lg animate-pulse">
-                        🚀
-                    </div>
-                </div>
-                <h2 class="font-semibold text-4xl lg:text-5xl text-blue-900 mb-6 leading-tight">
-                    Ready to Start Your<br>Fitness Journey?
-                </h2>
-                <p class="text-lg text-blue-900/60 mb-10 leading-relaxed">
-                    Join thousands of UMak students and faculty who are already tracking their fitness progress with UMakFit. Create your account and complete your first assessment today.
-                </p>
-                <button class="bg-gradient-to-r from-amber-400 to-amber-500 text-blue-900 px-10 py-4 rounded-full font-semibold text-lg hover:shadow-xl transform hover:scale-105 transition-all animate-bounce-slow">
-                    Login with UMak Credentials
-                </button>
+            <div class="float-badge right">
+                <div class="badge-dot" style="background:#F59E0B"></div>
+                Progress +12% this month
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Footer -->
-    <footer id="contact" class="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 sm:py-12">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
-                <!-- About UmakFit & College of Human Kinetics -->
-                <div>
-                    <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                        <img src="UMakfit Logo (2).png" 
-                             alt="UMak Logo" class="h-12 w-auto object-contain">
-                        <div>
-                            <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
-                            <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
-                        </div>
-                    </div>
-                    <p class="text-sm lg:text-base leading-relaxed text-blue-100">
-                        UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati. 
-                        Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
-                    </p>
-                    <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
-                        <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Fitness Tracking</span>
-                        <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Performance Assessment</span>
-                        <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Health & Wellness</span>
-                    </div>
-                </div>
+    <div class="scroll-indicator">
+        <div class="scroll-mouse"><div class="scroll-dot"></div></div>
+        Scroll
+    </div>
+</section>
 
-                <!-- Quick Links -->
-                <div>
-                    <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
-                    <div class="grid grid-cols-2 gap-4 lg:gap-6">
-                        <div class="space-y-3">
-                            <a href="#features" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-list-check mr-2"></i>Features
-                            </a>
-                            <a href="#benefits" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-star mr-2"></i>Benefits
-                            </a>
-                            <a href="./UmakfitAbout.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-info-circle mr-2"></i>About
-                            </a>
-                        </div>
-                        <div class="space-y-3">
-                            <a href="#contact" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-envelope mr-2"></i>Contact
-                            </a>
-                            <a href="#" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-person-circle mr-2"></i>Student Login
-                            </a>
-                            <a href="#" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-person-badge mr-2"></i>Faculty Login
-                            </a>
-                        </div>
-                    </div>
-                </div>
+<!-- ─── MARQUEE ─── -->
+<div class="marquee-section">
+    <div class="marquee-track" id="marqueeTrack">
+        <span class="marquee-item"><span class="marquee-dot"></span> Cardiovascular Endurance</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Muscular Strength</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Flexibility Assessment</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Body Composition</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Push-Up Test</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Sit-and-Reach</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> 3-Minute Step Test</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> BMI Analysis</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Progress Reports</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Personalized Insights</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Cardiovascular Endurance</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Muscular Strength</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Flexibility Assessment</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Body Composition</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Push-Up Test</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Sit-and-Reach</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> 3-Minute Step Test</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> BMI Analysis</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Progress Reports</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Personalized Insights</span>
+    </div>
+</div>
 
-                <!-- Contact & Social -->
-                <div>
-                    <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
-                    <div class="space-y-4 lg:space-y-5">
-                        <div class="flex items-start gap-3">
-                            <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
-                            <p class="text-sm lg:text-base text-blue-100">
-                                College of Human Kinetics<br>
-                                University of Makati<br>
-                               3rd floor, Administration Building, University of Makati, 
-                               JP Rizal Ext., West Rembo, Taguig City
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
-                            <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">
-                                chk@umak.edu.ph
-                            </a>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
-                            <span class="text-blue-100 text-sm lg:text-base">+63 933 189 7230</span>
-                        </div>
-                        <div class="flex items-center gap-4 pt-3 justify-center lg:justify-start">
-                            <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                                <i class="bi bi-facebook text-white text-lg lg:text-xl"></i>
-                            </a>
-                            <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                                <i class="bi bi-twitter text-white text-lg lg:text-xl"></i>
-                            </a>
-                            <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                                <i class="bi bi-instagram text-white text-lg lg:text-xl"></i>
-                            </a>
-                            <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                                <i class="bi bi-youtube text-white text-lg lg:text-xl"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+<!-- ─── FEATURES ─── -->
+<section class="features-section" id="features">
+    <div style="max-width:1200px; margin:0 auto;">
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1.5rem; margin-bottom:0;">
+            <div>
+                <div class="section-label">Platform Features</div>
+                <h2 class="section-title">Everything you need to <em>excel</em> in fitness</h2>
             </div>
-            
-            <!-- Divider -->
-            <div class="border-t border-blue-600/50 mt-8 lg:mt-12 pt-6 lg:pt-8">
-                <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
-                    <!-- Copyright -->
-                    <div class="text-center lg:text-left">
-                        <p class="text-xs lg:text-sm text-blue-200">
-                            © 2025 University of Makati - College of Human Kinetics. All Rights Reserved.
-                        </p>
+            <p style="font-size:0.9rem; color:var(--text-mid); max-width:380px; line-height:1.7; font-weight:300;">
+                Comprehensive tools built for UMak students and faculty to assess, track, and understand physical fitness with scientific precision.
+            </p>
+        </div>
+
+        <div class="features-grid reveal">
+            <div class="feat-card">
+                <div class="feat-num">01</div>
+                <div class="feat-icon">📋</div>
+                <div class="feat-title">Standardized Fitness Tests</div>
+                <p class="feat-desc">Scientifically-backed assessments including cardiovascular endurance, strength, flexibility, and body composition with built-in timers and calculators.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-num">02</div>
+                <div class="feat-icon">📈</div>
+                <div class="feat-title">Real-Time Progress Tracking</div>
+                <p class="feat-desc">Detailed analytics, progress charts, and personalized insights that help you understand your improvement over time with beautiful visualizations.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-num">03</div>
+                <div class="feat-icon">🎯</div>
+                <div class="feat-title">Personalized Results & Feedback</div>
+                <p class="feat-desc">Instant feedback with age and gender-specific norms, percentile rankings, and actionable recommendations tailored to your profile.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-num">04</div>
+                <div class="feat-icon">💻</div>
+                <div class="feat-title">Intuitive Interface</div>
+                <p class="feat-desc">Step-by-step instructions, clear visual guides, and streamlined tools that make fitness testing accessible and simple for everyone.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-num">05</div>
+                <div class="feat-icon">📊</div>
+                <div class="feat-title">Advanced Analytics</div>
+                <p class="feat-desc">Comprehensive reporting for educators and researchers with group comparisons, statistical analysis, and exportable data for academic use.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-num">06</div>
+                <div class="feat-icon">🔒</div>
+                <div class="feat-title">Secure & Private</div>
+                <p class="feat-desc">Enterprise-grade security protecting your fitness data. Integrated with UMak credentials for seamless, trusted access to your profile.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── WHY ─── -->
+<section class="why-section" id="benefits">
+    <div class="why-grid">
+        <div class="why-left reveal">
+            <div class="section-label" style="color:var(--gold)">Why UMakFIT</div>
+            <h2 class="section-title" style="color:white; max-width:460px;">The smarter way to understand your <em style="color:var(--gold-light)">physical health</em></h2>
+
+            <ul class="why-list">
+                <li class="why-item">
+                    <div class="why-item-icon">⚡</div>
+                    <div class="why-item-text">
+                        <strong>Fast Assessments</strong>
+                        Complete a full fitness battery in minutes, not hours — with automatic scoring
                     </div>
-                    
-                    <!-- University Links -->
-                    <div class="flex flex-wrap justify-center gap-3 lg:gap-4">
-                        <a href="https://umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                            University of Makati
-                        </a>
-                        <span class="text-blue-400">•</span>
-                        <a href="https://library.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                            UMak Online Library
-                        </a>
-                        <span class="text-blue-400">•</span>
-                        <a href="https://tbl.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                            TBL Hub
-                        </a>
+                </li>
+                <li class="why-item">
+                    <div class="why-item-icon">📈</div>
+                    <div class="why-item-text">
+                        <strong>Visual Progress Charts</strong>
+                        Beautiful, easy-to-read charts that show your improvement at a glance
+                    </div>
+                </li>
+                <li class="why-item">
+                    <div class="why-item-icon">🎯</div>
+                    <div class="why-item-text">
+                        <strong>Personalized Recommendations</strong>
+                        Get targeted fitness advice based on your unique results and goals
+                    </div>
+                </li>
+                <li class="why-item">
+                    <div class="why-item-icon">📄</div>
+                    <div class="why-item-text">
+                        <strong>Professional Reports</strong>
+                        Export polished reports suitable for academic or personal documentation
+                    </div>
+                </li>
+                <li class="why-item">
+                    <div class="why-item-icon">📚</div>
+                    <div class="why-item-text">
+                        <strong>Educational Content</strong>
+                        Access curated resources to deepen your understanding of fitness science
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Dashboard visualization -->
+        <div class="reveal" style="transition-delay:0.15s">
+            <div class="dashboard-card">
+                <div class="dashboard-header">
+                    <span class="dash-title">Fitness Dashboard</span>
+                    <span class="dash-badge">Live</span>
+                </div>
+
+                <div class="chart-area">
+                    <div class="chart-bars">
+                        <div class="chart-bar" style="height:45%"></div>
+                        <div class="chart-bar" style="height:60%"></div>
+                        <div class="chart-bar" style="height:50%"></div>
+                        <div class="chart-bar" style="height:75%"></div>
+                        <div class="chart-bar" style="height:65%"></div>
+                        <div class="chart-bar" style="height:80%"></div>
+                        <div class="chart-bar active" style="height:90%"></div>
+                    </div>
+                </div>
+
+                <div class="metric-row">
+                    <div class="metric-box">
+                        <span class="metric-val">84</span>
+                        <div class="metric-label">Overall</div>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-val">+12%</span>
+                        <div class="metric-label">Monthly</div>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-val">Good</span>
+                        <div class="metric-label">Rating</div>
+                    </div>
+                </div>
+
+                <div class="test-list-dash">
+                    <div class="test-row">
+                        <span class="test-row-name">Cardiovascular Endurance</span>
+                        <span class="test-row-score">78 / 100</span>
+                    </div>
+                    <div class="test-row">
+                        <span class="test-row-name">Muscular Strength</span>
+                        <span class="test-row-score">91 / 100</span>
+                    </div>
+                    <div class="test-row">
+                        <span class="test-row-name">Flexibility</span>
+                        <span class="test-row-score">83 / 100</span>
+                    </div>
+                    <div class="test-row">
+                        <span class="test-row-name">Body Composition</span>
+                        <span class="test-row-score">84 / 100</span>
                     </div>
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
+</section>
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<!-- ─── CTA ─── -->
+<section class="cta-section">
+    <div class="cta-content reveal">
+        <h2 class="cta-title">Ready to <em>transform</em> your fitness journey?</h2>
+        <p class="cta-sub">Join UMak students and faculty who are already tracking their fitness with precision. Create your profile and complete your first assessment today.</p>
+        <a href="./index.html" class="btn-primary" style="font-size:1rem; padding:1rem 2.5rem; display:inline-flex; margin:0 auto;">
+            <span>🚀</span>
+            Login with UMak Credentials
+        </a>
+    </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer id="contact">
+    <div class="footer-grid">
+        <div>
+            <div class="footer-logo-area">
+                <a href="#" class="nav-logo" style="display:inline-flex; margin-bottom:0.75rem;">
+                    <div class="logo-mark"><img src="UMakfit Logo (2).png" alt="UMakFIT Logo"></div>
+                    <span class="logo-text">UMakFIT</span>
+                </a>
+            </div>
+            <p class="footer-desc">
+                The official fitness assessment and tracking platform of the College of Human Kinetics at the University of Makati. Promoting health, wellness, and physical excellence.
+            </p>
+            <div class="footer-tags">
+                <span class="footer-tag">Fitness Tracking</span>
+                <span class="footer-tag">Performance Assessment</span>
+                <span class="footer-tag">Health & Wellness</span>
+            </div>
+        </div>
+
+        <div>
+            <div class="footer-heading">Quick Links</div>
+            <ul class="footer-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#benefits">Benefits</a></li>
+                <li><a href="./UmakfitAbout.html">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="./index.html">Student Login</a></li>
+                <li><a href="./index.html">Faculty Login</a></li>
+            </ul>
+        </div>
+
+        <div id="about">
+            <div class="footer-heading">Get In Touch</div>
+
+            <div class="contact-item">
+                <div class="contact-icon">📍</div>
+                <div class="contact-text">
+                    College of Human Kinetics<br>
+                    3rd Floor, Admin Building<br>
+                    University of Makati, JP Rizal Ext.<br>
+                    West Rembo, Taguig City
+                </div>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-icon">✉️</div>
+                <div class="contact-text">
+                    <a href="mailto:chk@umak.edu.ph">chk@umak.edu.ph</a>
+                </div>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-icon">📞</div>
+                <div class="contact-text">+63 933 189 7230</div>
+            </div>
+
+            <div class="social-row">
+                <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="social-btn" title="Facebook">f</a>
+                <a href="#" class="social-btn" title="Twitter">𝕏</a>
+                <a href="#" class="social-btn" title="Instagram">◎</a>
+                <a href="#" class="social-btn" title="YouTube">▶</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <span class="footer-copy">© 2025 University of Makati — College of Human Kinetics. All rights reserved.</span>
+        <div class="footer-bottom-links">
+            <a href="https://umak.edu.ph" target="_blank">University of Makati</a>
+            <a href="https://library.umak.edu.ph" target="_blank">UMak Library</a>
+            <a href="https://tbl.umak.edu.ph" target="_blank">TBL Hub</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Nav scroll
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Left Drawer
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const drawerOverlay = document.getElementById('drawerOverlay');
     
-    <script>
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
+
+    function openDrawer() {
+    mobileMenu.classList.add('open');
+    drawerOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+    mobileMenu.classList.remove('open');
+    drawerOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+    hamburger.addEventListener('click', () => {
+    if (mobileMenu.classList.contains('open')) {
+        closeDrawer();
+    } else {
+        openDrawer();
+    }
+});
+    
+    drawerOverlay.addEventListener('click', closeDrawer);
+
+    mobileMenu.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', closeDrawer);
+    });
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+            e.preventDefault();
+            const el = document.querySelector(a.getAttribute('href'));
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
+    });
 
-        // Initialize Swiper
-        const swiper = new Swiper('.heroSwiper', {
-            slidesPerView: 1,
-            spaceBetween: 0,
-            loop: true,
-            speed: 1000,
-            autoplay: {
-                delay: 4000,
-                disableOnInteraction: false,
-            },
-            effect: 'fade',
-            fadeEffect: {
-                crossFade: true
-            },
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
+    // Reveal on scroll
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+                observer.unobserve(e.target);
+            }
         });
+    }, { threshold: 0.12 });
 
-        // Hamburger Menu Toggle
-        const hamburger = document.getElementById('hamburger');
-        const mobileDrawer = document.getElementById('mobileDrawer');
-        const drawerOverlay = document.getElementById('drawerOverlay');
-        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-
-        if (hamburger && mobileDrawer && drawerOverlay) {
-            // Toggle drawer
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                mobileDrawer.classList.toggle('active');
-                drawerOverlay.classList.toggle('active');
-                document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-            });
-
-            // Close drawer when overlay is clicked
-            drawerOverlay.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                mobileDrawer.classList.remove('active');
-                drawerOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-
-            // Close drawer when nav link is clicked
-            mobileNavLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    mobileDrawer.classList.remove('active');
-                    drawerOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            });
-        }
-    </script>
+    reveals.forEach(r => observer.observe(r));
+</script>
 </body>
 </html>
