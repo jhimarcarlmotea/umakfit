@@ -783,12 +783,13 @@
         });
     }
 
-    window.handleLogout = async function(e) {
+ window.handleLogout = async function(e) {
         if (e) { e.preventDefault(); e.stopPropagation(); }
         document.getElementById('profileDropdown').classList.remove('show');
-        showConfirm('Are you sure you want to sign out?', async () => {
-            if (unsubActivities) unsubActivities();
-            try { await signOut(auth); } catch(err) {}
+        window.showConfirm('Are you sure you want to sign out?', async () => {
+            activeListeners.forEach(u => u());
+            if (refreshTimer) clearInterval(refreshTimer);
+            try { await signOut(auth); } catch(e) {}
             window.location.href = '/login/index.html';
         });
     };

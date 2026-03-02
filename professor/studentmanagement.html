@@ -494,7 +494,7 @@
                             <thead>
                                 <tr>
                                     <th>UMaK ID</th><th>Student Name</th><th>Section</th>
-                                    <th>Best Score</th><th>Average Score</th><th>Last Attempt</th><th>Actions</th>
+                                    <th>Best Score</th><th>Average Score</th><th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="studentsTableBody">
@@ -1225,18 +1225,6 @@
                                 }
                                 if (score > bestScore) bestScore = score;
 
-                                // Track last attempt
-                                let attemptTime = null;
-                                if (data.submittedAt) {
-                                    if (typeof data.submittedAt.toDate === 'function') attemptTime = data.submittedAt.toDate();
-                                    else if (data.submittedAt instanceof Date) attemptTime = data.submittedAt;
-                                    else if (data.submittedAt.seconds) attemptTime = new Date(data.submittedAt.seconds * 1000);
-                                    else if (typeof data.submittedAt === 'string' || typeof data.submittedAt === 'number') attemptTime = new Date(data.submittedAt);
-                                }
-                                if (attemptTime && (!lastAttempt || attemptTime > lastAttempt)) {
-                                    lastAttempt = attemptTime;
-                                    lastAttemptTest = data.testName || '';
-                                }
                             });
                         } catch (e) { console.warn('Error loading attempts for student:', fullName, e); }
                     }
@@ -1337,7 +1325,6 @@
                 <td data-label="Section">${student.section || 'N/A'}</td>
                 <td data-label="Best Score">${scoreDisplay}</td>
                 <td data-label="Average Score">${avgDisplay}</td>
-                <td data-label="Last Attempt">${lastAttemptFormatted}</td>
                 <td data-label="Actions"><div class="action-buttons"><button class="btn-action btn-view" onclick="event.stopPropagation(); viewStudentDetails('${student.id}')"><i class="fas fa-eye"></i> View</button></div></td>
             </tr>`;
         });
@@ -1383,7 +1370,6 @@
                     <div class="student-card-detail"><span class="student-card-label-small">Section</span><span class="student-card-value">${student.section || 'N/A'}</span></div>
                     <div class="student-card-detail"><span class="student-card-label-small">Average Score</span><span class="student-card-value">${student.uniqueTestCount > 0 ? `<strong>${student.averageScore.toFixed(2)}%</strong>` : '—'}</span></div>
                     <div class="student-card-detail"><span class="student-card-label-small">Best</span><span class="student-card-value">${student.totalAttempts > 0 ? `<strong>${student.bestScore}%</strong>` : '—'}</span></div>
-                    <div class="student-card-detail"><span class="student-card-label-small">Last Attempt</span><span class="student-card-value">${lastAttemptFormatted}</span></div>
                 </div>
             </div>`;
         });
@@ -1741,10 +1727,10 @@
     window.exportStudents = function() {
         if (window.filteredStudents.length === 0) { showWarningModal('No students to export.', () => {}, () => {}); return; }
         let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "UMaK ID,Student Name,Section,Total Attempts,Best Score,Average Score (2 decimals),Last Attempt\n";
+        csvContent += "UMaK ID,Student Name,Section,Total Attempts,Best Score,Average Score (2 decimals)\n";
         window.filteredStudents.forEach(student => {
-            const row = [student.umakId || '', `${student.firstName} ${student.lastName}`, student.section || '', student.totalAttempts || 0, student.bestScore || 0, (student.averageScore || 0).toFixed(2), student.lastAttempt instanceof Date && !isNaN(student.lastAttempt) ? student.lastAttempt.toLocaleDateString() : 'No attempts'].map(field => `"${field}"`).join(',');
-            csvContent += row + "\n";
+            const row = [student.umakId || '', `${student.firstName} ${student.lastName}`, student.section || '', student.totalAttempts || 0, student.bestScore || 0, (student.averageScore || 0).toFixed(2)];
+            csvContent += row.map(field => `"${field}"`).join(',') + "\n";
         });
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
