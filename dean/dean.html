@@ -988,7 +988,7 @@
                     <div class="dropdown-header-grad">
                         <div class="dropdown-avatar-lg" id="profileDropdownAvatar">D</div>
                         <div class="dropdown-uname" id="dropdownName">Dean</div>
-                        <div class="dropdown-email" id="dropdownEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="452120242b053028242e6b2021306b352d">[email&#160;protected]</a></div>
+                        <div class="dropdown-email" id="dropdownEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="452120242b053028202e6b2021306b352d">[email&#160;protected]</a></div>
                         <div class="dropdown-badge"><i class="fas fa-user-tie" style="margin-right:4px;"></i> Dean</div>
                     </div>
                     <div class="dropdown-menu-items">
@@ -2267,63 +2267,160 @@
     async function loadStudentRankings() {
         try {
             if (!testResults.length) await loadTestResults();
-            const stuData = {}; studentSections.clear();
+            
+            // Use a Map with a normalized key to prevent duplicates
+            const stuMap = new Map();
+            studentSections.clear();
 
             // ── Step 1: Load ALL students from users collection
             try {
                 const stuSnap = await getDocs(query(collection(db,'users'), where('role','==','student')));
                 stuSnap.forEach(d => {
                     const data = d.data();
-                    const sid  = data.studentId || data.uid || d.id;
-                    const name = data.name || data.displayName || data.firstName || data.email?.split('@')[0] || 'Unknown Student';
-                    const sec  = data.section || data.assignedSection || data.class || data.sectionName || 'N/A';
-                    if (!stuData[sid]) stuData[sid] = { name, id: sid, section: sec, email: data.email||'', tests:[], preScores:[], postScores:[], allScores:[], hasData: false };
-                    if (sec !== 'N/A') studentSections.add(sec);
+                    const studentId = data.studentId || d.id;
+                    const email = data.email || '';
+                    const name = data.name || data.displayName || data.firstName || email.split('@')[0] || 'Unknown Student';
+                    const section = data.section || data.assignedSection || data.class || data.sectionName || 'N/A';
+                    
+                    // Use composite key to prevent duplicates
+                    const key = `${studentId}_${email}`;
+                    
+                    if (!stuMap.has(key)) {
+                        stuMap.set(key, {
+                            id: studentId,
+                            email: email,
+                            name: name,
+                            section: section,
+                            tests: [],
+                            preScores: [],
+                            postScores: [],
+                            allScores: [],
+                            hasData: false,
+                            key: key
+                        });
+                        if (section !== 'N/A') studentSections.add(section);
+                    }
                 });
-            } catch(e) { console.log('Student load failed:', e); }
+            } catch(e) { 
+                console.log('Student load failed:', e); 
+            }
 
-            // ── Step 2: Overlay test results
+            // ── Step 2: Overlay test results, merging by student ID/email
             testResults.forEach(t => {
-                const sid  = t.studentId || t.studentEmail || t.studentName;
-                const name = t.studentName || 'Unknown Student';
-                const sec  = t.section || 'N/A';
+                const studentId = t.studentId || '';
+                const studentEmail = t.studentEmail || '';
+                const studentName = t.studentName || 'Unknown Student';
+                const section = t.section || 'N/A';
                 const score = t.score || 0;
-                const type  = t.type  || 'unknown';
-                if (!stuData[sid]) stuData[sid] = { name, id:sid, section:sec, email:'', tests:[], preScores:[], postScores:[], allScores:[], hasData:false };
-                stuData[sid].tests.push({ name: t.testName||'Unknown', type, score, date: t.submittedAt });
-                stuData[sid].allScores.push(score);
-                stuData[sid].hasData = true;
-                if (type==='pre')  stuData[sid].preScores.push(score);
-                else if (type==='post') stuData[sid].postScores.push(score);
-                if (sec !== 'N/A') studentSections.add(sec);
+                const type = t.type || 'unknown';
+                
+                // Try multiple keys to find the student
+                let found = false;
+                
+                // First try by studentId
+                if (studentId) {
+                    for (let [key, value] of stuMap.entries()) {
+                        if (value.id === studentId) {
+                            found = true;
+                            // Update student data with potentially better info
+                            if (!value.hasData) {
+                                value.name = studentName;
+                                value.section = section;
+                            }
+                            value.tests.push({ name: t.testName||'Unknown', type, score, date: t.submittedAt });
+                            value.allScores.push(score);
+                            value.hasData = true;
+                            if (type === 'pre') value.preScores.push(score);
+                            else if (type === 'post') value.postScores.push(score);
+                            if (section !== 'N/A') studentSections.add(section);
+                            break;
+                        }
+                    }
+                }
+                
+                // If not found by ID, try by email
+                if (!found && studentEmail) {
+                    for (let [key, value] of stuMap.entries()) {
+                        if (value.email === studentEmail) {
+                            found = true;
+                            if (!value.hasData) {
+                                value.name = studentName;
+                                value.section = section;
+                            }
+                            value.tests.push({ name: t.testName||'Unknown', type, score, date: t.submittedAt });
+                            value.allScores.push(score);
+                            value.hasData = true;
+                            if (type === 'pre') value.preScores.push(score);
+                            else if (type === 'post') value.postScores.push(score);
+                            if (section !== 'N/A') studentSections.add(section);
+                            break;
+                        }
+                    }
+                }
+                
+                // If still not found, create a new entry (this student exists in test results but not in users collection)
+                if (!found) {
+                    const key = `test_${studentId}_${studentEmail}_${Date.now()}_${Math.random()}`;
+                    stuMap.set(key, {
+                        id: studentId || 'unknown',
+                        email: studentEmail || '',
+                        name: studentName,
+                        section: section,
+                        tests: [{ name: t.testName||'Unknown', type, score, date: t.submittedAt }],
+                        preScores: type === 'pre' ? [score] : [],
+                        postScores: type === 'post' ? [score] : [],
+                        allScores: [score],
+                        hasData: true,
+                        key: key
+                    });
+                    if (section !== 'N/A') studentSections.add(section);
+                }
             });
 
+            // Convert Map to array for ranking
             studentRankings = [];
-            for (const [sid, data] of Object.entries(stuData)) {
-                const avg  = data.allScores.length  ? data.allScores.reduce((a,b)=>a+b,0)/data.allScores.length   : 0;
-                const preA = data.preScores.length  ? data.preScores.reduce((a,b)=>a+b,0)/data.preScores.length   : 0;
-                const postA= data.postScores.length ? data.postScores.reduce((a,b)=>a+b,0)/data.postScores.length : 0;
+            for (const [key, data] of stuMap.entries()) {
+                const avg = data.allScores.length ? data.allScores.reduce((a,b)=>a+b,0)/data.allScores.length : 0;
+                const preA = data.preScores.length ? data.preScores.reduce((a,b)=>a+b,0)/data.preScores.length : 0;
+                const postA = data.postScores.length ? data.postScores.reduce((a,b)=>a+b,0)/data.postScores.length : 0;
+                
                 studentRankings.push({
-                    id: sid, name: data.name, section: data.section,
+                    id: data.id,
+                    email: data.email,
+                    name: data.name,
+                    section: data.section,
                     testsTaken: data.tests.length,
-                    preTestAvg:  parseFloat(preA.toFixed(2)),
+                    preTestAvg: parseFloat(preA.toFixed(2)),
                     postTestAvg: parseFloat(postA.toFixed(2)),
-                    improvement: parseFloat((postA-preA).toFixed(2)),
-                    avgScore:    parseFloat(avg.toFixed(2)),
+                    improvement: parseFloat((postA - preA).toFixed(2)),
+                    avgScore: parseFloat(avg.toFixed(2)),
                     hasData: data.hasData,
-                    preScores: data.preScores, postScores: data.postScores,
-                    allScores: data.allScores, tests: data.tests
+                    preScores: data.preScores,
+                    postScores: data.postScores,
+                    allScores: data.allScores,
+                    tests: data.tests
                 });
             }
 
             // Students WITH scores ranked desc, then no-score students alphabetically
-            const withData    = studentRankings.filter(s=>s.hasData).sort((a,b)=>b.avgScore-a.avgScore);
-            const withoutData = studentRankings.filter(s=>!s.hasData).sort((a,b)=>a.name.localeCompare(b.name));
+            const withData = studentRankings.filter(s => s.hasData).sort((a, b) => {
+                if (b.avgScore !== a.avgScore) return b.avgScore - a.avgScore;
+                return a.name.localeCompare(b.name);
+            });
+            
+            const withoutData = studentRankings.filter(s => !s.hasData).sort((a, b) => a.name.localeCompare(b.name));
+            
             studentRankings = [...withData, ...withoutData];
 
             console.log(`✅ Student rankings: ${withData.length} with scores, ${withoutData.length} pending`);
-            updateStudentSectionFilter(); filterStudentRankings(); updateStudentRankingSummaryStats();
-        } catch(err) { console.error(err); showAlert('studentRankingAlert','Error: '+err.message,'error'); }
+            updateStudentSectionFilter();
+            filterStudentRankings();
+            updateStudentRankingSummaryStats();
+            
+        } catch(err) { 
+            console.error('Error in loadStudentRankings:', err); 
+            showAlert('studentRankingAlert','Error: '+err.message,'error');
+        }
     }
 
     function updateStudentSectionFilter() {
@@ -2333,51 +2430,61 @@
         Array.from(studentSections).sort().forEach(sec => {
             const o = document.createElement('option'); o.value=sec; o.textContent=sec; el.appendChild(o);
         });
-        el.value = cur;
+        // Try to restore previous selection if it exists
+        if (cur && Array.from(studentSections).includes(cur)) {
+            el.value = cur;
+        }
     }
 
     window.filterStudentRankings = function() {
         const search = (document.getElementById('searchStudentRankings')?.value||'').toLowerCase();
         const sec = document.getElementById('studentSectionFilter')?.value||'all';
         const type = document.getElementById('studentTestTypeFilter')?.value||'all';
+        
         filteredStudentRankings = studentRankings.filter(s => {
-            const ms = s.name.toLowerCase().includes(search)||s.id.toLowerCase().includes(search);
-            const msc = sec==='all'||s.section===sec;
+            const ms = s.name.toLowerCase().includes(search) || 
+                      s.id.toLowerCase().includes(search) ||
+                      (s.email && s.email.toLowerCase().includes(search));
+            const msc = sec === 'all' || s.section === sec;
             let mt = true;
-            if (type==='pre') mt = s.preScores.length>0;
-            else if (type==='post') mt = s.postScores.length>0;
+            if (type === 'pre') mt = s.preScores.length > 0;
+            else if (type === 'post') mt = s.postScores.length > 0;
             return ms && msc && mt;
         });
-        renderStudentRankingTable(); updateStudentRankingSummaryStats();
+        
+        renderStudentRankingTable();
+        updateStudentRankingSummaryStats();
     };
 
     function renderStudentRankingTable() {
         const tbody = document.getElementById('studentRankingTableBody'); if (!tbody) return;
         if (!filteredStudentRankings.length) {
-            tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-icon"><i class="fas fa-user-graduate"></i></div><div class="empty-title">No Students Found</div><div class="empty-sub">No students are registered in the system yet.</div></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-icon"><i class="fas fa-user-graduate"></i></div><div class="empty-title">No Students Found</div><div class="empty-sub">No students match your search criteria.</div></div></td></tr>`;
             return;
         }
+        
         let rankCounter = 0;
         tbody.innerHTML = filteredStudentRankings.map((s) => {
             const hasData = s.hasData;
             if (hasData) rankCounter++;
             const rankDisplay = hasData ? rankCounter : '—';
-            const rc = hasData ? (rankCounter<=3?`rank-${rankCounter}`:'rank-other') : 'rank-other';
-            const ic = s.improvement>0?'trend-up':s.improvement<0?'trend-down':'trend-neutral';
-            const ii = s.improvement>0?'arrow-up':s.improvement<0?'arrow-down':'minus';
+            const rc = hasData ? (rankCounter <= 3 ? `rank-${rankCounter}` : 'rank-other') : 'rank-other';
+            const ic = s.improvement > 0 ? 'trend-up' : s.improvement < 0 ? 'trend-down' : 'trend-neutral';
+            const ii = s.improvement > 0 ? 'arrow-up' : s.improvement < 0 ? 'arrow-down' : 'minus';
             const rt = getScoreRating(s.avgScore);
-            return `<tr style="${!hasData?'opacity:0.65;':''}">
-                <td><div class="rank-num ${rc}" style="${!hasData?'background:var(--surface);color:var(--text-muted);border:1px solid var(--border);':''}">${rankDisplay}</div></td>
+            
+            return `<tr style="${!hasData ? 'opacity:0.65;' : ''}">
+                <td><div class="rank-num ${rc}" style="${!hasData ? 'background:var(--surface);color:var(--text-muted);border:1px solid var(--border);' : ''}">${rankDisplay}</div></td>
                 <td>
                     <span class="cell-primary">${s.name}</span>
                     ${!hasData ? '<span style="margin-left:6px;font-size:10px;background:#f1f5f9;color:#94a3b8;padding:2px 7px;border-radius:10px;font-weight:600;">No data yet</span>' : ''}
                 </td>
                 <td><span style="font-size:13px;">${s.section}</span></td>
-                <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${s.id}</span></td>
+                <td><span style="font-family:\'DM Mono\',monospace;font-size:12px;color:var(--text-muted);">${s.id}</span></td>
                 <td>${s.testsTaken || '—'}</td>
-                <td>${s.preTestAvg>0?s.preTestAvg.toFixed(1):'—'}</td>
-                <td>${s.postTestAvg>0?s.postTestAvg.toFixed(1):'—'}</td>
-                <td>${hasData ? `<span class="${ic}"><i class="fas fa-${ii}" style="margin-right:4px;"></i>${s.improvement>0?'+':''}${s.improvement.toFixed(1)}</span>` : '<span style="color:var(--text-muted);">—</span>'}</td>
+                <td>${s.preTestAvg > 0 ? s.preTestAvg.toFixed(1) : '—'}</td>
+                <td>${s.postTestAvg > 0 ? s.postTestAvg.toFixed(1) : '—'}</td>
+                <td>${hasData ? `<span class="${ic}"><i class="fas fa-${ii}" style="margin-right:4px;"></i>${s.improvement > 0 ? '+' : ''}${s.improvement.toFixed(1)}</span>` : '<span style="color:var(--text-muted);">—</span>'}</td>
                 <td><strong>${hasData ? s.avgScore.toFixed(1) : '—'}</strong></td>
                 <td>${hasData ? `<span class="score-pill ${rt.cls}">${rt.text}</span>` : '<span style="color:var(--text-muted);font-size:12px;">Pending</span>'}</td>
                 <td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewStudentDetails('${s.id.replace(/'/g,"\\'")}')"><i class="fas fa-eye"></i> View</button></div></td>
@@ -2386,56 +2493,73 @@
     }
 
     function updateStudentRankingSummaryStats() {
-        document.getElementById('totalStudentsRanked').textContent = filteredStudentRankings.length;
-        const avgs = filteredStudentRankings.map(s=>s.avgScore).filter(s=>s>0);
-        document.getElementById('studentOverallAvgScore').textContent = avgs.length ? (avgs.reduce((a,b)=>a+b,0)/avgs.length).toFixed(1) : '0.0';
-        if (filteredStudentRankings.length>0) {
-            document.getElementById('topStudentName').textContent = filteredStudentRankings[0].name;
-            document.getElementById('topStudentScore').textContent = filteredStudentRankings[0].avgScore.toFixed(1)+' avg score';
-        } else { document.getElementById('topStudentName').textContent='—'; }
+        const withData = studentRankings.filter(s => s.hasData);
+        document.getElementById('totalStudentsRanked').textContent = withData.length;
+        
+        const avgs = withData.map(s => s.avgScore).filter(s => s > 0);
+        document.getElementById('studentOverallAvgScore').textContent = avgs.length ? (avgs.reduce((a,b) => a + b, 0) / avgs.length).toFixed(1) : '0.0';
+        
+        if (withData.length > 0) {
+            document.getElementById('topStudentName').textContent = withData[0].name;
+            document.getElementById('topStudentScore').textContent = withData[0].avgScore.toFixed(1) + ' avg score';
+        } else {
+            document.getElementById('topStudentName').textContent = '—';
+            document.getElementById('topStudentScore').textContent = '0.0 avg score';
+        }
+        
         document.getElementById('studentSectionsCount').textContent = studentSections.size;
     }
 
     window.refreshStudentRanking = function() {
         showAlert('studentRankingAlert','Refreshing student rankings…','success');
-        loadTestResults().then(()=>loadStudentRankings());
+        loadTestResults().then(() => loadStudentRankings());
     };
 
     window.exportStudentRankingReport = function() {
-        if (!filteredStudentRankings.length) { showAlert('studentRankingAlert','No data to export.','error'); return; }
+        const withData = studentRankings.filter(s => s.hasData);
+        if (!withData.length) { 
+            showAlert('studentRankingAlert','No data to export.','error'); 
+            return; 
+        }
         let csv = "Rank,Student Name,Section,Student ID,Tests Taken,Pre-Test Avg,Post-Test Avg,Improvement,Avg Score,Rating\n";
-        filteredStudentRankings.forEach((s,i) => csv += `${i+1},${s.name},${s.section},${s.id},${s.testsTaken},${s.preTestAvg},${s.postTestAvg},${s.improvement},${s.avgScore},${getScoreRating(s.avgScore).text}\n`);
+        withData.forEach((s, i) => {
+            csv += `${i + 1},${s.name},${s.section},${s.id},${s.testsTaken},${s.preTestAvg},${s.postTestAvg},${s.improvement},${s.avgScore},${getScoreRating(s.avgScore).text}\n`;
+        });
         downloadCSV(csv, `student_rankings_${new Date().toISOString().split('T')[0]}.csv`);
         showAlert('studentRankingAlert','Report exported!','success');
     };
 
     window.viewStudentDetails = async function(studentId) {
-        const s = studentRankings.find(r=>r.id===studentId); if (!s) return;
-        const rank = studentRankings.findIndex(r=>r.id===studentId)+1;
-        const rc = rank<=3?`rank-${rank}`:'rank-other';
+        const s = studentRankings.find(r => r.id === studentId); 
+        if (!s) return;
+        
+        const rank = studentRankings.findIndex(r => r.id === studentId) + 1;
+        const rc = rank <= 3 ? `rank-${rank}` : 'rank-other';
         const rt = getScoreRating(s.avgScore);
-        const sortedTests = [...s.tests].sort((a,b)=>{
-            const da = a.date?.toDate?.() || new Date(a.date||0);
-            const db_ = b.date?.toDate?.() || new Date(b.date||0);
-            return db_ - da;
+        
+        const sortedTests = [...s.tests].sort((a, b) => {
+            const da = a.date?.toDate?.() || new Date(a.date || 0);
+            const db = b.date?.toDate?.() || new Date(b.date || 0);
+            return db - da;
         });
+        
         const testRows = sortedTests.map(t => {
-            const d = t.date?.toDate?.() || new Date(t.date||0);
-            return `<tr><td>${t.name}</td><td>${t.type||'N/A'}</td><td><strong>${t.score}</strong></td><td>${d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</td></tr>`;
-        }).join('') || `<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px;">No test history available.</td></tr>`;
+            const d = t.date?.toDate?.() || new Date(t.date || 0);
+            return `<tr><td>${t.name}</td><td>${t.type || 'N/A'}</td><td><strong>${t.score}</strong></td><td>${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td></tr>`;
+        }).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px;">No test history available.</td></tr>';
 
         document.getElementById('studentDetailsTitle').textContent = `Student: ${s.name}`;
         document.getElementById('studentDetailsContent').innerHTML = `
             <div class="detail-grid" style="margin-bottom:24px;">
                 <div class="detail-block"><div class="detail-block-label">Full Name</div><div class="detail-block-val">${s.name}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Student ID</div><div class="detail-block-val" style="font-family:'DM Mono',monospace;font-size:13px;">${s.id}</div></div>
+                <div class="detail-block"><div class="detail-block-label">Student ID</div><div class="detail-block-val" style="font-family:\'DM Mono\',monospace;font-size:13px;">${s.id}</div></div>
                 <div class="detail-block"><div class="detail-block-label">Section</div><div class="detail-block-val">${s.section}</div></div>
                 <div class="detail-block"><div class="detail-block-label">Tests Taken</div><div class="detail-block-val">${s.testsTaken}</div></div>
                 <div class="detail-block"><div class="detail-block-label">Average Score</div><div class="detail-block-val big">${s.avgScore.toFixed(1)}</div></div>
                 <div class="detail-block"><div class="detail-block-label">Rating</div><div class="detail-block-val"><span class="score-pill ${rt.cls}" style="font-size:13px;">${rt.text}</span></div></div>
-                <div class="detail-block"><div class="detail-block-label">Pre-Test Average</div><div class="detail-block-val">${s.preTestAvg>0?s.preTestAvg.toFixed(1):'N/A'}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Post-Test Average</div><div class="detail-block-val">${s.postTestAvg>0?s.postTestAvg.toFixed(1):'N/A'}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Improvement</div><div class="detail-block-val" style="${s.improvement>0?'color:var(--success)':s.improvement<0?'color:var(--danger)':'color:var(--text-muted)'}">${s.improvement>0?'+':''}${s.improvement.toFixed(1)}</div></div>
+                <div class="detail-block"><div class="detail-block-label">Pre-Test Average</div><div class="detail-block-val">${s.preTestAvg > 0 ? s.preTestAvg.toFixed(1) : 'N/A'}</div></div>
+                <div class="detail-block"><div class="detail-block-label">Post-Test Average</div><div class="detail-block-val">${s.postTestAvg > 0 ? s.postTestAvg.toFixed(1) : 'N/A'}</div></div>
+                <div class="detail-block"><div class="detail-block-label">Improvement</div><div class="detail-block-val" style="${s.improvement > 0 ? 'color:var(--success)' : s.improvement < 0 ? 'color:var(--danger)' : 'color:var(--text-muted)'}">${s.improvement > 0 ? '+' : ''}${s.improvement.toFixed(1)}</div></div>
                 <div class="detail-block"><div class="detail-block-label">Overall Rank</div><div class="detail-block-val"><div class="rank-num ${rc}" style="width:40px;height:40px;font-size:18px;">${rank}</div></div></div>
             </div>
             <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
@@ -2450,16 +2574,23 @@
         document.getElementById('studentDetailsModal').style.display = 'flex';
     };
 
-    window.closeStudentDetailsModal = function() { document.getElementById('studentDetailsModal').style.display='none'; };
+    window.closeStudentDetailsModal = function() { 
+        document.getElementById('studentDetailsModal').style.display = 'none'; 
+    };
 
     // ── ASSESSMENTS ──
     async function loadPreAssessments() {
         try {
             const q = query(collection(db,'assessments'),where('type','==','pre'),orderBy('assessmentDate','desc'));
             const snap = await getDocs(q);
-            preAssessments = []; snap.forEach(d => preAssessments.push({id:d.id,...d.data()}));
+            preAssessments = []; 
+            snap.forEach(d => preAssessments.push({id:d.id,...d.data()}));
             renderPreAssessmentsTable();
-        } catch(e) { preAssessments = []; renderPreAssessmentsTable(); }
+        } catch(e) { 
+            console.error('Error loading pre-assessments:', e);
+            preAssessments = []; 
+            renderPreAssessmentsTable(); 
+        }
     }
 
     function renderPreAssessmentsTable() {
@@ -2469,9 +2600,10 @@
             return;
         }
         tbody.innerHTML = preAssessments.map(a => {
-            const bmi = a.bmi||0; const cat = getBMICategory(bmi);
+            const bmi = a.bmi || 0; 
+            const cat = getBMICategory(bmi);
             const date = a.assessmentDate ? (a.assessmentDate.toDate ? a.assessmentDate.toDate().toLocaleDateString() : new Date(a.assessmentDate).toLocaleDateString()) : 'N/A';
-            return `<tr><td><span class="cell-primary">${a.studentName||'Unknown'}</span></td><td>${a.section||'N/A'}</td><td>${a.height||'N/A'}</td><td>${a.weight||'N/A'}</td><td><strong>${bmi.toFixed(1)}</strong></td><td><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td><td>${date}</td><td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewAssessmentDetails('${a.id}','pre')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
+            return `<tr><td><span class="cell-primary">${a.studentName || 'Unknown'}</span></td><td>${a.section || 'N/A'}</td><td>${a.height || 'N/A'}</td><td>${a.weight || 'N/A'}</td><td><strong>${typeof bmi === 'number' ? bmi.toFixed(1) : bmi}</strong></td><td><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td><td>${date}</td><td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewAssessmentDetails('${a.id}','pre')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
         }).join('');
     }
 
@@ -2479,9 +2611,14 @@
         try {
             const q = query(collection(db,'assessments'),where('type','==','post'),orderBy('assessmentDate','desc'));
             const snap = await getDocs(q);
-            postAssessments = []; snap.forEach(d => postAssessments.push({id:d.id,...d.data()}));
+            postAssessments = []; 
+            snap.forEach(d => postAssessments.push({id:d.id,...d.data()}));
             renderPostAssessmentsTable();
-        } catch(e) { postAssessments = []; renderPostAssessmentsTable(); }
+        } catch(e) { 
+            console.error('Error loading post-assessments:', e);
+            postAssessments = []; 
+            renderPostAssessmentsTable(); 
+        }
     }
 
     function renderPostAssessmentsTable() {
@@ -2491,71 +2628,98 @@
             return;
         }
         tbody.innerHTML = postAssessments.map(a => {
-            const bmi = a.bmi||0; const cat = getBMICategory(bmi);
+            const bmi = a.bmi || 0; 
+            const cat = getBMICategory(bmi);
             const date = a.assessmentDate ? (a.assessmentDate.toDate ? a.assessmentDate.toDate().toLocaleDateString() : new Date(a.assessmentDate).toLocaleDateString()) : 'N/A';
-            return `<tr><td><span class="cell-primary">${a.studentName||'Unknown'}</span></td><td>${a.section||'N/A'}</td><td>${a.height||'N/A'}</td><td>${a.weight||'N/A'}</td><td><strong>${bmi.toFixed(1)}</strong></td><td><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td><td>${a.improvement||'No data'}</td><td>${date}</td><td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewAssessmentDetails('${a.id}','post')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
+            return `<tr><td><span class="cell-primary">${a.studentName || 'Unknown'}</span></td><td>${a.section || 'N/A'}</td><td>${a.height || 'N/A'}</td><td>${a.weight || 'N/A'}</td><td><strong>${typeof bmi === 'number' ? bmi.toFixed(1) : bmi}</strong></td><td><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td><td>${a.improvement || 'No data'}</td><td>${date}</td><td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewAssessmentDetails('${a.id}','post')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
         }).join('');
     }
 
-    window.refreshPreAssessments = function() { showAlert('preAssessmentAlert','Refreshing…','success'); loadPreAssessments(); };
-    window.refreshPostAssessments = function() { showAlert('postAssessmentAlert','Refreshing…','success'); loadPostAssessments(); };
+    window.refreshPreAssessments = function() { 
+        showAlert('preAssessmentAlert','Refreshing pre-assessments…','success'); 
+        loadPreAssessments(); 
+    };
+    
+    window.refreshPostAssessments = function() { 
+        showAlert('postAssessmentAlert','Refreshing post-assessments…','success'); 
+        loadPostAssessments(); 
+    };
 
     window.viewAssessmentDetails = async function(id, type) {
         try {
             const snap = await getDoc(doc(db,'assessments',id));
             if (!snap.exists()) return;
-            const a = snap.data(); const bmi = a.bmi||0; const cat = getBMICategory(bmi);
+            const a = snap.data(); 
+            const bmi = a.bmi || 0; 
+            const cat = getBMICategory(bmi);
             const date = a.assessmentDate ? (a.assessmentDate.toDate ? a.assessmentDate.toDate().toLocaleDateString() : new Date(a.assessmentDate).toLocaleDateString()) : 'N/A';
             let html = `<div class="detail-grid">
-                <div class="detail-block"><div class="detail-block-label">Student Name</div><div class="detail-block-val">${a.studentName||'Unknown'}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Section</div><div class="detail-block-val">${a.section||'N/A'}</div></div>
+                <div class="detail-block"><div class="detail-block-label">Student Name</div><div class="detail-block-val">${a.studentName || 'Unknown'}</div></div>
+                <div class="detail-block"><div class="detail-block-label">Section</div><div class="detail-block-val">${a.section || 'N/A'}</div></div>
                 <div class="detail-block"><div class="detail-block-label">Assessment Date</div><div class="detail-block-val">${date}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Test Score</div><div class="detail-block-val">${a.testScore||'N/A'}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Height (cm)</div><div class="detail-block-val">${a.height||'N/A'}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Weight (kg)</div><div class="detail-block-val">${a.weight||'N/A'}</div></div>
-                <div class="detail-block"><div class="detail-block-label">BMI</div><div class="detail-block-val big">${bmi.toFixed(1)}</div></div>
+                <div class="detail-block"><div class="detail-block-label">Test Score</div><div class="detail-block-val">${a.testScore || 'N/A'}</div></div>
+                <div class="detail-block"><div class="detail-block-label">Height (cm)</div><div class="detail-block-val">${a.height || 'N/A'}</div></div>
+                <div class="detail-block"><div class="detail-block-label">Weight (kg)</div><div class="detail-block-val">${a.weight || 'N/A'}</div></div>
+                <div class="detail-block"><div class="detail-block-label">BMI</div><div class="detail-block-val big">${typeof bmi === 'number' ? bmi.toFixed(1) : bmi}</div></div>
                 <div class="detail-block"><div class="detail-block-label">Category</div><div class="detail-block-val"><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></div></div>`;
-            if (type==='post'&&a.improvement) html += `<div class="detail-block detail-block-full"><div class="detail-block-label">Improvement</div><div class="detail-block-val">${a.improvement}</div></div>`;
+            if (type === 'post' && a.improvement) html += `<div class="detail-block detail-block-full"><div class="detail-block-label">Improvement</div><div class="detail-block-val">${a.improvement}</div></div>`;
             if (a.notes) html += `<div class="detail-block detail-block-full"><div class="detail-block-label">Notes</div><div class="detail-block-val" style="font-size:14px;line-height:1.6;">${a.notes}</div></div>`;
             html += '</div>';
             document.getElementById('assessmentDetailContent').innerHTML = html;
             document.getElementById('assessmentDetailModal').style.display = 'flex';
-        } catch(e) { alert('Error loading assessment details: '+e.message); }
+        } catch(e) { 
+            console.error('Error loading assessment details:', e);
+            alert('Error loading assessment details: ' + e.message); 
+        }
     };
 
-    window.closeAssessmentDetailModal = function() { document.getElementById('assessmentDetailModal').style.display='none'; };
+    window.closeAssessmentDetailModal = function() { 
+        document.getElementById('assessmentDetailModal').style.display = 'none'; 
+    };
 
     window.filterPreAssessments = function() {
-        const search = (document.getElementById('searchPreAssessments')?.value||'').toLowerCase();
-        const cat = document.getElementById('preAssessmentFilter')?.value||'all';
+        const search = (document.getElementById('searchPreAssessments')?.value || '').toLowerCase();
+        const cat = document.getElementById('preAssessmentFilter')?.value || 'all';
         const filtered = preAssessments.filter(a => {
-            const ms = (a.studentName||'').toLowerCase().includes(search)||(a.section||'').toLowerCase().includes(search);
-            const mc = cat==='all'||getBMICategory(a.bmi||0)===cat;
+            const ms = (a.studentName || '').toLowerCase().includes(search) || 
+                      (a.section || '').toLowerCase().includes(search);
+            const mc = cat === 'all' || getBMICategory(a.bmi || 0) === cat;
             return ms && mc;
         });
-        const tbody = document.getElementById('preAssessmentsTableBody'); if (!tbody) return;
-        if (!filtered.length) { tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-sub">No results match your search.</div></div></td></tr>`; return; }
+        const tbody = document.getElementById('preAssessmentsTableBody'); 
+        if (!tbody) return;
+        if (!filtered.length) { 
+            tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-sub">No results match your search.</div></div></td></tr>`; 
+            return; 
+        }
         tbody.innerHTML = filtered.map(a => {
-            const bmi=a.bmi||0; const cat2=getBMICategory(bmi);
-            const date = a.assessmentDate?(a.assessmentDate.toDate?a.assessmentDate.toDate().toLocaleDateString():new Date(a.assessmentDate).toLocaleDateString()):'N/A';
-            return `<tr><td><span class="cell-primary">${a.studentName||'Unknown'}</span></td><td>${a.section||'N/A'}</td><td>${a.height||'N/A'}</td><td>${a.weight||'N/A'}</td><td><strong>${bmi.toFixed(1)}</strong></td><td><span class="bmi-pill ${getBMICategoryClass(cat2)}">${getBMICategoryDisplay(cat2)}</span></td><td>${date}</td><td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewAssessmentDetails('${a.id}','pre')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
+            const bmi = a.bmi || 0; 
+            const cat2 = getBMICategory(bmi);
+            const date = a.assessmentDate ? (a.assessmentDate.toDate ? a.assessmentDate.toDate().toLocaleDateString() : new Date(a.assessmentDate).toLocaleDateString()) : 'N/A';
+            return `<tr><td><span class="cell-primary">${a.studentName || 'Unknown'}</span></td><td>${a.section || 'N/A'}</td><td>${a.height || 'N/A'}</td><td>${a.weight || 'N/A'}</td><td><strong>${typeof bmi === 'number' ? bmi.toFixed(1) : bmi}</strong></td><td><span class="bmi-pill ${getBMICategoryClass(cat2)}">${getBMICategoryDisplay(cat2)}</span></td><td>${date}</td><td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewAssessmentDetails('${a.id}','pre')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
         }).join('');
     };
 
     window.filterPostAssessments = function() {
-        const search = (document.getElementById('searchPostAssessments')?.value||'').toLowerCase();
-        const cat = document.getElementById('postAssessmentFilter')?.value||'all';
+        const search = (document.getElementById('searchPostAssessments')?.value || '').toLowerCase();
+        const cat = document.getElementById('postAssessmentFilter')?.value || 'all';
         const filtered = postAssessments.filter(a => {
-            const ms = (a.studentName||'').toLowerCase().includes(search)||(a.section||'').toLowerCase().includes(search);
-            const mc = cat==='all'||getBMICategory(a.bmi||0)===cat;
+            const ms = (a.studentName || '').toLowerCase().includes(search) || 
+                      (a.section || '').toLowerCase().includes(search);
+            const mc = cat === 'all' || getBMICategory(a.bmi || 0) === cat;
             return ms && mc;
         });
-        const tbody = document.getElementById('postAssessmentsTableBody'); if (!tbody) return;
-        if (!filtered.length) { tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-sub">No results match your search.</div></div></td></tr>`; return; }
+        const tbody = document.getElementById('postAssessmentsTableBody'); 
+        if (!tbody) return;
+        if (!filtered.length) { 
+            tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-sub">No results match your search.</div></div></td></tr>`; 
+            return; 
+        }
         tbody.innerHTML = filtered.map(a => {
-            const bmi=a.bmi||0; const cat2=getBMICategory(bmi);
-            const date = a.assessmentDate?(a.assessmentDate.toDate?a.assessmentDate.toDate().toLocaleDateString():new Date(a.assessmentDate).toLocaleDateString()):'N/A';
-            return `<tr><td><span class="cell-primary">${a.studentName||'Unknown'}</span></td><td>${a.section||'N/A'}</td><td>${a.height||'N/A'}</td><td>${a.weight||'N/A'}</td><td><strong>${bmi.toFixed(1)}</strong></td><td><span class="bmi-pill ${getBMICategoryClass(cat2)}">${getBMICategoryDisplay(cat2)}</span></td><td>${a.improvement||'No data'}</td><td>${date}</td><td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewAssessmentDetails('${a.id}','post')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
+            const bmi = a.bmi || 0; 
+            const cat2 = getBMICategory(bmi);
+            const date = a.assessmentDate ? (a.assessmentDate.toDate ? a.assessmentDate.toDate().toLocaleDateString() : new Date(a.assessmentDate).toLocaleDateString()) : 'N/A';
+            return `<tr><td><span class="cell-primary">${a.studentName || 'Unknown'}</span></td><td>${a.section || 'N/A'}</td><td>${a.height || 'N/A'}</td><td>${a.weight || 'N/A'}</td><td><strong>${typeof bmi === 'number' ? bmi.toFixed(1) : bmi}</strong></td><td><span class="bmi-pill ${getBMICategoryClass(cat2)}">${getBMICategoryDisplay(cat2)}</span></td><td>${a.improvement || 'No data'}</td><td>${date}</td><td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewAssessmentDetails('${a.id}','post')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
         }).join('');
     };
 
@@ -2566,49 +2730,77 @@
             allAccounts = [];
             snap.forEach(d => {
                 const data = d.data();
-                const role = (data.role||'').toLowerCase();
-                if (role==='head_admin') return;
+                const role = (data.role || '').toLowerCase();
+                if (role === 'head_admin') return;
                 const uid = data.uid || d.id;
                 let name = data.name
-                    || (data.firstName||data.lastName ? `${data.firstName||''} ${data.lastName||''}`.trim() : null)
+                    || (data.firstName || data.lastName ? `${data.firstName || ''} ${data.lastName || ''}`.trim() : null)
                     || data.displayName
-                    || data.email?.split('@')[0]
-                    || 'Unknown';
+                    || (data.email ? data.email.split('@')[0] : 'Unknown');
 
                 // Determine college/section to display
                 let college;
                 if (role === 'professor') {
-                    // Professors are always College of Human Kinetics
                     college = 'College of Human Kinetics';
                 } else {
                     college = data.college || data.section || data.assignedClass || data.assignedSection || 'N/A';
                 }
 
-                allAccounts.push({ id:uid, docId:d.id, name, email:data.email||'N/A', role, college, status:data.status||'active', userData:data });
+                allAccounts.push({ 
+                    id: uid, 
+                    docId: d.id, 
+                    name, 
+                    email: data.email || 'N/A', 
+                    role, 
+                    college, 
+                    status: data.status || 'active', 
+                    userData: data 
+                });
             });
-            updateRoleFilterOptions(); filteredAccounts = [...allAccounts]; renderAccountsTable(); updateTotalAccountsCount();
-        } catch(e) { console.error(e); allAccounts=[]; filteredAccounts=[]; renderAccountsTable(); showAlert('accountAlert','Error: '+e.message,'error'); }
+            updateRoleFilterOptions(); 
+            filteredAccounts = [...allAccounts]; 
+            renderAccountsTable(); 
+            updateTotalAccountsCount();
+        } catch(e) { 
+            console.error('Error loading accounts:', e); 
+            allAccounts = []; 
+            filteredAccounts = []; 
+            renderAccountsTable(); 
+            showAlert('accountAlert','Error loading accounts: ' + e.message,'error'); 
+        }
     }
 
     function updateRoleFilterOptions() {
-        const el = document.getElementById('roleFilter'); if (!el) return;
+        const el = document.getElementById('roleFilter'); 
+        if (!el) return;
         const cur = el.value;
-        const roles = new Set(allAccounts.map(a=>a.role).filter(Boolean));
+        const roles = new Set(allAccounts.map(a => a.role).filter(Boolean));
         el.innerHTML = '<option value="all">All Roles</option>';
-        Array.from(roles).sort().forEach(r => { const o=document.createElement('option'); o.value=r; o.textContent=r.charAt(0).toUpperCase()+r.slice(1); el.appendChild(o); });
+        Array.from(roles).sort().forEach(r => { 
+            const o = document.createElement('option'); 
+            o.value = r; 
+            o.textContent = r.charAt(0).toUpperCase() + r.slice(1); 
+            el.appendChild(o); 
+        });
         el.value = cur;
     }
 
     function renderAccountsTable() {
-        const tbody = document.getElementById('accountsTableBody'); if (!tbody) return;
+        const tbody = document.getElementById('accountsTableBody'); 
+        if (!tbody) return;
         if (!filteredAccounts.length) {
             tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon"><i class="fas fa-users"></i></div><div class="empty-title">No Accounts Found</div><div class="empty-sub">No user accounts match your search.</div></div></td></tr>`;
             return;
         }
         tbody.innerHTML = filteredAccounts.map(a => {
-            const display = a.name||a.email?.split('@')[0]||'Unknown';
-            const roleDisplay = a.role ? a.role.charAt(0).toUpperCase()+a.role.slice(1) : 'Unknown';
-            const roleCls = { dean:'badge-dean', professor:'badge-professor', secretary:'badge-secretary', student:'badge-student' }[a.role] || 'badge-default';
+            const display = a.name || a.email?.split('@')[0] || 'Unknown';
+            const roleDisplay = a.role ? a.role.charAt(0).toUpperCase() + a.role.slice(1) : 'Unknown';
+            const roleCls = { 
+                dean: 'badge-dean', 
+                professor: 'badge-professor', 
+                secretary: 'badge-secretary', 
+                student: 'badge-student' 
+            }[a.role] || 'badge-default';
             return `<tr>
                 <td>
                     <div style="display:flex;align-items:center;gap:12px;">
@@ -2622,11 +2814,11 @@
                 <td><span style="font-size:13px;">${a.email}</span></td>
                 <td><span class="badge-pill ${roleCls}">${roleDisplay}</span></td>
                 <td><span style="font-size:13px;">${a.college}</span></td>
-                <td><span class="badge-pill ${a.status==='active'?'badge-active':'badge-inactive'}"><i class="fas fa-circle" style="font-size:7px;margin-right:4px;"></i>${a.status}</span></td>
+                <td><span class="badge-pill ${a.status === 'active' ? 'badge-active' : 'badge-inactive'}"><i class="fas fa-circle" style="font-size:7px;margin-right:4px;"></i>${a.status}</span></td>
                 <td>
                     <div class="tbl-actions">
                         <button class="tbl-btn tbl-btn-edit" onclick="showEditRoleModal('${a.id}','${a.docId}','${display.replace(/'/g,"\\'")}','${a.email.replace(/'/g,"\\'")}','${a.role}')"><i class="fas fa-pen"></i> Role</button>
-                        ${a.status==='active'
+                        ${a.status === 'active'
                             ? `<button class="tbl-btn tbl-btn-deact" onclick="toggleAccountStatus('${a.docId}','inactive')"><i class="fas fa-ban"></i> Deactivate</button>`
                             : `<button class="tbl-btn tbl-btn-act" onclick="toggleAccountStatus('${a.docId}','active')"><i class="fas fa-check"></i> Activate</button>`}
                     </div>
@@ -2635,82 +2827,142 @@
         }).join('');
     }
 
-    function updateTotalAccountsCount() { document.getElementById('totalAccountsCount').textContent = allAccounts.length; }
+    function updateTotalAccountsCount() { 
+        document.getElementById('totalAccountsCount').textContent = allAccounts.length; 
+    }
 
-    window.refreshAccounts = function() { showAlert('accountAlert','Refreshing…','success'); loadAllAccounts(); };
+    window.refreshAccounts = function() { 
+        showAlert('accountAlert','Refreshing accounts…','success'); 
+        loadAllAccounts(); 
+    };
 
     window.filterAccounts = function() {
-        const search = (document.getElementById('searchAccounts')?.value||'').toLowerCase();
-        const role = document.getElementById('roleFilter')?.value||'all';
+        const search = (document.getElementById('searchAccounts')?.value || '').toLowerCase();
+        const role = document.getElementById('roleFilter')?.value || 'all';
         filteredAccounts = allAccounts.filter(a => {
-            const ms = a.name.toLowerCase().includes(search)||a.email.toLowerCase().includes(search)||a.college.toLowerCase().includes(search);
-            return ms && (role==='all'||a.role===role);
+            const ms = a.name.toLowerCase().includes(search) || 
+                      a.email.toLowerCase().includes(search) || 
+                      a.college.toLowerCase().includes(search);
+            return ms && (role === 'all' || a.role === role);
         });
         renderAccountsTable();
     };
 
-    window.filterAccountsByRole = function() { filterAccounts(); };
+    window.filterAccountsByRole = function() { 
+        filterAccounts(); 
+    };
 
     window.showEditRoleModal = function(uid, docId, name, email, role) {
-        currentUserToEdit = { id:uid, docId, name, email, currentRole:role };
+        currentUserToEdit = { id: uid, docId, name, email, currentRole: role };
         document.getElementById('editRoleUserName').textContent = name;
         document.getElementById('editRoleUserEmail').textContent = email;
-        document.getElementById('editRoleCurrentRole').textContent = role.charAt(0).toUpperCase()+role.slice(1);
+        document.getElementById('editRoleCurrentRole').textContent = role.charAt(0).toUpperCase() + role.slice(1);
         const sel = document.getElementById('editRoleSelect');
         sel.innerHTML = `<option value="">— Choose Role —</option>
-            <option value="dean" ${role==='dean'?'selected':''}>Dean</option>
-            <option value="professor" ${role==='professor'?'selected':''}>Professor</option>
-            <option value="secretary" ${role==='secretary'?'selected':''}>Secretary</option>
-            <option value="student" ${role==='student'?'selected':''}>Student</option>`;
+            <option value="dean" ${role === 'dean' ? 'selected' : ''}>Dean</option>
+            <option value="professor" ${role === 'professor' ? 'selected' : ''}>Professor</option>
+            <option value="secretary" ${role === 'secretary' ? 'selected' : ''}>Secretary</option>
+            <option value="student" ${role === 'student' ? 'selected' : ''}>Student</option>`;
         document.getElementById('editRoleModal').style.display = 'flex';
     };
 
-    window.closeEditRoleModal = function() { document.getElementById('editRoleModal').style.display='none'; currentUserToEdit=null; };
+    window.closeEditRoleModal = function() { 
+        document.getElementById('editRoleModal').style.display = 'none'; 
+        currentUserToEdit = null; 
+    };
 
     window.updateUserRole = async function() {
         if (!currentUserToEdit) return;
         const newRole = document.getElementById('editRoleSelect')?.value;
-        if (!newRole) { alert('Please select a role.'); return; }
-        if (newRole===currentUserToEdit.currentRole) { alert('This is already the current role.'); return; }
-        if (!confirm(`Change ${currentUserToEdit.name}'s role to ${newRole.charAt(0).toUpperCase()+newRole.slice(1)}?`)) return;
+        if (!newRole) { 
+            alert('Please select a role.'); 
+            return; 
+        }
+        if (newRole === currentUserToEdit.currentRole) { 
+            alert('This is already the current role.'); 
+            return; 
+        }
+        if (!confirm(`Change ${currentUserToEdit.name}'s role to ${newRole.charAt(0).toUpperCase() + newRole.slice(1)}?`)) return;
         try {
             let ref = doc(db,'users',currentUserToEdit.docId);
             let d = await getDoc(ref);
-            if (!d.exists()) { ref = doc(db,'users',currentUserToEdit.id); }
-            await updateDoc(ref, { role:newRole, updatedAt:serverTimestamp() });
-            showAlert('accountAlert',`✅ ${currentUserToEdit.name}'s role updated to ${newRole.charAt(0).toUpperCase()+newRole.slice(1)}.`,'success');
-            closeEditRoleModal(); await loadAllAccounts(); await loadDashboardStats();
-        } catch(e) { showAlert('accountAlert','❌ Error: '+e.message,'error'); }
+            if (!d.exists()) { 
+                ref = doc(db,'users',currentUserToEdit.id); 
+            }
+            await updateDoc(ref, { 
+                role: newRole, 
+                updatedAt: serverTimestamp() 
+            });
+            showAlert('accountAlert',`✅ ${currentUserToEdit.name}'s role updated to ${newRole.charAt(0).toUpperCase() + newRole.slice(1)}.`,'success');
+            closeEditRoleModal(); 
+            await loadAllAccounts(); 
+            await loadDashboardStats();
+        } catch(e) { 
+            console.error('Error updating role:', e);
+            showAlert('accountAlert','❌ Error: ' + e.message,'error'); 
+        }
     };
 
     window.toggleAccountStatus = async function(docId, newStatus) {
-        const a = allAccounts.find(ac=>ac.docId===docId); if (!a) return;
-        const action = newStatus==='active'?'activate':'deactivate';
-        if (!confirm(`Are you sure you want to ${action} ${a.name||a.email}?`)) return;
+        const a = allAccounts.find(ac => ac.docId === docId); 
+        if (!a) return;
+        const action = newStatus === 'active' ? 'activate' : 'deactivate';
+        if (!confirm(`Are you sure you want to ${action} ${a.name || a.email}?`)) return;
         try {
             let ref = doc(db,'users',docId);
             const d = await getDoc(ref);
-            if (!d.exists()) ref = doc(db,'users',a.id);
-            await updateDoc(ref, { status:newStatus, updatedAt:serverTimestamp() });
+            if (!d.exists()) { 
+                ref = doc(db,'users',a.id); 
+            }
+            await updateDoc(ref, { 
+                status: newStatus, 
+                updatedAt: serverTimestamp() 
+            });
             showAlert('accountAlert',`✅ Account ${action}d successfully.`,'success');
-            await loadAllAccounts(); await loadDashboardStats();
-        } catch(e) { showAlert('accountAlert','❌ Error: '+e.message,'error'); }
+            await loadAllAccounts(); 
+            await loadDashboardStats();
+        } catch(e) { 
+            console.error('Error toggling account status:', e);
+            showAlert('accountAlert','❌ Error: ' + e.message,'error'); 
+        }
     };
 
     // ── HELPERS ──
     function showAlert(id, msg, type) {
-        const el = document.getElementById(id); if (!el) return;
+        const el = document.getElementById(id); 
+        if (!el) return;
         el.className = `alert-msg alert-${type} show`;
-        el.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i><span>${msg}</span>`;
+        el.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i><span>${msg}</span>`;
         setTimeout(() => el.classList.remove('show'), 5000);
     }
 
     function downloadCSV(content, filename) {
         const blob = new Blob([content], {type:'text/csv'});
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href=url; a.download=filename; a.click();
+        const a = document.createElement('a'); 
+        a.href = url; 
+        a.download = filename; 
+        a.click();
         URL.revokeObjectURL(url);
     }
+
+    // Make functions available globally
+    window.viewAssessmentDetails = viewAssessmentDetails;
+    window.closeAssessmentDetailModal = closeAssessmentDetailModal;
+    window.filterPreAssessments = filterPreAssessments;
+    window.filterPostAssessments = filterPostAssessments;
+    window.refreshPreAssessments = refreshPreAssessments;
+    window.refreshPostAssessments = refreshPostAssessments;
+    window.showEditRoleModal = showEditRoleModal;
+    window.closeEditRoleModal = closeEditRoleModal;
+    window.updateUserRole = updateUserRole;
+    window.toggleAccountStatus = toggleAccountStatus;
+    window.filterAccounts = filterAccounts;
+    window.filterAccountsByRole = filterAccountsByRole;
+    window.refreshAccounts = refreshAccounts;
+    window.exportStudentRankingReport = exportStudentRankingReport;
+    window.viewStudentDetails = viewStudentDetails;
+    window.closeStudentDetailsModal = closeStudentDetailsModal;
 </script>
 </body>
 </html>
