@@ -333,7 +333,7 @@
                             <i class="fas fa-user-circle w-4 text-center"></i><span>View Profile</span>
                         </a>
                         <div class="h-px bg-border my-1 mx-2"></div>
-                        <div onclick="showLogoutModal(event)" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer text-danger text-[13px] font-medium hover:bg-danger-bg transition-all">
+                        <div onclick="handleLogout(event)" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer text-danger text-[13px] font-medium hover:bg-danger-bg transition-all">
                             <i class="fas fa-sign-out-alt w-4 text-center"></i><span>Sign Out</span>
                         </div>
                     </div>
@@ -812,10 +812,127 @@
         setAvatar('profileDropdownAvatar');
     }
     window.updateProfileUI = updateProfileUI;
-    window.showLogoutModal = function(event) {
-        if (event) event.preventDefault();
-        document.getElementById('profileDropdown').classList.remove('show');
-        if (window._showLogoutConfirm) window._showLogoutConfirm();
+
+    // Logout popup (matching student dashboard / professor pages)
+    function showLogoutConfirmPopup() {
+        const existing = document.getElementById('logoutOverlay');
+        if (existing) existing.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'logoutOverlay';
+        overlay.style.cssText = `
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 99999; padding: 1rem;
+            animation: fadeInLogout 0.2s ease;
+        `;
+
+        overlay.innerHTML = `
+            <style>
+                @keyframes fadeInLogout { from { opacity:0; } to { opacity:1; } }
+                @keyframes slideUpLogout { from { opacity:0; transform:translateY(24px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+            </style>
+            <div style="
+                background:#fff;
+                border-radius:24px;
+                padding:2rem 1.5rem 1.5rem;
+                max-width:360px;
+                width:100%;
+                box-shadow:0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
+                animation:slideUpLogout 0.35s cubic-bezier(.4,0,.2,1);
+                text-align:center;
+                font-family:'Inter',sans-serif;
+            ">
+                <div style="
+                    width:68px; height:68px;
+                    background:#fce8e6;
+                    border-radius:50%;
+                    display:flex; align-items:center; justify-content:center;
+                    margin:0 auto 1.25rem;
+                ">
+                    <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
+                        <path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
+                        <path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+
+                <div style="font-size:1.25rem; font-weight:600; color:#202124; margin-bottom:0.35rem; letter-spacing:-0.01em;">
+                    Log Out
+                </div>
+
+                <div style="font-size:0.875rem; color:#5f6368; margin-bottom:1.5rem; line-height:1.5;">
+                    Are you sure you want to log out of your account?
+                </div>
+
+                <div style="height:1px; background:#e8eaed; margin:0 -1.5rem 1.25rem;"></div>
+
+                <div style="display:flex; gap:0.75rem;">
+                    <button id="logoutCancelBtn" style="
+                        flex:1;
+                        padding:0.75rem 0.5rem;
+                        border-radius:100px;
+                        border:1.5px solid #dadce0;
+                        background:#fff;
+                        color:#3c4043;
+                        font-size:0.9375rem;
+                        font-weight:500;
+                        cursor:pointer;
+                        font-family:'Inter',sans-serif;
+                        transition:background 0.15s;
+                        min-height:48px;
+                    ">Cancel</button>
+                    <button id="logoutConfirmBtn" style="
+                        flex:1;
+                        padding:0.75rem 0.5rem;
+                        border-radius:100px;
+                        border:none;
+                        background:#ea4335;
+                        color:#fff;
+                        font-size:0.9375rem;
+                        font-weight:500;
+                        cursor:pointer;
+                        font-family:'Inter',sans-serif;
+                        transition:background 0.15s, box-shadow 0.15s;
+                        min-height:48px;
+                    ">Log Out</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        const profileDropdown = document.getElementById('profileDropdown');
+        if (profileDropdown) profileDropdown.classList.remove('show');
+
+        document.getElementById('logoutCancelBtn').addEventListener('click', () => {
+            overlay.remove();
+        });
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) overlay.remove();
+        });
+
+        document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
+            const confirmBtn = document.getElementById('logoutConfirmBtn');
+            confirmBtn.textContent = 'Logging out...';
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = '0.7';
+
+            try {
+                await signOut(auth);
+                window.location.href = '/login/index.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                overlay.remove();
+                alert('Error logging out. Please try again.');
+            }
+        });
+    }
+
+    window.handleLogout = function(event) {
+        if (event) { event.preventDefault(); event.stopPropagation(); }
+        showLogoutConfirmPopup();
     };
 </script>
 
