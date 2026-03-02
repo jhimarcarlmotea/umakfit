@@ -3,2553 +3,1103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMakFit - Professor Profile</title>
+    <title>UMakFit — Professor Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
- <style>
-        * { 
-            -webkit-font-smoothing: antialiased; 
-            box-sizing: border-box; 
-            font-family: 'Poppins', sans-serif; 
-        }
-        body { 
-            margin: 0; 
-            padding: 0; 
-            background-color: #f6f6f6;
-            overflow-x: hidden;
-            width: 100%;
-        }
-        
-        .font-montserrat {
-            font-family: 'Montserrat', sans-serif;
-        }
-        
-        /* Custom animations */
-        @keyframes pulse { 
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
-        .spinner {
-            border: 4px solid #e5e7eb;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        
-        /* ============ DASHBOARD-STYLE ALERT MODALS ============ */
-        .alert-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-            padding: 1rem;
-            animation: fadeIn 0.2s ease;
-        }
-        
-        .alert-popup-card {
-            background: #fff;
-            border-radius: 28px;
-            padding: 2.5rem 2rem 2rem;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
-            animation: slideUp 0.35s cubic-bezier(.4,0,.2,1);
-            text-align: center;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .alert-icon-circle {
-            width: 72px; 
-            height: 72px;
-            background: #fce8e6;
-            border-radius: 50%;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            margin: 0 auto 1.25rem;
-        }
-        
-        .alert-icon-circle.success {
-            background: #d1fae5;
-        }
-        
-        .alert-icon-circle.info {
-            background: #dbeafe;
-        }
-        
-        .alert-icon-circle.warning {
-            background: #fef3c7;
-        }
-        
-        .alert-icon-circle.error {
-            background: #fee2e2;
-        }
-        
-        .alert-title {
-            font-size: 1.375rem;
-            font-weight: 600;
-            color: #202124;
-            margin-bottom: 0.4rem;
-            letter-spacing: -0.01em;
-        }
-        
-        .alert-message {
-            font-size: 0.875rem;
-            color: #5f6368;
-            margin-bottom: 1.75rem;
-        }
-        
-        .alert-divider {
-            height: 1px;
-            background: #e8eaed;
-            margin: 0 -2rem 1.5rem;
-        }
-        
-        .alert-btn-row {
-            display: flex;
-            gap: 0.75rem;
-        }
-        
-        .alert-btn-cancel {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border-radius: 100px;
-            border: 1px solid #dadce0;
-            background: #fff;
-            color: #3c4043;
-            font-size: 0.9375rem;
-            font-weight: 500;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: background 0.15s;
-        }
-        
-        .alert-btn-cancel:hover { 
-            background: #f8f9fa; 
-        }
-        
-        .alert-btn-confirm {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border-radius: 100px;
-            border: none;
-            background: #3b82f6;
-            color: #fff;
-            font-size: 0.9375rem;
-            font-weight: 500;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: background 0.15s, box-shadow 0.15s;
-        }
-        
-        .alert-btn-confirm.success {
-            background: #10b981;
-        }
-        
-        .alert-btn-confirm.success:hover {
-            background: #059669;
-        }
-        
-        .alert-btn-confirm.error {
-            background: #ef4444;
-        }
-        
-        .alert-btn-confirm.error:hover {
-            background: #dc2626;
-        }
-        
-        .alert-btn-confirm.warning {
-            background: #f59e0b;
-        }
-        
-        .alert-btn-confirm.warning:hover {
-            background: #d97706;
-        }
-        
-        .alert-btn-confirm.info {
-            background: #3b82f6;
-        }
-        
-        .alert-btn-confirm.info:hover {
-            background: #2563eb;
-        }
-        
-        .alert-btn-confirm:hover {
-            box-shadow: 0 2px 8px rgba(59,130,246,0.35);
-        }
-        
-        .alert-btn-confirm:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        /* Hamburger Menu Styles */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            cursor: pointer;
-            z-index: 60;
-        }
-
-        .hamburger span {
-            width: 22px;
-            height: 3px;
-            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -6px);
-        }
-
-        /* Mobile Drawer */
-        .mobile-drawer {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 260px;
-            height: 100vh;
-            background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
-            z-index: 55;
-            transition: right 0.3s ease;
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-            overflow-y: auto;
-        }
-
-        .mobile-drawer.active { right: 0; }
-        .drawer-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        .drawer-overlay.active { opacity: 1; visibility: visible; }
-
-        @media (max-width: 768px) {
-            .hamburger { display: flex; }
-            .desktop-nav { display: none; }
-        }
-        
-        /* Gradient text */
-        .gradient-text {
-            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .slide-down {
-            animation: slideDown 0.3s ease;
-        }
-        
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.3s ease;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #3b82f6;
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #2563eb;
-        }
-        
-        .card-shadow {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        
-        .profile-section-card {
-            transition: all 0.3s ease;
-        }
-        
-        .profile-section-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-        }
-        
-        .student-avatar {
-            transition: all 0.3s ease;
-        }
-        
-        .student-avatar:hover {
-            transform: scale(1.1);
-            z-index: 10;
-        }
-        
-        /* ============ FIXED MODAL STYLES - NO VERTICAL SCROLL ON MODAL ITSELF ============ */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 1000px;
-            display: flex;
-            flex-direction: column;
-            max-height: 85vh;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            animation: slideDown 0.3s ease;
-        }
-        
-        .modal-header {
-            flex-shrink: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            border-bottom: 1px solid #e2e8f0;
-            background-color: white;
-            border-radius: 16px 16px 0 0;
-        }
-        
-        .modal-header h3 {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
-            color: #1e3a8a;
-            font-size: 24px;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .modal-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px;
-            background-color: white;
-        }
-        
-        .modal-footer {
-            flex-shrink: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            border-top: 1px solid #e2e8f0;
-            background-color: #f9fafb;
-            border-radius: 0 0 16px 16px;
-        }
-        
-        .modal-close-btn {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background-color: #f3f4f6;
-            color: #4b5563;
-            font-size: 20px;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .modal-close-btn:hover {
-            background-color: #e5e7eb;
-            color: #111827;
-        }
-        
-        /* Student table styles */
-        .student-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .student-table th {
-            background: #f8fafc;
-            padding: 12px 16px;
-            text-align: left;
-            font-weight: 600;
-            color: #374151;
-            border-bottom: 2px solid #e5e7eb;
-        }
-        
-        .student-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .student-table tr:hover {
-            background: #f9fafb;
-        }
-        
-        /* Print styles */
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            
-            .print-content {
-                display: block !important;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .modal-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-            
-            .modal-header h3 {
-                font-size: 20px;
-            }
-            
-            .modal-body {
-                padding: 16px;
-            }
-            
-            .modal-footer {
-                flex-direction: column;
-                gap: 12px;
-            }
-            
-            .modal-footer > div:first-child {
-                text-align: center;
-            }
-            
-            .student-table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-            
-            .profile-section-card {
-                padding: 16px !important;
-            }
-            
-            .profile-section-card h3 {
-                font-size: 18px;
-            }
-        }
-        
-        /* COMPACT NAVIGATION STYLES */
-        .logo-compact {
-            margin-right: 0.75rem;
-        }
-        
-        .nav-group {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .nav-link-compact {
-            padding: 0.35rem 0.6rem;
-            font-size: 0.85rem;
-            white-space: nowrap;
-        }
-        
-        .profile-compact {
-            margin-left: 0.75rem;
-        }
-        
-        @media (min-width: 1280px) {
-            .nav-link-compact {
-                padding: 0.4rem 0.7rem;
-                font-size: 0.9rem;
-            }
-        }
-    </style>
-</head>
-<body class="bg-gray-50 overflow-x-hidden">
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="fixed inset-0 bg-white bg-opacity-95 flex flex-col justify-center items-center z-50">
-        <div class="w-12 h-12 border-4 border-gray-100 border-t-blue-500 rounded-full spinner"></div>
-        <div class="mt-5 text-gray-600 font-medium">Loading Profile...</div>
-    </div>
-    
-    <!-- ============ DASHBOARD-STYLE ALERT MODALS ============ -->
-    <!-- Success Modal -->
-    <div class="alert-modal-overlay" id="successModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle success">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#10b981" stroke-width="3" fill="none"/>
-                    <path d="M16 24L22 30L32 18" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <div class="alert-title" id="successTitle">Success</div>
-            <div class="alert-message" id="successMessage">Operation completed successfully.</div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-confirm success" id="successOkBtn">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Info Modal -->
-    <div class="alert-modal-overlay" id="infoModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle info">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#3b82f6" stroke-width="3" fill="none"/>
-                    <path d="M24 16V24M24 32V32.5" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="alert-title" id="infoTitle">Information</div>
-            <div class="alert-message" id="infoMessage"></div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-confirm info" id="infoOkBtn">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Warning Modal -->
-    <div class="alert-modal-overlay" id="warningModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle warning">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <path d="M24 4L4 40H44L24 4Z" stroke="#f59e0b" stroke-width="3" fill="none"/>
-                    <circle cx="24" cy="32" r="2" fill="#f59e0b"/>
-                    <path d="M24 16V24" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="alert-title" id="warningTitle">Warning</div>
-            <div class="alert-message" id="warningMessage"></div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-cancel" id="warningCancelBtn">Cancel</button>
-                <button class="alert-btn-confirm warning" id="warningConfirmBtn">Continue</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Error Modal -->
-    <div class="alert-modal-overlay" id="errorModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle error">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#ef4444" stroke-width="3" fill="none"/>
-                    <line x1="16" y1="16" x2="32" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
-                    <line x1="32" y1="16" x2="16" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="alert-title" id="errorTitle">Error</div>
-            <div class="alert-message" id="errorMessage"></div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-confirm error" id="errorOkBtn">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Confirm Modal (Yes/No) -->
-    <div class="alert-modal-overlay" id="confirmModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle warning">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#f59e0b" stroke-width="3" fill="none"/>
-                    <path d="M24 16V24M24 32V32.5" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="alert-title">Confirm Action</div>
-            <div class="alert-message" id="confirmMessage"></div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-cancel" id="confirmNoBtn">No</button>
-                <button class="alert-btn-confirm warning" id="confirmYesBtn">Yes</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="profileContent" class="hidden overflow-x-hidden">
-        <!-- COMPACT NAVIGATION BANNER -->
-        <header class="shadow-lg fixed w-full top-0 z-50" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
-            <nav class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-                <div class="flex justify-between items-center h-14 md:h-16">
-                    
-                    <!-- LOGO - compact -->
-                    <div class="flex items-center logo-compact">
-                        <div class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center overflow-visible">
-                            <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-12 h-12 md:w-14 md:h-14 object-contain">
-                        </div>
-                        <span class="text-base sm:text-lg md:text-xl lg:text-2xl font-extrabold font-montserrat gradient-text ml-1">
-                            UMakFIT
-                        </span>
-                    </div>
-
-                    <!-- DESKTOP NAVIGATION - super compact -->
-                    <div class="hidden md:flex items-center nav-group">
-                        <!-- Dashboard -->
-                        <a href="professor.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
-                        </a>
-                        
-                        <!-- Students -->
-                        <a href="studentmanagement.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-users mr-1"></i>Students
-                        </a>
-                        
-                        <!-- Activities -->
-                        <a href="addactivities.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-dumbbell mr-1"></i>Activities
-                        </a>
-                        
-                        <!-- Lessons -->
-                        <a href="addlesson.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-book-open mr-1"></i>Lessons
-                        </a>
-                        
-                        <!-- Monitoring -->
-                        <a href="monitoringactivities.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-chart-bar mr-1"></i>Monitoring
-                        </a>
-                        
-                        <!-- Grades -->
-                        <a href="grades.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-graduation-cap mr-1"></i>Grades
-                        </a>
-                        
-                        <!-- Section Rank -->
-                        <a href="sectionranklist.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-trophy mr-1"></i>Rank
-                        </a>
-                    </div>
-
-                    <!-- PROFILE - compact (active) -->
-                    <div class="hidden md:block relative profile-compact">
-                        <img src="" alt="Profile" id="profilePictureBtn"
-                             class="w-7 h-7 md:w-8 md:h-8 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
-                        
-                        <!-- Profile Dropdown -->
-                        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-                            <div class="p-3 border-b-2 border-gray-200 text-center">
-                                <img src="" alt="Profile" id="profileDropdownPicture" class="w-14 h-14 rounded-full mx-auto mb-2 border-3 border-blue-500 object-cover">
-                                <h6 id="profileDropdownName" class="font-bold text-gray-900 text-sm">Loading...</h6>
-                                <p id="profileDropdownEmail" class="text-xs text-gray-500 mt-1 truncate px-2">Loading...</p>
-                            </div>
-                            <div class="p-1">
-                                <a href="professor-profile.html" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-xs bg-blue-50">
-                                    <i class="bi bi-person-circle text-blue-500 text-base"></i>
-                                    <span class="font-medium text-gray-700">View Profile</span>
-                                </a>
-                                <div class="h-px bg-gray-200 my-1"></div>
-                                <div onclick="handleLogout(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
-                                    <i class="fas fa-sign-out-alt text-base"></i>
-                                    <span class="font-medium">Logout</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- MOBILE MENU -->
-                    <div class="flex md:hidden items-center gap-2">
-                        <!-- Mobile Profile -->
-                        <div class="relative">
-                            <img src="" alt="Profile" id="profilePictureBtnMobile"
-                                 class="w-7 h-7 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
-                            
-                            <div id="profileDropdownMobile" class="hidden fixed right-2 top-14 w-56 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-                                <div class="p-3 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-14 h-14 rounded-full mx-auto mb-2 border-3 border-blue-500 object-cover">
-                                    <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-sm">Loading...</h6>
-                                    <p id="profileDropdownEmailMobile" class="text-xs text-gray-500 mt-1 truncate px-2">Loading...</p>
-                                </div>
-                                <div class="p-1">
-                                    <a href="professor-profile.html" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-xs bg-blue-50">
-                                        <i class="bi bi-person-circle text-blue-500 text-base"></i>
-                                        <span class="font-medium text-gray-700">View Profile</span>
-                                    </a>
-                                    <div class="h-px bg-gray-200 my-1"></div>
-                                    <div onclick="handleLogout(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
-                                        <i class="fas fa-sign-out-alt text-base"></i>
-                                        <span class="font-medium">Logout</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Hamburger Menu -->
-                        <div class="hamburger" id="hamburger">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Mobile Drawer Overlay -->
-            <div class="drawer-overlay" id="drawerOverlay"></div>
-
-            <!-- Mobile Drawer -->
-            <div class="mobile-drawer" id="mobileDrawer">
-                <div class="p-5 pt-6">
-                    <!-- Drawer Header -->
-                    <div class="flex items-center gap-2 mb-6 pb-4 border-b border-white/20">
-                        <div class="w-10 h-10 flex items-center justify-center overflow-visible">
-                            <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-12 h-12 object-contain">
-                        </div>
-                        <span class="text-xl font-extrabold font-montserrat gradient-text">
-                            UMakFIT
-                        </span>
-                    </div>
-
-                    <!-- Navigation Links -->
-                    <nav class="space-y-1 mb-6">
-                        <a href="professor.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
-                        </a>
-                        <a href="studentmanagement.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-users mr-2"></i>Student Management
-                        </a>
-                        <a href="addactivities.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-dumbbell mr-2"></i>Add Activities
-                        </a>
-                        <a href="addlesson.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-book-open mr-2"></i>Add Lesson
-                        </a>
-                        <a href="monitoringactivities.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-chart-bar mr-2"></i>Monitoring Activities
-                        </a>
-                        <a href="grades.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-graduation-cap mr-2"></i>Grades
-                        </a>
-                        <a href="sectionranklist.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-trophy mr-2"></i>Section Rank
-                        </a>
-                    </nav>
-                    
-                    <!-- Active Profile Indicator -->
-                    <div class="mt-4 p-4 bg-white/10 rounded-lg">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 flex items-center justify-center">
-                                <i class="fas fa-user-tie text-blue-900"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="text-white text-sm font-semibold" id="mobileProfessorName">Professor</div>
-                                <div class="text-white/70 text-xs">Viewing Profile</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Main Content - with top padding to account for fixed header -->
-        <div class="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen pt-32 pb-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Header with Back Button -->
-                <div class="flex items-center justify-between mb-6 no-print">
-                    <div class="flex items-center space-x-4">
-                        <h1 class="text-2xl md:text-3xl font-bold text-blue-900">Professor Profile</h1>
-                    </div>
-                    <div class="flex space-x-3">
-                    <button onclick="refreshProfile()" class="no-print flex items-center px-4 py-2 bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-semibold rounded-lg transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                        <i class="fas fa-sync-alt mr-2"></i>
-                        <span class="hidden sm:inline">Refresh</span>
-                        <span class="sm:hidden">Refresh</span>
-                    </button>
-                </div>
-                </div>
-
-                <!-- Profile Overview -->
-                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 mb-8">
-                    <div class="flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-8">
-                        <!-- Profile Picture -->
-                        <div class="flex flex-col items-center">
-                            <div class="relative">
-                                <img id="profileMainPicture" src="" alt="Profile" class="w-40 h-40 rounded-full border-4 border-blue-100 object-cover shadow-lg">
-                                <div class="absolute bottom-3 right-3 w-8 h-8 bg-gradient-to-r from-amber-400 to-amber-500 rounded-full flex items-center justify-center border-2 border-white">
-                                    <i class="fas fa-user-tie text-blue-900 text-sm"></i>
-                                </div>
-                            </div>
-                            <div class="mt-4 text-center">
-                                <div class="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-blue-900 text-sm font-semibold">
-                                    <i class="fas fa-user-tie mr-1"></i>
-                                    <span>Professor</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Profile Details -->
-                        <div class="flex-1">
-                            <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
-                                <div>
-                                    <h2 id="profileFullName" class="text-2xl md:text-3xl font-bold text-gray-900">Loading...</h2>
-                                    <p id="profileEmail" class="text-gray-600 mt-1">Loading...</p>
-                                </div>
-                                <div class="mt-4 md:mt-0">
-                                    <div class="text-sm text-gray-500">Professor ID</div>
-                                    <div id="professorId" class="font-mono text-lg font-bold text-blue-700">Loading...</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Stats Grid -->
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center border border-blue-200">
-                                    <div class="text-2xl font-bold text-blue-700" id="statTotalSections">0</div>
-                                    <div class="text-sm text-gray-600 mt-1">Sections</div>
-                                </div>
-                                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 text-center border border-green-200">
-                                    <div class="text-2xl font-bold text-green-700" id="statTotalStudents">0</div>
-                                    <div class="text-sm text-gray-600 mt-1">Students</div>
-                                </div>
-                                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 text-center border border-purple-200">
-                                    <div class="text-2xl font-bold text-purple-700" id="statActivitiesCreated">0</div>
-                                    <div class="text-sm text-gray-600 mt-1">Activities</div>
-                                </div>
-                                <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 text-center border border-yellow-200">
-                                    <div class="text-2xl font-bold text-yellow-700" id="statLessonsCreated">0</div>
-                                    <div class="text-sm text-gray-600 mt-1">Lessons</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sections and Students -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Sections Card -->
-                    <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 profile-section-card">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-bold text-gray-900 flex items-center">
-                                <i class="fas fa-chalkboard-teacher text-blue-500 mr-2"></i>
-                                Assigned Sections
-                                <span class="ml-2 bg-blue-100 text-blue-700 text-sm font-medium px-2.5 py-0.5 rounded-full" id="sectionsCount">0</span>
-                            </h3>
-                            <div class="flex items-center space-x-3">
-                                <button onclick="openSectionsModal()" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
-                                    <i class="fas fa-expand-alt mr-1"></i>
-                                    <span>View All</span>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div id="sectionsList" class="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                            <!-- Sections will be loaded here -->
-                            <div class="text-center py-8">
-                                <div class="text-5xl mb-3 opacity-40">📚</div>
-                                <div class="text-gray-700 font-semibold mb-1">Loading sections...</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Students Card -->
-                    <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 profile-section-card">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-bold text-gray-900 flex items-center">
-                                <i class="fas fa-user-graduate text-green-500 mr-2"></i>
-                                Students by Section
-                                <span class="ml-2 bg-green-100 text-green-700 text-sm font-medium px-2.5 py-0.5 rounded-full" id="studentsCount">0</span>
-                            </h3>
-                            <div class="flex items-center space-x-3">
-                                <div class="relative">
-                                    <select id="sectionFilter" class="appearance-none bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8">
-                                        <option value="all">All Sections</option>
-                                        <!-- Sections will be added here -->
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                        <i class="fas fa-chevron-down"></i>
-                                    </div>
-                                </div>
-                                <button onclick="openStudentsModal()" class="text-green-600 hover:text-green-800 text-sm font-medium flex items-center">
-                                    <i class="fas fa-expand-alt mr-1"></i>
-                                    <span>View All</span>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div id="studentsList" class="max-h-[500px] overflow-y-auto pr-2">
-                            <!-- Students will be loaded here -->
-                            <div class="text-center py-8">
-                                <div class="text-5xl mb-3 opacity-40">👥</div>
-                                <div class="text-gray-700 font-semibold mb-1">Loading students...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Activity History -->
-                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 mt-8">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 flex items-center">
-                            <i class="fas fa-history text-blue-500 mr-2"></i>
-                            Recent Activity History
-                        </h3>
-                        <button onclick="viewFullHistory()" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
-                            <i class="fas fa-external-link-alt mr-1"></i>
-                            View Full History
-                        </button>
-                    </div>
-                    
-                    <div id="activityHistory" class="space-y-4">
-                        <!-- Activity history will be loaded here -->
-                        <div class="text-center py-8">
-                            <div class="text-5xl mb-3 opacity-40">📊</div>
-                            <div class="text-gray-700 font-semibold mb-1">Loading activity history...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-                    <!-- ============ FULL ACTIVITY HISTORY MODAL ============ -->
-            <div id="activityHistoryModal" class="modal-overlay hidden">
-                <div class="modal-content" style="max-width: 750px;" onclick="event.stopPropagation()">
-                    <div class="modal-header">
-                        <div>
-                            <h3 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                                <i class="fas fa-history text-purple-500"></i>
-                                Full Activity History
-                            </h3>
-                            <p class="text-gray-500 text-sm mt-1">
-                                All test activities and lessons you have created —
-                                <span id="fullHistoryCount" class="font-semibold text-purple-600">0</span> total
-                            </p>
-                        </div>
-                        <button class="modal-close-btn" onclick="closeActivityHistoryModal()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="fullHistoryList" class="space-y-3">
-                            <div class="text-center py-8 text-gray-500">Loading history...</div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <div class="text-gray-500 text-sm">
-                            Showing all activity history
-                        </div>
-                        <button onclick="closeActivityHistoryModal()"
-                            class="px-5 py-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-blue-900 font-semibold rounded-lg transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                            Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        <!-- ✅ UPDATED FOOTER - MATCHING LANDING PAGE DESIGN -->
-        <footer class="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 sm:py-12">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
-                    <!-- About UmakFit & College of Human Kinetics -->
-                    <div>
-                        <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                            <img src="UMakfit Logo (2).png" 
-                                 alt="UMak Logo" class="h-12 w-auto object-contain">
-                            <div>
-                                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
-                                <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
-                            </div>
-                        </div>
-                        <p class="text-sm lg:text-base leading-relaxed text-blue-100">
-                            UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati. 
-                            Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
-                        </p>
-                        <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
-                            <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Fitness Tracking</span>
-                            <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Performance Assessment</span>
-                            <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Health & Wellness</span>
-                        </div>
-                    </div>
-
-                    <!-- Quick Links -->
-                    <div>
-                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
-                        <div class="grid grid-cols-2 gap-4 lg:gap-6">
-                            <div class="space-y-3">
-                                <a href="professor.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-tachometer mr-2"></i>Dashboard
-                                </a>
-                                <a href="studentmanagement.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-people mr-2"></i>Students
-                                </a>
-                                <a href="addactivities.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-dumbbell mr-2"></i>Activities
-                                </a>
-                            </div>
-                            <div class="space-y-3">
-                                <a href="addlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-book mr-2"></i>Lessons
-                                </a>
-                                <a href="monitoringactivities.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-graph-up mr-2"></i>Monitoring
-                                </a>
-                                <a href="grades.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-mortarboard mr-2"></i>Grades
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Contact & Social -->
-                    <div>
-                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
-                        <div class="space-y-4 lg:space-y-5">
-                            <div class="flex items-start gap-3">
-                                <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
-                                <p class="text-sm lg:text-base text-blue-100">
-                                    College of Human Kinetics<br>
-                                    University of Makati<br>
-                                   3rd floor, Administration Building, University of Makati, 
-                                   JP Rizal Ext., West Rembo, Taguig City
-                                </p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
-                                <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">
-                                    chk@umak.edu.ph
-                                </a>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
-                                <span class="text-blue-100 text-sm lg:text-base">+63 933 189 7230</span>
-                            </div>
-                            <div class="flex items-center gap-4 pt-3 justify-center lg:justify-start">
-                                <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                                    <i class="bi bi-facebook text-white text-lg lg:text-xl"></i>
-                                </a>
-                                <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                                    <i class="bi bi-twitter text-white text-lg lg:text-xl"></i>
-                                </a>
-                                <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                                    <i class="bi bi-instagram text-white text-lg lg:text-xl"></i>
-                                </a>
-                                <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                                    <i class="bi bi-youtube text-white text-lg lg:text-xl"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Divider -->
-                <div class="border-t border-blue-600/50 mt-8 lg:mt-12 pt-6 lg:pt-8">
-                    <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
-                        <!-- Copyright -->
-                        <div class="text-center lg:text-left">
-                            <p class="text-xs lg:text-sm text-blue-200">
-                                © 2025 University of Makati - College of Human Kinetics. All Rights Reserved.
-                            </p>
-                        </div>
-                        
-                        <!-- University Links -->
-                        <div class="flex flex-wrap justify-center gap-3 lg:gap-4">
-                            <a href="https://umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                                University of Makati
-                            </a>
-                            <span class="text-blue-400">•</span>
-                            <a href="https://library.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                                UMak Online Library
-                            </a>
-                            <span class="text-blue-400">•</span>
-                            <a href="https://tbl.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                                TBL Hub
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </footer>
-    </div>
-
-    <!-- ============ ⭐ FIXED MODAL FOR ALL SECTIONS - NO VERTICAL SCROLL ON MODAL ITSELF ============ -->
-    <div id="sectionsModal" class="modal-overlay hidden">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <div>
-                    <h3 class="text-2xl font-bold text-gray-900">All Sections</h3>
-                    <p class="text-gray-600 mt-1 text-sm">Showing all assigned sections with complete details</p>
-                </div>
-               <div class="flex items-center space-x-3">
-                    <button class="modal-close-btn" onclick="closeSectionsModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="modal-body">
-                <div id="modalSectionsList" class="space-y-4">
-                    <!-- Modal sections will be loaded here -->
-                </div>
-            </div>
-            
-            <div class="modal-footer">
-                <div class="text-gray-600 text-sm">
-                    <span id="modalSectionCount">0</span> sections found
-                </div>
-                <div class="flex items-center space-x-3">
-                    <button onclick="closeSectionsModal()" class="px-4 py-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-blue-900 font-semibold rounded-lg transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============ ⭐ FIXED MODAL FOR ALL STUDENTS - NO VERTICAL SCROLL ON MODAL ITSELF ============ -->
-    <div id="studentsModal" class="modal-overlay hidden">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <div>
-                    <h3 class="text-2xl font-bold text-gray-900">All Students</h3>
-                    <p class="text-gray-600 mt-1 text-sm">Showing all students across all sections</p>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <div class="relative">
-                        <select id="modalSortStudents" class="appearance-none bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8">
-                            <option value="name-asc">Sort by: Name (A-Z)</option>
-                            <option value="name-desc">Sort by: Name (Z-A)</option>
-                            <option value="section-asc">Sort by: Section (A-Z)</option>
-                            <option value="section-desc">Sort by: Section (Z-A)</option>
-                            <option value="email-asc">Sort by: Email (A-Z)</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                            <i class="fas fa-sort"></i>
-                        </div>
-                    </div>
-                    <button class="modal-close-btn" onclick="closeStudentsModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="modal-body">
-                <div class="mb-4">
-                    <div class="relative w-full">
-                        <input type="text" id="studentSearch" placeholder="Search students by name or email..." 
-                               class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                            <i class="fas fa-search"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="student-table w-full">
-                        <thead>
-                            <tr>
-                                <th>Student Name</th>
-                                <th>Email</th>
-                                <th>Section</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="modalStudentsList">
-                            <!-- Modal students will be loaded here -->
-                            <tr>
-                                <td colspan="4" class="text-center py-8 text-gray-500">
-                                    Loading students...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="modal-footer">
-                <div class="text-gray-600 text-sm">
-                    <span id="modalStudentCount">0</span> students found
-                </div>
-                <div class="flex items-center space-x-3">
-                    <button onclick="exportStudents()" class="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg flex items-center transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                        <i class="fas fa-download mr-2"></i>
-                        Export
-                    </button>
-                    <button onclick="closeStudentsModal()" class="px-4 py-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-blue-900 font-semibold rounded-lg transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
-            authDomain: "umakfit-e3b1d.firebaseapp.com",
-            projectId: "umakfit-e3b1d",
-            storageBucket: "umakfit-e3b1d.appspot.com",
-            messagingSenderId: "276569891504",
-            appId: "1:276569891504:web:39b1732b519f4d8b785175"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // ============ DASHBOARD-STYLE ALERT FUNCTIONS ============
-        function showSuccessModal(message, onOk) {
-            const modal = document.getElementById('successModal');
-            const messageEl = document.getElementById('successMessage');
-            const okBtn = document.getElementById('successOkBtn');
-            
-            messageEl.textContent = message;
-            
-            // Clone button to remove previous listeners
-            const newOkBtn = okBtn.cloneNode(true);
-            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-            
-            newOkBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onOk) onOk();
-            });
-            
-            modal.style.display = 'flex';
-        }
-
-        function showInfoModal(message, onOk) {
-            const modal = document.getElementById('infoModal');
-            const messageEl = document.getElementById('infoMessage');
-            const okBtn = document.getElementById('infoOkBtn');
-            
-            messageEl.textContent = message;
-            
-            const newOkBtn = okBtn.cloneNode(true);
-            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-            
-            newOkBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onOk) onOk();
-            });
-            
-            modal.style.display = 'flex';
-        }
-
-        function showWarningModal(message, onConfirm, onCancel) {
-            const modal = document.getElementById('warningModal');
-            const messageEl = document.getElementById('warningMessage');
-            const confirmBtn = document.getElementById('warningConfirmBtn');
-            const cancelBtn = document.getElementById('warningCancelBtn');
-            
-            messageEl.textContent = message;
-            
-            const newConfirmBtn = confirmBtn.cloneNode(true);
-            const newCancelBtn = cancelBtn.cloneNode(true);
-            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
-            
-            newConfirmBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onConfirm) onConfirm();
-            });
-            
-            newCancelBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onCancel) onCancel();
-            });
-            
-            modal.style.display = 'flex';
-        }
-
-        function showErrorModal(message, onOk) {
-            const modal = document.getElementById('errorModal');
-            const messageEl = document.getElementById('errorMessage');
-            const okBtn = document.getElementById('errorOkBtn');
-            
-            messageEl.textContent = message;
-            
-            const newOkBtn = okBtn.cloneNode(true);
-            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-            
-            newOkBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onOk) onOk();
-            });
-            
-            modal.style.display = 'flex';
-        }
-
-        function showConfirmModal(message, onYes, onNo) {
-            const modal = document.getElementById('confirmModal');
-            const messageEl = document.getElementById('confirmMessage');
-            const yesBtn = document.getElementById('confirmYesBtn');
-            const noBtn = document.getElementById('confirmNoBtn');
-            
-            messageEl.textContent = message;
-            
-            const newYesBtn = yesBtn.cloneNode(true);
-            const newNoBtn = noBtn.cloneNode(true);
-            yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
-            noBtn.parentNode.replaceChild(newNoBtn, noBtn);
-            
-            newYesBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onYes) onYes();
-            });
-            
-            newNoBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onNo) onNo();
-            });
-            
-            modal.style.display = 'flex';
-        }
-
-        let currentProfessor = null;
-        let professorSections = [];
-        let professorStudents = [];
-        let professorActivities = [];
-        let professorLessons = [];
-        let currentSectionSort = 'name-asc';
-        let currentStudentSort = 'name-asc';
-
-        // DOM Elements
-        const hamburger = document.getElementById('hamburger');
-        const mobileDrawer = document.getElementById('mobileDrawer');
-        const drawerOverlay = document.getElementById('drawerOverlay');
-        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-        const profilePictureBtn = document.getElementById('profilePictureBtn');
-        const profilePictureBtnMobile = document.getElementById('profilePictureBtnMobile');
-        const profileDropdown = document.getElementById('profileDropdown');
-        const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-        const sortSections = document.getElementById('sortSections');
-        const modalSortSections = document.getElementById('modalSortSections');
-        const modalSortStudents = document.getElementById('modalSortStudents');
-        const studentSearch = document.getElementById('studentSearch');
-        const sectionsModal = document.getElementById('sectionsModal');
-        const studentsModal = document.getElementById('studentsModal');
-
-        // Hamburger Menu Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            if (hamburger && mobileDrawer && drawerOverlay) {
-                hamburger.addEventListener('click', () => {
-                    hamburger.classList.toggle('active');
-                    mobileDrawer.classList.toggle('active');
-                    drawerOverlay.classList.toggle('active');
-                    document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-                });
-
-                drawerOverlay.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    mobileDrawer.classList.remove('active');
-                    drawerOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-
-                mobileNavLinks.forEach(link => {
-                    link.addEventListener('click', () => {
-                        hamburger.classList.remove('active');
-                        mobileDrawer.classList.remove('active');
-                        drawerOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    });
-                });
-            }
-            
-            // Profile dropdowns
-            if (profilePictureBtn) {
-                profilePictureBtn.addEventListener('click', toggleProfileDropdown);
-            }
-            
-            if (profilePictureBtnMobile) {
-                profilePictureBtnMobile.addEventListener('click', toggleProfileDropdown);
-            }
-            
-            // Sorting
-            if (sortSections) {
-                sortSections.addEventListener('change', function() {
-                    currentSectionSort = this.value;
-                    sortAndDisplaySections();
-                });
-            }
-            
-            if (modalSortSections) {
-                modalSortSections.addEventListener('change', function() {
-                    currentSectionSort = this.value;
-                    displayModalSections();
-                });
-            }
-            
-            if (modalSortStudents) {
-                modalSortStudents.addEventListener('change', function() {
-                    currentStudentSort = this.value;
-                    displayModalStudents();
-                });
-            }
-            
-            // Student search
-            if (studentSearch) {
-                studentSearch.addEventListener('input', function() {
-                    displayModalStudents();
-                });
-            }
-            
-            // Close dropdowns when clicking outside
-            document.addEventListener('click', closeAllDropdowns);
-            
-            // Close modal when clicking outside overlay
-            document.addEventListener('click', function(event) {
-                if (event.target === sectionsModal) {
-                    closeSectionsModal();
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0a1628',
+                        'navy-mid': '#112240',
+                        'navy-light': '#1a3a5c',
+                        royal: '#1e4d8c',
+                        blue: '#2d6fc4',
+                        accent: '#c8a84b',
+                        'accent-light': '#e8c96a',
+                        'accent-pale': '#f5edd6',
+                        surface: '#f4f6fa',
+                        border: '#e1e6ef',
+                        'border-strong': '#c5cfe0',
+                        'text-primary': '#0a1628',
+                        'text-secondary': '#4a5a72',
+                        'text-muted': '#8a98ae',
+                        success: '#0e8a5f',
+                        'success-bg': '#d4f0e6',
+                        danger: '#c0392b',
+                        'danger-bg': '#fce8e6',
+                        warning: '#b07e16',
+                        'warning-bg': '#fef3d4',
+                        info: '#1a6fa8',
+                        'info-bg': '#d6eaf8',
+                        purple: '#6b21a8',
+                        'purple-bg': '#f3e8ff',
+                    },
+                    fontFamily: {
+                        sans: ['DM Sans', 'sans-serif'],
+                        display: ['Playfair Display', 'serif'],
+                        mono: ['DM Mono', 'monospace'],
+                    },
                 }
-                if (event.target === studentsModal) {
-                    closeStudentsModal();
-                }
-            });
-        });
-
-        // Profile dropdown
-        function toggleProfileDropdown(event) {
-            event?.stopPropagation();
-            const isMobile = window.innerWidth < 768;
-            const dropdown = isMobile ? profileDropdownMobile : profileDropdown;
-            const isHidden = dropdown.classList.contains('hidden');
-            dropdown.classList.toggle('hidden');
-        }
-
-        function closeProfileDropdown() {
-            if (profileDropdown) profileDropdown.classList.add('hidden');
-            if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
-        }
-
-        // Close all dropdowns when clicking outside
-        function closeAllDropdowns(event) {
-            if (!event.target.closest('#profilePictureBtn') && 
-                !event.target.closest('#profilePictureBtnMobile') && 
-                !event.target.closest('#profileDropdown') && 
-                !event.target.closest('#profileDropdownMobile')) {
-                closeProfileDropdown();
-            }
-        }
-
-        // Modal functions
-        window.openSectionsModal = function() {
-            sectionsModal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-            displayModalSections();
-        };
-
-        window.closeSectionsModal = function() {
-            sectionsModal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        };
-
-        window.openStudentsModal = function() {
-            studentsModal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-            displayModalStudents();
-        };
-
-        window.closeStudentsModal = function() {
-            studentsModal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        };
-
-        // Export students function
-        window.exportStudents = function() {
-            showInfoModal('Export functionality would be implemented here. CSV/Excel download.');
-        };
-
-        // View profile function
-        window.showViewProfile = function(event) { 
-            if (event) event.preventDefault();
-            closeProfileDropdown();
-        };
-
-        // Logout function
-        window.handleLogout = async function(event) {
-            if (event) event.preventDefault();
-            closeProfileDropdown();
-            
-            showConfirmModal('Are you sure you want to logout?', async () => {
-                try {
-                    await signOut(auth);
-                    window.location.href = '/login/index.html';
-                } catch (error) {
-                    console.error('Error logging out:', error);
-                    showErrorModal('Error logging out. Please try again.');
-                }
-            });
-        };
-
-        // Refresh profile function
-        window.refreshProfile = async function() {
-            if (currentProfessor) {
-                const loadingScreen = document.getElementById('loadingScreen');
-                const profileContent = document.getElementById('profileContent');
-                
-                loadingScreen.style.display = 'flex';
-                profileContent.style.display = 'none';
-                
-                await loadProfessorProfile();
-                
-                loadingScreen.style.display = 'none';
-                profileContent.classList.remove('hidden');
-                profileContent.style.display = 'block';
-                
-                showSuccessModal('Profile refreshed successfully!');
-            }
-        };
-
-        // View full history function
-        window.viewFullHistory = function() {
-            const modal = document.getElementById('activityHistoryModal');
-            if (!modal) return;
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-            renderFullHistoryModal();
-        };
-
-        window.closeActivityHistoryModal = function() {
-            const modal = document.getElementById('activityHistoryModal');
-            if (modal) modal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        };
-
-        function renderFullHistoryModal() {
-            const items = window.allActivityItems || [];
-            const container = document.getElementById('fullHistoryList');
-            const countEl = document.getElementById('fullHistoryCount');
-            
-            if (countEl) countEl.textContent = items.length;
-            
-            if (!container) return;
-            
-            if (items.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12">
-                        <div class="text-5xl mb-3 opacity-40">📝</div>
-                        <div class="text-gray-700 font-semibold">No activity history found</div>
-                        <div class="text-gray-500 text-sm mt-1">Schedule tests or add lessons to see activity here</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            items.forEach((item, index) => {
-                const isActivity = item.testName !== undefined;
-                const icon = isActivity ? 'fa-dumbbell' : 'fa-book-open';
-                const color = isActivity ? 'text-green-500' : 'text-blue-500';
-                const bgColor = isActivity ? 'bg-green-50' : 'bg-blue-50';
-                const type = isActivity ? 'Test Activity' : 'Lesson';
-                const title = item.testName || item.title || 'Untitled';
-                const date = item.createdAt ? formatDate(item.createdAt) : 'Unknown date';
-                const statusBadge = isActivity ? getStatusBadge(item.status) : '';
-                
-                html += `
-                    <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-white hover:border-gray-200 hover:shadow-sm transition-all duration-200">
-                        <div class="w-10 h-10 rounded-full ${bgColor} flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <i class="fas ${icon} ${color}"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-start justify-between gap-2">
-                                <div class="font-semibold text-gray-900">${title}</div>
-                                <div class="flex flex-col items-end gap-1 flex-shrink-0">
-                                   <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${isActivity ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">
-                                        ${type}
-                                    </span>
-                                    ${statusBadge}
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-2">
-                                <span class="flex items-center gap-1">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    Created: ${date}
-                                </span>
-                                ${item.section ? `<span class="flex items-center gap-1"><i class="fas fa-users"></i>${item.section}</span>` : ''}
-                                ${isActivity && item.date ? `<span class="flex items-center gap-1"><i class="fas fa-calendar-check"></i>Test date: ${item.date}</span>` : ''}
-                                ${isActivity && item.deadline ? `<span class="flex items-center gap-1"><i class="fas fa-clock text-red-400"></i>Deadline: ${item.deadline} ${item.deadlineTime || ''}</span>` : ''}
-                                ${isActivity && item.attemptsAllowed ? `<span class="flex items-center gap-1"><i class="fas fa-redo"></i>${item.attemptsAllowed} attempt(s)</span>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        // Update profile picture in navigation
-        function updateProfilePicture(photoURL, userName) {
-            const profileBtn = document.getElementById('profilePictureBtn');
-            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-            const dropdownPic = document.getElementById('profileDropdownPicture');
-            const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
-            
-            const displayName = window.currentProfessor?.fullName || window.currentProfessor?.name || userName || 'Professor';
-            const email = window.currentProfessor?.email || 'professor@umak.edu.ph';
-            
-            const photoUrlToUse = photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=3b82f6&color=fff&size=128`;
-            
-            if (profileBtn) profileBtn.src = photoUrlToUse;
-            if (profileBtnMobile) profileBtnMobile.src = photoUrlToUse;
-            if (dropdownPic) dropdownPic.src = photoUrlToUse;
-            if (dropdownPicMobile) dropdownPicMobile.src = photoUrlToUse;
-            
-            const dropdownName = document.getElementById('profileDropdownName');
-            const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
-            if (dropdownName) dropdownName.textContent = displayName;
-            if (dropdownNameMobile) dropdownNameMobile.textContent = displayName;
-            
-            const dropdownEmail = document.getElementById('profileDropdownEmail');
-            const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
-            if (dropdownEmail) dropdownEmail.textContent = email;
-            if (dropdownEmailMobile) dropdownEmailMobile.textContent = email;
-            
-            // Update main profile picture
-            const profileMainPicture = document.getElementById('profileMainPicture');
-            if (profileMainPicture) {
-                profileMainPicture.src = photoUrlToUse;
-            }
-            
-            // Update mobile drawer professor name
-            const mobileProfessorName = document.getElementById('mobileProfessorName');
-            if (mobileProfessorName) {
-                mobileProfessorName.textContent = displayName;
-            }
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-            const loadingScreen = document.getElementById('loadingScreen');
-            const profileContent = document.getElementById('profileContent');
-            
-            if (user) {
-                try {
-                    console.log('=== PROFESSOR AUTHENTICATION ===');
-                    console.log('User authenticated:', user.email);
-                    
-                    const userEmail = user.email.toLowerCase();
-                    
-                    // First try to find professor by email in professors collection
-                    const professorsQuery = query(
-                        collection(db, 'professors'),
-                        where('email', '==', userEmail)
-                    );
-                    const professorsSnapshot = await getDocs(professorsQuery);
-                    
-                    if (!professorsSnapshot.empty) {
-                        const professorDoc = professorsSnapshot.docs[0];
-                        window.currentProfessor = { id: professorDoc.id, ...professorDoc.data() };
-                        currentProfessor = window.currentProfessor;
-                        console.log('✓ Professor found in professors collection:', currentProfessor);
-                    } else {
-                        // Try users collection
-                        const usersQuery = query(
-                            collection(db, 'users'),
-                            where('email', '==', userEmail),
-                            where('role', '==', 'professor')
-                        );
-                        const usersSnapshot = await getDocs(usersQuery);
-                        
-                        if (!usersSnapshot.empty) {
-                            const userDoc = usersSnapshot.docs[0];
-                            window.currentProfessor = { id: userDoc.id, ...userDoc.data() };
-                            currentProfessor = window.currentProfessor;
-                            console.log('✓ Professor found in users collection:', currentProfessor);
-                        } else {
-                            throw new Error('Professor account not found. Please contact the secretary.');
-                        }
-                    }
-                    
-                    // Update profile picture
-                    updateProfilePicture(user.photoURL, user.displayName);
-                    
-                    // Load professor's profile data
-                    await loadProfessorProfile();
-                    
-                    // Show profile content
-                    loadingScreen.style.display = 'none';
-                    profileContent.classList.remove('hidden');
-                    profileContent.style.display = 'block';
-                    
-                } catch (error) {
-                    console.error('=== ERROR IN AUTHENTICATION ===');
-                    console.error('Error:', error);
-                    
-                    loadingScreen.style.display = 'none';
-                    showErrorModal(error.message || 'Error loading profile. Please try again.');
-                    setTimeout(() => {
-                        signOut(auth);
-                        window.location.href = '/login/index.html';
-                    }, 2000);
-                }
-            } else {
-                console.log('No user authenticated, redirecting to login...');
-                window.location.href = '/login/index.html';
-            }
-        });
-
-        async function loadProfessorProfile() {
-            try {
-                console.log('Loading professor profile...');
-                
-                // Reset arrays
-                professorSections = [];
-                professorStudents = [];
-                professorActivities = [];
-                professorLessons = [];
-                
-                // Get professor's name for matching
-                const professorName = window.currentProfessor.fullName || window.currentProfessor.name || '';
-                const professorEmail = window.currentProfessor.email;
-                
-                console.log('Loading profile for:', professorName);
-                
-                // Update basic profile information
-                updateProfileInformation();
-                
-                // Load sections
-                await loadProfessorSections();
-                
-                // Load activities and lessons created by professor
-                await loadProfessorActivities();
-                await loadProfessorLessons();
-                
-                // Load activity history
-                await loadActivityHistory();
-                
-            } catch (error) {
-                console.error('Error loading professor profile:', error);
-                showErrorModal('Error loading profile data: ' + error.message);
-            }
-        }
-
-        function updateProfileInformation() {
-            // Update profile information
-            const fullName = window.currentProfessor.fullName || window.currentProfessor.name || 'Professor';
-            const email = window.currentProfessor.email || 'professor@umak.edu.ph';
-            
-            document.getElementById('profileFullName').textContent = fullName;
-            document.getElementById('profileEmail').textContent = email;
-            document.getElementById('professorId').textContent = window.currentProfessor.id?.substring(0, 8) || 'PROF-' + Math.floor(Math.random() * 10000);
-        }
-
-        async function loadProfessorSections() {
-            try {
-                console.log('Loading professor sections...');
-                
-                professorSections = [];
-                professorStudents = [];
-                
-                const professorName = window.currentProfessor.fullName || window.currentProfessor.name || '';
-                const professorEmail = window.currentProfessor.email;
-                
-                // Query sections collection for this professor
-                const sectionsQuery = query(
-                    collection(db, 'sections')
-                );
-                const sectionsSnapshot = await getDocs(sectionsQuery);
-                
-                console.log('Total sections in database:', sectionsSnapshot.size);
-                
-                sectionsSnapshot.forEach((doc) => {
-                    const sectionData = doc.data();
-                    
-                    // Check if this professor teaches this section
-                    const professorMatches = 
-                        sectionData.professor === professorName ||
-                        sectionData.professorEmail === professorEmail ||
-                        (sectionData.professor && professorName.includes(sectionData.professor)) ||
-                        (sectionData.professor && sectionData.professor.includes(professorName));
-                    
-                    if (professorMatches) {
-                        console.log(`✓ Section assigned: ${sectionData.name}`);
-                        
-                        professorSections.push({
-                            id: doc.id,
-                            ...sectionData,
-                            days: sectionData.day || sectionData.days || ''
-                        });
-                        
-                        // Add students from this section
-                        if (sectionData.students && Array.isArray(sectionData.students)) {
-                            sectionData.students.forEach(student => {
-                                professorStudents.push({
-                                    ...student,
-                                    section: sectionData.name,
-                                    sectionId: doc.id
-                                });
-                            });
-                        }
-                    }
-                });
-                
-                console.log(`Found ${professorSections.length} sections with ${professorStudents.length} students`);
-                
-                // Update statistics
-                document.getElementById('statTotalSections').textContent = professorSections.length;
-                document.getElementById('statTotalStudents').textContent = professorStudents.length;
-                document.getElementById('sectionsCount').textContent = professorSections.length;
-                document.getElementById('studentsCount').textContent = professorStudents.length;
-                
-                // Sort and display sections
-                sortAndDisplaySections();
-                
-                // Display students
-                displayStudents();
-                
-                // Update section filter dropdown
-                updateSectionFilter();
-                
-            } catch (error) {
-                console.error('Error loading sections:', error);
-                showErrorModal('Error loading sections: ' + error.message);
-            }
-        }
-
-        function sortAndDisplaySections() {
-            if (professorSections.length === 0) return;
-            
-            // Sort sections based on current sort option
-            const sortedSections = [...professorSections];
-            
-            switch(currentSectionSort) {
-                case 'name-asc':
-                    sortedSections.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                    break;
-                case 'name-desc':
-                    sortedSections.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
-                    break;
-                case 'students-asc':
-                    sortedSections.sort((a, b) => (a.students?.length || 0) - (b.students?.length || 0));
-                    break;
-                case 'students-desc':
-                    sortedSections.sort((a, b) => (b.students?.length || 0) - (a.students?.length || 0));
-                    break;
-                case 'course-asc':
-                    sortedSections.sort((a, b) => (a.courseCode || '').localeCompare(b.courseCode || ''));
-                    break;
-            }
-            
-            // Display sorted sections
-            displaySections(sortedSections);
-        }
-
-        function displaySections(sectionsToDisplay = professorSections) {
-            const sectionsList = document.getElementById('sectionsList');
-            
-            if (sectionsToDisplay.length === 0) {
-                sectionsList.innerHTML = `
-                    <div class="text-center py-8">
-                        <div class="text-5xl mb-3 opacity-40">📚</div>
-                        <div class="text-gray-700 font-semibold mb-1">No Sections Assigned</div>
-                        <div class="text-gray-500 text-sm">Sections assigned by the secretary will appear here</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            sectionsToDisplay.slice(0, 5).forEach((section, index) => { // Show only 5 in main view
-                const students = section.students || [];
-                const isExpanded = false;
-                
-                html += `
-                    <div class="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
-                        <div class="p-4 flex items-center justify-between cursor-pointer" onclick="toggleSectionDetails('${section.id}')">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                                    <i class="fas fa-chalkboard text-blue-600"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-gray-900">${section.name || 'Unnamed Section'}</h4>
-                                    <div class="flex items-center space-x-4 text-sm text-gray-600 mt-1">
-                                        <span><i class="fas fa-book mr-1"></i> ${section.courseCode || 'PE 3'}</span>
-                                        <span><i class="fas fa-users mr-1"></i> ${students.length} students</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <i class="fas fa-chevron-${isExpanded ? 'up' : 'down'} text-gray-400"></i>
-                            </div>
-                        </div>
-                        
-                        <div id="section-${section.id}" class="border-t border-gray-200 p-4 ${isExpanded ? '' : 'hidden'}">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <h5 class="font-medium text-gray-700 mb-2">Section Details</h5>
-                                    <ul class="space-y-2 text-sm">
-                                        <li class="flex items-center">
-                                            <i class="fas fa-calendar-alt text-gray-400 w-5 mr-2"></i>
-                                            <span>Schedule: ${section.days || section.day || 'Not specified'}</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <i class="fas fa-clock text-gray-400 w-5 mr-2"></i>
-                                            <span>Time: ${section.time || 'Not specified'}</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <i class="fas fa-map-marker-alt text-gray-400 w-5 mr-2"></i>
-                                            <span>Room: ${section.room || 'Not specified'}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h5 class="font-medium text-gray-700 mb-2">Academic Information</h5>
-                                    <ul class="space-y-2 text-sm">
-                                        <li class="flex items-center">
-                                            <i class="fas fa-graduation-cap text-gray-400 w-5 mr-2"></i>
-                                            <span>Course: ${section.course || 'Physical Education'}</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <i class="fas fa-hashtag text-gray-400 w-5 mr-2"></i>
-                                            <span>Units: ${section.units || '3'}</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <i class="fas fa-calendar text-gray-400 w-5 mr-2"></i>
-                                            <span>Term: ${section.term || 'Current Term'}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            
-                            ${students.length > 0 ? `
-                                <div class="mt-4">
-                                    <h5 class="font-medium text-gray-700 mb-3">Student Roster (${students.length})</h5>
-                                    <div class="flex flex-wrap gap-2">
-                                        ${students.slice(0, 10).map(student => {
-                                            const displayName = student.name || student.email || 'Unknown Student';
-                                            const initials = getInitials(displayName);
-                                            return `
-                                                <div class="student-avatar relative group">
-                                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium text-xs" title="${displayName}">
-                                                        ${initials}
-                                                    </div>
-                                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-20">
-                                                        ${displayName}
-                                                    </div>
-                                                </div>
-                                            `;
-                                        }).join('')}
-                                        ${students.length > 10 ? `
-                                            <div class="student-avatar">
-                                                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-medium text-xs">
-                                                    +${students.length - 10}
-                                                </div>
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            // Add "View More" message if there are more sections
-            if (sectionsToDisplay.length > 5) {
-                html += `
-                    <div class="text-center py-4">
-                        <span class="text-gray-500 text-sm">
-                            And ${sectionsToDisplay.length - 5} more sections. 
-                            <button onclick="openSectionsModal()" class="text-blue-600 hover:text-blue-800 font-medium">
-                                View all sections →
-                            </button>
-                        </span>
-                    </div>
-                `;
-            }
-            
-            sectionsList.innerHTML = html;
-        }
-
-        function displayModalSections() {
-            const modalSectionsList = document.getElementById('modalSectionsList');
-            const modalSectionCount = document.getElementById('modalSectionCount');
-            
-            if (!modalSectionsList || professorSections.length === 0) return;
-            
-            // Sort sections for modal
-            const sortedSections = [...professorSections];
-            
-            switch(currentSectionSort) {
-                case 'name-asc':
-                    sortedSections.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                    break;
-                case 'name-desc':
-                    sortedSections.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
-                    break;
-                case 'students-asc':
-                    sortedSections.sort((a, b) => (a.students?.length || 0) - (b.students?.length || 0));
-                    break;
-                case 'students-desc':
-                    sortedSections.sort((a, b) => (b.students?.length || 0) - (a.students?.length || 0));
-                    break;
-                case 'course-asc':
-                    sortedSections.sort((a, b) => (a.courseCode || '').localeCompare(b.courseCode || ''));
-                    break;
-            }
-            
-            modalSectionCount.textContent = sortedSections.length;
-            
-            let html = '';
-            sortedSections.forEach((section) => {
-                const students = section.students || [];
-                
-                html += `
-                    <div class="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
-                        <div class="p-4">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                                        <i class="fas fa-chalkboard text-blue-600"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-gray-900">${section.name || 'Unnamed Section'}</h4>
-                                        <div class="flex items-center space-x-4 text-sm text-gray-600 mt-1">
-                                            <span><i class="fas fa-book mr-1"></i> ${section.courseCode || 'PE 3'}</span>
-                                            <span><i class="fas fa-users mr-1"></i> ${students.length} students</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    <i class="fas fa-user-tie mr-1"></i> ${section.professor || 'Professor'}
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <h5 class="font-medium text-gray-700 mb-2">Section Details</h5>
-                                    <ul class="space-y-2 text-sm">
-                                        <li class="flex items-center">
-                                            <i class="fas fa-calendar-alt text-gray-400 w-5 mr-2"></i>
-                                            <span>Schedule: ${section.days || section.day || 'Not specified'}</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <i class="fas fa-clock text-gray-400 w-5 mr-2"></i>
-                                            <span>Time: ${section.time || 'Not specified'}</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <i class="fas fa-map-marker-alt text-gray-400 w-5 mr-2"></i>
-                                            <span>Room: ${section.room || 'Not specified'}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h5 class="font-medium text-gray-700 mb-2">Academic Information</h5>
-                                    <ul class="space-y-2 text-sm">
-                                        <li class="flex items-center">
-                                            <i class="fas fa-graduation-cap text-gray-400 w-5 mr-2"></i>
-                                            <span>Course: ${section.course || 'Physical Education'}</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <i class="fas fa-hashtag text-gray-400 w-5 mr-2"></i>
-                                            <span>Units: ${section.units || '3'}</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <i class="fas fa-calendar text-gray-400 w-5 mr-2"></i>
-                                            <span>Term: ${section.term || 'Current Term'}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            
-                            ${students.length > 0 ? `
-                                <div class="mt-4">
-                                    <h5 class="font-medium text-gray-700 mb-3">Student Roster (${students.length})</h5>
-                                    <div class="flex flex-wrap gap-2">
-                                        ${students.map(student => {
-                                            const displayName = student.name || student.email || 'Unknown Student';
-                                            const initials = getInitials(displayName);
-                                            return `
-                                                <div class="student-avatar relative group">
-                                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium text-xs" title="${displayName}">
-                                                        ${initials}
-                                                    </div>
-                                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-20">
-                                                        ${displayName}
-                                                    </div>
-                                                </div>
-                                            `;
-                                        }).join('')}
-                                    </div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            modalSectionsList.innerHTML = html;
-        }
-
-        function displayStudents() {
-            const studentsList = document.getElementById('studentsList');
-            
-            if (professorStudents.length === 0) {
-                studentsList.innerHTML = `
-                    <div class="text-center py-8">
-                        <div class="text-5xl mb-3 opacity-40">👥</div>
-                        <div class="text-gray-700 font-semibold mb-1">No Students Found</div>
-                        <div class="text-gray-500 text-sm">Students will appear here when assigned to your sections</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            professorStudents.slice(0, 15).forEach(student => {
-                const displayName = student.name || student.email || 'Unknown Student';
-                const initials = getInitials(displayName);
-                const section = student.section || 'Unassigned';
-                
-                html += `
-                    <div class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-100 mb-2 hover:bg-white hover:border-blue-200 transition-all duration-300">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold mr-3">
-                            ${initials}
-                        </div>
-                        <div class="flex-1">
-                            <div class="font-semibold text-gray-900">${displayName}</div>
-                            <div class="flex space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i class="fas fa-envelope mr-1"></i>
-                                    ${student.email || 'No email'}
-                                </span>
-                                <span class="flex items-center">
-                                    <i class="fas fa-users mr-1"></i>
-                                    ${section}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="text-sm text-gray-600">
-                            <i class="fas fa-user-graduate mr-1"></i>
-                            Student
-                        </div>
-                    </div>
-                `;
-            });
-            
-            if (professorStudents.length > 15) {
-                html += `
-                    <div class="text-center py-4">
-                        <span class="text-gray-500 text-sm">
-                            And ${professorStudents.length - 15} more students. 
-                            <button onclick="openStudentsModal()" class="text-blue-600 hover:text-blue-800 font-medium">
-                                View all students →
-                            </button>
-                        </span>
-                    </div>
-                `;
-            }
-            
-            studentsList.innerHTML = html;
-        }
-
-        function displayModalStudents() {
-            const modalStudentsList = document.getElementById('modalStudentsList');
-            const modalStudentCount = document.getElementById('modalStudentCount');
-            
-            if (!modalStudentsList || professorStudents.length === 0) return;
-            
-            const searchTerm = studentSearch ? studentSearch.value.toLowerCase() : '';
-            
-            let filteredStudents = [...professorStudents];
-            
-            if (searchTerm) {
-                filteredStudents = filteredStudents.filter(student => {
-                    const name = (student.name || '').toLowerCase();
-                    const email = (student.email || '').toLowerCase();
-                    const section = (student.section || '').toLowerCase();
-                    
-                    return name.includes(searchTerm) || 
-                           email.includes(searchTerm) || 
-                           section.includes(searchTerm);
-                });
-            }
-            
-            switch(currentStudentSort) {
-                case 'name-asc':
-                    filteredStudents.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                    break;
-                case 'name-desc':
-                    filteredStudents.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
-                    break;
-                case 'section-asc':
-                    filteredStudents.sort((a, b) => (a.section || '').localeCompare(b.section || ''));
-                    break;
-                case 'section-desc':
-                    filteredStudents.sort((a, b) => (b.section || '').localeCompare(a.section || ''));
-                    break;
-                case 'email-asc':
-                    filteredStudents.sort((a, b) => (a.email || '').localeCompare(b.email || ''));
-                    break;
-            }
-            
-            modalStudentCount.textContent = filteredStudents.length;
-            
-            if (filteredStudents.length === 0) {
-                modalStudentsList.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="text-center py-8 text-gray-500">
-                            <div class="text-5xl mb-3 opacity-40">🔍</div>
-                            <div class="text-gray-700 font-semibold mb-1">No students found</div>
-                            <div class="text-gray-500 text-sm">Try a different search term</div>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            let html = '';
-            filteredStudents.forEach(student => {
-                const displayName = student.name || student.email || 'Unknown Student';
-                const email = student.email || 'No email';
-                const section = student.section || 'Unassigned';
-                const initials = getInitials(displayName);
-                
-                html += `
-                    <tr>
-                        <td>
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium text-xs mr-3">
-                                    ${initials}
-                                </div>
-                                <span class="font-medium text-gray-900">${displayName}</span>
-                            </div>
-                        </td>
-                        <td class="text-gray-700">${email}</td>
-                        <td>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                <i class="fas fa-users mr-1 text-xs"></i>
-                                ${section}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                <i class="fas fa-check-circle mr-1 text-xs"></i>
-                                Active
-                            </span>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            modalStudentsList.innerHTML = html;
-        }
-
-        function updateSectionFilter() {
-            const sectionFilter = document.getElementById('sectionFilter');
-            
-            while (sectionFilter.options.length > 1) {
-                sectionFilter.remove(1);
-            }
-            
-            professorSections.forEach(section => {
-                const option = document.createElement('option');
-                option.value = section.id;
-                option.textContent = section.name || 'Unnamed Section';
-                sectionFilter.appendChild(option);
-            });
-            
-            sectionFilter.addEventListener('change', filterStudentsBySection);
-        }
-
-        function filterStudentsBySection() {
-            const sectionId = document.getElementById('sectionFilter').value;
-            
-            if (sectionId === 'all') {
-                displayStudents();
-                return;
-            }
-            
-            const filteredStudents = professorStudents.filter(student => student.sectionId === sectionId);
-            const studentsList = document.getElementById('studentsList');
-            
-            if (filteredStudents.length === 0) {
-                studentsList.innerHTML = `
-                    <div class="text-center py-8">
-                        <div class="text-5xl mb-3 opacity-40">👤</div>
-                        <div class="text-gray-700 font-semibold mb-1">No Students in this Section</div>
-                        <div class="text-gray-500 text-sm">No students are currently assigned to this section</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            filteredStudents.slice(0, 15).forEach(student => {
-                const displayName = student.name || student.email || 'Unknown Student';
-                const initials = getInitials(displayName);
-                const section = student.section || 'Unassigned';
-                
-                html += `
-                    <div class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-100 mb-2 hover:bg-white hover:border-blue-200 transition-all duration-300">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold mr-3">
-                            ${initials}
-                        </div>
-                        <div class="flex-1">
-                            <div class="font-semibold text-gray-900">${displayName}</div>
-                            <div class="flex space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i class="fas fa-envelope mr-1"></i>
-                                    ${student.email || 'No email'}
-                                </span>
-                                <span class="flex items-center">
-                                    <i class="fas fa-users mr-1"></i>
-                                    ${section}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="text-sm text-gray-600">
-                            <i class="fas fa-user-graduate mr-1"></i>
-                            Student
-                        </div>
-                    </div>
-                `;
-            });
-            
-            if (filteredStudents.length > 15) {
-                html += `
-                    <div class="text-center py-4">
-                        <span class="text-gray-500 text-sm">
-                            And ${filteredStudents.length - 15} more students in this section. 
-                            <button onclick="openStudentsModal()" class="text-blue-600 hover:text-blue-800 font-medium">
-                                View all students →
-                            </button>
-                        </span>
-                    </div>
-                `;
-            }
-            
-            studentsList.innerHTML = html;
-        }
-
-        async function loadProfessorActivities() {
-        try {
-            // Query ALL scheduled tests by this professor (no orderBy to avoid index issues)
-            const activitiesQuery = query(
-                collection(db, 'scheduledTests'),
-                where('professorEmail', '==', window.currentProfessor.email)
-            );
-            
-            const activitiesSnapshot = await getDocs(activitiesQuery);
-            professorActivities = activitiesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
-            // Sort in memory by createdAt descending
-            professorActivities.sort((a, b) => {
-                const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
-                const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
-                return dateB - dateA;
-            });
-            
-            document.getElementById('statActivitiesCreated').textContent = professorActivities.length;
-            
-        } catch (error) {
-            console.error('Error loading activities:', error);
-            document.getElementById('statActivitiesCreated').textContent = '0';
-        }
-    }
-
-        async function loadProfessorLessons() {
-        try {
-            const lessonsQuery = query(
-                collection(db, 'lessons'),
-                where('professorEmail', '==', window.currentProfessor.email)
-            );
-            
-            const lessonsSnapshot = await getDocs(lessonsQuery);
-            professorLessons = lessonsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
-            // Sort in memory
-            professorLessons.sort((a, b) => {
-                const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
-                const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
-                return dateB - dateA;
-            });
-            
-            document.getElementById('statLessonsCreated').textContent = professorLessons.length;
-            
-        } catch (error) {
-            console.error('Error loading lessons:', error);
-            document.getElementById('statLessonsCreated').textContent = '0';
-        }
-    }
-
-        async function loadActivityHistory() {
-    try {
-        const activityHistory = document.getElementById('activityHistory');
-        
-        const allItems = [...professorActivities, ...professorLessons];
-        
-        allItems.sort((a, b) => {
-            const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
-            const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
-            return dateB - dateA;
-        });
-        
-        // Store all items globally for the full history modal
-        window.allActivityItems = allItems;
-        
-        if (allItems.length === 0) {
-            activityHistory.innerHTML = `
-                <div class="text-center py-8">
-                    <div class="text-5xl mb-3 opacity-40">📝</div>
-                    <div class="text-gray-700 font-semibold mb-1">No Recent Activity</div>
-                    <div class="text-gray-500 text-sm">Your created activities and lessons will appear here</div>
-                </div>
-            `;
-            return;
-        }
-        
-        let html = '';
-        allItems.slice(0, 2).forEach(item => {
-            const isActivity = item.testName !== undefined;
-            const icon = isActivity ? 'fa-dumbbell' : 'fa-book-open';
-            const color = isActivity ? 'text-green-500' : 'text-blue-500';
-            const type = isActivity ? 'Test Activity' : 'Lesson';
-            const title = item.testName || item.title || 'Untitled';
-            const date = item.createdAt ? formatDate(item.createdAt) : 'Unknown date';
-            const statusBadge = isActivity ? getStatusBadge(item.status) : '';
-            
-            html += `
-                <div class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-white transition-all duration-300">
-                    <div class="w-10 h-10 rounded-full ${isActivity ? 'bg-green-50' : 'bg-purple-50'} flex items-center justify-center mr-3 flex-shrink-0">
-                        <i class="fas ${icon} ${color}"></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="font-semibold text-gray-900 truncate">${title}</div>
-                        <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500 mt-1">
-                            <span class="flex items-center">
-                                <i class="fas fa-tag mr-1"></i>${type}
-                            </span>
-                            <span class="flex items-center">
-                                <i class="fas fa-calendar mr-1"></i>${date}
-                            </span>
-                            ${item.section ? `<span class="flex items-center"><i class="fas fa-users mr-1"></i>${item.section}</span>` : ''}
-                            ${isActivity && item.deadline ? `<span class="flex items-center"><i class="fas fa-clock mr-1"></i>Due: ${item.deadline}</span>` : ''}
-                        </div>
-                    </div>
-                    <div class="flex flex-col items-end gap-1 ml-2 flex-shrink-0">
-                       <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${isActivity ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">
-                            ${type}
-                        </span>
-                        ${statusBadge}
-                    </div>
-                </div>
-            `;
-        });
-        
-        activityHistory.innerHTML = html;
-        
-    } catch (error) {
-        console.error('Error loading activity history:', error);
-    }
-}
-
-        function getStatusBadge(status) {
-            if (!status) return '';
-            const map = {
-                active:    'bg-green-100 text-green-700',
-                scheduled: 'bg-yellow-100 text-yellow-700',
-                completed: 'bg-blue-100 text-blue-700'
-            };
-            const cls = map[status] || 'bg-gray-100 text-gray-600';
-            const label = status.charAt(0).toUpperCase() + status.slice(1);
-            return `<span class="text-xs font-medium px-2 py-0.5 rounded-full ${cls}">${label}</span>`;
-        }
-
-        // Utility functions
-        window.toggleSectionDetails = function(sectionId) {
-            const sectionDetails = document.getElementById(`section-${sectionId}`);
-            if (sectionDetails) {
-                sectionDetails.classList.toggle('hidden');
-                
-                const chevron = sectionDetails.previousElementSibling.querySelector('.fas.fa-chevron-up, .fas.fa-chevron-down');
-                if (chevron) {
-                    if (sectionDetails.classList.contains('hidden')) {
-                        chevron.classList.remove('fa-chevron-up');
-                        chevron.classList.add('fa-chevron-down');
-                    } else {
-                        chevron.classList.remove('fa-chevron-down');
-                        chevron.classList.add('fa-chevron-up');
-                    }
-                }
-            }
-        };
-
-        function getInitials(name) {
-            if (!name) return '??';
-            const nameParts = name.split(' ');
-            if (nameParts.length >= 2) {
-                return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
-            }
-            return name.substring(0, 2).toUpperCase();
-        }
-
-        function formatDate(timestamp) {
-            if (!timestamp) return 'Unknown';
-            
-            try {
-                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-                return date.toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            } catch (error) {
-                return 'Invalid date';
             }
         }
     </script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c5cfe0; border-radius: 3px; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        .animate-fadeSlide { animation: fadeSlide 0.3s ease; }
+        .animate-fadeIn { animation: fadeIn 0.35s ease; }
+        .spinner { width: 44px; height: 44px; border-radius: 50%; border: 3px solid rgba(200,168,75,0.2); border-top-color: #c8a84b; animation: spin 0.9s linear infinite; }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
+        .nav-active { position: relative; }
+        .nav-active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #c8a84b; border-radius: 0 2px 2px 0; }
+
+        .stat-card { transition: all 0.22s; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.09); }
+
+        .profile-btn:hover { background: rgba(255,255,255,0.12); }
+
+        .profile-dropdown {
+            opacity: 0; visibility: hidden; transform: translateY(-8px);
+            transition: all 0.2s ease;
+        }
+        .profile-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        #hamburgerBtn { display: none; }
+        @media (max-width: 768px) {
+            #hamburgerBtn { display: flex !important; align-items: center; justify-content: center; }
+        }
+        #hamburgerBtn.hamburger-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        #hamburgerBtn.hamburger-open span:nth-child(2) { opacity: 0; }
+        #hamburgerBtn.hamburger-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        #hamburgerBtn span { transition: transform 0.25s ease, opacity 0.2s ease; }
+
+        .sidebar-transition { transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); }
+
+        @media (max-width: 768px) {
+            #mainSidebar { transform: translateX(-100%); }
+            #mainSidebar.sidebar-open { transform: translateX(0); }
+            main { margin-left: 0 !important; }
+        }
+
+        .modal-overlay { display: none; }
+        .modal-overlay.open { display: flex; }
+
+        @media (max-width: 768px) {
+            #headerDate, #headerDivider, #headerNameBlock { display: none; }
+        }
+
+        .section-card-profile { transition: all 0.22s; }
+        .section-card-profile:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,0.08); border-color: #c8a84b !important; }
+
+        .student-row { transition: background 0.15s; }
+        .student-row:hover { background: #f4f6fa; }
+
+        /* Modal */
+        .pro-modal { display: none; }
+        .pro-modal.open { display: flex; }
+    </style>
+</head>
+<body class="font-sans bg-surface text-text-primary min-h-screen m-0 p-0">
+
+<!-- ─── LOADING ─── -->
+<div id="loadingScreen" class="fixed inset-0 bg-navy flex flex-col items-center justify-center z-[9999] gap-6">
+    <div class="font-display text-3xl font-extrabold text-accent tracking-widest">UMakFit</div>
+    <div class="text-white/50 text-sm tracking-[3px] uppercase">Professor Profile</div>
+    <div class="spinner"></div>
+</div>
+
+<!-- ─── ALERT MODAL ─── -->
+<div id="alertModal" class="modal-overlay fixed inset-0 bg-black/55 justify-center items-center z-[10000] backdrop-blur-sm p-5">
+    <div class="bg-white rounded-2xl max-w-[440px] w-full shadow-[0_30px_80px_rgba(0,0,0,0.25)] animate-fadeSlide overflow-hidden">
+        <div class="flex items-center justify-between px-6 pt-5">
+            <h3 class="font-display text-[19px] font-bold text-navy" id="alertModalTitle">Alert</h3>
+            <button onclick="closeAlertModal()" class="w-8 h-8 rounded-full bg-surface border-0 flex items-center justify-center cursor-pointer text-text-muted text-sm hover:bg-danger-bg hover:text-danger transition-all">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="px-6 py-5 text-center">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center text-[28px] mx-auto mb-4" id="alertModalIcon"><i class="fas fa-info-circle"></i></div>
+            <p class="text-sm text-text-secondary leading-relaxed" id="alertModalMsg"></p>
+        </div>
+        <div class="flex justify-center gap-2 px-6 pb-5 pt-4 border-t border-border">
+            <button onclick="closeAlertModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-royal to-blue text-white border-0 rounded-lg font-sans text-sm font-semibold cursor-pointer transition-all hover:-translate-y-px hover:shadow-lg">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── CONFIRM MODAL ─── -->
+<div id="confirmModal" class="modal-overlay fixed inset-0 bg-black/55 justify-center items-center z-[10000] backdrop-blur-sm p-5">
+    <div class="bg-white rounded-2xl max-w-[440px] w-full shadow-[0_30px_80px_rgba(0,0,0,0.25)] animate-fadeSlide overflow-hidden">
+        <div class="flex items-center justify-between px-6 pt-5">
+            <h3 class="font-display text-[19px] font-bold text-navy">Confirm Action</h3>
+            <button onclick="closeConfirmModal()" class="w-8 h-8 rounded-full bg-surface border-0 flex items-center justify-center cursor-pointer text-text-muted text-sm hover:bg-danger-bg hover:text-danger transition-all">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="px-6 py-5 text-center">
+            <div class="w-16 h-16 rounded-full bg-warning-bg text-warning flex items-center justify-center text-[28px] mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <p class="text-sm text-text-secondary leading-relaxed" id="confirmModalMsg"></p>
+        </div>
+        <div class="flex justify-center gap-2 px-6 pb-5 pt-4 border-t border-border">
+            <button onclick="closeConfirmModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-transparent text-text-secondary border border-border rounded-lg font-sans text-sm font-semibold cursor-pointer hover:bg-surface transition-all">Cancel</button>
+            <button id="confirmModalYesBtn" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-[#991b1b] to-danger text-white border-0 rounded-lg font-sans text-sm font-semibold cursor-pointer transition-all">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── ALL STUDENTS MODAL ─── -->
+<div id="studentsModal" class="pro-modal fixed inset-0 bg-black/55 justify-center items-center z-[9000] backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl w-full max-w-[900px] max-h-[85vh] flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.2)] animate-fadeIn overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
+            <div>
+                <h3 class="font-display text-xl font-bold text-navy flex items-center gap-2">
+                    <i class="fas fa-user-graduate text-blue text-lg"></i>
+                    All Students
+                </h3>
+                <p class="text-xs text-text-muted mt-0.5">
+                    <span id="modalStudentTotal">0</span> students across all sections
+                </p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-xs pointer-events-none"></i>
+                    <input id="studentSearchInput" type="text" placeholder="Search students..." oninput="filterModalStudents()"
+                        class="pl-8 pr-3 py-2 border border-border rounded-lg text-[13px] font-sans bg-surface focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/10 w-[200px]">
+                </div>
+                <select id="modalSectionFilter" onchange="filterModalStudents()"
+                    class="px-3 py-2 border border-border rounded-lg text-[13px] font-sans bg-surface focus:outline-none focus:border-blue cursor-pointer">
+                    <option value="">All Sections</option>
+                </select>
+                <button onclick="closeStudentsModal()" class="w-8 h-8 rounded-lg bg-surface border border-border flex items-center justify-center text-text-muted hover:bg-danger-bg hover:text-danger transition-all cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto">
+            <table class="w-full">
+                <thead class="sticky top-0 bg-surface border-b border-border">
+                    <tr>
+                        <th class="text-left px-6 py-3 text-[11px] font-bold text-text-muted uppercase tracking-[0.8px]">Student</th>
+                        <th class="text-left px-4 py-3 text-[11px] font-bold text-text-muted uppercase tracking-[0.8px]">Email</th>
+                        <th class="text-left px-4 py-3 text-[11px] font-bold text-text-muted uppercase tracking-[0.8px]">Section</th>
+                        <th class="text-left px-4 py-3 text-[11px] font-bold text-text-muted uppercase tracking-[0.8px]">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="modalStudentsList"></tbody>
+            </table>
+        </div>
+        <div class="px-6 py-3 border-t border-border bg-surface flex-shrink-0 flex items-center justify-between">
+            <span class="text-[13px] text-text-muted">Showing <span id="modalStudentShowing">0</span> students</span>
+            <button onclick="closeStudentsModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-navy to-navy-light text-white rounded-lg text-[13px] font-semibold cursor-pointer hover:-translate-y-px transition-all">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── ALL SECTIONS MODAL ─── -->
+<div id="sectionsModal" class="pro-modal fixed inset-0 bg-black/55 justify-center items-center z-[9000] backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl w-full max-w-[900px] max-h-[85vh] flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.2)] animate-fadeIn overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
+            <div>
+                <h3 class="font-display text-xl font-bold text-navy flex items-center gap-2">
+                    <i class="fas fa-layer-group text-purple text-lg"></i>
+                    All Sections
+                </h3>
+                <p class="text-xs text-text-muted mt-0.5"><span id="modalSectionTotal">0</span> sections assigned</p>
+            </div>
+            <button onclick="closeSectionsModal()" class="w-8 h-8 rounded-lg bg-surface border border-border flex items-center justify-center text-text-muted hover:bg-danger-bg hover:text-danger transition-all cursor-pointer">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6">
+            <div id="modalSectionsList" class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));"></div>
+        </div>
+        <div class="px-6 py-3 border-t border-border bg-surface flex-shrink-0 flex justify-end">
+            <button onclick="closeSectionsModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-navy to-navy-light text-white rounded-lg text-[13px] font-semibold cursor-pointer hover:-translate-y-px transition-all">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── ACTIVITY HISTORY MODAL ─── -->
+<div id="historyModal" class="pro-modal fixed inset-0 bg-black/55 justify-center items-center z-[9000] backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl w-full max-w-[700px] max-h-[85vh] flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.2)] animate-fadeIn overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
+            <div>
+                <h3 class="font-display text-xl font-bold text-navy flex items-center gap-2">
+                    <i class="fas fa-history text-accent text-lg"></i>
+                    Full Activity History
+                </h3>
+                <p class="text-xs text-text-muted mt-0.5"><span id="historyTotal">0</span> total records</p>
+            </div>
+            <button onclick="closeHistoryModal()" class="w-8 h-8 rounded-lg bg-surface border border-border flex items-center justify-center text-text-muted hover:bg-danger-bg hover:text-danger transition-all cursor-pointer">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6">
+            <div id="historyList" class="space-y-3"></div>
+        </div>
+        <div class="px-6 py-3 border-t border-border bg-surface flex-shrink-0 flex justify-end">
+            <button onclick="closeHistoryModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-navy to-navy-light text-white rounded-lg text-[13px] font-semibold cursor-pointer hover:-translate-y-px transition-all">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── MAIN ─── -->
+<div id="mainContent" style="display:none;">
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div id="sidebarOverlay" onclick="closeSidebar()" class="hidden fixed inset-0 bg-navy/60 backdrop-blur-sm z-[399]"></div>
+
+    <!-- ─── TOP HEADER ─── -->
+    <header class="fixed top-0 left-0 right-0 h-[70px] bg-navy flex items-center px-4 md:px-8 z-[500] border-b border-white/[0.06] shadow-[0_2px_20px_rgba(0,0,0,0.25)]">
+        <button id="hamburgerBtn" onclick="toggleSidebar()"
+            class="flex-col gap-[5px] w-10 h-10 bg-white/[0.08] border border-white/[0.12] rounded-lg cursor-pointer mr-3 flex-shrink-0">
+            <span class="block w-[18px] h-0.5 bg-white/80 rounded"></span>
+            <span class="block w-[18px] h-0.5 bg-white/80 rounded"></span>
+            <span class="block w-[18px] h-0.5 bg-white/80 rounded"></span>
+        </button>
+        <div class="flex items-center gap-3.5 flex-1 min-w-0">
+            <div class="w-10 h-10 bg-accent/15 border border-accent/30 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+                <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-8 h-8 object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="font-display font-extrabold text-accent text-lg hidden items-center justify-center">U</div>
+            </div>
+            <div class="min-w-0">
+                <div class="text-[13px] font-semibold text-white/85 tracking-[0.3px] truncate">University of Makati</div>
+                <div class="text-[11px] text-accent tracking-[1.5px] uppercase font-medium truncate">UMakFit — Professor Portal</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 md:gap-4 flex-shrink-0">
+            <div id="headerDate" class="text-xs text-white/40 tracking-[0.5px]"></div>
+            <div id="headerDivider" class="w-px h-7 bg-white/10"></div>
+            <div class="relative">
+                <div id="profileCircle" onclick="toggleProfileDropdown()"
+                    class="profile-btn flex items-center gap-2.5 bg-white/[0.07] border border-white/10 rounded-xl px-3 py-1.5 cursor-pointer transition-all">
+                    <div id="profileAvatarSmall" class="w-8 h-8 rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-sm overflow-hidden flex-shrink-0">P</div>
+                    <div id="headerNameBlock">
+                        <div class="text-[13px] font-semibold text-white" id="headerName">Professor</div>
+                        <div class="text-[11px] text-white/45">Faculty Member</div>
+                    </div>
+                    <i class="fas fa-chevron-down text-[10px] text-white/40 ml-1"></i>
+                </div>
+                <div id="profileDropdown" class="profile-dropdown absolute top-[calc(100%+12px)] right-0 w-[280px] bg-white rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] border border-border z-[1000]">
+                    <div class="bg-gradient-to-br from-navy to-navy-light p-5 rounded-t-2xl text-center">
+                        <div id="profileDropdownAvatar" class="w-[52px] h-[52px] rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-xl mx-auto mb-2.5 overflow-hidden">P</div>
+                        <div class="text-[15px] font-bold text-white" id="dropdownName">Professor</div>
+                        <div class="text-xs text-white/55 mt-1 break-all" id="dropdownEmail">professor@umak.edu.ph</div>
+                        <div class="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent/20 border border-accent/30 text-accent-light text-[11px] font-semibold tracking-[0.5px]">
+                            <i class="fas fa-chalkboard-teacher mr-1"></i> Faculty Member
+                        </div>
+                    </div>
+                    <div class="p-2">
+                        <a href="professor-profile.html" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg no-underline text-text-secondary text-[13px] font-medium hover:bg-surface hover:text-text-primary transition-all bg-surface">
+                            <i class="fas fa-user-circle w-4 text-center text-blue"></i><span>View Profile</span>
+                        </a>
+                        <div class="h-px bg-border my-1 mx-2"></div>
+                        <a href="#" onclick="handleLogout(event)" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg no-underline text-danger text-[13px] font-medium hover:bg-danger-bg transition-all">
+                            <i class="fas fa-sign-out-alt w-4 text-center"></i><span>Sign Out</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ─── SIDEBAR ─── -->
+    <aside id="mainSidebar"
+        class="sidebar-transition sidebar-scroll fixed top-[70px] left-0 w-[260px] h-[calc(100vh-70px)] bg-navy-mid border-r border-white/[0.06] flex flex-col overflow-y-auto overflow-x-hidden z-[400] py-6">
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mb-2">Main</div>
+        <a href="professor.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-tachometer-alt"></i></div>
+            <span>Dashboard</span>
+        </a>
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mt-5 mb-2">Classes</div>
+        <a href="studentmanagement.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-users"></i></div>
+            <span>Students</span>
+        </a>
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mt-5 mb-2">Content</div>
+        <a href="addactivities.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-dumbbell"></i></div>
+            <span>Activities</span>
+        </a>
+        <a href="addlesson.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-book-open"></i></div>
+            <span>Lessons</span>
+        </a>
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mt-5 mb-2">Analytics</div>
+        <a href="monitoringactivities.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-chart-bar"></i></div>
+            <span>Monitoring</span>
+        </a>
+        <a href="grades.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-graduation-cap"></i></div>
+            <span>Grades</span>
+        </a>
+        <a href="sectionranklist.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-trophy"></i></div>
+            <span>Section Rank</span>
+        </a>
+        <!-- Profile - active -->
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mt-5 mb-2">Account</div>
+        <a href="professor-profile.html" class="nav-active flex items-center gap-3 px-5 py-2.5 text-white bg-gradient-to-r from-accent/12 to-accent/[0.04] no-underline text-[13.5px] font-medium">
+            <div class="w-8 h-8 rounded-lg bg-accent/20 text-accent flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-user-circle"></i></div>
+            <span>My Profile</span>
+        </a>
+        <div class="mt-auto px-5 pt-4">
+            <div class="bg-accent/10 border border-accent/20 rounded-xl p-3 flex items-center gap-2.5">
+                <div class="w-[30px] h-[30px] rounded-lg bg-accent/15 flex items-center justify-center text-accent text-[13px]"><i class="fas fa-shield-alt"></i></div>
+                <div>
+                    <div class="text-[12px] font-semibold text-white/70">UMakFit</div>
+                    <div class="text-[10px] text-white/35 mt-0.5">College of Human Kinetics</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ─── MAIN CONTENT ─── -->
+    <main class="ml-[260px] pt-[70px] min-h-screen" style="margin-left: 260px;">
+        <div class="px-10 py-9 pb-20" style="padding-left: 2.5rem; padding-right: 2.5rem;">
+
+            <!-- Page Hero -->
+            <div class="relative bg-gradient-to-br from-navy via-[#1a4580] to-navy-light rounded-2xl p-7 mb-7 overflow-hidden">
+                <div class="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-accent/[0.07] pointer-events-none"></div>
+                <div class="absolute -bottom-10 right-20 w-36 h-36 rounded-full bg-blue/10 pointer-events-none"></div>
+                <div class="relative flex items-center justify-between gap-5 flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="w-[52px] h-[52px] rounded-2xl bg-accent/15 border border-accent/25 flex items-center justify-center text-accent text-[22px] flex-shrink-0">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-white/50 uppercase tracking-[2px] mb-1">Faculty Member</div>
+                            <div class="font-display text-2xl font-bold text-white mb-1" id="heroName">Professor Profile</div>
+                            <div class="text-[13px] text-white/45">College of Human Kinetics — Profile Overview</div>
+                        </div>
+                    </div>
+                    <button onclick="refreshProfile()" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white text-[13px] font-semibold px-4 py-2 rounded-xl transition-all hover:-translate-y-px">
+                        <i class="fas fa-sync-alt text-xs"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profile Identity Card -->
+            <div class="bg-white rounded-2xl border border-border shadow-sm mb-7 overflow-hidden">
+                <div class="px-8 py-6">
+                    <div class="flex items-center gap-6 flex-wrap">
+                        <!-- Avatar -->
+                        <div class="relative flex-shrink-0">
+                            <div id="profileAvatarLg" class="w-20 h-20 rounded-2xl bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-3xl border-2 border-border overflow-hidden">P</div>
+                            <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-accent to-accent-light rounded-full border-2 border-white flex items-center justify-center">
+                                <i class="fas fa-chalkboard-teacher text-navy text-[9px]"></i>
+                            </div>
+                        </div>
+                        <!-- Info -->
+                        <div class="flex flex-wrap gap-8 flex-1 items-center">
+                            <div>
+                                <div class="text-[11px] font-semibold text-text-muted uppercase tracking-[0.7px] mb-1">Full Name</div>
+                                <div class="text-base font-bold text-text-primary" id="profNameDisplay">Loading...</div>
+                            </div>
+                            <div>
+                                <div class="text-[11px] font-semibold text-text-muted uppercase tracking-[0.7px] mb-1">Email</div>
+                                <div class="text-[13px] font-medium text-text-secondary" id="profEmailDisplay">Loading...</div>
+                            </div>
+                            <div>
+                                <div class="text-[11px] font-semibold text-text-muted uppercase tracking-[0.7px] mb-1">Professor ID</div>
+                                <div class="font-mono text-[13px] font-semibold text-blue" id="profIdDisplay">—</div>
+                            </div>
+                            <div>
+                                <div class="text-[11px] font-semibold text-text-muted uppercase tracking-[0.7px] mb-1">Role</div>
+                                <div class="inline-flex items-center gap-1.5 bg-info-bg text-info border border-info/30 text-xs font-semibold px-3 py-1 rounded-full">
+                                    <i class="fas fa-chalkboard-teacher"></i> Faculty Member
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-7">
+                <div class="stat-card bg-white rounded-2xl p-5 border border-border border-t-4 border-t-[#7c3aed] shadow-sm">
+                    <div class="w-[42px] h-[42px] rounded-xl bg-purple-bg text-[#7c3aed] flex items-center justify-center text-[17px] mb-3.5">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="text-[11px] font-semibold text-text-muted uppercase tracking-[0.8px] mb-1.5">Sections</div>
+                    <div class="text-[34px] font-bold font-mono text-text-primary leading-none" id="statSections">0</div>
+                </div>
+                <div class="stat-card bg-white rounded-2xl p-5 border border-border border-t-4 border-t-blue shadow-sm">
+                    <div class="w-[42px] h-[42px] rounded-xl bg-info-bg text-blue flex items-center justify-center text-[17px] mb-3.5">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="text-[11px] font-semibold text-text-muted uppercase tracking-[0.8px] mb-1.5">Students</div>
+                    <div class="text-[34px] font-bold font-mono text-text-primary leading-none" id="statStudents">0</div>
+                </div>
+                <div class="stat-card bg-white rounded-2xl p-5 border border-border border-t-4 border-t-success shadow-sm">
+                    <div class="w-[42px] h-[42px] rounded-xl bg-success-bg text-success flex items-center justify-center text-[17px] mb-3.5">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <div class="text-[11px] font-semibold text-text-muted uppercase tracking-[0.8px] mb-1.5">Activities</div>
+                    <div class="text-[34px] font-bold font-mono text-text-primary leading-none" id="statActivities">0</div>
+                </div>
+                <div class="stat-card bg-white rounded-2xl p-5 border border-border border-t-4 border-t-accent shadow-sm">
+                    <div class="w-[42px] h-[42px] rounded-xl bg-accent-pale text-warning flex items-center justify-center text-[17px] mb-3.5">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="text-[11px] font-semibold text-text-muted uppercase tracking-[0.8px] mb-1.5">Lessons</div>
+                    <div class="text-[34px] font-bold font-mono text-text-primary leading-none" id="statLessons">0</div>
+                </div>
+            </div>
+
+            <!-- Sections + Students Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+                <!-- Sections Panel -->
+                <div class="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-border flex items-center justify-between">
+                        <div class="flex items-center gap-2 text-[15px] font-semibold text-navy">
+                            <div class="w-8 h-8 rounded-lg bg-purple-bg text-[#7c3aed] flex items-center justify-center text-[13px]">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            Assigned Sections
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-purple-bg text-[#7c3aed] text-xs font-bold" id="sectionsBadge">0</span>
+                        </div>
+                        <button onclick="openSectionsModal()" class="text-[12px] font-semibold text-blue hover:text-royal transition-colors flex items-center gap-1">
+                            <i class="fas fa-expand-alt text-[10px]"></i> View All
+                        </button>
+                    </div>
+                    <div id="sectionsList" class="divide-y divide-border max-h-[420px] overflow-y-auto">
+                        <div class="flex items-center justify-center py-12 text-text-muted text-sm gap-2">
+                            <i class="fas fa-circle-notch fa-spin"></i> Loading sections...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Panel -->
+                <div class="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-border flex items-center justify-between">
+                        <div class="flex items-center gap-2 text-[15px] font-semibold text-navy">
+                            <div class="w-8 h-8 rounded-lg bg-info-bg text-blue flex items-center justify-center text-[13px]">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            Students
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-info-bg text-blue text-xs font-bold" id="studentsBadge">0</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <select id="sectionFilter" onchange="filterStudentsBySection()"
+                                class="px-2.5 py-1.5 border border-border rounded-lg text-[12px] font-sans bg-surface focus:outline-none focus:border-blue cursor-pointer">
+                                <option value="">All Sections</option>
+                            </select>
+                            <button onclick="openStudentsModal()" class="text-[12px] font-semibold text-blue hover:text-royal transition-colors flex items-center gap-1">
+                                <i class="fas fa-expand-alt text-[10px]"></i> View All
+                            </button>
+                        </div>
+                    </div>
+                    <div id="studentsList" class="divide-y divide-border max-h-[420px] overflow-y-auto">
+                        <div class="flex items-center justify-center py-12 text-text-muted text-sm gap-2">
+                            <i class="fas fa-circle-notch fa-spin"></i> Loading students...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity History -->
+            <div class="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-border flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-[15px] font-semibold text-navy">
+                        <div class="w-8 h-8 rounded-lg bg-accent-pale text-warning flex items-center justify-center text-[13px]">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        Recent Activity History
+                    </div>
+                    <button onclick="openHistoryModal()" class="text-[12px] font-semibold text-blue hover:text-royal transition-colors flex items-center gap-1">
+                        <i class="fas fa-external-link-alt text-[10px]"></i> View Full History
+                    </button>
+                </div>
+                <div id="activityHistoryList" class="divide-y divide-border">
+                    <div class="flex items-center justify-center py-12 text-text-muted text-sm gap-2">
+                        <i class="fas fa-circle-notch fa-spin"></i> Loading history...
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    function updateHeaderDate() {
+        const el = document.getElementById('headerDate');
+        if (el) el.textContent = new Date().toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+    }
+    updateHeaderDate(); setInterval(updateHeaderDate, 60000);
+
+    function toggleSidebar() {
+        const sb = document.getElementById('mainSidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        const hb = document.getElementById('hamburgerBtn');
+        sb.classList.toggle('sidebar-open');
+        ov.classList.toggle('hidden');
+        hb.classList.toggle('hamburger-open');
+    }
+    function closeSidebar() {
+        document.getElementById('mainSidebar').classList.remove('sidebar-open');
+        document.getElementById('sidebarOverlay').classList.add('hidden');
+        document.getElementById('hamburgerBtn').classList.remove('hamburger-open');
+    }
+
+    window.toggleProfileDropdown = function() {
+        document.getElementById('profileDropdown').classList.toggle('show');
+    };
+    document.addEventListener('click', e => {
+        const dd = document.getElementById('profileDropdown');
+        if (dd && !e.target.closest('#profileCircle') && !dd.contains(e.target)) dd.classList.remove('show');
+    });
+
+    window.showAlert = function(msg, type='info', title='') {
+        const icons  = { success:'check-circle', error:'times-circle', warning:'exclamation-triangle', info:'info-circle' };
+        const titles = { success:'Success', error:'Error', warning:'Warning', info:'Information' };
+        const colors = { success:'bg-success-bg text-success', error:'bg-danger-bg text-danger', warning:'bg-warning-bg text-warning', info:'bg-info-bg text-info' };
+        document.getElementById('alertModalTitle').textContent = title || titles[type];
+        document.getElementById('alertModalMsg').textContent   = msg;
+        const iconWrap = document.getElementById('alertModalIcon');
+        iconWrap.className = `w-16 h-16 rounded-full flex items-center justify-center text-[28px] mx-auto mb-4 ${colors[type]}`;
+        iconWrap.innerHTML = `<i class="fas fa-${icons[type]||'info-circle'}"></i>`;
+        document.getElementById('alertModal').classList.add('open');
+    };
+    window.closeAlertModal = () => document.getElementById('alertModal').classList.remove('open');
+
+    window.showConfirm = function(msg, onYes) {
+        document.getElementById('confirmModalMsg').textContent = msg;
+        const yesBtn = document.getElementById('confirmModalYesBtn');
+        yesBtn.onclick = () => { closeConfirmModal(); onYes(); };
+        document.getElementById('confirmModal').classList.add('open');
+    };
+    window.closeConfirmModal = () => document.getElementById('confirmModal').classList.remove('open');
+
+    // Modal helpers
+    window.openStudentsModal = function() {
+        document.getElementById('studentsModal').classList.add('open');
+        renderModalStudents(window._allStudents || []);
+        populateModalSectionFilter();
+    };
+    window.closeStudentsModal = function() { document.getElementById('studentsModal').classList.remove('open'); };
+
+    window.openSectionsModal = function() {
+        document.getElementById('sectionsModal').classList.add('open');
+        renderModalSections(window._allSections || []);
+    };
+    window.closeSectionsModal = function() { document.getElementById('sectionsModal').classList.remove('open'); };
+
+    window.openHistoryModal = function() {
+        document.getElementById('historyModal').classList.add('open');
+        renderFullHistory(window._allHistory || []);
+    };
+    window.closeHistoryModal = function() { document.getElementById('historyModal').classList.remove('open'); };
+
+    window.filterModalStudents = function() {
+        const search = (document.getElementById('studentSearchInput').value || '').toLowerCase();
+        const sec = document.getElementById('modalSectionFilter').value;
+        let list = window._allStudents || [];
+        if (sec) list = list.filter(s => s.section === sec);
+        if (search) list = list.filter(s =>
+            (s.name||'').toLowerCase().includes(search) ||
+            (s.email||'').toLowerCase().includes(search) ||
+            (s.section||'').toLowerCase().includes(search)
+        );
+        renderModalStudents(list);
+    };
+
+    window.filterStudentsBySection = function() {
+        const val = document.getElementById('sectionFilter').value;
+        const list = val ? (window._allStudents||[]).filter(s => s.section === val) : (window._allStudents||[]);
+        renderStudentsSidebar(list);
+    };
+
+    function renderModalStudents(list) {
+        const tbody = document.getElementById('modalStudentsList');
+        document.getElementById('modalStudentShowing').textContent = list.length;
+        document.getElementById('modalStudentTotal').textContent = (window._allStudents||[]).length;
+        if (!list.length) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-text-muted text-sm">No students found</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = list.map(s => {
+            const name = s.name || s.email || 'Unknown';
+            const init = getInitials(name);
+            return `
+            <tr class="student-row border-b border-border">
+                <td class="px-6 py-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-xs flex-shrink-0">${init}</div>
+                        <span class="text-[13px] font-semibold text-text-primary">${name}</span>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-[13px] text-text-secondary">${s.email || '—'}</td>
+                <td class="px-4 py-3">
+                    <span class="inline-flex items-center bg-info-bg text-blue text-[11px] font-semibold px-2.5 py-0.5 rounded-full">${s.section || '—'}</span>
+                </td>
+                <td class="px-4 py-3">
+                    <span class="inline-flex items-center bg-success-bg text-success text-[11px] font-semibold px-2.5 py-0.5 rounded-full gap-1">
+                        <i class="fas fa-check-circle text-[9px]"></i> Active
+                    </span>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function populateModalSectionFilter() {
+        const sel = document.getElementById('modalSectionFilter');
+        sel.innerHTML = '<option value="">All Sections</option>';
+        (window._allSections || []).forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.name; opt.textContent = s.name;
+            sel.appendChild(opt);
+        });
+    }
+
+    function renderModalSections(sections) {
+        document.getElementById('modalSectionTotal').textContent = sections.length;
+        const container = document.getElementById('modalSectionsList');
+        if (!sections.length) {
+            container.innerHTML = `<div class="col-span-full text-center py-10 text-text-muted text-sm">No sections found</div>`;
+            return;
+        }
+        container.innerHTML = sections.map(s => {
+            const schedule = [s.time, s.day, s.room].filter(Boolean).join(' / ');
+            return `
+            <div class="section-card-profile bg-surface rounded-xl border-2 border-border p-5">
+                <div class="flex items-start justify-between mb-3">
+                    <div>
+                        <div class="font-display font-bold text-navy text-[15px]">${s.name}</div>
+                        <span class="inline-block bg-info-bg text-blue text-[11px] font-semibold px-2 py-0.5 rounded mt-1">${s.courseCode || 'PE'}</span>
+                    </div>
+                    <span class="inline-flex items-center bg-success-bg text-success text-[11px] font-bold px-2.5 py-1 rounded-full gap-1">
+                        <i class="fas fa-user-graduate text-[9px]"></i>${s.studentCount || 0}
+                    </span>
+                </div>
+                ${s.courseTitle ? `<div class="text-[12px] text-text-muted mb-1"><i class="fas fa-book w-4 text-center mr-1"></i>${s.courseTitle}</div>` : ''}
+                ${schedule ? `<div class="text-[12px] text-blue bg-info-bg/50 px-2 py-1 rounded-md mb-1"><i class="fas fa-calendar-alt mr-1"></i>${schedule}</div>` : ''}
+                ${s.yearLevel ? `<div class="text-[12px] text-text-muted"><i class="fas fa-graduation-cap w-4 text-center mr-1"></i>Year ${s.yearLevel}</div>` : ''}
+            </div>`;
+        }).join('');
+    }
+
+    function renderSectionsSidebar(sections) {
+        const el = document.getElementById('sectionsList');
+        if (!sections.length) {
+            el.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 text-center px-6">
+                    <div class="w-12 h-12 rounded-2xl bg-surface flex items-center justify-center text-xl text-text-muted mb-3"><i class="fas fa-layer-group"></i></div>
+                    <div class="text-[13px] font-semibold text-text-primary mb-1">No Sections Assigned</div>
+                    <div class="text-[12px] text-text-muted">The secretary will assign sections to your account.</div>
+                </div>`;
+            return;
+        }
+        el.innerHTML = sections.map(s => {
+            const schedule = [s.time, s.day, s.room].filter(Boolean).join(' / ');
+            return `
+            <div class="px-5 py-4 hover:bg-surface transition-colors">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-purple-bg text-[#7c3aed] flex items-center justify-center text-[13px] flex-shrink-0 mt-0.5">
+                            <i class="fas fa-chalkboard"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-[13px] text-text-primary">${s.name}</div>
+                            <div class="text-[11px] text-blue font-medium">${s.courseCode || 'PE'}</div>
+                            ${schedule ? `<div class="text-[11px] text-text-muted mt-0.5">${schedule}</div>` : ''}
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center bg-success-bg text-success text-[11px] font-bold px-2 py-0.5 rounded-full gap-1 flex-shrink-0">
+                        <i class="fas fa-user-graduate text-[9px]"></i>${s.studentCount || 0}
+                    </span>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderStudentsSidebar(list) {
+        const el = document.getElementById('studentsList');
+        if (!list.length) {
+            el.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 text-center px-6">
+                    <div class="w-12 h-12 rounded-2xl bg-surface flex items-center justify-center text-xl text-text-muted mb-3"><i class="fas fa-user-graduate"></i></div>
+                    <div class="text-[13px] font-semibold text-text-primary mb-1">No Students</div>
+                    <div class="text-[12px] text-text-muted">Students will appear when enrolled.</div>
+                </div>`;
+            return;
+        }
+        const show = list.slice(0, 20);
+        let html = show.map(s => {
+            const name = s.name || s.email || 'Unknown';
+            const init = getInitials(name);
+            return `
+            <div class="px-5 py-3 hover:bg-surface transition-colors flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-xs flex-shrink-0">${init}</div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-[13px] font-semibold text-text-primary truncate">${name}</div>
+                    <div class="text-[11px] text-text-muted truncate">${s.section || '—'}</div>
+                </div>
+                <span class="inline-flex items-center bg-info-bg text-blue text-[11px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0">${s.section || '—'}</span>
+            </div>`;
+        }).join('');
+        if (list.length > 20) {
+            html += `<div class="px-5 py-3 text-center text-[12px] text-blue font-semibold cursor-pointer hover:underline" onclick="openStudentsModal()">
+                +${list.length - 20} more — View all students →
+            </div>`;
+        }
+        el.innerHTML = html;
+    }
+
+    function renderActivityHistory(items, limit = 5) {
+        const el = document.getElementById('activityHistoryList');
+        if (!items.length) {
+            el.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 text-center px-6">
+                    <div class="w-12 h-12 rounded-2xl bg-surface flex items-center justify-center text-xl text-text-muted mb-3"><i class="fas fa-history"></i></div>
+                    <div class="text-[13px] font-semibold text-text-primary mb-1">No Activity Yet</div>
+                    <div class="text-[12px] text-text-muted">Created activities and lessons will appear here.</div>
+                </div>`;
+            return;
+        }
+        el.innerHTML = items.slice(0, limit).map(item => historyItemHTML(item)).join('');
+    }
+
+    function renderFullHistory(items) {
+        document.getElementById('historyTotal').textContent = items.length;
+        const el = document.getElementById('historyList');
+        if (!items.length) {
+            el.innerHTML = `<div class="text-center py-10 text-text-muted text-sm">No history found.</div>`;
+            return;
+        }
+        el.innerHTML = items.map(item => historyItemHTML(item)).join('');
+    }
+
+    function historyItemHTML(item) {
+        const isActivity = item.testName !== undefined;
+        const title = item.testName || item.title || 'Untitled';
+        const date = item.createdAt ? formatDate(item.createdAt) : '—';
+        const section = item.section || '';
+        const icon = isActivity ? 'fa-dumbbell' : 'fa-book-open';
+        const typeBg = isActivity ? 'bg-success-bg text-success' : 'bg-info-bg text-info';
+        const typeLabel = isActivity ? 'Activity' : 'Lesson';
+        const statusBadge = isActivity && item.status
+            ? `<span class="inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                item.status === 'active' ? 'bg-success-bg text-success' :
+                item.status === 'completed' ? 'bg-info-bg text-info' : 'bg-warning-bg text-warning'
+              }">${item.status.charAt(0).toUpperCase()+item.status.slice(1)}</span>` : '';
+        return `
+        <div class="px-6 py-4 hover:bg-surface transition-colors flex items-start gap-4">
+            <div class="w-9 h-9 rounded-xl ${isActivity ? 'bg-success-bg text-success' : 'bg-info-bg text-info'} flex items-center justify-center text-[13px] flex-shrink-0 mt-0.5">
+                <i class="fas ${icon}"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="text-[13px] font-semibold text-text-primary truncate">${title}</div>
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <span class="inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full ${typeBg}">${typeLabel}</span>
+                        ${statusBadge}
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-text-muted mt-1.5">
+                    <span><i class="fas fa-calendar-alt mr-1"></i>${date}</span>
+                    ${section ? `<span><i class="fas fa-users mr-1"></i>${section}</span>` : ''}
+                    ${isActivity && item.deadline ? `<span><i class="fas fa-clock mr-1 text-warning"></i>Due: ${item.deadline}</span>` : ''}
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function getInitials(name) {
+        if (!name) return '??';
+        const parts = name.split(' ');
+        if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        return name.substring(0, 2).toUpperCase();
+    }
+
+    function formatDate(timestamp) {
+        try {
+            const d = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+            return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+        } catch { return '—'; }
+    }
+</script>
+
+<script type="module">
+    import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getFirestore, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+        authDomain: "umakfit-e3b1d.firebaseapp.com",
+        projectId: "umakfit-e3b1d",
+        storageBucket: "umakfit-e3b1d.appspot.com",
+        messagingSenderId: "276569891504",
+        appId: "1:276569891504:web:39b1732b519f4d8b785175"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    let currentUser = null, currentProfessor = null;
+
+    onAuthStateChanged(auth, async user => {
+        if (user) {
+            try {
+                currentUser = user;
+                const email = user.email.toLowerCase();
+
+                // ── find professor (same logic as dashboard) ──
+                const profQ = await getDocs(query(collection(db,'professors'), where('email','==',email)));
+                if (!profQ.empty) {
+                    currentProfessor = { id: profQ.docs[0].id, ...profQ.docs[0].data() };
+                } else {
+                    const usrQ = await getDocs(query(collection(db,'users'), where('email','==',email), where('role','==','professor')));
+                    if (!usrQ.empty) {
+                        currentProfessor = { id: usrQ.docs[0].id, ...usrQ.docs[0].data() };
+                    } else {
+                        throw new Error('Professor account not found. Please contact the secretary.');
+                    }
+                }
+
+                window.currentProfessor = currentProfessor;
+                setupUI(user);
+                await loadAll();
+
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('mainContent').style.display   = 'block';
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loadingScreen').style.display = 'none';
+                showAlert(err.message || 'Error loading profile.', 'error');
+                setTimeout(async () => { await signOut(auth); window.location.href = '/login/index.html'; }, 2500);
+            }
+        } else {
+            window.location.href = '/login/index.html';
+        }
+    });
+
+    function setupUI(user) {
+        const profName = currentProfessor.fullName || currentProfessor.name || user.displayName || 'Professor';
+        const email    = currentProfessor.email || user.email;
+        const initial  = profName.charAt(0).toUpperCase();
+        const shortName = profName.split(',')[0]?.trim() || profName;
+        const photoURL = user.photoURL || null;
+
+        document.getElementById('headerName').textContent      = shortName;
+        document.getElementById('heroName').textContent        = shortName;
+        document.getElementById('dropdownName').textContent    = profName;
+        document.getElementById('dropdownEmail').textContent   = email;
+        document.getElementById('profNameDisplay').textContent = profName;
+        document.getElementById('profEmailDisplay').textContent= email;
+        document.getElementById('profIdDisplay').textContent   = currentProfessor.id?.substring(0, 8)?.toUpperCase() || '—';
+
+        const setAvatar = (id, photo, init) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = photo
+                ? `<img src="${photo}" alt="Profile" class="w-full h-full object-cover rounded-full">`
+                : init;
+        };
+        setAvatar('profileAvatarSmall', photoURL, initial);
+        setAvatar('profileDropdownAvatar', photoURL, initial);
+        setAvatar('profileAvatarLg', photoURL, initial);
+    }
+
+    async function loadAll() {
+        await loadSections();
+        await loadActivities();
+        await loadLessons();
+        buildHistory();
+    }
+
+    async function loadSections() {
+        const profEmail = (currentProfessor.email || currentUser.email).toLowerCase();
+
+        // ── Build name variations (same robust logic as dashboard) ──
+        const nameVariations = new Set();
+        ['fullName','name','displayName'].forEach(f => {
+            if (currentProfessor[f]) nameVariations.add(currentProfessor[f].toUpperCase().trim());
+        });
+        if (currentUser.displayName) nameVariations.add(currentUser.displayName.toUpperCase().trim());
+
+        // Fetch additional name aliases from DB
+        const profSnap = await getDocs(query(collection(db,'professors'), where('email','==',profEmail)));
+        profSnap.forEach(d => ['fullName','name','displayName'].forEach(f => { if (d.data()[f]) nameVariations.add(d.data()[f].toUpperCase().trim()); }));
+
+        const usersSnap = await getDocs(query(collection(db,'users'), where('email','==',profEmail)));
+        usersSnap.forEach(d => ['fullName','name','displayName'].forEach(f => { if (d.data()[f]) nameVariations.add(d.data()[f].toUpperCase().trim()); }));
+
+        nameVariations.add(profEmail.split('@')[0].toUpperCase().trim());
+        nameVariations.delete('');
+
+        const nameTokens = new Set();
+        nameVariations.forEach(n => n.split(/[\s,\.]+/).forEach(w => { if (w.length >= 3) nameTokens.add(w); }));
+
+        // Fetch all sections and match
+        const secSnap = await getDocs(collection(db,'sections'));
+        const sections = [];
+        const students = [];
+
+        secSnap.forEach(d => {
+            const data = d.data();
+            const dbProf      = (data.professor || '').toString().trim().toUpperCase();
+            const dbProfEmail = (data.professorEmail || '').toString().trim().toLowerCase();
+            let isMatch = false;
+
+            if (dbProfEmail && dbProfEmail === profEmail) isMatch = true;
+            if (!isMatch) for (const v of nameVariations) { if (v && v.length >= 3 && dbProf === v) { isMatch = true; break; } }
+            if (!isMatch) for (const v of nameVariations) { if (v && v.length >= 3 && (dbProf.includes(v) || v.includes(dbProf))) { isMatch = true; break; } }
+            if (!isMatch) for (const v of nameVariations) {
+                if (v && v.length >= 3) {
+                    const ln = v.split(',')[0].trim();
+                    if (ln.length >= 3 && dbProf.includes(ln)) { isMatch = true; break; }
+                }
+            }
+            if (!isMatch && dbProf.length >= 3) {
+                const dbWords = dbProf.split(/[\s,\.]+/).filter(w => w.length >= 3);
+                for (const w of dbWords) { if (nameTokens.has(w)) { isMatch = true; break; } }
+            }
+            if (!isMatch) {
+                const eu = profEmail.split('@')[0].toUpperCase();
+                if (eu.length > 3 && dbProf.includes(eu)) isMatch = true;
+            }
+
+            if (isMatch) {
+                const sData = data.students || [];
+                sections.push({
+                    id: d.id,
+                    name: data.name || 'Unnamed Section',
+                    courseCode: data.courseCode || 'PE',
+                    courseTitle: data.courseTitle || '',
+                    time: data.time || '',
+                    day: data.day || '',
+                    room: data.room || '',
+                    yearLevel: data.yearLevel || '',
+                    studentCount: sData.length,
+                    students: sData
+                });
+                sData.forEach(s => students.push({ ...s, section: data.name, sectionId: d.id }));
+            }
+        });
+
+        window._allSections = sections;
+        window._allStudents = students;
+
+        // Update stats
+        document.getElementById('statSections').textContent = sections.length;
+        document.getElementById('statStudents').textContent = students.length;
+        document.getElementById('sectionsBadge').textContent = sections.length;
+        document.getElementById('studentsBadge').textContent = students.length;
+
+        // Render
+        renderSectionsSidebar(sections);
+        renderStudentsSidebar(students);
+        populateSectionFilter(sections);
+    }
+
+    function populateSectionFilter(sections) {
+        const sel = document.getElementById('sectionFilter');
+        sel.innerHTML = '<option value="">All Sections</option>';
+        sections.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.name; opt.textContent = s.name;
+            sel.appendChild(opt);
+        });
+    }
+
+    async function loadActivities() {
+        try {
+            const q = await getDocs(query(collection(db,'scheduledTests'), where('professorEmail','==',currentProfessor.email)));
+            const acts = q.docs.map(d => ({ id: d.id, ...d.data() }));
+            acts.sort((a,b) => sortByDate(b,a));
+            window._allActivities = acts;
+            document.getElementById('statActivities').textContent = acts.length;
+        } catch(e) {
+            console.error('Activities error:', e);
+            window._allActivities = [];
+        }
+    }
+
+    async function loadLessons() {
+        try {
+            const q = await getDocs(query(collection(db,'lessons'), where('professorEmail','==',currentProfessor.email)));
+            const lessons = q.docs.map(d => ({ id: d.id, ...d.data() }));
+            lessons.sort((a,b) => sortByDate(b,a));
+            window._allLessons = lessons;
+            document.getElementById('statLessons').textContent = lessons.length;
+        } catch(e) {
+            console.error('Lessons error:', e);
+            window._allLessons = [];
+        }
+    }
+
+    function sortByDate(a, b) {
+        const da = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const db2 = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return da - db2;
+    }
+
+    function buildHistory() {
+        const all = [...(window._allActivities||[]), ...(window._allLessons||[])];
+        all.sort((a,b) => {
+            const da = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+            const db2 = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+            return db2 - da;
+        });
+        window._allHistory = all;
+        renderActivityHistory(all);
+    }
+
+    window.refreshProfile = async function() {
+        document.getElementById('loadingScreen').style.display = 'flex';
+        document.getElementById('mainContent').style.display = 'none';
+        try {
+            await loadAll();
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            showAlert('Profile refreshed successfully!', 'success');
+        } catch(e) {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            showAlert('Error refreshing: ' + e.message, 'error');
+        }
+    };
+
+    window.handleLogout = async function(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        document.getElementById('profileDropdown')?.classList.remove('show');
+        showConfirm('Are you sure you want to sign out?', async () => {
+            try { await signOut(auth); } catch {}
+            window.location.href = '/login/index.html';
+        });
+    };
+</script>
 </body>
 </html>

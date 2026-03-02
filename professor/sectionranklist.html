@@ -2,2542 +2,1152 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>UMakFit - Section Rank List</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMakFit — Section Rank List</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0a1628',
+                        'navy-mid': '#112240',
+                        'navy-light': '#1a3a5c',
+                        royal: '#1e4d8c',
+                        blue: '#2d6fc4',
+                        accent: '#c8a84b',
+                        'accent-light': '#e8c96a',
+                        'accent-pale': '#f5edd6',
+                        surface: '#f4f6fa',
+                        border: '#e1e6ef',
+                        'border-strong': '#c5cfe0',
+                        'text-primary': '#0a1628',
+                        'text-secondary': '#4a5a72',
+                        'text-muted': '#8a98ae',
+                        success: '#0e8a5f',
+                        'success-bg': '#d4f0e6',
+                        danger: '#c0392b',
+                        'danger-bg': '#fce8e6',
+                        warning: '#b07e16',
+                        'warning-bg': '#fef3d4',
+                        info: '#1a6fa8',
+                        'info-bg': '#d6eaf8',
+                        purple: '#6b21a8',
+                        'purple-bg': '#f3e8ff',
+                    },
+                    fontFamily: {
+                        sans: ['DM Sans', 'sans-serif'],
+                        display: ['Playfair Display', 'serif'],
+                        mono: ['DM Mono', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
- <style>
-        * { 
-            -webkit-font-smoothing: antialiased; 
-            box-sizing: border-box; 
-            font-family: 'Poppins', sans-serif; 
+    <style>
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c5cfe0; border-radius: 3px; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fadeSlide { animation: fadeSlide 0.3s ease; }
+        .spinner { width: 44px; height: 44px; border-radius: 50%; border: 3px solid rgba(200,168,75,0.2); border-top-color: #c8a84b; animation: spin 0.9s linear infinite; }
+
+        .nav-active { position: relative; }
+        .nav-active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #c8a84b; border-radius: 0 2px 2px 0; }
+
+        .section-card { transition: all 0.22s; }
+        .section-card:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,0.09); border-color: #c8a84b !important; }
+        .section-card.active-section { border-color: #2d6fc4 !important; background: rgba(45,111,196,0.04) !important; box-shadow: 0 0 0 3px rgba(45,111,196,0.12); }
+        .section-card.active-section .section-name { color: #2d6fc4 !important; }
+
+        .stat-card { transition: all 0.22s; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.09); }
+
+        .profile-btn:hover { background: rgba(255,255,255,0.12); }
+
+        .profile-dropdown {
+            opacity: 0; visibility: hidden; transform: translateY(-8px);
+            transition: all 0.2s ease;
         }
-        body { 
-            margin: 0; 
-            padding: 0; 
-            background-color: #f6f6f6;
-            overflow-x: hidden;
-            width: 100%;
+        .profile-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        #hamburgerBtn { display: none; }
+        @media (max-width: 768px) {
+            #hamburgerBtn { display: flex !important; align-items: center; justify-content: center; }
         }
-        
-        .font-montserrat {
-            font-family: 'Montserrat', sans-serif;
-        }
-        
-        /* Custom animations */
-        @keyframes pulse { 
-            0%, 100% { opacity: 1; } 
-            50% { opacity: 0.5; } 
-        }
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes bounceSlow {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .slide-down { animation: slideDown 0.3s ease; }
-        .animate-bounce-slow { animation: bounceSlow 2s ease-in-out infinite; }
-        
-        /* ============ DASHBOARD-STYLE ALERT MODALS ============ */
-        .alert-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-            padding: 1rem;
-            animation: fadeIn 0.2s ease;
-        }
-        
-        .alert-popup-card {
-            background: #fff;
-            border-radius: 28px;
-            padding: 2.5rem 2rem 2rem;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
-            animation: slideUp 0.35s cubic-bezier(.4,0,.2,1);
-            text-align: center;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .alert-icon-circle {
-            width: 72px; 
-            height: 72px;
-            background: #fce8e6;
-            border-radius: 50%;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            margin: 0 auto 1.25rem;
-        }
-        
-        .alert-icon-circle.success {
-            background: #d1fae5;
-        }
-        
-        .alert-icon-circle.info {
-            background: #dbeafe;
-        }
-        
-        .alert-icon-circle.warning {
-            background: #fef3c7;
-        }
-        
-        .alert-icon-circle.error {
-            background: #fee2e2;
-        }
-        
-        .alert-title {
-            font-size: 1.375rem;
-            font-weight: 600;
-            color: #202124;
-            margin-bottom: 0.4rem;
-            letter-spacing: -0.01em;
-        }
-        
-        .alert-message {
-            font-size: 0.875rem;
-            color: #5f6368;
-            margin-bottom: 1.75rem;
-        }
-        
-        .alert-divider {
-            height: 1px;
-            background: #e8eaed;
-            margin: 0 -2rem 1.5rem;
-        }
-        
-        .alert-btn-row {
-            display: flex;
-            gap: 0.75rem;
-        }
-        
-        .alert-btn-cancel {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border-radius: 100px;
-            border: 1px solid #dadce0;
-            background: #fff;
-            color: #3c4043;
-            font-size: 0.9375rem;
-            font-weight: 500;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: background 0.15s;
-        }
-        
-        .alert-btn-cancel:hover { 
-            background: #f8f9fa; 
-        }
-        
-        .alert-btn-confirm {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border-radius: 100px;
-            border: none;
-            background: #3b82f6;
-            color: #fff;
-            font-size: 0.9375rem;
-            font-weight: 500;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: background 0.15s, box-shadow 0.15s;
-        }
-        
-        .alert-btn-confirm.success {
-            background: #10b981;
-        }
-        
-        .alert-btn-confirm.success:hover {
-            background: #059669;
-        }
-        
-        .alert-btn-confirm.error {
-            background: #ef4444;
-        }
-        
-        .alert-btn-confirm.error:hover {
-            background: #dc2626;
-        }
-        
-        .alert-btn-confirm.warning {
-            background: #f59e0b;
-        }
-        
-        .alert-btn-confirm.warning:hover {
-            background: #d97706;
-        }
-        
-        .alert-btn-confirm.info {
-            background: #3b82f6;
-        }
-        
-        .alert-btn-confirm.info:hover {
-            background: #2563eb;
-        }
-        
-        .alert-btn-confirm:hover {
-            box-shadow: 0 2px 8px rgba(59,130,246,0.35);
-        }
-        
-        .alert-btn-confirm:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        /* Hamburger Menu Styles */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            cursor: pointer;
-            z-index: 60;
+        #hamburgerBtn.hamburger-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        #hamburgerBtn.hamburger-open span:nth-child(2) { opacity: 0; }
+        #hamburgerBtn.hamburger-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        #hamburgerBtn span { transition: transform 0.25s ease, opacity 0.2s ease; }
+
+        .sidebar-transition { transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); }
+        @media (max-width: 768px) {
+            #mainSidebar { transform: translateX(-100%); }
+            #mainSidebar.sidebar-open { transform: translateX(0); }
+            main { margin-left: 0 !important; }
         }
 
-        .hamburger span {
-            width: 22px;
-            height: 3px;
-            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
+        .modal-overlay { display: none; }
+        .modal-overlay.open { display: flex; }
 
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
+        /* Rank badges */
+        .rank-gold { background: linear-gradient(135deg,#FFD700,#FDB931); color:#1e293b; }
+        .rank-silver { background: linear-gradient(135deg,#C0C0C0,#E0E0E0); color:#1e293b; }
+        .rank-bronze { background: linear-gradient(135deg,#CD7F32,#B87333); color:#fff; }
+        .rank-other { background: linear-gradient(135deg,#1e3a8a,#3b82f6); color:#fff; }
 
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -6px);
-        }
-
-        /* Mobile Drawer */
-        .mobile-drawer {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 260px;
-            height: 100vh;
-            background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
-            z-index: 55;
-            transition: right 0.3s ease;
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-            overflow-y: auto;
-        }
-
-        .mobile-drawer.active { right: 0; }
-        .drawer-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        .drawer-overlay.active { opacity: 1; visibility: visible; }
+        /* Score badges */
+        .sc-excellent { background:#d4f0e6; color:#0e8a5f; }
+        .sc-good { background:#d6eaf8; color:#1a6fa8; }
+        .sc-fair { background:#fef3d4; color:#b07e16; }
+        .sc-poor { background:#fce8e6; color:#c0392b; }
 
         @media (max-width: 768px) {
-            .hamburger { display: flex; }
-            .desktop-nav { display: none; }
-        }
-        
-        /* Gradient text */
-        .gradient-text {
-            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        /* Card shadows */
-        .card-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        
-        /* Loading Screen */
-        .spinner {
-            border: 4px solid #f1f5f9;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        
-        /* Rank badge styles */
-        .rank-1 {
-            background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%);
-            color: #1e293b;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-        }
-        .rank-2 {
-            background: linear-gradient(135deg, #C0C0C0 0%, #E0E0E0 100%);
-            color: #1e293b;
-            box-shadow: 0 4px 15px rgba(192, 192, 192, 0.3);
-        }
-        .rank-3 {
-            background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(205, 127, 50, 0.3);
-        }
-        .rank-other {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-        }
-        
-        /* Student rank badges */
-        .student-rank-1 {
-            background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%);
-            color: #1e293b;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
-        }
-        .student-rank-2 {
-            background: linear-gradient(135deg, #C0C0C0 0%, #E0E0E0 100%);
-            color: #1e293b;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-            box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
-        }
-        .student-rank-3 {
-            background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-            box-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
-        }
-        .student-rank-other {
-            background: #e2e8f0;
-            color: #475569;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        /* Table styles */
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            background: white;
-        }
-        
-        .custom-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        @media screen and (min-width: 769px) {
-            .custom-table {
-                min-width: 800px;
-            }
-            
-            .custom-table thead {
-                background: linear-gradient(90deg, rgba(30, 58, 138, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%);
-            }
-            
-            .custom-table th {
-                font-weight: 600;
-                color: white;
-                font-size: 14px;
-                text-align: left;
-                padding: 15px 12px;
-                border-bottom: 2px solid #e2e8f0;
-                white-space: nowrap;
-            }
-            
-            .custom-table td {
-                font-weight: 400;
-                color: #000;
-                font-size: 14px;
-                padding: 16px 12px;
-                border-bottom: 1px solid #f1f5f9;
-            }
-            
-            .custom-table tbody tr {
-                transition: all 0.2s ease;
-                cursor: pointer;
-            }
-            
-            .custom-table tbody tr:hover {
-                background-color: #f8fafc;
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            }
-        }
-        
-        @media screen and (max-width: 768px) {
-            .table-responsive {
-                overflow-x: visible;
-                border: none;
-                background: transparent;
-            }
-            
-            .custom-table {
-                min-width: 0;
-                width: 100%;
-                background: transparent;
-                border: none;
-            }
-            
-            .custom-table thead {
-                display: none;
-            }
-            
-            .custom-table tbody tr {
-                display: block;
-                margin-bottom: 16px;
-                border: 1px solid #e2e8f0;
-                border-radius: 12px;
-                background: white;
-                padding: 16px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-                cursor: pointer;
-            }
-            
-            .custom-table tbody td {
-                display: flex;
-                padding: 10px 8px 10px 40%;
-                border: none;
-                border-bottom: 1px solid #f1f5f9;
-                text-align: left;
-                position: relative;
-                min-height: 44px;
-                align-items: center;
-            }
-            
-            .custom-table tbody td:before {
-                content: attr(data-label);
-                position: absolute;
-                left: 12px;
-                width: 35%;
-                font-weight: 600;
-                color: #4b5563;
-                font-size: 13px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            
-            .custom-table tbody td:last-child {
-                border-bottom: none;
-                padding-left: 40%;
-            }
-        }
-        
-        /* Badge styles */
-        .badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 12px;
-            display: inline-block;
-            text-align: center;
-        }
-        
-        .badge-excellent {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        
-        .badge-good {
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
-        
-        .badge-fair {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-        
-        .badge-poor {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        
-        .rank-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            font-weight: 700;
-            font-size: 16px;
-        }
-        
-        /* Stats cards */
-        .stat-card {
-            transition: all 0.3s ease;
-        }
-        
-        /* Filter select */
-        .filter-select {
-            padding: 10px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #1f2937;
-            background-color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 20px;
-            padding-right: 40px;
+            #rankTableHead { display: none; }
+            #rankTableBody tr { display: block; margin-bottom: 14px; border: 1px solid #e1e6ef; border-radius: 12px; background: white; padding: 14px; }
+            #rankTableBody td { display: flex; padding: 8px 8px 8px 42%; border: none; border-bottom: 1px solid #f1f5f9; position: relative; min-height: 40px; align-items: center; font-size: 13px; }
+            #rankTableBody td:before { content: attr(data-label); position: absolute; left: 10px; width: 38%; font-weight: 600; color: #4a5a72; font-size: 12px; }
+            #rankTableBody td:last-child { border-bottom: none; }
         }
 
-        .filter-select:hover {
-            border-color: #3b82f6;
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
-        }
+        @media (max-width: 768px) { #headerDate, #headerDivider, #headerNameBlock { display: none; } }
 
-        .filter-select:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-        
-        .modal-content {
-            background-color: white;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 900px;
-            display: flex;
-            flex-direction: column;
-            max-height: 85vh;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-        
-        .modal-header {
-            flex-shrink: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            border-bottom: 1px solid #e2e8f0;
-            background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 100%);
-            border-radius: 12px 12px 0 0;
-        }
-        
-        .modal-header h3 {
-            font-weight: 700;
-            color: white;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 0;
-        }
-        
-        .modal-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px;
-            background-color: white;
-        }
-        
-        .modal-footer {
-            flex-shrink: 0;
-            display: flex;
-            justify-content: flex-end;
-            padding: 16px 24px;
-            border-top: 1px solid #e2e8f0;
-            background-color: #f9fafb;
-            border-radius: 0 0 12px 12px;
-        }
-        
-        .modal-close-btn {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background-color: rgba(255,255,255,0.2);
-            color: white;
-            font-size: 20px;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .modal-close-btn:hover {
-            background-color: rgba(255,255,255,0.3);
-        }
-        
-        .section-info-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e2e8f0;
-            flex-wrap: wrap;
-        }
-        
-        .section-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 700;
-            color: white;
-            flex-shrink: 0;
-        }
-        
-        .section-basic-info {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .section-title {
-            font-weight: 700;
-            color: #1e3a8a;
-            font-size: 20px;
-            margin-bottom: 5px;
-            word-break: break-word;
-        }
-        
-        .section-meta {
-            font-weight: 500;
-            color: #64748b;
-            font-size: 14px;
-            word-break: break-word;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .stat-item {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            text-align: center;
-        }
-        
-        .stat-label {
-            font-weight: 600;
-            color: #64748b;
-            font-size: 12px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-        
-        .stat-value {
-            font-weight: 700;
-            color: #1e3a8a;
-            font-size: 24px;
-        }
-        
-        .stat-sub {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 4px;
-        }
-        
-        .student-rank-row {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            transition: all 0.2s;
-        }
-        
-        .student-rank-row:hover {
-            transform: translateX(5px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border-color: #3b82f6;
-        }
-        
-        .student-rank-number {
-            width: 40px;
-            font-weight: 700;
-            color: #64748b;
-        }
-        
-        .student-info {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .student-avatar-small {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .student-details {
-            flex: 1;
-        }
-        
-        .student-name {
-            font-weight: 600;
-            color: #1e293b;
-            font-size: 15px;
-        }
-        
-        .student-email {
-            font-size: 12px;
-            color: #64748b;
-        }
-        
-        .student-score {
-            font-weight: 700;
-            color: #1e3a8a;
-            font-size: 18px;
-            min-width: 70px;
-            text-align: right;
-        }
-        
-        .student-badge {
-            min-width: 80px;
-            text-align: right;
-        }
-        
-        /* Empty state for no grades */
-        .no-grades-badge {
-            background: #f1f5f9;
-            color: #64748b;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        /* Section card clickable filter */
-        .section-card {
-            cursor: pointer;
-            transition: all 0.25s ease;
-            border: 2px solid transparent;
-        }
-        .section-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.10);
-            border-color: #f59e0b !important;
-        }
-        .section-card.active-section {
-            border-color: #3b82f6 !important;
-            background: #eff6ff !important;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-        }
-        .section-card.active-section .section-name {
-            color: #1d4ed8 !important;
-        }
-        
-        /* Filter badge */
-        .filter-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #dbeafe;
-            color: #1d4ed8;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 999px;
-            border: 1px solid #bfdbfe;
-        }
-        .filter-badge .clear-filter {
-            cursor: pointer;
-            font-size: 14px;
-            line-height: 1;
-            color: #3b82f6;
-            transition: color 0.2s;
-        }
-        .filter-badge .clear-filter:hover { color: #dc2626; }
-        
-        /* COMPACT NAVIGATION STYLES */
-        .logo-compact {
-            margin-right: 0.75rem;
-        }
-        
-        .nav-group {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .nav-link-compact {
-            padding: 0.35rem 0.6rem;
-            font-size: 0.85rem;
-            white-space: nowrap;
-        }
-        
-        .profile-compact {
-            margin-left: 0.75rem;
-        }
-        
-        @media (min-width: 1280px) {
-            .nav-link-compact {
-                padding: 0.4rem 0.7rem;
-                font-size: 0.9rem;
-            }
-        }
+        .progress-fill { transition: width 0.8s ease; }
+        .student-rank-row { transition: all 0.2s ease; }
+        .student-rank-row:hover { transform: translateX(4px); border-color: #2d6fc4; }
     </style>
 </head>
-<body class="bg-gray-50 overflow-x-hidden">
+<body class="bg-surface font-sans">
 
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="fixed inset-0 bg-white bg-opacity-95 flex flex-col justify-center items-center z-50">
-        <div class="spinner"></div>
-        <div class="mt-5 text-gray-600 font-medium">Loading Section Rank List...</div>
-    </div>
-    
-    <!-- ============ DASHBOARD-STYLE ALERT MODALS ============ -->
-    <!-- Success Modal -->
-    <div class="alert-modal-overlay" id="successModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle success">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#10b981" stroke-width="3" fill="none"/>
-                    <path d="M16 24L22 30L32 18" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <div class="alert-title" id="successTitle">Success</div>
-            <div class="alert-message" id="successMessage">Operation completed successfully.</div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-confirm success" id="successOkBtn">OK</button>
-            </div>
+<!-- LOADING SCREEN -->
+<div id="loadingScreen" class="fixed inset-0 bg-navy flex flex-col items-center justify-center z-[9999] gap-6">
+    <div class="font-display text-3xl font-extrabold text-accent tracking-widest">UMakFit</div>
+    <div class="text-white/50 text-sm tracking-[3px] uppercase">Section Rank List</div>
+    <div class="spinner"></div>
+</div>
+
+<!-- ALERT MODAL -->
+<div id="alertModal" class="modal-overlay fixed inset-0 bg-black/55 justify-center items-center z-[10000] backdrop-blur-sm p-5">
+    <div class="bg-white rounded-2xl max-w-[440px] w-full shadow-[0_30px_80px_rgba(0,0,0,0.25)] animate-fadeSlide overflow-hidden">
+        <div class="flex items-center justify-between px-6 pt-5">
+            <h3 class="font-display text-[19px] font-bold text-navy" id="alertModalTitle">Alert</h3>
+            <button onclick="closeAlertModal()" class="w-8 h-8 rounded-full bg-surface border-0 flex items-center justify-center cursor-pointer text-text-muted text-sm hover:bg-danger-bg hover:text-danger transition-all">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="px-6 py-5 text-center">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center text-[28px] mx-auto mb-4" id="alertModalIcon"><i class="fas fa-info-circle"></i></div>
+            <p class="text-sm text-text-secondary leading-relaxed" id="alertModalMsg"></p>
+        </div>
+        <div class="flex justify-center gap-2 px-6 pb-5 pt-4 border-t border-border">
+            <button onclick="closeAlertModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-royal to-blue text-white border-0 rounded-lg font-sans text-sm font-semibold cursor-pointer transition-all hover:-translate-y-px hover:shadow-lg">OK</button>
         </div>
     </div>
+</div>
 
-    <!-- Info Modal -->
-    <div class="alert-modal-overlay" id="infoModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle info">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#3b82f6" stroke-width="3" fill="none"/>
-                    <path d="M24 16V24M24 32V32.5" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" class="modal-overlay fixed inset-0 bg-black/55 justify-center items-center z-[10000] backdrop-blur-sm p-5">
+    <div class="bg-white rounded-2xl max-w-[440px] w-full shadow-[0_30px_80px_rgba(0,0,0,0.25)] animate-fadeSlide overflow-hidden">
+        <div class="flex items-center justify-between px-6 pt-5">
+            <h3 class="font-display text-[19px] font-bold text-navy">Confirm Action</h3>
+            <button onclick="closeConfirmModal()" class="w-8 h-8 rounded-full bg-surface border-0 flex items-center justify-center cursor-pointer text-text-muted text-sm hover:bg-danger-bg hover:text-danger transition-all">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="px-6 py-5 text-center">
+            <div class="w-16 h-16 rounded-full bg-warning-bg text-warning flex items-center justify-center text-[28px] mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle"></i>
             </div>
-            <div class="alert-title" id="infoTitle">Information</div>
-            <div class="alert-message" id="infoMessage"></div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-confirm info" id="infoOkBtn">OK</button>
-            </div>
+            <p class="text-sm text-text-secondary leading-relaxed" id="confirmModalMsg"></p>
+        </div>
+        <div class="flex justify-center gap-2 px-6 pb-5 pt-4 border-t border-border">
+            <button onclick="closeConfirmModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-transparent text-text-secondary border border-border rounded-lg font-sans text-sm font-semibold cursor-pointer hover:bg-surface hover:border-border-strong hover:text-text-primary transition-all">Cancel</button>
+            <button id="confirmModalYesBtn" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-[#991b1b] to-danger text-white border-0 rounded-lg font-sans text-sm font-semibold cursor-pointer transition-all">Confirm</button>
         </div>
     </div>
+</div>
 
-    <!-- Warning Modal -->
-    <div class="alert-modal-overlay" id="warningModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle warning">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <path d="M24 4L4 40H44L24 4Z" stroke="#f59e0b" stroke-width="3" fill="none"/>
-                    <circle cx="24" cy="32" r="2" fill="#f59e0b"/>
-                    <path d="M24 16V24" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
+<!-- SECTION DETAILS MODAL -->
+<div id="sectionDetailsModal" class="modal-overlay fixed inset-0 bg-black/55 justify-center items-center z-[10000] backdrop-blur-sm p-4" onclick="if(event.target===this) closeSectionDetailsModal()">
+    <div class="bg-white rounded-2xl w-full max-w-[820px] max-h-[90vh] flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.25)] animate-fadeSlide overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0 bg-gradient-to-br from-navy to-navy-light">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-accent/20 flex items-center justify-center text-accent"><i class="fas fa-trophy"></i></div>
+                <div class="font-display text-[17px] font-bold text-white" id="modalSectionName">Section Details</div>
             </div>
-            <div class="alert-title" id="warningTitle">Warning</div>
-            <div class="alert-message" id="warningMessage"></div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-cancel" id="warningCancelBtn">Cancel</button>
-                <button class="alert-btn-confirm warning" id="warningConfirmBtn">Continue</button>
-            </div>
+            <button onclick="closeSectionDetailsModal()" class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white/70 hover:bg-white/25 transition-all border-0 cursor-pointer text-sm">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6 bg-white" id="sectionDetailsBody"></div>
+        <div class="flex justify-end px-6 py-4 border-t border-border bg-surface flex-shrink-0">
+            <button onclick="closeSectionDetailsModal()" class="px-6 py-2.5 bg-navy hover:bg-navy-light text-white rounded-xl text-sm font-semibold border-0 cursor-pointer transition-all">Close</button>
         </div>
     </div>
+</div>
 
-    <!-- Error Modal -->
-    <div class="alert-modal-overlay" id="errorModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle error">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#ef4444" stroke-width="3" fill="none"/>
-                    <line x1="16" y1="16" x2="32" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
-                    <line x1="32" y1="16" x2="16" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
+<!-- MAIN CONTENT -->
+<div id="mainContent" style="display:none;">
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay" onclick="closeSidebar()" class="hidden fixed inset-0 bg-navy/60 backdrop-blur-sm z-[399]"></div>
+
+    <!-- HEADER -->
+    <header class="fixed top-0 left-0 right-0 h-[70px] bg-navy flex items-center px-4 md:px-8 z-[500] border-b border-white/[0.06] shadow-[0_2px_20px_rgba(0,0,0,0.25)]">
+        <button id="hamburgerBtn" onclick="toggleSidebar()"
+            class="flex-col gap-[5px] w-10 h-10 bg-white/[0.08] border border-white/[0.12] rounded-lg cursor-pointer mr-3 flex-shrink-0">
+            <span class="block w-[18px] h-0.5 bg-white/80 rounded"></span>
+            <span class="block w-[18px] h-0.5 bg-white/80 rounded"></span>
+            <span class="block w-[18px] h-0.5 bg-white/80 rounded"></span>
+        </button>
+        <div class="flex items-center gap-3.5 flex-1 min-w-0">
+            <div class="w-10 h-10 bg-accent/15 border border-accent/30 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+                <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-8 h-8 object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="font-display font-extrabold text-accent text-lg hidden items-center justify-center">U</div>
             </div>
-            <div class="alert-title" id="errorTitle">Error</div>
-            <div class="alert-message" id="errorMessage"></div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-confirm error" id="errorOkBtn">OK</button>
+            <div class="min-w-0">
+                <div class="text-[13px] font-semibold text-white/85 tracking-[0.3px] truncate">University of Makati</div>
+                <div class="text-[11px] text-accent tracking-[1.5px] uppercase font-medium truncate">UMakFit — Professor Portal</div>
             </div>
         </div>
-    </div>
-
-    <!-- Confirm Modal (Yes/No) -->
-    <div class="alert-modal-overlay" id="confirmModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle warning">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#f59e0b" stroke-width="3" fill="none"/>
-                    <path d="M24 16V24M24 32V32.5" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="alert-title">Confirm Action</div>
-            <div class="alert-message" id="confirmMessage"></div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-cancel" id="confirmNoBtn">No</button>
-                <button class="alert-btn-confirm warning" id="confirmYesBtn">Yes</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="mainContent" class="hidden overflow-x-hidden">
-        <!-- COMPACT NAVIGATION BANNER -->
-        <header class="shadow-lg fixed w-full top-0 z-50" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
-            <nav class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-                <div class="flex justify-between items-center h-14 md:h-16">
-                    
-                    <!-- LOGO - compact -->
-                    <div class="flex items-center logo-compact">
-                        <div class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center overflow-visible">
-                            <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-12 h-12 md:w-14 md:h-14 object-contain">
-                        </div>
-                        <span class="text-base sm:text-lg md:text-xl lg:text-2xl font-extrabold font-montserrat gradient-text ml-1">
-                            UMakFIT
-                        </span>
+        <div class="flex items-center gap-3 md:gap-4 flex-shrink-0">
+            <div id="headerDate" class="text-xs text-white/40 tracking-[0.5px]"></div>
+            <div id="headerDivider" class="w-px h-7 bg-white/10"></div>
+            <div class="relative">
+                <div id="profileCircle" onclick="toggleProfileDropdown()"
+                    class="profile-btn flex items-center gap-2.5 bg-white/[0.07] border border-white/10 rounded-xl px-3 py-1.5 cursor-pointer transition-all">
+                    <div id="profileAvatarSmall" class="w-8 h-8 rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-sm overflow-hidden flex-shrink-0">P</div>
+                    <div id="headerNameBlock">
+                        <div class="text-[13px] font-semibold text-white" id="headerName">Professor</div>
+                        <div class="text-[11px] text-white/45">Faculty Member</div>
                     </div>
-
-                    <!-- DESKTOP NAVIGATION - super compact -->
-                    <div class="hidden md:flex items-center nav-group">
-                        <!-- Dashboard -->
-                        <a href="professor.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
-                        </a>
-                        
-                        <!-- Students -->
-                        <a href="studentmanagement.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-users mr-1"></i>Students
-                        </a>
-                        
-                        <!-- Activities -->
-                        <a href="addactivities.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-dumbbell mr-1"></i>Activities
-                        </a>
-                        
-                        <!-- Lessons -->
-                        <a href="addlesson.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-book-open mr-1"></i>Lessons
-                        </a>
-                        
-                        <!-- Monitoring -->
-                        <a href="monitoringactivities.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-chart-bar mr-1"></i>Monitoring
-                        </a>
-                        
-                        <!-- Grades -->
-                        <a href="grades.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-graduation-cap mr-1"></i>Grades
-                        </a>
-                        
-                        <!-- Section Rank - active -->
-                        <a href="sectionranklist.html" class="nav-link-compact text-white font-medium rounded-lg" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);">
-                            <i class="fas fa-trophy mr-1"></i>Rank
-                        </a>
-                    </div>
-
-                    <!-- PROFILE - compact -->
-                    <div class="hidden md:block relative profile-compact">
-                        <img src="" alt="Profile" id="profilePictureBtn"
-                             class="w-7 h-7 md:w-8 md:h-8 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
-                        
-                        <!-- Profile Dropdown -->
-                        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-                            <div class="p-3 border-b-2 border-gray-200 text-center">
-                                <img src="" alt="Profile" id="profileDropdownPicture" class="w-14 h-14 rounded-full mx-auto mb-2 border-3 border-blue-500 object-cover">
-                                <h6 id="profileDropdownName" class="font-bold text-gray-900 text-sm">Loading...</h6>
-                                <p id="profileDropdownEmail" class="text-xs text-gray-500 mt-1 truncate px-2">Loading...</p>
-                            </div>
-                            <div class="p-1">
-                                <a href="professor-profile.html" onclick="showViewProfile(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-xs">
-                                    <i class="bi bi-person-circle text-blue-500 text-base"></i>
-                                    <span class="font-medium text-gray-700">View Profile</span>
-                                </a>
-                                <div class="h-px bg-gray-200 my-1"></div>
-                                <div onclick="showLogoutModal(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
-                                    <i class="fas fa-sign-out-alt text-base"></i>
-                                    <span class="font-medium">Logout</span>
-                                </div>
-                            </div>
+                    <i class="fas fa-chevron-down text-[10px] text-white/40 ml-1"></i>
+                </div>
+                <div id="profileDropdown" class="profile-dropdown absolute top-[calc(100%+12px)] right-0 w-[280px] bg-white rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] border border-border z-[1000]">
+                    <div class="bg-gradient-to-br from-navy to-navy-light p-5 rounded-t-2xl text-center">
+                        <div id="profileDropdownAvatar" class="w-[52px] h-[52px] rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-xl mx-auto mb-2.5 overflow-hidden">P</div>
+                        <div class="text-[15px] font-bold text-white" id="dropdownName">Professor</div>
+                        <div class="text-xs text-white/55 mt-1 break-all" id="dropdownEmail">professor@umak.edu.ph</div>
+                        <div class="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent/20 border border-accent/30 text-accent-light text-[11px] font-semibold tracking-[0.5px]">
+                            <i class="fas fa-chalkboard-teacher mr-1"></i> Faculty Member
                         </div>
                     </div>
-
-                    <!-- MOBILE MENU -->
-                    <div class="flex md:hidden items-center gap-2">
-                        <!-- Mobile Profile -->
-                        <div class="relative">
-                            <img src="" alt="Profile" id="profilePictureBtnMobile"
-                                 class="w-7 h-7 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
-                            
-                            <div id="profileDropdownMobile" class="hidden fixed right-2 top-14 w-56 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-                                <div class="p-3 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-14 h-14 rounded-full mx-auto mb-2 border-3 border-blue-500 object-cover">
-                                    <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-sm">Loading...</h6>
-                                    <p id="profileDropdownEmailMobile" class="text-xs text-gray-500 mt-1 truncate px-2">Loading...</p>
-                                </div>
-                                <div class="p-1">
-                                    <a href="professor-profile.html" onclick="showViewProfile(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-xs">
-                                        <i class="bi bi-person-circle text-blue-500 text-base"></i>
-                                        <span class="font-medium text-gray-700">View Profile</span>
-                                    </a>
-                                    <div class="h-px bg-gray-200 my-1"></div>
-                                    <div onclick="showLogoutModal(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
-                                        <i class="fas fa-sign-out-alt text-base"></i>
-                                        <span class="font-medium">Logout</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Hamburger Menu -->
-                        <div class="hamburger" id="hamburger">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
+                    <div class="p-2">
+                        <a href="professor-profile.html" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg no-underline text-text-secondary text-[13px] font-medium hover:bg-surface hover:text-text-primary transition-all">
+                            <i class="fas fa-user-circle w-4 text-center"></i><span>View Profile</span>
+                        </a>
+                        <div class="h-px bg-border my-1 mx-2"></div>
+                        <a href="#" onclick="handleLogout(event)" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg no-underline text-danger text-[13px] font-medium hover:bg-danger-bg transition-all">
+                            <i class="fas fa-sign-out-alt w-4 text-center"></i><span>Sign Out</span>
+                        </a>
                     </div>
                 </div>
-            </nav>
+            </div>
+        </div>
+    </header>
 
-            <!-- Mobile Drawer Overlay -->
-            <div class="drawer-overlay" id="drawerOverlay"></div>
-
-            <!-- Mobile Drawer -->
-            <div class="mobile-drawer" id="mobileDrawer">
-                <div class="p-5 pt-6">
-                    <!-- Drawer Header -->
-                    <div class="flex items-center gap-2 mb-6 pb-4 border-b border-white/20">
-                        <div class="w-10 h-10 flex items-center justify-center overflow-visible">
-                            <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-12 h-12 object-contain">
-                        </div>
-                        <span class="text-xl font-extrabold font-montserrat gradient-text">
-                            UMakFIT
-                        </span>
-                    </div>
-
-                    <!-- Navigation Links -->
-                    <nav class="space-y-1 mb-6">
-                        <a href="professor.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
-                        </a>
-                        <a href="studentmanagement.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-users mr-2"></i>Student Management
-                        </a>
-                        <a href="addactivities.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-dumbbell mr-2"></i>Add Activities
-                        </a>
-                        <a href="addlesson.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-book-open mr-2"></i>Add Lesson
-                        </a>
-                        <a href="monitoringactivities.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-chart-bar mr-2"></i>Monitoring Activities
-                        </a>
-                        <a href="grades.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-graduation-cap mr-2"></i>Grades
-                        </a>
-                        <a href="sectionranklist.html" class="mobile-nav-link block text-white font-medium py-2 px-3 rounded-lg text-sm" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);">
-                            <i class="fas fa-trophy mr-2"></i>Section Rank
-                        </a>
-                    </nav>
+    <!-- SIDEBAR -->
+    <aside id="mainSidebar"
+        class="sidebar-transition sidebar-scroll fixed top-[70px] left-0 w-[260px] h-[calc(100vh-70px)] bg-navy-mid border-r border-white/[0.06] flex flex-col overflow-y-auto overflow-x-hidden z-[400] py-6">
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mb-2">Main</div>
+        <a href="professor.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-tachometer-alt"></i></div>
+            <span>Dashboard</span>
+        </a>
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mt-5 mb-2">Classes</div>
+        <a href="studentmanagement.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-users"></i></div>
+            <span>Students</span>
+        </a>
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mt-5 mb-2">Content</div>
+        <a href="addactivities.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-dumbbell"></i></div>
+            <span>Activities</span>
+        </a>
+        <a href="addlesson.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-book-open"></i></div>
+            <span>Lessons</span>
+        </a>
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mt-5 mb-2">Analytics</div>
+        <a href="monitoringactivities.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-chart-bar"></i></div>
+            <span>Monitoring</span>
+        </a>
+        <a href="grades.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-graduation-cap"></i></div>
+            <span>Grades</span>
+        </a>
+        <a href="sectionranklist.html" class="nav-active flex items-center gap-3 px-5 py-2.5 text-white bg-gradient-to-r from-accent/12 to-accent/[0.04] no-underline text-[13.5px] font-medium">
+            <div class="w-8 h-8 rounded-lg bg-accent/20 text-accent flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-trophy"></i></div>
+            <span>Section Rank</span>
+        </a>
+        <div class="mt-auto px-5 pt-4">
+            <div class="bg-accent/10 border border-accent/20 rounded-xl p-3 flex items-center gap-2.5">
+                <div class="w-[30px] h-[30px] rounded-lg bg-accent/15 flex items-center justify-center text-accent text-[13px]"><i class="fas fa-shield-alt"></i></div>
+                <div>
+                    <div class="text-[12px] font-semibold text-white/70">UMakFit</div>
+                    <div class="text-[10px] text-white/35 mt-0.5">College of Human Kinetics</div>
                 </div>
             </div>
-        </header>
+        </div>
+    </aside>
 
-        <!-- Main Content -->
-        <div class="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen pt-32 pb-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
-                <!-- Page Header -->
-                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-8 mb-8 animate-fade-in-up">
-                    <div class="flex items-center mb-5">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center mr-5 shadow-lg">
-                            <i class="fas fa-trophy text-white text-3xl"></i>
+    <!-- MAIN CONTENT -->
+    <main class="ml-[260px] pt-[70px] min-h-screen" style="margin-left: 260px;">
+        <div class="px-6 md:px-10 py-8 pb-20">
+
+            <!-- Page Hero -->
+            <div class="relative bg-gradient-to-br from-navy via-[#1a4580] to-navy-light rounded-2xl p-7 mb-7 overflow-hidden">
+                <div class="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-accent/[0.07] pointer-events-none"></div>
+                <div class="absolute -bottom-10 right-20 w-36 h-36 rounded-full bg-blue/10 pointer-events-none"></div>
+                <div class="relative flex items-center justify-between gap-5 flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="w-[52px] h-[52px] rounded-2xl bg-accent/15 border border-accent/25 flex items-center justify-center text-accent text-[22px] flex-shrink-0">
+                            <i class="fas fa-trophy"></i>
                         </div>
                         <div>
-                            <h1 class="text-blue-900 font-bold text-3xl">Section Rank List</h1>
-                            <p class="text-gray-600 font-medium text-base mt-2">Compare section performance and track progress</p>
+                            <div class="text-xs text-white/50 uppercase tracking-[2px] mb-1">Performance Analytics</div>
+                            <div class="font-display text-2xl font-bold text-white mb-1">Section Rank List</div>
+                            <div class="text-[13px] text-white/45">Compare section performance and track student progress</div>
+                        </div>
+                    </div>
+                    <div id="activeFilterBadgeHero" class="hidden">
+                        <div class="inline-flex items-center gap-1.5 bg-info-bg text-info text-[13px] font-semibold px-3.5 py-1.5 rounded-full border border-info/20">
+                            <i class="fas fa-filter text-[11px]"></i>
+                            <span>Filtered: </span>
+                            <span id="heroFilterName" class="font-bold"></span>
+                            <span onclick="clearSectionFilter()" class="cursor-pointer text-blue text-base leading-none hover:text-danger transition-colors ml-1">✕</span>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Stats Overview Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div class="stat-card bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl text-white p-6 hover:-translate-y-1 hover:shadow-xl transition-all">
-                        <div class="flex items-center gap-3 mb-3">
-                            <i class="fas fa-trophy text-2xl"></i>
-                            <span class="font-semibold">Top Section</span>
-                        </div>
-                        <div class="font-extrabold text-2xl" id="topSectionName">-</div>
-                        <div class="text-sm opacity-90 mt-2" id="topSectionScore">0% average</div>
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-7">
+                <div class="stat-card bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl text-white p-5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fas fa-trophy text-xl"></i>
+                        <span class="font-semibold text-sm">Top Section</span>
                     </div>
-
-                    <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl text-white p-6 hover:-translate-y-1 hover:shadow-xl transition-all">
-                        <div class="flex items-center gap-3 mb-3">
-                            <i class="fas fa-chart-line text-2xl"></i>
-                            <span class="font-semibold">Total Sections</span>
-                        </div>
-                        <div class="font-extrabold text-3xl" id="totalSections">0</div>
-                    </div>
-
-                    <div class="stat-card bg-gradient-to-br from-green-500 to-green-700 rounded-2xl text-white p-6 hover:-translate-y-1 hover:shadow-xl transition-all">
-                        <div class="flex items-center gap-3 mb-3">
-                            <i class="fas fa-users text-2xl"></i>
-                            <span class="font-semibold">Total Students</span>
-                        </div>
-                        <div class="font-extrabold text-3xl" id="totalStudents">0</div>
-                    </div>
-
-                    <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl text-white p-6 hover:-translate-y-1 hover:shadow-xl transition-all">
-                        <div class="flex items-center gap-3 mb-3">
-                            <i class="fas fa-star text-2xl"></i>
-                            <span class="font-semibold">Overall Avg</span>
-                        </div>
-                        <div class="font-extrabold text-3xl" id="overallAvg">0%</div>
-                    </div>
+                    <div class="font-display font-bold text-xl leading-tight" id="statTopSection">—</div>
+                    <div class="text-xs opacity-90 mt-1" id="statTopScore">0% average</div>
                 </div>
+                <div class="stat-card bg-gradient-to-br from-royal to-blue rounded-2xl text-white p-5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fas fa-layer-group text-xl"></i>
+                        <span class="font-semibold text-sm">Total Sections</span>
+                    </div>
+                    <div class="font-mono font-bold text-3xl" id="statTotalSections">0</div>
+                </div>
+                <div class="stat-card bg-gradient-to-br from-success to-emerald-700 rounded-2xl text-white p-5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fas fa-users text-xl"></i>
+                        <span class="font-semibold text-sm">Total Students</span>
+                    </div>
+                    <div class="font-mono font-bold text-3xl" id="statTotalStudents">0</div>
+                </div>
+                <div class="stat-card bg-gradient-to-br from-purple to-purple-900 rounded-2xl text-white p-5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fas fa-star text-xl"></i>
+                        <span class="font-semibold text-sm">Overall Avg</span>
+                    </div>
+                    <div class="font-mono font-bold text-3xl" id="statOverallAvg">0%</div>
+                </div>
+            </div>
 
-                <!-- My Assigned Sections (from dashboard) -->
-                <div id="sectionsContainer" class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 mb-8">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-chalkboard text-gray-700"></i>
-                            <h3 class="text-gray-900 font-bold text-xl">My Assigned Sections</h3>
+            <!-- Assigned Sections Panel -->
+            <div class="bg-white rounded-2xl border border-border shadow-sm mb-7 overflow-hidden">
+                <div class="px-6 py-4 border-b border-border flex items-center justify-between flex-wrap gap-3">
+                    <div class="flex items-center gap-2.5 text-[15px] font-semibold text-navy">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0d7a5a] to-success flex items-center justify-center text-white text-[13px]">
+                            <i class="fas fa-layer-group"></i>
                         </div>
-                        <!-- Active filter badge + clear button -->
+                        My Assigned Sections
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-info-bg text-blue text-xs font-semibold" id="sectionsCount">0</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 flex-wrap">
                         <div id="activeFilterBadge" class="hidden">
-                            <span class="filter-badge">
-                                <i class="fas fa-filter text-xs"></i>
-                                <span id="activeFilterName">All</span>
-                                <span class="clear-filter" onclick="clearSectionFilter()" title="Clear filter">✕</span>
-                            </span>
+                            <div class="inline-flex items-center gap-1.5 bg-info-bg text-info text-xs font-semibold px-2.5 py-1 rounded-full border border-info/20">
+                                <i class="fas fa-filter text-[11px]"></i>
+                                <span id="activeFilterName"></span>
+                                <span onclick="clearSectionFilter()" class="cursor-pointer text-blue text-sm leading-none hover:text-danger ml-1 transition-colors">✕</span>
+                            </div>
                         </div>
-                        <!-- Hint text when no filter active -->
-                        <div id="filterHint" class="text-xs text-gray-400 italic flex items-center gap-1">
-                            <i class="fas fa-hand-pointer text-gray-300"></i>
-                            Click a section to filter the rankings
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="sectionsGrid">
-                        <!-- Sections will be dynamically added here -->
-                    </div>
-                </div>
-
-                <!-- Main Content Card -->
-                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-                        <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
-                            <i class="fas fa-ranking-star text-yellow-500"></i>
-                            Section Performance Rankings
-                        </h3>
-                        <div class="flex gap-3 mt-3 sm:mt-0">
-                            <select id="sortBy" class="filter-select" onchange="applyFilters()">
-                                <option value="rank">Sort by Rank</option>
-                                <option value="average-desc">Highest to Lowest Score</option>
-                                <option value="average-asc">Lowest to Highest Score</option>
-                                <option value="students-desc">Most Students</option>
-                                <option value="students-asc">Least Students</option>
-                                <option value="name-asc">Section Name (A-Z)</option>
-                                <option value="name-desc">Section Name (Z-A)</option>
+                        <div class="flex items-center gap-2.5 flex-wrap">
+                            <div class="relative flex items-center">
+                                <i class="fas fa-search absolute left-3 text-text-muted text-[13px] pointer-events-none"></i>
+                                <input type="text" id="sectionSearchInput" placeholder="Search sections..."
+                                    oninput="filterSections()"
+                                    class="pl-9 pr-3.5 py-2 border border-border rounded-lg font-sans text-[13px] text-text-primary bg-surface w-[220px] focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/10 focus:bg-white transition-all">
+                            </div>
+                            <select id="sectionNameFilter" onchange="filterSections()"
+                                class="px-3.5 py-2 border border-border rounded-lg font-sans text-[13px] text-text-primary bg-surface cursor-pointer focus:outline-none focus:border-blue">
+                                <option value="">All Sections</option>
                             </select>
-                            <button onclick="refreshData()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center gap-2 transition-all">
-                                <i class="fas fa-sync-alt"></i>
-                                <span class="hidden sm:inline">Refresh</span>
-                            </button>
+                            <select id="yearFilter" onchange="filterSections()"
+                                class="px-3.5 py-2 border border-border rounded-lg font-sans text-[13px] text-text-primary bg-surface cursor-pointer focus:outline-none focus:border-blue">
+                                <option value="">All Years</option>
+                                <option value="1">1st Year</option>
+                                <option value="2">2nd Year</option>
+                                <option value="3">3rd Year</option>
+                                <option value="4">4th Year</option>
+                            </select>
                         </div>
                     </div>
-
-                    <!-- Table Responsive -->
-                    <div class="table-responsive">
-                        <table class="custom-table" id="rankTable">
-                            <thead>
-                                <tr>
-                                    <th style="width: 80px;">Rank</th>
-                                    <th>Section Name</th>
-                                    <th>Total Students</th>
-                                    <th>Students with Grades</th>
-                                    <th>Completion Rate</th>
-                                    <th>Average Score</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="rankTableBody">
-                                <tr>
-                                    <td colspan="7">
-                                        <div class="empty-state">
-                                            <div class="empty-icon">⏳</div>
-                                            <div class="empty-title">Loading Rankings...</div>
-                                            <div class="empty-text">Please wait while we calculate section performance.</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                </div>
+                <div id="sectionsGrid" class="grid gap-4 p-6" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));"></div>
+                <div id="noSectionsMsg" class="hidden py-12 px-8 text-center">
+                    <div class="w-[60px] h-[60px] rounded-2xl bg-surface flex items-center justify-center text-2xl text-text-muted mx-auto mb-4">
+                        <i class="fas fa-layer-group"></i>
                     </div>
+                    <div class="text-base font-semibold text-text-primary mb-1.5">No Sections Found</div>
+                    <div class="text-[13px] text-text-muted">The secretary has not yet assigned you to any sections.</div>
                 </div>
             </div>
+
+            <!-- Rankings Table Card -->
+            <div class="bg-white rounded-2xl border border-border shadow-sm p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <h3 class="font-display text-[17px] font-bold text-navy flex items-center gap-2">
+                        <i class="fas fa-ranking-star text-accent text-base"></i>
+                        Section Performance Rankings
+                    </h3>
+                    <div class="flex items-center gap-3">
+                        <select id="sortBy" onchange="applyFilters()"
+                            class="px-3 py-2 border border-border rounded-xl text-[13px] font-medium text-text-primary bg-surface cursor-pointer focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/10 transition-all">
+                            <option value="rank">Sort by Rank</option>
+                            <option value="average-desc">Highest → Lowest Score</option>
+                            <option value="average-asc">Lowest → Highest Score</option>
+                            <option value="students-desc">Most Students</option>
+                            <option value="students-asc">Least Students</option>
+                            <option value="name-asc">Name A→Z</option>
+                            <option value="name-desc">Name Z→A</option>
+                        </select>
+                        <button onclick="refreshData()" class="inline-flex items-center gap-2 px-3.5 py-2 border border-border rounded-xl text-[13px] font-medium text-text-secondary hover:bg-surface transition-all">
+                            <i class="fas fa-sync-alt text-xs"></i>
+                            <span class="hidden sm:inline">Refresh</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-border">
+                    <table class="w-full border-collapse" style="min-width:750px;">
+                        <thead id="rankTableHead">
+                            <tr class="bg-gradient-to-r from-navy/90 to-royal/90 text-white">
+                                <th class="text-left px-4 py-3.5 text-[13px] font-semibold tracking-wide" style="width:70px">Rank</th>
+                                <th class="text-left px-4 py-3.5 text-[13px] font-semibold tracking-wide">Section Name</th>
+                                <th class="text-left px-4 py-3.5 text-[13px] font-semibold tracking-wide">Students</th>
+                                <th class="text-left px-4 py-3.5 text-[13px] font-semibold tracking-wide">With Grades</th>
+                                <th class="text-left px-4 py-3.5 text-[13px] font-semibold tracking-wide">Completion</th>
+                                <th class="text-left px-4 py-3.5 text-[13px] font-semibold tracking-wide">Avg Score</th>
+                                <th class="text-left px-4 py-3.5 text-[13px] font-semibold tracking-wide">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankTableBody">
+                            <tr><td colspan="7" class="text-center py-12 text-text-muted text-sm">
+                                <div class="spinner mx-auto mb-3" style="width:28px;height:28px;border-width:2px"></div>
+                                Calculating rankings…
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
+    </main>
+</div>
 
-        <!-- Footer -->
-        <footer class="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 sm:py-12">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
-                    <!-- About UmakFit -->
-                    <div>
-                        <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                            <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
-                            <div>
-                                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
-                                <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
-                            </div>
-                        </div>
-                        <p class="text-sm lg:text-base leading-relaxed text-blue-100">
-                            UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati.
-                        </p>
-                    </div>
+<script>
+    function updateHeaderDate() {
+        const el = document.getElementById('headerDate');
+        if (el) el.textContent = new Date().toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+    }
+    updateHeaderDate(); setInterval(updateHeaderDate, 60000);
 
-                    <!-- Quick Links -->
-                    <div>
-                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
-                        <div class="grid grid-cols-2 gap-4 lg:gap-6">
-                            <div class="space-y-3">
-                                <a href="professor.html" class="block text-blue-100 hover:text-yellow-300 transition-all">Dashboard</a>
-                                <a href="studentmanagement.html" class="block text-blue-100 hover:text-yellow-300 transition-all">Students</a>
-                                <a href="addactivities.html" class="block text-blue-100 hover:text-yellow-300 transition-all">Activities</a>
-                            </div>
-                            <div class="space-y-3">
-                                <a href="addlesson.html" class="block text-blue-100 hover:text-yellow-300 transition-all">Lessons</a>
-                                <a href="monitoringactivities.html" class="block text-blue-100 hover:text-yellow-300 transition-all">Monitoring</a>
-                                <a href="grades.html" class="block text-blue-100 hover:text-yellow-300 transition-all">Grades</a>
-                            </div>
-                        </div>
-                    </div>
+    function toggleSidebar() {
+        const sb = document.getElementById('mainSidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        const hb = document.getElementById('hamburgerBtn');
+        sb.classList.toggle('sidebar-open');
+        ov.classList.toggle('hidden');
+        hb.classList.toggle('hamburger-open');
+    }
+    function closeSidebar() {
+        const sb = document.getElementById('mainSidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        const hb = document.getElementById('hamburgerBtn');
+        sb.classList.remove('sidebar-open');
+        ov.classList.add('hidden');
+        hb.classList.remove('hamburger-open');
+    }
 
-                    <!-- Contact -->
-                    <div>
-                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
-                        <div class="space-y-4">
-                            <p class="text-sm lg:text-base text-blue-100">
-                                College of Human Kinetics<br>
-                                University of Makati<br>
-                                3rd floor, Administration Building
-                            </p>
-                            <p class="text-sm lg:text-base text-blue-100">chk@umak.edu.ph</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="border-t border-blue-600/50 mt-8 pt-6">
-                    <p class="text-center text-xs lg:text-sm text-blue-200">
-                        © 2025 University of Makati - College of Human Kinetics. All Rights Reserved.
-                    </p>
-                </div>
-            </div>
-        </footer>
-    </div>
+    window.toggleProfileDropdown = function() {
+        document.getElementById('profileDropdown').classList.toggle('show');
+    };
+    document.addEventListener('click', e => {
+        const dd = document.getElementById('profileDropdown');
+        if (dd && !e.target.closest('#profileCircle') && !dd.contains(e.target)) dd.classList.remove('show');
+    });
 
-    <!-- Section Details Modal -->
-    <div id="sectionDetailsModal" class="modal-overlay" style="display: none;" onclick="closeSectionDetailsModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h3>
-                    <i class="fas fa-trophy text-yellow-400"></i>
-                    <span id="modalSectionName">Section Details</span>
-                </h3>
-                <button class="modal-close-btn" onclick="closeSectionDetailsModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <div id="sectionDetailsContent"></div>
-                
-                <h4 class="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
-                    <i class="fas fa-users text-yellow-500"></i> 
-                    All Students in this Section
-                </h4>
-                
-                <div id="allStudentsList"></div>
-            </div>
-            
-            <div class="modal-footer">
-                <button class="px-6 py-2.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg font-semibold transition-all" onclick="closeSectionDetailsModal()">
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
+    window.showAlert = function(msg, type='info', title='') {
+        const icons  = { success:'check-circle', error:'times-circle', warning:'exclamation-triangle', info:'info-circle' };
+        const titles = { success:'Success', error:'Error', warning:'Warning', info:'Information' };
+        const colors = { success:'bg-success-bg text-success', error:'bg-danger-bg text-danger', warning:'bg-warning-bg text-warning', info:'bg-info-bg text-info' };
+        document.getElementById('alertModalTitle').textContent = title || titles[type];
+        document.getElementById('alertModalMsg').textContent   = msg;
+        const iconWrap = document.getElementById('alertModalIcon');
+        iconWrap.className = `w-16 h-16 rounded-full flex items-center justify-center text-[28px] mx-auto mb-4 ${colors[type]}`;
+        iconWrap.innerHTML = `<i class="fas fa-${icons[type]||'info-circle'}"></i>`;
+        document.getElementById('alertModal').classList.add('open');
+    };
+    window.closeAlertModal = () => document.getElementById('alertModal').classList.remove('open');
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, collection, getDocs, query, where, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    window.showConfirm = function(msg, onYes) {
+        document.getElementById('confirmModalMsg').textContent = msg;
+        const yesBtn = document.getElementById('confirmModalYesBtn');
+        yesBtn.onclick = () => { closeConfirmModal(); onYes(); };
+        document.getElementById('confirmModal').classList.add('open');
+    };
+    window.closeConfirmModal = () => document.getElementById('confirmModal').classList.remove('open');
+</script>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
-            authDomain: "umakfit-e3b1d.firebaseapp.com",
-            projectId: "umakfit-e3b1d",
-            storageBucket: "umakfit-e3b1d.appspot.com",
-            messagingSenderId: "276569891504",
-            appId: "1:276569891504:web:39b1732b519f4d8b785175"
-        };
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getFirestore, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    const firebaseConfig = {
+        apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+        authDomain: "umakfit-e3b1d.firebaseapp.com",
+        projectId: "umakfit-e3b1d",
+        storageBucket: "umakfit-e3b1d.appspot.com",
+        messagingSenderId: "276569891504",
+        appId: "1:276569891504:web:39b1732b519f4d8b785175"
+    };
 
-        // ============ DASHBOARD-STYLE ALERT FUNCTIONS ============
-        function showSuccessModal(message, onOk) {
-            const modal = document.getElementById('successModal');
-            const messageEl = document.getElementById('successMessage');
-            const okBtn = document.getElementById('successOkBtn');
-            
-            messageEl.textContent = message;
-            
-            const newOkBtn = okBtn.cloneNode(true);
-            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-            
-            newOkBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onOk) onOk();
-            });
-            
-            modal.style.display = 'flex';
-        }
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
 
-        function showInfoModal(message, onOk) {
-            const modal = document.getElementById('infoModal');
-            const messageEl = document.getElementById('infoMessage');
-            const okBtn = document.getElementById('infoOkBtn');
-            
-            messageEl.textContent = message;
-            
-            const newOkBtn = okBtn.cloneNode(true);
-            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-            
-            newOkBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onOk) onOk();
-            });
-            
-            modal.style.display = 'flex';
-        }
+    // State
+    let currentUser = null;
+    let currentProfessor = null;
+    let assignedSections = [];
+    let allSections = [];
+    let filteredSections = [];
+    let allTestResults = [];
+    let sectionRankings = [];
+    let activeSectionFilter = null;
 
-        function showWarningModal(message, onConfirm, onCancel) {
-            const modal = document.getElementById('warningModal');
-            const messageEl = document.getElementById('warningMessage');
-            const confirmBtn = document.getElementById('warningConfirmBtn');
-            const cancelBtn = document.getElementById('warningCancelBtn');
-            
-            messageEl.textContent = message;
-            
-            const newConfirmBtn = confirmBtn.cloneNode(true);
-            const newCancelBtn = cancelBtn.cloneNode(true);
-            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
-            
-            newConfirmBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onConfirm) onConfirm();
-            });
-            
-            newCancelBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onCancel) onCancel();
-            });
-            
-            modal.style.display = 'flex';
-        }
+    // Scoring functions
+    function calculateActivityScore(testName, result, testTarget = null) {
+        const n = (testName || '').toLowerCase().trim();
 
-        function showErrorModal(message, onOk) {
-            const modal = document.getElementById('errorModal');
-            const messageEl = document.getElementById('errorMessage');
-            const okBtn = document.getElementById('errorOkBtn');
-            
-            messageEl.textContent = message;
-            
-            const newOkBtn = okBtn.cloneNode(true);
-            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-            
-            newOkBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onOk) onOk();
-            });
-            
-            modal.style.display = 'flex';
-        }
+        if (n.includes('skinfold') || n.includes('step test') || n.includes('3-minute')) return 100;
 
-        function showConfirmModal(message, onYes, onNo) {
-            const modal = document.getElementById('confirmModal');
-            const messageEl = document.getElementById('confirmMessage');
-            const yesBtn = document.getElementById('confirmYesBtn');
-            const noBtn = document.getElementById('confirmNoBtn');
-            
-            messageEl.textContent = message;
-            
-            const newYesBtn = yesBtn.cloneNode(true);
-            const newNoBtn = noBtn.cloneNode(true);
-            yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
-            noBtn.parentNode.replaceChild(newNoBtn, noBtn);
-            
-            newYesBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onYes) onYes();
-            });
-            
-            newNoBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onNo) onNo();
-            });
-            
-            modal.style.display = 'flex';
-        }
-
-        // Global variables
-        let currentProfessor = null;
-        let professorSections = [];
-        let professorStudents = [];
-        let allTestResults = [];
-        let sectionRankings = [];
-        let filteredRankings = [];
-
-        // ── SECTION FILTER STATE ──
-        let activeSectionFilter = null;
-
-        // ============ EXACT SCORING FUNCTION FROM GRADES PAGE ============
-        function calculateActivityScore(testName, result, testTarget = null) {
-            const normalized = testName.toLowerCase().trim();
-
-            // Completion-based tests: always 100 (matches studentgrades.html)
-            if (normalized.includes('skinfold') ||
-                normalized.includes('step test') ||
-                normalized.includes('3-minute')) {
-                return 100;
-            }
-
-            // Check for professor override with pre-calculated score
-            if (result && typeof result === 'object' && result !== null) {
-                if (result.score !== undefined && result.score !== null) {
-                    const score = parseFloat(result.score);
-                    if (!isNaN(score) && score >= 0 && score <= 100) {
-                        return score;
-                    }
-                }
-            }
-
-            // Extract numeric value
-            let numericValue = 0;
-            if (typeof result === 'object' && result !== null) {
-                numericValue = result.repetitions || result.time || result.distance ||
-                            result.value || result.result || result.count ||
-                            result.score || 0;
-            } else if (typeof result === 'string') {
-                const match = result.match(/(\d+\.?\d*)/);
-                if (match) {
-                    numericValue = parseFloat(match[1]);
-                } else {
-                    numericValue = parseFloat(result) || 0;
-                }
-            } else {
-                numericValue = parseFloat(result) || 0;
-            }
-
-            // Use test target if available
-            if (testTarget && testTarget > 0) {
-                if (normalized.includes('push-up') || normalized.includes('pushup') ||
-                    normalized.includes('sit-up') || normalized.includes('situp') ||
-                    normalized.includes('curl-up')) {
-
-                    const reps = numericValue;
-                    if (reps >= testTarget) return 100;
-                    const percentage = (reps / testTarget) * 100;
-                    let score = Math.min(100, Math.max(50, percentage));
-                    if (percentage >= 100) score = 100;
-                    else if (percentage >= 90) score = 95;
-                    else if (percentage >= 80) score = 90;
-                    else if (percentage >= 70) score = 85;
-                    else if (percentage >= 60) score = 80;
-                    else if (percentage >= 50) score = 75;
-                    return Math.round(score);
-                }
-
-                if (normalized.includes('plank')) {
-                    let seconds = numericValue;
-                    if (seconds >= testTarget) return 100;
-                    const percentage = (seconds / testTarget) * 100;
-                    let score = Math.min(100, Math.max(50, percentage));
-                    if (percentage >= 100) score = 100;
-                    else if (percentage >= 90) score = 95;
-                    else if (percentage >= 80) score = 90;
-                    else if (percentage >= 70) score = 85;
-                    else if (percentage >= 60) score = 80;
-                    else if (percentage >= 50) score = 75;
-                    return Math.round(score);
-                }
-
-                if (normalized.includes('sit-and-reach')) {
-                    const distance = numericValue;
-                    if (distance >= testTarget) return 100;
-                    const percentage = (distance / testTarget) * 100;
-                    let score = Math.min(100, Math.max(50, percentage));
-                    if (percentage >= 100) score = 100;
-                    else if (percentage >= 90) score = 95;
-                    else if (percentage >= 80) score = 90;
-                    else if (percentage >= 70) score = 85;
-                    else if (percentage >= 60) score = 80;
-                    else if (percentage >= 50) score = 75;
-                    return Math.round(score);
-                }
-
-                if (normalized.includes('grip')) {
-                    if (numericValue >= testTarget) return 100;
-                    const percentage = (numericValue / testTarget) * 100;
-                    let score = Math.min(100, Math.max(50, percentage));
-                    if (percentage >= 90) score = 95;
-                    else if (percentage >= 80) score = 90;
-                    else if (percentage >= 70) score = 85;
-                    else if (percentage >= 60) score = 80;
-                    else if (percentage >= 50) score = 75;
-                    return Math.round(score);
-                }
-
-                if (normalized.includes('mile') || normalized.includes('run')) {
-                    if (numericValue <= testTarget) return 100;
-                    const percentage = (testTarget / numericValue) * 100;
-                    let score = Math.min(100, Math.max(50, percentage));
-                    if (percentage >= 90) score = 95;
-                    else if (percentage >= 80) score = 90;
-                    else if (percentage >= 70) score = 85;
-                    else if (percentage >= 60) score = 80;
-                    else if (percentage >= 50) score = 75;
-                    return Math.round(score);
-                }
-            }
-
-            // FALLBACK DEFAULT SCORING (matches studentgrades.html)
-            if (normalized.includes('push-up') || normalized.includes('pushup')) {
-                if (numericValue >= 40) return 100;
-                if (numericValue >= 30) return 90;
-                if (numericValue >= 20) return 80;
-                if (numericValue >= 15) return 70;
-                return 60;
-            }
-
-            if (normalized.includes('curl-up') || normalized.includes('curl up')) {
-                if (numericValue >= 75) return 100;
-                if (numericValue >= 50) return 90;
-                if (numericValue >= 30) return 80;
-                if (numericValue >= 20) return 70;
-                return 60;
-            }
-
-            if (normalized.includes('plank')) {
-                if (numericValue >= 120) return 100;
-                if (numericValue >= 90) return 90;
-                if (numericValue >= 60) return 80;
-                if (numericValue >= 45) return 70;
-                return 60;
-            }
-
-            if (normalized.includes('grip')) {
-                if (numericValue >= 60) return 100;
-                if (numericValue >= 50) return 90;
-                if (numericValue >= 40) return 80;
-                if (numericValue >= 30) return 70;
-                return 60;
-            }
-
-            if (normalized.includes('sit-and-reach')) {
-                if (numericValue >= 20) return 100;
-                if (numericValue >= 15) return 90;
-                if (numericValue >= 10) return 80;
-                if (numericValue >= 5) return 70;
-                return 60;
-            }
-
-            return 75;
-        }
-
-        function getPerformanceBadge(score) {
-            if (score >= 90) return { text: 'Excellent', class: 'badge-excellent' };
-            if (score >= 80) return { text: 'Good', class: 'badge-good' };
-            if (score >= 70) return { text: 'Fair', class: 'badge-fair' };
-            return { text: 'Needs Improvement', class: 'badge-poor' };
-        }
-
-        function getRankClass(rank) {
-            if (rank === 1) return 'rank-1';
-            if (rank === 2) return 'rank-2';
-            if (rank === 3) return 'rank-3';
-            return 'rank-other';
-        }
-
-        function getStudentRankClass(rank) {
-            if (rank === 1) return 'student-rank-1';
-            if (rank === 2) return 'student-rank-2';
-            if (rank === 3) return 'student-rank-3';
-            return 'student-rank-other';
-        }
-
-        function getInitials(name) {
-            if (!name) return '?';
-            const parts = name.split(' ');
-            if (parts.length >= 2) {
-                return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-            }
-            return name.substring(0, 2).toUpperCase();
-        }
-
-        // Navigation setup
-        const hamburger = document.getElementById('hamburger');
-        const mobileDrawer = document.getElementById('mobileDrawer');
-        const drawerOverlay = document.getElementById('drawerOverlay');
-        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-        const profilePictureBtn = document.getElementById('profilePictureBtn');
-        const profilePictureBtnMobile = document.getElementById('profilePictureBtnMobile');
-        const profileDropdown = document.getElementById('profileDropdown');
-        const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-
-        // Hamburger Menu Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            if (hamburger && mobileDrawer && drawerOverlay) {
-                hamburger.addEventListener('click', () => {
-                    hamburger.classList.toggle('active');
-                    mobileDrawer.classList.toggle('active');
-                    drawerOverlay.classList.toggle('active');
-                    document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-                });
-
-                drawerOverlay.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    mobileDrawer.classList.remove('active');
-                    drawerOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-
-                mobileNavLinks.forEach(link => {
-                    link.addEventListener('click', () => {
-                        hamburger.classList.remove('active');
-                        mobileDrawer.classList.remove('active');
-                        drawerOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    });
-                });
-            }
-            
-            if (profilePictureBtn) {
-                profilePictureBtn.addEventListener('click', toggleProfileDropdown);
-            }
-            
-            if (profilePictureBtnMobile) {
-                profilePictureBtnMobile.addEventListener('click', toggleProfileDropdown);
-            }
-            
-            document.addEventListener('click', closeAllDropdowns);
-        });
-
-        function toggleProfileDropdown(event) {
-            event?.stopPropagation();
-            const isMobile = window.innerWidth < 768;
-            const dropdown = isMobile ? profileDropdownMobile : profileDropdown;
-            dropdown.classList.toggle('hidden');
-        }
-
-        function closeProfileDropdown() {
-            if (profileDropdown) profileDropdown.classList.add('hidden');
-            if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
-        }
-
-        function closeAllDropdowns(event) {
-            if (!event.target.closest('#profilePictureBtn') && 
-                !event.target.closest('#profilePictureBtnMobile') && 
-                !event.target.closest('#profileDropdown') && 
-                !event.target.closest('#profileDropdownMobile')) {
-                closeProfileDropdown();
+        if (result && typeof result === 'object' && result !== null) {
+            if (result.score !== undefined && result.score !== null) {
+                const s = parseFloat(result.score);
+                if (!isNaN(s) && s >= 0 && s <= 100) return s;
             }
         }
 
-        // --- MODAL LOGOUT HANDLING ---
-        window.showLogoutModal = function(event) {
-            if (event) event.preventDefault();
-            profileDropdown?.classList.add('hidden');
-            profileDropdownMobile?.classList.add('hidden');
-            
-            showConfirmModal('Are you sure you want to logout?', async () => {
-                try { 
-                    await signOut(auth); 
-                    window.location.href = '/login/index.html';
-                } catch(e) {
-                    showErrorModal('Error logging out. Please try again.');
-                }
-            });
-        };
+        let v = 0;
+        if (typeof result === 'object' && result !== null) {
+            v = result.repetitions || result.time || result.distance || result.value || result.result || result.count || result.score || 0;
+        } else if (typeof result === 'string') {
+            const m = result.match(/(\d+\.?\d*)/);
+            v = m ? parseFloat(m[1]) : parseFloat(result) || 0;
+        } else { v = parseFloat(result) || 0; }
 
-        function updateProfilePicture(photoURL, userName) {
-            const profileBtn = document.getElementById('profilePictureBtn');
-            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-            const dropdownPic = document.getElementById('profileDropdownPicture');
-            const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
-            
-            const displayName = currentProfessor?.fullName || currentProfessor?.name || userName || 'Professor';
-            const email = currentProfessor?.email || 'professor@umak.edu.ph';
-            
-            const photoUrlToUse = photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=3b82f6&color=fff&size=128`;
-            
-            if (profileBtn) profileBtn.src = photoUrlToUse;
-            if (profileBtnMobile) profileBtnMobile.src = photoUrlToUse;
-            if (dropdownPic) dropdownPic.src = photoUrlToUse;
-            if (dropdownPicMobile) dropdownPicMobile.src = photoUrlToUse;
-            
-            document.getElementById('profileDropdownName').textContent = displayName;
-            document.getElementById('profileDropdownNameMobile').textContent = displayName;
-            document.getElementById('profileDropdownEmail').textContent = email;
-            document.getElementById('profileDropdownEmailMobile').textContent = email;
+        if (testTarget && testTarget > 0) {
+            const pctBracket = (pct) => {
+                if (pct >= 100) return 100; if (pct >= 90) return 95; if (pct >= 80) return 90;
+                if (pct >= 70) return 85;  if (pct >= 60) return 80; if (pct >= 50) return 75;
+                return Math.round(Math.max(50, pct));
+            };
+            if (n.includes('push-up')||n.includes('pushup')||n.includes('sit-up')||n.includes('situp')||n.includes('curl-up'))
+                return pctBracket((v / testTarget) * 100);
+            if (n.includes('plank'))      return pctBracket((v / testTarget) * 100);
+            if (n.includes('sit-and-reach')) return pctBracket((v / testTarget) * 100);
+            if (n.includes('grip'))       return pctBracket((v / testTarget) * 100);
+            if (n.includes('mile')||n.includes('run')) return pctBracket((testTarget / v) * 100);
         }
 
-        // ── SECTION FILTER FUNCTIONS ──
-        window.selectSectionFilter = function(sectionId) {
-            if (activeSectionFilter === sectionId) {
-                clearSectionFilter();
-                return;
-            }
-            activeSectionFilter = sectionId;
-            const section = professorSections.find(s => s.id === sectionId);
-            const sectionName = section?.name || 'Section';
-
-            document.querySelectorAll('.section-card').forEach(card => {
-                card.classList.remove('active-section');
-            });
-            const activeCard = document.querySelector(`.section-card[data-section-id="${sectionId}"]`);
-            if (activeCard) activeCard.classList.add('active-section');
-
-            document.getElementById('activeFilterBadge').classList.remove('hidden');
-            document.getElementById('activeFilterName').textContent = sectionName;
-            document.getElementById('filterHint').classList.add('hidden');
-
-            applySectionFilter(sectionId);
-        };
-
-        window.clearSectionFilter = function() {
-            activeSectionFilter = null;
-
-            document.querySelectorAll('.section-card').forEach(card => {
-                card.classList.remove('active-section');
-            });
-
-            document.getElementById('activeFilterBadge').classList.add('hidden');
-            document.getElementById('filterHint').classList.remove('hidden');
-
-            applySectionFilter(null);
-        };
-
-        function applySectionFilter(sectionId) {
-            if (sectionId) {
-                const filteredSections = sectionRankings.filter(s => s.id === sectionId);
-                displayRankings(filteredSections);
-                updateStatsForFiltered(filteredSections);
-            } else {
-                displayRankings(sectionRankings);
-                updateStats(sectionRankings);
-            }
+        // Fallback defaults
+        if (n.includes('push-up')||n.includes('pushup')) {
+            if (v>=40) return 100; if (v>=30) return 90; if (v>=20) return 80; if (v>=15) return 70; return 60;
         }
-
-        function updateStatsForFiltered(filteredSections) {
-            if (filteredSections.length === 0) return;
-            
-            const topSection = filteredSections[0];
-            document.getElementById('topSectionName').textContent = topSection.name;
-            document.getElementById('topSectionScore').textContent = `${topSection.averageScore}% average`;
-            
-            document.getElementById('totalSections').textContent = filteredSections.length;
-            
-            const totalStudents = filteredSections.reduce((sum, s) => sum + s.totalStudents, 0);
-            document.getElementById('totalStudents').textContent = totalStudents;
-            
-            const overallAvg = filteredSections.reduce((sum, s) => sum + s.averageScore, 0) / filteredSections.length;
-            document.getElementById('overallAvg').textContent = `${overallAvg.toFixed(2)}%`;
+        if (n.includes('curl-up')||n.includes('curl up')) {
+            if (v>=75) return 100; if (v>=50) return 90; if (v>=30) return 80; if (v>=20) return 70; return 60;
         }
-
-        // Main auth state listener
-        onAuthStateChanged(auth, async (user) => {
-            const loadingScreen = document.getElementById('loadingScreen');
-            const mainContent = document.getElementById('mainContent');
-
-            if (user) {
-                try {
-                    console.log('User authenticated:', user.email);
-                    
-                    // Load professor data
-                    const professorsQuery = query(collection(db, 'professors'), where('email', '==', user.email));
-                    const professorsSnapshot = await getDocs(professorsQuery);
-                    
-                    if (!professorsSnapshot.empty) {
-                        currentProfessor = { id: professorsSnapshot.docs[0].id, ...professorsSnapshot.docs[0].data() };
-                    } else {
-                        const usersQuery = query(collection(db, 'users'), where('email', '==', user.email), where('role', '==', 'professor'));
-                        const usersSnapshot = await getDocs(usersQuery);
-                        if (!usersSnapshot.empty) {
-                            currentProfessor = { id: usersSnapshot.docs[0].id, ...usersSnapshot.docs[0].data() };
-                        }
-                    }
-                    
-                    updateProfilePicture(user.photoURL, user.displayName);
-                    
-                    // Load professor's sections
-                    await loadProfessorSections();
-                    
-                    // Load test results
-                    await loadTestResults();
-                    
-                    // Calculate and display rankings
-                    calculateSectionRankings();
-                    
-                    loadingScreen.style.display = 'none';
-                    mainContent.classList.remove('hidden');
-                    
-                } catch (error) {
-                    console.error('Error loading section rank list:', error);
-                    loadingScreen.style.display = 'none';
-                    mainContent.classList.remove('hidden');
-                    showErrorModal('Error loading data: ' + error.message);
-                }
-            } else {
-                window.location.href = '/login/index.html';
-            }
-        });
-
-        // ==================== FIXED: Load ONLY professor's assigned sections ====================
-        async function loadProfessorSections() {
-            try {
-                professorSections = [];
-                professorStudents = [];
-
-                const professorName = currentProfessor?.fullName || currentProfessor?.name || '';
-                const professorEmail = currentProfessor?.email;
-                
-                console.log('Loading sections for professor:', professorName, professorEmail);
-
-                const sectionsSnapshot = await getDocs(collection(db, 'sections'));
-
-                sectionsSnapshot.forEach((doc) => {
-                    const sectionData = doc.data();
-                    const sectionProfessor = (sectionData.professor || '').toString().trim();
-                    
-                    // EXACT MATCHING LOGIC - Only include if professor name matches exactly
-                    let isMatch = false;
-                    
-                    // Check exact match with professorName (case insensitive)
-                    if (professorName && sectionProfessor.toUpperCase() === professorName.toUpperCase()) {
-                        isMatch = true;
-                        console.log(`✅ Exact match: ${sectionProfessor} === ${professorName}`);
-                    }
-                    
-                    // Check if professorEmail matches
-                    if (!isMatch && sectionData.professorEmail === professorEmail) {
-                        isMatch = true;
-                        console.log(`✅ Email match: ${sectionData.professorEmail} === ${professorEmail}`);
-                    }
-                    
-                    // Check if section professor contains professor's last name (for "LASTNAME, FIRSTNAME" format)
-                    if (!isMatch && professorName) {
-                        // Extract last name from professor name (assuming format "LASTNAME, FIRSTNAME")
-                        const nameParts = professorName.toUpperCase().split(',');
-                        if (nameParts.length > 1) {
-                            const lastName = nameParts[0].trim();
-                            if (sectionProfessor.toUpperCase().includes(lastName)) {
-                                isMatch = true;
-                                console.log(`✅ Last name match: ${sectionProfessor} contains ${lastName}`);
-                            }
-                        } else {
-                            // If no comma, try matching the whole name
-                            if (sectionProfessor.toUpperCase().includes(professorName.toUpperCase())) {
-                                isMatch = true;
-                                console.log(`✅ Partial name match: ${sectionProfessor} contains ${professorName}`);
-                            }
-                        }
-                    }
-
-                    if (isMatch) {
-                        const section = {
-                            id: doc.id,
-                            name: sectionData.name || 'Unnamed Section',
-                            courseCode: sectionData.courseCode || 'PE 3',
-                            students: sectionData.students || [],
-                            studentCount: (sectionData.students || []).length,
-                            yearLevel: sectionData.yearLevel || 'N/A',
-                            professor: sectionData.professor || professorName
-                        };
-                        
-                        professorSections.push(section);
-                        
-                        // Add students to professorStudents array
-                        if (sectionData.students && Array.isArray(sectionData.students)) {
-                            sectionData.students.forEach(student => {
-                                professorStudents.push({
-                                    ...student,
-                                    section: sectionData.name,
-                                    sectionId: doc.id
-                                });
-                            });
-                        }
-                        
-                        console.log(`✅ Added section: ${sectionData.name} with professor: ${sectionData.professor}`);
-                    } else {
-                        // Log sections that are NOT matching for debugging
-                        console.log(`❌ Skipped section: ${sectionData.name} - professor: ${sectionData.professor} (doesn't match ${professorName})`);
-                    }
-                });
-
-                console.log(`✅ Loaded ${professorSections.length} sections for professor:`, professorSections.map(s => s.name));
-                console.log(`✅ Loaded ${professorStudents.length} students total`);
-
-                // Display sections in the grid
-                displaySections();
-
-            } catch (error) {
-                console.error('Error loading professor sections:', error);
-                showErrorModal('Error loading sections: ' + error.message);
-            }
+        if (n.includes('plank')) {
+            if (v>=120) return 100; if (v>=90) return 90; if (v>=60) return 80; if (v>=45) return 70; return 60;
         }
-
-        // ── DISPLAY SECTIONS ──
-        function displaySections() {
-            const sectionsGrid = document.getElementById('sectionsGrid');
-
-            if (professorSections.length === 0) {
-                sectionsGrid.innerHTML = `
-                    <div class="col-span-3 py-10 text-center">
-                        <div class="text-5xl mb-3 opacity-40">📚</div>
-                        <div class="text-gray-700 font-semibold mb-1">No Sections Assigned</div>
-                        <div class="text-gray-500 text-sm">Sections assigned by the secretary will appear here</div>
-                    </div>`;
-                return;
-            }
-
-            let html = '';
-            professorSections.forEach(section => {
-                const students = section.students || [];
-                const firstFew = students.slice(0, 5);
-                const remaining = Math.max(0, students.length - 5);
-
-                let studentsHtml = '';
-                firstFew.forEach(student => {
-                    const displayName = student.name || student.email || 'Unknown Student';
-                    studentsHtml += `<span class="inline-flex items-center bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 m-1">${displayName}</span>`;
-                });
-                if (remaining > 0) {
-                    studentsHtml += `<span class="inline-flex items-center bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 m-1">+${remaining} more</span>`;
-                }
-
-                html += `
-                    <div class="section-card bg-gray-50 rounded-xl border border-gray-200 p-5 select-none"
-                         data-section-id="${section.id}"
-                         onclick="selectSectionFilter('${section.id}')">
-
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="section-name text-blue-900 font-bold text-lg">${section.name || 'Unnamed Section'}</div>
-                            <div class="flex items-center gap-2">
-                                <div class="bg-blue-500 text-white text-xs font-semibold py-1 px-3 rounded-full">${students.length} students</div>
-                            </div>
-                        </div>
-
-                        <div class="mb-4 space-y-2">
-                            <div class="flex items-center text-gray-600 text-sm">
-                                <i class="fas fa-book w-5"></i>
-                                <span>${section.courseCode || 'PE 3'}</span>
-                            </div>
-                            <div class="flex items-center text-gray-600 text-sm">
-                                <i class="fas fa-user-tie w-5"></i>
-                                <span>${section.professor || 'Professor'}</span>
-                            </div>
-                        </div>
-
-                        ${students.length > 0 ? `
-                            <div class="pt-4 border-t border-gray-200">
-                                <div class="flex items-center text-gray-700 font-semibold text-sm mb-3">
-                                    <i class="fas fa-users mr-1"></i>
-                                    <span>Students in this section:</span>
-                                </div>
-                                <div class="flex flex-wrap">${studentsHtml}</div>
-                            </div>` : ''}
-
-                        <div class="mt-4 pt-3 border-t border-dashed border-gray-200 flex items-center gap-1 text-xs text-gray-400">
-                            <i class="fas fa-filter text-gray-300"></i>
-                            <span>Click to filter rankings by this section</span>
-                        </div>
-                    </div>`;
-            });
-
-            sectionsGrid.innerHTML = html;
+        if (n.includes('grip')) {
+            if (v>=60) return 100; if (v>=50) return 90; if (v>=40) return 80; if (v>=30) return 70; return 60;
         }
-
-        async function loadTestResults() {
-            try {
-                allTestResults = [];
-
-                if (professorSections.length === 0) {
-                    console.log('No sections assigned');
-                    return;
-                }
-
-                const OVERDUE_PENALTY = 0.10;
-
-                // Fetch ALL testResults (completed, overdue, late)
-                const testResultsSnapshot = await getDocs(collection(db, 'testResults'));
-
-                // bestScoresMap: key = studentEmail_testId, value = best result object
-                const bestScoresMap = new Map();
-
-                testResultsSnapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-
-                    // Only process completed, overdue, or late results
-                    if (!['completed', 'overdue', 'late'].includes(data.status)) return;
-
-                    const studentEmail = data.studentEmail;
-                    if (!studentEmail) return;
-
-                    // Find which section this student belongs to
-                    let studentSection = professorSections.find(s =>
-                        s.name === data.section
-                    );
-
-                    // Fallback: check by student email in section roster
-                    if (!studentSection) {
-                        studentSection = professorSections.find(s =>
-                            s.students && s.students.some(student => student.email === studentEmail)
-                        );
-                    }
-
-                    if (!studentSection) return;
-
-                    const testId = data.testId || docSnap.id;
-                    const testKey = `${studentEmail}_${testId}`;
-
-                    const isProfessorOverride = data.isProfessorOverride === true;
-                    const testNorm = (data.testName || '').toLowerCase();
-                    const isCompletionBased = testNorm.includes('skinfold') ||
-                                            testNorm.includes('step test') ||
-                                            testNorm.includes('3-minute');
-
-                    // Calculate score
-                    let score;
-                    if (isProfessorOverride && typeof data.score === 'number' && !isNaN(data.score)) {
-                        score = data.score;
-                    } else {
-                        score = calculateActivityScore(
-                            data.testName,
-                            data.result || data.resultData || data.repetitions || data,
-                            data.testTarget || null
-                        );
-
-                        // Apply overdue penalty
-                        const isOverdue = data.status === 'overdue' || data.status === 'late';
-                        if (isOverdue && !isProfessorOverride && !isCompletionBased) {
-                            score = Math.max(0, score - (score * OVERDUE_PENALTY));
-                        }
-                    }
-
-                    score = Math.max(0, Math.min(100, Math.round(score)));
-
-                    // Keep best score per student per test
-                    if (!bestScoresMap.has(testKey) || score > bestScoresMap.get(testKey).score) {
-                        bestScoresMap.set(testKey, {
-                            id: docSnap.id,
-                            studentName: data.studentName || 'Unknown',
-                            studentEmail: studentEmail,
-                            section: studentSection.name,
-                            sectionId: studentSection.id,
-                            testName: data.testName,
-                            testId: testId,
-                            score: score,
-                            submittedAt: data.submittedAt,
-                            isProfessorOverride: isProfessorOverride,
-                            isOverdue: data.status === 'overdue' || data.status === 'late'
-                        });
-                    }
-                });
-
-                allTestResults = Array.from(bestScoresMap.values());
-
-                console.log(`✅ Loaded ${allTestResults.length} unique test results`);
-
-            } catch (error) {
-                console.error('Error loading test results:', error);
-                showErrorModal('Error loading test results: ' + error.message);
-            }
+        if (n.includes('sit-and-reach')) {
+            if (v>=20) return 100; if (v>=15) return 90; if (v>=10) return 80; if (v>=5) return 70; return 60;
         }
+        return 75;
+    }
 
-        function calculateSectionRankings() {
-            try {
-                sectionRankings = [];
-                
-                if (professorSections.length === 0) {
-                    console.log('No sections to rank');
-                    displayRankings([]);
-                    return;
-                }
-                
-                professorSections.forEach(section => {
-                    // Get all students in this section
-                    const studentsInSection = section.students || [];
-                    
-                    // Get test results for this section
-                    const sectionResults = allTestResults.filter(r => r.sectionId === section.id || r.section === section.name);
-                    
-                    // Group results by student email and calculate averages
-                    const studentPerformance = new Map();
-                    
-                    // First, initialize ALL students with empty scores
-                    studentsInSection.forEach(student => {
-                        if (student.email) {
-                            studentPerformance.set(student.email, {
-                                studentName: student.name || student.email.split('@')[0],
-                                studentEmail: student.email,
-                                scores: [],
-                                totalScore: 0,
-                                hasGrades: false
-                            });
-                        }
-                    });
-                    
-                    // Add results for students who have taken tests
-                    sectionResults.forEach(result => {
-                        if (studentPerformance.has(result.studentEmail)) {
-                            const student = studentPerformance.get(result.studentEmail);
-                            student.scores.push(result.score);
-                            student.totalScore += result.score;
-                            student.hasGrades = true;
-                        } else {
-                            // Student not in section roster but has results - add them
-                            studentPerformance.set(result.studentEmail, {
-                                studentName: result.studentName || result.studentEmail.split('@')[0],
-                                studentEmail: result.studentEmail,
-                                scores: [result.score],
-                                totalScore: result.score,
-                                hasGrades: true
-                            });
-                        }
-                    });
-                    
-                    // Calculate average per student and store student data
-                    const studentAverages = [];
-                    studentPerformance.forEach((student, email) => {
-                        if (student.scores.length > 0) {
-                            const avg = student.totalScore / student.scores.length;
-                            studentAverages.push({
-                                email: email,
-                                name: student.studentName,
-                                averageScore: parseFloat(avg.toFixed(2)),
-                                scores: student.scores,
-                                totalScore: student.totalScore,
-                                activitiesCount: student.scores.length,
-                                hasGrades: true
-                            });
-                        } else {
-                            // Student with no grades at all - include with 0%
-                            studentAverages.push({
-                                email: email,
-                                name: student.studentName,
-                                averageScore: 0,
-                                scores: [],
-                                totalScore: 0,
-                                activitiesCount: 0,
-                                hasGrades: false
-                            });
-                        }
-                    });
-                    
-                    // Sort students by average score (highest first)
-                    studentAverages.sort((a, b) => b.averageScore - a.averageScore);
-                    
-                    // Calculate section statistics
-                    const totalStudents = studentsInSection.length;
-                    const studentsWithGrades = studentAverages.filter(s => s.hasGrades).length;
-                    const completionRate = totalStudents > 0 ? (studentsWithGrades / totalStudents) * 100 : 0;
-                    
-                    let sectionAverage = 0;
-                    if (studentsWithGrades > 0) {
-                        sectionAverage = studentAverages
-                            .filter(s => s.hasGrades)
-                            .reduce((sum, student) => sum + student.averageScore, 0) / studentsWithGrades;
-                    }
-                    
-                    sectionRankings.push({
-                        id: section.id,
-                        name: section.name,
-                        courseCode: section.courseCode,
-                        yearLevel: section.yearLevel,
-                        totalStudents: totalStudents,
-                        studentsWithGrades: studentsWithGrades,
-                        completionRate: parseFloat(completionRate.toFixed(2)),
-                        averageScore: parseFloat(sectionAverage.toFixed(2)),
-                        allStudentAverages: studentAverages, // Store ALL students (including those with 0%)
-                        students: studentsInSection
-                    });
-                });
-                
-                // Sort by average score (highest first) for ranking
-                sectionRankings.sort((a, b) => b.averageScore - a.averageScore);
-                
-                // Add rank numbers
-                sectionRankings = sectionRankings.map((section, index) => ({
-                    ...section,
-                    rank: index + 1
-                }));
-                
-                filteredRankings = [...sectionRankings];
-                displayRankings(filteredRankings);
-                updateStats(sectionRankings);
-                
-                console.log('✅ Rankings calculated:', sectionRankings.length);
-                
-            } catch (error) {
-                console.error('Error calculating rankings:', error);
-                showErrorModal('Error calculating rankings: ' + error.message);
-            }
-        }
+    function scoreBadge(score) {
+        if (score >= 90) return { text:'Excellent', cls:'sc-excellent' };
+        if (score >= 80) return { text:'Good', cls:'sc-good' };
+        if (score >= 70) return { text:'Fair', cls:'sc-fair' };
+        return { text:'Needs Work', cls:'sc-poor' };
+    }
 
-        function updateStats(rankings) {
-            if (rankings.length === 0) return;
-            
-            const topSection = rankings[0];
-            document.getElementById('topSectionName').textContent = topSection.name;
-            document.getElementById('topSectionScore').textContent = `${topSection.averageScore}% average`;
-            
-            document.getElementById('totalSections').textContent = rankings.length;
-            
-            const totalStudents = rankings.reduce((sum, s) => sum + s.totalStudents, 0);
-            document.getElementById('totalStudents').textContent = totalStudents;
-            
-            const overallAvg = rankings.reduce((sum, s) => sum + s.averageScore, 0) / rankings.length;
-            document.getElementById('overallAvg').textContent = `${overallAvg.toFixed(2)}%`;
-        }
+    function rankClass(r) {
+        return r===1 ? 'rank-gold' : r===2 ? 'rank-silver' : r===3 ? 'rank-bronze' : 'rank-other';
+    }
 
-        function displayRankings(rankings) {
-            const tableBody = document.getElementById('rankTableBody');
-            
-            if (rankings.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7">
-                            <div class="empty-state text-center py-10">
-                                <div class="text-5xl mb-3 opacity-40">📊</div>
-                                <div class="text-gray-700 font-semibold mb-1">No Sections Found</div>
-                                <div class="text-gray-500 text-sm">You don't have any sections assigned yet.</div>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            let html = '';
-            rankings.forEach((section) => {
-                const rankClass = getRankClass(section.rank);
-                const performanceBadge = getPerformanceBadge(section.averageScore);
-                
-                html += `
-                    <tr onclick="viewSectionDetails('${section.id}')" style="cursor: pointer;">
-                        <td data-label="Rank">
-                            <div class="rank-badge ${rankClass}">${section.rank}</div>
-                        </td>
-                        <td data-label="Section Name">
-                            <strong>${section.name}</strong>
-                            <br><small class="text-gray-500">${section.courseCode} • ${section.yearLevel}</small>
-                        </td>
-                        <td data-label="Total Students">
-                            <strong>${section.totalStudents}</strong>
-                        </td>
-                        <td data-label="Students with Grades">
-                            <strong>${section.studentsWithGrades}</strong>
-                            <br><small class="text-gray-500">${section.completionRate}%</small>
-                        </td>
-                        <td data-label="Completion Rate">
-                            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
-                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${section.completionRate}%"></div>
-                            </div>
-                            <span class="text-xs font-medium">${section.completionRate}%</span>
-                        </td>
-                        <td data-label="Average Score">
-                            <span class="font-bold text-lg">${section.averageScore}%</span>
-                        </td>
-                        <td data-label="Actions">
-                            <button class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1 transition-all" onclick="event.stopPropagation(); viewSectionDetails('${section.id}')">
-                                <i class="fas fa-eye"></i> View Students
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tableBody.innerHTML = html;
-        }
+    function getInitials(name) {
+        if (!name) return '?';
+        const p = name.split(' ');
+        return p.length >= 2 ? (p[0][0] + p[p.length-1][0]).toUpperCase() : name.substring(0,2).toUpperCase();
+    }
 
-        window.viewSectionDetails = function(sectionId) {
-            const section = sectionRankings.find(s => s.id === sectionId);
-            if (!section) {
-                showErrorModal('Section not found!');
-                return;
-            }
-            
-            document.getElementById('modalSectionName').textContent = `${section.name} - All Students`;
-            
-            // Section header info
-            const sectionInfo = `
-                <div class="section-info-header">
-                    <div class="section-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="section-basic-info">
-                        <div class="section-title">${section.name}</div>
-                        <div class="section-meta">
-                            ${section.courseCode} • ${section.yearLevel}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-label">Total Students</div>
-                        <div class="stat-value">${section.totalStudents}</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">With Grades</div>
-                        <div class="stat-value">${section.studentsWithGrades}</div>
-                        <div class="stat-sub">${section.completionRate}% completion</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Section Rank</div>
-                        <div class="stat-value">#${section.rank}</div>
-                        <div class="stat-sub">out of ${sectionRankings.length} sections</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Average Score</div>
-                        <div class="stat-value">${section.averageScore}%</div>
-                        <div class="stat-sub">${getPerformanceBadge(section.averageScore).text}</div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('sectionDetailsContent').innerHTML = sectionInfo;
-            
-            // All students list (including those with 0%)
-            const allStudents = section.allStudentAverages || [];
-            let studentsHTML = '';
-            
-            if (allStudents.length === 0) {
-                studentsHTML = `
-                    <div class="text-center py-8 text-gray-500">
-                        <i class="fas fa-user-graduate text-4xl mb-3 opacity-40"></i>
-                        <p>No students found in this section.</p>
-                    </div>
-                `;
-            } else {
-                allStudents.forEach((student, index) => {
-                    const rankClass = getStudentRankClass(index + 1);
-                    const badge = student.hasGrades ? getPerformanceBadge(student.averageScore) : null;
-                    
-                    studentsHTML += `
-                        <div class="student-rank-row">
-                            <div class="student-rank-number">
-                                <div class="${rankClass}">${index + 1}</div>
-                            </div>
-                            <div class="student-info">
-                                <div class="student-avatar-small">
-                                    ${getInitials(student.name)}
-                                </div>
-                                <div class="student-details">
-                                    <div class="student-name">${student.name}</div>
-                                    <div class="student-email">${student.email}</div>
-                                </div>
-                            </div>
-                            <div class="student-score">
-                                ${student.hasGrades ? student.averageScore + '%' : '0%'}
-                            </div>
-                            <div class="student-badge">
-                                ${student.hasGrades ? 
-                                    `<span class="badge ${badge.class}">${badge.text}</span>` : 
-                                    '<span class="no-grades-badge">No Grades Yet</span>'
-                                }
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            document.getElementById('allStudentsList').innerHTML = studentsHTML;
-            
-            document.getElementById('sectionDetailsModal').style.display = 'flex';
-        };
-
-        window.closeSectionDetailsModal = function() {
-            document.getElementById('sectionDetailsModal').style.display = 'none';
-        };
-
-        window.applyFilters = function() {
-            const sortBy = document.getElementById('sortBy').value;
-            
-            let sorted = [...sectionRankings];
-            
-            switch(sortBy) {
-                case 'rank':
-                    sorted.sort((a, b) => a.rank - b.rank);
-                    break;
-                case 'average-desc':
-                    sorted.sort((a, b) => b.averageScore - a.averageScore);
-                    break;
-                case 'average-asc':
-                    sorted.sort((a, b) => a.averageScore - b.averageScore);
-                    break;
-                case 'students-desc':
-                    sorted.sort((a, b) => b.totalStudents - a.totalStudents);
-                    break;
-                case 'students-asc':
-                    sorted.sort((a, b) => a.totalStudents - b.totalStudents);
-                    break;
-                case 'name-asc':
-                    sorted.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-                case 'name-desc':
-                    sorted.sort((a, b) => b.name.localeCompare(a.name));
-                    break;
-            }
-            
-            // Reassign ranks based on new sort order
-            if (sortBy !== 'rank') {
-                sorted = sorted.map((item, index) => ({
-                    ...item,
-                    rank: index + 1
-                }));
-            }
-            
-            filteredRankings = sorted;
-            displayRankings(filteredRankings);
-            
-            if (activeSectionFilter) {
-                const filtered = filteredRankings.filter(s => s.id === activeSectionFilter);
-                updateStatsForFiltered(filtered);
-            } else {
-                updateStats(filteredRankings);
-            }
-        };
-
-        window.refreshData = async function() {
-            const refreshBtn = event?.target?.closest('button');
-            if (refreshBtn) {
-                refreshBtn.disabled = true;
-                refreshBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i>';
-            }
-            
-            await loadProfessorSections();
+    // Auth
+    onAuthStateChanged(auth, async user => {
+        if (!user) { window.location.href = '/login/index.html'; return; }
+        try {
+            currentUser = user;
+            await loadProfessorData(user);
+            setupUI(user);
+            await loadAssignedSections();
             await loadTestResults();
-            calculateSectionRankings();
-            
-            if (refreshBtn) {
-                setTimeout(() => {
-                    refreshBtn.disabled = false;
-                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> <span class="hidden sm:inline">Refresh</span>';
-                }, 500);
-            }
-        };
+            calculateRankings();
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        } catch(err) {
+            console.error(err);
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            showAlert('Error loading dashboard: ' + err.message, 'error');
+        }
+    });
 
-        // Make functions available globally
-        window.viewSectionDetails = viewSectionDetails;
-        window.closeSectionDetailsModal = closeSectionDetailsModal;
-    </script>
+    async function loadProfessorData(user) {
+        const email = user.email.toLowerCase();
+        const q1 = await getDocs(query(collection(db,'professors'), where('email','==',email)));
+        if (!q1.empty) { currentProfessor = { id:q1.docs[0].id, ...q1.docs[0].data() }; return; }
+        const q2 = await getDocs(query(collection(db,'users'), where('email','==',email), where('role','==','professor')));
+        if (!q2.empty) { currentProfessor = { id:q2.docs[0].id, ...q2.docs[0].data() }; return; }
+        currentProfessor = { name: user.displayName || 'Professor', email: user.email };
+    }
+
+    function setupUI(user) {
+        const name = currentProfessor.fullName || currentProfessor.name || user.displayName || 'Professor';
+        const email = currentProfessor.email || user.email;
+        const init = name.charAt(0).toUpperCase();
+        const short = name.split(',')[0]?.trim() || name;
+        const photo = user.photoURL || null;
+
+        document.getElementById('headerName').textContent = short;
+        document.getElementById('dropdownName').textContent = name;
+        document.getElementById('dropdownEmail').textContent = email;
+
+        const setAv = (el, src, i) => {
+            if (!el) return;
+            el.innerHTML = src ? `<img src="${src}" class="w-full h-full object-cover rounded-full" alt="">` : i;
+        };
+        setAv(document.getElementById('profileAvatarSmall'), photo, init);
+        setAv(document.getElementById('profileDropdownAvatar'), photo, init);
+    }
+
+    async function loadAssignedSections() {
+        assignedSections = [];
+        allSections = [];
+        const profEmail = (currentProfessor.email || currentUser.email).toLowerCase();
+        const profUid = currentUser.uid || '';
+
+        // Collect name variations
+        const nameVariations = new Set();
+        ['fullName','name','displayName'].forEach(f => {
+            if (currentProfessor[f]) nameVariations.add(currentProfessor[f].toUpperCase().trim());
+        });
+        if (currentUser.displayName) nameVariations.add(currentUser.displayName.toUpperCase().trim());
+
+        const profSnap = await getDocs(query(collection(db,'professors'), where('email','==',profEmail)));
+        profSnap.forEach(d => ['fullName','name','displayName'].forEach(f => { if (d.data()[f]) nameVariations.add(d.data()[f].toUpperCase().trim()); }));
+
+        const usrSnap = await getDocs(query(collection(db,'users'), where('email','==',profEmail)));
+        usrSnap.forEach(d => ['fullName','name','displayName'].forEach(f => { if (d.data()[f]) nameVariations.add(d.data()[f].toUpperCase().trim()); }));
+
+        nameVariations.add(profEmail.split('@')[0].toUpperCase().trim());
+        nameVariations.delete('');
+
+        const nameTokens = new Set();
+        nameVariations.forEach(n => n.split(/[\s,\.]+/).forEach(w => { if (w.length >= 3) nameTokens.add(w); }));
+
+        const addedIds = new Set();
+
+        // Direct query by professorId
+        if (profUid) {
+            try {
+                const q1 = await getDocs(query(collection(db,'sections'), where('professorId','==',profUid)));
+                q1.forEach(d => {
+                    if (addedIds.has(d.id)) return;
+                    addedIds.add(d.id);
+                    const data = d.data();
+                    const section = { id:d.id, name:data.name||'Unnamed', courseCode:data.courseCode||'PE', students:data.students||[], studentCount:(data.students||[]).length, yearLevel:data.yearLevel||'', professor:data.professor||'', ...data };
+                    assignedSections.push(section);
+                });
+            } catch(e) {}
+        }
+
+        // Direct query by professorEmail
+        try {
+            const q2 = await getDocs(query(collection(db,'sections'), where('professorEmail','==',profEmail)));
+            q2.forEach(d => {
+                if (addedIds.has(d.id)) return;
+                addedIds.add(d.id);
+                const data = d.data();
+                const section = { id:d.id, name:data.name||'Unnamed', courseCode:data.courseCode||'PE', students:data.students||[], studentCount:(data.students||[]).length, yearLevel:data.yearLevel||'', professor:data.professor||'', ...data };
+                assignedSections.push(section);
+            });
+        } catch(e) {}
+
+        // Full scan for fuzzy matching
+        const secSnap = await getDocs(collection(db,'sections'));
+        secSnap.forEach(d => {
+            if (addedIds.has(d.id)) return;
+            const data = d.data();
+            const dbProf = (data.professor || '').toString().trim().toUpperCase();
+            let isMatch = false;
+
+            for (const v of nameVariations) { if (v && v.length>=3 && dbProf===v) { isMatch=true; break; } }
+            if (!isMatch) for (const v of nameVariations) { if (v && v.length>=3 && (dbProf.includes(v)||v.includes(dbProf))) { isMatch=true; break; } }
+            if (!isMatch) for (const v of nameVariations) { if (v && v.length>=3) { const ln=v.split(',')[0].trim(); if (ln.length>=3 && dbProf.includes(ln)) { isMatch=true; break; } } }
+            if (!isMatch && dbProf.length>=3) { const dbW=dbProf.split(/[\s,\.]+/).filter(w=>w.length>=3); for (const w of dbW) { if (nameTokens.has(w)) { isMatch=true; break; } } }
+            if (!isMatch) { const eu=profEmail.split('@')[0].toUpperCase(); if (eu.length>3 && dbProf.includes(eu)) isMatch=true; }
+
+            if (isMatch) {
+                addedIds.add(d.id);
+                const section = { id:d.id, name:data.name||'Unnamed', courseCode:data.courseCode||'PE', students:data.students||[], studentCount:(data.students||[]).length, yearLevel:data.yearLevel||'', professor:data.professor||'', ...data };
+                assignedSections.push(section);
+            }
+        });
+
+        allSections = [...assignedSections];
+        filteredSections = [...assignedSections];
+        
+        document.getElementById('sectionsCount').textContent = assignedSections.length;
+        renderSections(filteredSections);
+        populateSectionNameFilter();
+    }
+
+    function renderSections(sections) {
+        const grid = document.getElementById('sectionsGrid');
+        const empty = document.getElementById('noSectionsMsg');
+
+        if (!sections.length) {
+            grid.innerHTML = '';
+            empty.classList.remove('hidden');
+            return;
+        }
+        empty.classList.add('hidden');
+
+        let html = '';
+        sections.forEach(sec => {
+            const students = sec.students || [];
+            const firstFew = students.slice(0, 4);
+            const remaining = Math.max(0, students.length - 4);
+            const studentPills = firstFew.map(s => 
+                `<span class="inline-flex items-center bg-surface border border-border rounded px-1.5 py-0.5 text-[11px] text-text-secondary m-0.5">${s.name || s.email || 'Student'}</span>`
+            ).join('');
+            const morePill = remaining > 0 ? `<span class="inline-flex items-center bg-info-bg text-info border border-border rounded px-1.5 py-0.5 text-[11px] m-0.5">+${remaining} more</span>` : '';
+
+            html += `
+            <div class="section-card bg-surface rounded-xl border-2 border-border p-5 cursor-pointer" data-section-id="${sec.id}" onclick="selectSectionFilter('${sec.id}')">
+                <div class="flex justify-between items-start mb-3.5">
+                    <div>
+                        <div class="section-name font-display text-base font-bold text-navy">${sec.name}</div>
+                        <div class="inline-block bg-info-bg text-blue text-[11px] font-semibold px-2 py-0.5 rounded mt-1">${sec.courseCode}</div>
+                    </div>
+                    <span class="inline-flex items-center bg-success-bg text-success text-[11px] font-bold px-2.5 py-1 rounded-full">
+                        <i class="fas fa-user-graduate text-[10px] mr-1"></i>${students.length} ${students.length===1?'Student':'Students'}
+                    </span>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    ${sec.yearLevel ? `<div class="flex items-center gap-2 text-[13px] text-text-secondary"><i class="fas fa-graduation-cap w-4 text-center text-text-muted text-xs flex-shrink-0"></i><span class="text-[12px]">Year ${sec.yearLevel}</span></div>` : ''}
+                    ${sec.professor ? `<div class="flex items-center gap-2 text-[13px] text-text-secondary"><i class="fas fa-user-tie w-4 text-center text-text-muted text-xs flex-shrink-0"></i><span class="text-[12px]">${sec.professor}</span></div>` : ''}
+                </div>
+                ${students.length > 0 ? `
+                <div class="mt-3 pt-2.5 border-t border-border">
+                    <div class="text-[10px] font-semibold text-text-muted uppercase tracking-[0.7px] mb-1.5">Students</div>
+                    <div class="flex flex-wrap">${studentPills}${morePill}</div>
+                </div>` : ''}
+                <div class="flex items-center gap-1 text-[11px] text-text-muted mt-3 pt-2.5 border-t border-dashed border-border">
+                    <i class="fas fa-hand-pointer text-[11px]"></i>
+                    <span>Click to filter dashboard</span>
+                </div>
+            </div>`;
+        });
+
+        grid.innerHTML = html;
+    }
+
+    function populateSectionNameFilter() {
+        const sel = document.getElementById('sectionNameFilter');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">All Sections</option>';
+        const uniqueNames = [...new Set(allSections.map(s => s.name))];
+        uniqueNames.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            sel.appendChild(opt);
+        });
+    }
+
+    window.filterSections = function() {
+        const search = (document.getElementById('sectionSearchInput').value || '').toLowerCase();
+        const secName = document.getElementById('sectionNameFilter').value;
+        const yr = document.getElementById('yearFilter').value;
+
+        filteredSections = allSections.filter(s => {
+            const matchesSearch = !search || s.name.toLowerCase().includes(search) || s.courseCode.toLowerCase().includes(search);
+            const matchesName = !secName || s.name === secName;
+            const matchesYear = !yr || s.yearLevel?.toString() === yr;
+            return matchesSearch && matchesName && matchesYear;
+        });
+
+        renderSections(filteredSections);
+        document.getElementById('sectionsCount').textContent = filteredSections.length;
+    };
+
+    async function loadTestResults() {
+        allTestResults = [];
+        if (!assignedSections.length) return;
+
+        const bestMap = new Map();
+        const OVERDUE_PENALTY = 0.10;
+
+        try {
+            const snap = await getDocs(collection(db, 'testResults'));
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                if (!['completed','overdue','late'].includes(data.status)) return;
+
+                const studentEmail = data.studentEmail || '';
+                if (!studentEmail) return;
+
+                const studentSection = assignedSections.find(s => s.name === data.section)
+                    || assignedSections.find(s => s.students && s.students.some(st => st.email === studentEmail));
+                if (!studentSection) return;
+
+                const testId = data.testId || docSnap.id;
+                const testKey = `${studentEmail}_${testId}`;
+                const isOverride = data.isProfessorOverride === true;
+                const testNorm = (data.testName || '').toLowerCase();
+                const isCBased = testNorm.includes('skinfold') || testNorm.includes('step test') || testNorm.includes('3-minute');
+
+                let score;
+                if (isOverride && typeof data.score === 'number' && !isNaN(data.score)) {
+                    score = data.score;
+                } else {
+                    score = calculateActivityScore(data.testName, data.result || data.resultData || data.repetitions || data, data.testTarget || null);
+                    if ((data.status === 'overdue' || data.status === 'late') && !isOverride && !isCBased) {
+                        score = Math.max(0, score - score * OVERDUE_PENALTY);
+                    }
+                }
+                score = Math.max(0, Math.min(100, Math.round(score)));
+
+                if (!bestMap.has(testKey) || score > bestMap.get(testKey).score) {
+                    bestMap.set(testKey, {
+                        studentName: data.studentName || 'Unknown',
+                        studentEmail, section: studentSection.name, sectionId: studentSection.id,
+                        testName: data.testName, testId, score,
+                        isOverdue: data.status === 'overdue' || data.status === 'late'
+                    });
+                }
+            });
+        } catch(e) { console.error('testResults error:', e); }
+
+        allTestResults = Array.from(bestMap.values());
+    }
+
+    function calculateRankings() {
+        sectionRankings = [];
+
+        assignedSections.forEach(sec => {
+            const studentsInSection = sec.students || [];
+            const sectionResults = allTestResults.filter(r => r.sectionId === sec.id || r.section === sec.name);
+
+            const studentMap = new Map();
+            studentsInSection.forEach(st => {
+                if (st.email) studentMap.set(st.email, { name: st.name || st.email.split('@')[0], email: st.email, scores: [], hasGrades: false });
+            });
+
+            sectionResults.forEach(r => {
+                if (studentMap.has(r.studentEmail)) {
+                    const s = studentMap.get(r.studentEmail);
+                    s.scores.push(r.score);
+                    s.hasGrades = true;
+                } else {
+                    studentMap.set(r.studentEmail, { name: r.studentName || r.studentEmail.split('@')[0], email: r.studentEmail, scores: [r.score], hasGrades: true });
+                }
+            });
+
+            const studentAverages = [];
+            studentMap.forEach((s, email) => {
+                const avg = s.scores.length ? s.scores.reduce((a, b) => a + b, 0) / s.scores.length : 0;
+                studentAverages.push({ email, name: s.name, averageScore: parseFloat(avg.toFixed(2)), activitiesCount: s.scores.length, hasGrades: s.hasGrades });
+            });
+            studentAverages.sort((a, b) => b.averageScore - a.averageScore);
+
+            const totalStudents = studentsInSection.length;
+            const studentsWithGrades = studentAverages.filter(s => s.hasGrades).length;
+            const completionRate = totalStudents > 0 ? (studentsWithGrades / totalStudents) * 100 : 0;
+            const sectionAvg = studentsWithGrades > 0
+                ? studentAverages.filter(s => s.hasGrades).reduce((sum, s) => sum + s.averageScore, 0) / studentsWithGrades
+                : 0;
+
+            sectionRankings.push({
+                id: sec.id, name: sec.name, courseCode: sec.courseCode, yearLevel: sec.yearLevel,
+                totalStudents, studentsWithGrades, completionRate: parseFloat(completionRate.toFixed(2)),
+                averageScore: parseFloat(sectionAvg.toFixed(2)),
+                studentAverages,
+            });
+        });
+
+        sectionRankings.sort((a, b) => b.averageScore - a.averageScore);
+        sectionRankings = sectionRankings.map((s, i) => ({ ...s, rank: i + 1 }));
+
+        renderRankings(sectionRankings);
+        updateStats(sectionRankings);
+    }
+
+    function renderRankings(rankings) {
+        const tbody = document.getElementById('rankTableBody');
+
+        if (!rankings.length) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-14 text-text-muted text-sm">
+                <div class="text-4xl mb-3 opacity-30">📊</div>
+                <div class="font-semibold text-text-secondary mb-1">No sections found</div>
+                <div>You don't have any sections assigned yet.</div>
+            </td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = rankings.map(sec => {
+            const rc = rankClass(sec.rank);
+            const bd = scoreBadge(sec.averageScore);
+            return `
+            <tr class="border-b border-border hover:bg-surface/60 transition-all cursor-pointer" onclick="viewSectionDetails('${sec.id}')">
+                <td data-label="Rank" class="px-4 py-3.5">
+                    <div class="${rc} inline-flex items-center justify-center w-9 h-9 rounded-full text-[15px] font-bold">${sec.rank}</div>
+                </td>
+                <td data-label="Section Name" class="px-4 py-3.5">
+                    <div class="font-semibold text-navy text-[14px]">${sec.name}</div>
+                    <div class="text-[12px] text-text-muted mt-0.5">${sec.courseCode || 'PE'} · ${sec.yearLevel || 'N/A'}</div>
+                </td>
+                <td data-label="Students" class="px-4 py-3.5">
+                    <span class="font-bold text-navy">${sec.totalStudents}</span>
+                </td>
+                <td data-label="With Grades" class="px-4 py-3.5">
+                    <span class="font-bold text-navy">${sec.studentsWithGrades}</span>
+                    <span class="text-[12px] text-text-muted ml-1">(${sec.completionRate}%)</span>
+                </td>
+                <td data-label="Completion" class="px-4 py-3.5">
+                    <div class="h-1.5 bg-border rounded-full overflow-hidden mb-1" style="min-width:100px">
+                        <div class="h-full bg-gradient-to-r from-success to-emerald-400 rounded-full progress-fill" style="width:${sec.completionRate}%"></div>
+                    </div>
+                    <span class="text-[12px] text-text-muted">${sec.completionRate}%</span>
+                </td>
+                <td data-label="Avg Score" class="px-4 py-3.5">
+                    <span class="font-bold text-navy text-lg">${sec.averageScore}%</span>
+                    <span class="ml-2 inline-block px-2 py-0.5 rounded text-[11px] font-semibold ${bd.cls}">${bd.text}</span>
+                </td>
+                <td data-label="Actions" class="px-4 py-3.5">
+                    <button onclick="event.stopPropagation(); viewSectionDetails('${sec.id}')"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-br from-royal to-blue text-white rounded-lg text-[12px] font-semibold hover:-translate-y-px hover:shadow-md transition-all border-0 cursor-pointer">
+                        <i class="fas fa-eye text-[10px]"></i> View
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function updateStats(rankings) {
+        if (!rankings.length) return;
+        const top = rankings[0];
+        document.getElementById('statTopSection').textContent = top.name;
+        document.getElementById('statTopScore').textContent = `${top.averageScore}% average`;
+        document.getElementById('statTotalSections').textContent = rankings.length;
+        document.getElementById('statTotalStudents').textContent = rankings.reduce((s, r) => s + r.totalStudents, 0);
+        const avg = rankings.reduce((s, r) => s + r.averageScore, 0) / rankings.length;
+        document.getElementById('statOverallAvg').textContent = `${avg.toFixed(1)}%`;
+    }
+
+    window.selectSectionFilter = function(sectionId) {
+        if (activeSectionFilter === sectionId) { clearSectionFilter(); return; }
+        activeSectionFilter = sectionId;
+
+        document.querySelectorAll('.section-card').forEach(c => c.classList.remove('active-section'));
+        const card = document.querySelector(`.section-card[data-section-id="${sectionId}"]`);
+        if (card) card.classList.add('active-section');
+
+        const sec = assignedSections.find(s => s.id === sectionId);
+        
+        document.getElementById('activeFilterBadge').classList.remove('hidden');
+        document.getElementById('activeFilterBadge').classList.add('flex');
+        document.getElementById('activeFilterBadgeHero').classList.remove('hidden');
+        document.getElementById('activeFilterBadgeHero').classList.add('flex');
+        document.getElementById('activeFilterName').textContent = sec?.name || 'Section';
+        document.getElementById('heroFilterName').textContent = sec?.name || 'Section';
+
+        const filtered = sectionRankings.filter(s => s.id === sectionId);
+        renderRankings(filtered);
+        updateStats(filtered.length ? filtered : sectionRankings);
+    };
+
+    window.clearSectionFilter = function() {
+        activeSectionFilter = null;
+        document.querySelectorAll('.section-card').forEach(c => c.classList.remove('active-section'));
+        document.getElementById('activeFilterBadge').classList.add('hidden');
+        document.getElementById('activeFilterBadge').classList.remove('flex');
+        document.getElementById('activeFilterBadgeHero').classList.add('hidden');
+        document.getElementById('activeFilterBadgeHero').classList.remove('flex');
+        renderRankings(sectionRankings);
+        updateStats(sectionRankings);
+    };
+
+    window.viewSectionDetails = function(sectionId) {
+        const sec = sectionRankings.find(s => s.id === sectionId);
+        if (!sec) { showAlert('Section not found', 'error'); return; }
+
+        document.getElementById('modalSectionName').textContent = `${sec.name} — Student Rankings`;
+
+        const bd = scoreBadge(sec.averageScore);
+        const rc = rankClass(sec.rank);
+
+        let studentsHtml = '';
+        if (!sec.studentAverages || !sec.studentAverages.length) {
+            studentsHtml = `<div class="text-center py-10 text-text-muted text-sm"><i class="fas fa-user-graduate text-4xl mb-3 opacity-30"></i><div>No students found in this section.</div></div>`;
+        } else {
+            studentsHtml = sec.studentAverages.map((st, i) => {
+                const sr = i < 3 ? ['rank-gold','rank-silver','rank-bronze'][i] : 'rank-other';
+                const sb = st.hasGrades ? scoreBadge(st.averageScore) : null;
+                return `
+                <div class="student-rank-row flex items-center gap-3 p-3 rounded-xl border border-border mb-2 bg-white">
+                    <div class="${sr} inline-flex items-center justify-center w-8 h-8 rounded-full text-[13px] font-bold flex-shrink-0">${i+1}</div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-sm flex-shrink-0">${getInitials(st.name)}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold text-navy text-[14px] truncate">${st.name}</div>
+                        <div class="text-[12px] text-text-muted truncate">${st.email}</div>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <span class="font-bold text-navy text-[16px]">${st.hasGrades ? st.averageScore + '%' : '0%'}</span>
+                        ${st.hasGrades
+                            ? `<span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold ${sb.cls}">${sb.text}</span>`
+                            : `<span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-surface text-text-muted border border-border">No Grades</span>`
+                        }
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        document.getElementById('sectionDetailsBody').innerHTML = `
+            <div class="flex items-center gap-4 mb-5 pb-5 border-b border-border flex-wrap">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-display font-bold text-navy text-xl">${sec.name}</div>
+                    <div class="text-[13px] text-text-muted mt-0.5">${sec.courseCode || 'PE'} · ${sec.yearLevel || 'N/A'}</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <div class="bg-surface rounded-xl p-4 border border-border text-center">
+                    <div class="text-[11px] font-semibold text-text-muted uppercase tracking-wide mb-1">Total Students</div>
+                    <div class="font-mono font-bold text-navy text-2xl">${sec.totalStudents}</div>
+                </div>
+                <div class="bg-surface rounded-xl p-4 border border-border text-center">
+                    <div class="text-[11px] font-semibold text-text-muted uppercase tracking-wide mb-1">With Grades</div>
+                    <div class="font-mono font-bold text-navy text-2xl">${sec.studentsWithGrades}</div>
+                    <div class="text-[11px] text-text-muted mt-0.5">${sec.completionRate}% done</div>
+                </div>
+                <div class="bg-surface rounded-xl p-4 border border-border text-center">
+                    <div class="text-[11px] font-semibold text-text-muted uppercase tracking-wide mb-1">Section Rank</div>
+                    <div class="font-mono font-bold text-navy text-2xl">#${sec.rank}</div>
+                    <div class="text-[11px] text-text-muted mt-0.5">of ${sectionRankings.length}</div>
+                </div>
+                <div class="bg-surface rounded-xl p-4 border border-border text-center">
+                    <div class="text-[11px] font-semibold text-text-muted uppercase tracking-wide mb-1">Average Score</div>
+                    <div class="font-mono font-bold text-navy text-2xl">${sec.averageScore}%</div>
+                    <div class="text-[11px] mt-0.5 ${bd.cls} inline-block px-2 rounded font-semibold">${bd.text}</div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <div class="flex justify-between text-[12px] text-text-muted mb-1.5">
+                    <span>Completion Progress</span><span>${sec.completionRate}%</span>
+                </div>
+                <div class="h-2 bg-border rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-success to-emerald-400 rounded-full" style="width:${sec.completionRate}%"></div>
+                </div>
+            </div>
+
+            <div class="font-display font-bold text-navy text-[15px] mb-3 flex items-center gap-2">
+                <i class="fas fa-users text-accent text-base"></i> All Students
+            </div>
+            ${studentsHtml}
+        `;
+
+        document.getElementById('sectionDetailsModal').classList.add('open');
+    };
+
+    window.closeSectionDetailsModal = function() {
+        document.getElementById('sectionDetailsModal').classList.remove('open');
+    };
+
+    window.applyFilters = function() {
+        const sortBy = document.getElementById('sortBy').value;
+        let sorted = [...sectionRankings];
+
+        switch(sortBy) {
+            case 'rank': sorted.sort((a,b) => a.rank - b.rank); break;
+            case 'average-desc': sorted.sort((a,b) => b.averageScore - a.averageScore); break;
+            case 'average-asc': sorted.sort((a,b) => a.averageScore - b.averageScore); break;
+            case 'students-desc': sorted.sort((a,b) => b.totalStudents - a.totalStudents); break;
+            case 'students-asc': sorted.sort((a,b) => a.totalStudents - b.totalStudents); break;
+            case 'name-asc': sorted.sort((a,b) => a.name.localeCompare(b.name)); break;
+            case 'name-desc': sorted.sort((a,b) => b.name.localeCompare(a.name)); break;
+        }
+        if (sortBy !== 'rank') sorted = sorted.map((s,i) => ({...s, rank: i+1}));
+
+        const display = activeSectionFilter ? sorted.filter(s => s.id === activeSectionFilter) : sorted;
+        renderRankings(display);
+        updateStats(display.length ? display : sorted);
+    };
+
+    window.refreshData = async function() {
+        try {
+            await loadAssignedSections();
+            await loadTestResults();
+            calculateRankings();
+            showAlert('Rankings refreshed successfully!', 'success');
+        } catch(e) { showAlert('Error refreshing: ' + e.message, 'error'); }
+    };
+
+    window.handleLogout = async function(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        document.getElementById('profileDropdown').classList.remove('show');
+        showConfirm('Are you sure you want to sign out?', async () => {
+            try { await signOut(auth); window.location.href = '/login/index.html'; } catch(err) {}
+        });
+    };
+</script>
 </body>
 </html>

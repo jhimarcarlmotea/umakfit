@@ -3,2844 +3,1287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMakFit - Grades Management</title>
+    <title>UMakFit — Professor Grades</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-        * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
-        body { 
-            font-family: 'Poppins', sans-serif; 
-        }
-        .font-montserrat {
-            font-family: 'Montserrat', sans-serif;
-        }
-        
-        /* Custom animations */
-        @keyframes pulse { 
-            0%, 100% { opacity: 1; } 
-            50% { opacity: 0.5; } 
-        }
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
-        @keyframes dropdownSlide {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-        
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-        
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-        }
-        
-        @keyframes bounceSlow {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        .animate-slide-up {
-            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .animate-fade-in-up {
-            animation: fadeInUp 1s ease-out;
-        }
-        
-        .animate-slide-in-left {
-            animation: slideInLeft 1s ease-out;
-        }
-        
-        .animate-slide-in-right {
-            animation: slideInRight 1s ease-out;
-        }
-        
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .animate-float-delayed {
-            animation: float 6s ease-in-out infinite 3s;
-        }
-        
-        .animate-bounce-slow {
-            animation: bounceSlow 2s ease-in-out infinite;
-        }
-        
-        .slide-down {
-            animation: slideDown 0.3s ease;
-        }
-        
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Hamburger Menu Styles */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            cursor: pointer;
-            z-index: 60;
-        }
-
-        .hamburger span {
-            width: 22px;
-            height: 3px;
-            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -6px);
-        }
-
-        /* Mobile Drawer */
-        .mobile-drawer {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 260px;
-            height: 100vh;
-            background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
-            z-index: 55;
-            transition: right 0.3s ease;
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-            overflow-y: auto;
-        }
-
-        .mobile-drawer.active {
-            right: 0;
-        }
-
-        .drawer-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .drawer-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-            
-            .desktop-nav {
-                display: none;
-            }
-        }
-        
-        /* Gradient text */
-        .gradient-text {
-            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .custom-shadow {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-        
-        .card-shadow {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        
-        .btn-shadow {
-            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
-        }
-        
-        .btn-shadow:hover {
-            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4);
-        }
-        
-        .live-dot {
-            animation: pulse 2s infinite;
-        }
-        
-        .spinner {
-            animation: spin 1s linear infinite;
-            border: 4px solid #f1f5f9;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-        }
-        
-        /* Table Styles */
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            width: 100%;
-        }
-        
-        .custom-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        /* Desktop table */
-        @media screen and (min-width: 769px) {
-            .custom-table {
-                min-width: 800px;
-            }
-            
-            .table-responsive {
-                overflow-x: auto;
-            }
-            
-            .custom-table thead {
-                background: linear-gradient(90deg, rgba(30, 58, 138, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%);
-            }
-            
-            .custom-table th {
-                font-weight: 600;
-                color: white;
-                font-size: 14px;
-                text-align: left;
-                padding: 15px 12px;
-                border-bottom: 2px solid #e2e8f0;
-                white-space: nowrap;
-                cursor: pointer;
-                user-select: none;
-            }
-            
-            .custom-table th:hover {
-                background-color: rgba(255,255,255,0.1);
-            }
-            
-            .custom-table td {
-                font-weight: 400;
-                color: #000;
-                font-size: 14px;
-                padding: 16px 12px;
-                border-bottom: 1px solid #f1f5f9;
-            }
-            
-            .custom-table tbody tr {
-                transition: all 0.2s ease;
-            }
-            
-            .custom-table tbody tr:hover {
-                background-color: #f8fafc;
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            }
-        }
-        
-        /* Mobile Responsive Table */
-        @media screen and (max-width: 768px) {
-            .table-responsive {
-                overflow-x: visible;
-                border: none;
-                background: transparent;
-            }
-            
-            .custom-table {
-                min-width: 0;
-                width: 100%;
-                background: transparent;
-                border: none;
-            }
-            
-            .custom-table thead {
-                display: none;
-            }
-            
-            .custom-table tbody tr {
-                display: block;
-                margin-bottom: 16px;
-                border: 1px solid #e2e8f0;
-                border-radius: 12px;
-                background: white;
-                padding: 16px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-                transition: transform 0.2s, box-shadow 0.2s;
-            }
-            
-            .custom-table tbody tr:active {
-                transform: translateY(2px);
-                box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            }
-            
-            .custom-table tbody td {
-                display: block;
-                padding: 12px 8px 12px 45%;
-                border: none;
-                border-bottom: 1px solid #f1f5f9;
-                text-align: left;
-                position: relative;
-                min-height: 44px;
-                display: flex;
-                align-items: center;
-            }
-            
-            .custom-table tbody td:before {
-                content: attr(data-label);
-                position: absolute;
-                left: 12px;
-                width: 40%;
-                font-weight: 600;
-                color: #4b5563;
-                font-size: 13px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            
-            .custom-table tbody td:last-child {
-                border-bottom: none;
-                justify-content: flex-end;
-                padding-left: 12px;
-            }
-            
-            .custom-table tbody td:last-child:before {
-                display: none;
-            }
-            
-            /* Hide test count badge position */
-            .custom-table tbody td:first-child {
-                position: relative;
-            }
-        }
-        
-        /* Grade colors */
-        .grade-excellent { color: #10b981; font-weight: 600; }
-        .grade-good { color: #3b82f6; font-weight: 600; }
-        .grade-fair { color: #f59e0b; font-weight: 600; }
-        .grade-poor { color: #ef4444; font-weight: 600; }
-        
-        /* Badges */
-        .badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 12px;
-            min-width: 100px;
-        }
-        
-        .badge-excellent {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        
-        .badge-good {
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
-        
-        .badge-fair {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-        
-        .badge-poor {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        
-        /* ============ DASHBOARD-STYLE ALERT MODALS ============ */
-        .alert-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-            padding: 1rem;
-            animation: fadeIn 0.2s ease;
-        }
-        
-        .alert-popup-card {
-            background: #fff;
-            border-radius: 28px;
-            padding: 2.5rem 2rem 2rem;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
-            animation: slideUp 0.35s cubic-bezier(.4,0,.2,1);
-            text-align: center;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .alert-icon-circle {
-            width: 72px; 
-            height: 72px;
-            background: #fce8e6;
-            border-radius: 50%;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            margin: 0 auto 1.25rem;
-        }
-        
-        .alert-icon-circle.success {
-            background: #d1fae5;
-        }
-        
-        .alert-icon-circle.info {
-            background: #dbeafe;
-        }
-        
-        .alert-icon-circle.warning {
-            background: #fef3c7;
-        }
-        
-        .alert-icon-circle.error {
-            background: #fee2e2;
-        }
-        
-        .alert-title {
-            font-size: 1.375rem;
-            font-weight: 600;
-            color: #202124;
-            margin-bottom: 0.4rem;
-            letter-spacing: -0.01em;
-        }
-        
-        .alert-message {
-            font-size: 0.875rem;
-            color: #5f6368;
-            margin-bottom: 1.75rem;
-        }
-        
-        .alert-divider {
-            height: 1px;
-            background: #e8eaed;
-            margin: 0 -2rem 1.5rem;
-        }
-        
-        .alert-btn-row {
-            display: flex;
-            gap: 0.75rem;
-        }
-        
-        .alert-btn-cancel {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border-radius: 100px;
-            border: 1px solid #dadce0;
-            background: #fff;
-            color: #3c4043;
-            font-size: 0.9375rem;
-            font-weight: 500;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: background 0.15s;
-        }
-        
-        .alert-btn-cancel:hover { 
-            background: #f8f9fa; 
-        }
-        
-        .alert-btn-confirm {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border-radius: 100px;
-            border: none;
-            background: #3b82f6;
-            color: #fff;
-            font-size: 0.9375rem;
-            font-weight: 500;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: background 0.15s, box-shadow 0.15s;
-        }
-        
-        .alert-btn-confirm.success {
-            background: #10b981;
-        }
-        
-        .alert-btn-confirm.success:hover {
-            background: #059669;
-        }
-        
-        .alert-btn-confirm.error {
-            background: #ef4444;
-        }
-        
-        .alert-btn-confirm.error:hover {
-            background: #dc2626;
-        }
-        
-        .alert-btn-confirm.warning {
-            background: #f59e0b;
-        }
-        
-        .alert-btn-confirm.warning:hover {
-            background: #d97706;
-        }
-        
-        .alert-btn-confirm.info {
-            background: #3b82f6;
-        }
-        
-        .alert-btn-confirm.info:hover {
-            background: #2563eb;
-        }
-        
-        .alert-btn-confirm:hover {
-            box-shadow: 0 2px 8px rgba(59,130,246,0.35);
-        }
-        
-        .alert-btn-confirm:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        /* ============ FIXED MODAL STYLES ============ */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-        
-        .modal-content {
-            background-color: white;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 900px;
-            display: flex;
-            flex-direction: column;
-            max-height: 85vh;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-        
-        .modal-header {
-            flex-shrink: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            border-bottom: 1px solid #e2e8f0;
-            background-color: white;
-            border-radius: 12px 12px 0 0;
-        }
-        
-        .modal-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px;
-            background-color: white;
-        }
-        
-        .modal-footer {
-            flex-shrink: 0;
-            display: flex;
-            justify-content: flex-end;
-            padding: 16px 24px;
-            border-top: 1px solid #e2e8f0;
-            background-color: #f9fafb;
-            border-radius: 0 0 12px 12px;
-        }
-        
-        .modal-close-btn {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background-color: #f3f4f6;
-            color: #4b5563;
-            font-size: 20px;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .modal-close-btn:hover {
-            background-color: #e5e7eb;
-            color: #111827;
-        }
-        
-        .student-info-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        
-        .student-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 700;
-            color: white;
-            flex-shrink: 0;
-        }
-        
-        .student-basic-info {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .student-name {
-            font-weight: 700;
-            color: #1e3a8a;
-            font-size: 20px;
-            margin-bottom: 5px;
-            word-wrap: break-word;
-        }
-        
-        .student-id {
-            font-weight: 500;
-            color: #64748b;
-            font-size: 14px;
-            word-wrap: break-word;
-        }
-        
-        .score-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .score-excellent {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        .score-good {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-        .score-poor {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        
-        .summary-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
-        
-        .summary-stat {
-            text-align: center;
-        }
-        
-        .summary-stat-label {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-        
-        .summary-stat-value {
-            font-size: 28px;
-            font-weight: 700;
-        }
-
-        .filter-select {
-            padding: 10px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #1f2937;
-            background-color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 20px;
-            padding-right: 40px;
-        }
-
-        .filter-select:hover {
-            border-color: #3b82f6;
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        /* ============ COMPACT NAVIGATION STYLES ============ */
-        .logo-compact {
-            margin-right: 0.75rem;
-        }
-        
-        .nav-group {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .nav-link-compact {
-            padding: 0.35rem 0.6rem;
-            font-size: 0.85rem;
-            white-space: nowrap;
-        }
-        
-        .profile-compact {
-            margin-left: 0.75rem;
-        }
-        
-        @media (min-width: 1280px) {
-            .nav-link-compact {
-                padding: 0.4rem 0.7rem;
-                font-size: 0.9rem;
-            }
-        }
-        
-        /* Mobile adjustments */
-        @media screen and (max-width: 768px) {
-            .modal-content {
-                max-height: 90vh;
-                width: 95%;
-            }
-            
-            .modal-header {
-                padding: 12px 16px;
-            }
-            
-            .modal-body {
-                padding: 16px;
-            }
-            
-            .modal-footer {
-                padding: 12px 16px;
-            }
-            
-            .student-name {
-                font-size: 18px;
-            }
-            
-            .student-avatar {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-            }
-            
-            .summary-card {
-                padding: 16px;
-                margin: 0 0 16px 0;
-                border-radius: 12px;
-                width: 100%;
-            }
-            
-            .summary-stat-value {
-                font-size: 22px;
-            }
-            
-            .summary-stat-label {
-                font-size: 11px;
-            }
-            
-            .empty-state {
-                padding: 40px 20px;
-            }
-            
-            .empty-icon {
-                font-size: 48px;
-            }
-            
-            .empty-title {
-                font-size: 18px;
-            }
-            
-            .empty-text {
-                font-size: 13px;
-            }
-            
-            button {
-                min-height: 44px;
-                min-width: 44px;
-            }
-        }
-    </style>
-</head>
-<body class="bg-gray-50">
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
-        <div class="spinner"></div>
-        <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Grades Management...</div>
-    </div>
-    
-    <!-- ============ DASHBOARD-STYLE ALERT MODALS ============ -->
-    <!-- Success Modal -->
-    <div class="alert-modal-overlay" id="successModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle success">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#10b981" stroke-width="3" fill="none"/>
-                    <path d="M16 24L22 30L32 18" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <div class="alert-title" id="successTitle">Success</div>
-            <div class="alert-message" id="successMessage">Operation completed successfully.</div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-confirm success" id="successOkBtn">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Info Modal -->
-    <div class="alert-modal-overlay" id="infoModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle info">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#3b82f6" stroke-width="3" fill="none"/>
-                    <path d="M24 16V24M24 32V32.5" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="alert-title" id="infoTitle">Information</div>
-            <div class="alert-message" id="infoMessage"></div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-confirm info" id="infoOkBtn">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Warning Modal -->
-    <div class="alert-modal-overlay" id="warningModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle warning">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <path d="M24 4L4 40H44L24 4Z" stroke="#f59e0b" stroke-width="3" fill="none"/>
-                    <circle cx="24" cy="32" r="2" fill="#f59e0b"/>
-                    <path d="M24 16V24" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="alert-title" id="warningTitle">Warning</div>
-            <div class="alert-message" id="warningMessage"></div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-cancel" id="warningCancelBtn">Cancel</button>
-                <button class="alert-btn-confirm warning" id="warningConfirmBtn">Continue</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Error Modal -->
-    <div class="alert-modal-overlay" id="errorModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle error">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#ef4444" stroke-width="3" fill="none"/>
-                    <line x1="16" y1="16" x2="32" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
-                    <line x1="32" y1="16" x2="16" y2="32" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="alert-title" id="errorTitle">Error</div>
-            <div class="alert-message" id="errorMessage"></div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-confirm error" id="errorOkBtn">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Confirm Modal (Yes/No) -->
-    <div class="alert-modal-overlay" id="confirmModal">
-        <div class="alert-popup-card">
-            <div class="alert-icon-circle warning">
-                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#f59e0b" stroke-width="3" fill="none"/>
-                    <path d="M24 16V24M24 32V32.5" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="alert-title">Confirm Action</div>
-            <div class="alert-message" id="confirmMessage"></div>
-            <div class="alert-divider"></div>
-            <div class="alert-btn-row">
-                <button class="alert-btn-cancel" id="confirmNoBtn">No</button>
-                <button class="alert-btn-confirm warning" id="confirmYesBtn">Yes</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="mainContent" class="hidden">
-        <!-- COMPACT NAVIGATION BANNER -->
-        <header class="shadow-lg fixed w-full top-0 z-50" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
-            <nav class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-                <div class="flex justify-between items-center h-14 md:h-16">
-                    
-                    <!-- LOGO - compact -->
-                    <div class="flex items-center logo-compact">
-                        <div class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center overflow-visible">
-                            <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-12 h-12 md:w-14 md:h-14 object-contain">
-                        </div>
-                        <span class="text-base sm:text-lg md:text-xl lg:text-2xl font-extrabold font-montserrat gradient-text ml-1">
-                            UMakFIT
-                        </span>
-                    </div>
-
-                    <!-- DESKTOP NAVIGATION - super compact -->
-                    <div class="hidden md:flex items-center nav-group">
-                        <!-- Dashboard -->
-                        <a href="professor.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
-                        </a>
-                        
-                        <!-- Students -->
-                        <a href="studentmanagement.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-users mr-1"></i>Students
-                        </a>
-                        
-                        <!-- Activities -->
-                        <a href="addactivities.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-dumbbell mr-1"></i>Activities
-                        </a>
-                        
-                        <!-- Lessons -->
-                        <a href="addlesson.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-book-open mr-1"></i>Lessons
-                        </a>
-                        
-                        <!-- Monitoring -->
-                        <a href="monitoringactivities.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-chart-bar mr-1"></i>Monitoring
-                        </a>
-                        
-                        <!-- Grades - active -->
-                        <a href="grades.html" class="nav-link-compact text-white font-medium rounded-lg" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);">
-                            <i class="fas fa-graduation-cap mr-1"></i>Grades
-                        </a>
-                        
-                        <!-- Section Rank -->
-                        <a href="sectionranklist.html" class="nav-link-compact text-white/80 hover:text-white font-medium rounded-lg transition-colors">
-                            <i class="fas fa-trophy mr-1"></i>Rank
-                        </a>
-                    </div>
-
-                    <!-- PROFILE - compact -->
-                    <div class="hidden md:block relative profile-compact">
-                        <img src="" alt="Profile" id="profilePictureBtn"
-                             class="w-7 h-7 md:w-8 md:h-8 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
-                        
-                        <!-- Profile Dropdown -->
-                        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-                            <div class="p-3 border-b-2 border-gray-200 text-center">
-                                <img src="" alt="Profile" id="profileDropdownPicture" class="w-14 h-14 rounded-full mx-auto mb-2 border-3 border-blue-500 object-cover">
-                                <h6 id="profileDropdownName" class="font-bold text-gray-900 text-sm">Loading...</h6>
-                                <p id="profileDropdownEmail" class="text-xs text-gray-500 mt-1 truncate px-2">Loading...</p>
-                            </div>
-                            <div class="p-1">
-                                <a href="professor-profile.html" onclick="showViewProfile(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-xs">
-                                    <i class="bi bi-person-circle text-blue-500 text-base"></i>
-                                    <span class="font-medium text-gray-700">View Profile</span>
-                                </a>
-                                <div class="h-px bg-gray-200 my-1"></div>
-                                <div onclick="handleLogout(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
-                                    <i class="fas fa-sign-out-alt text-base"></i>
-                                    <span class="font-medium">Logout</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- MOBILE MENU -->
-                    <div class="flex md:hidden items-center gap-2">
-                        <!-- Mobile Profile -->
-                        <div class="relative">
-                            <img src="" alt="Profile" id="profilePictureBtnMobile"
-                                 class="w-7 h-7 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
-                            
-                            <div id="profileDropdownMobile" class="hidden fixed right-2 top-14 w-56 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-                                <div class="p-3 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-14 h-14 rounded-full mx-auto mb-2 border-3 border-blue-500 object-cover">
-                                    <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-sm">Loading...</h6>
-                                    <p id="profileDropdownEmailMobile" class="text-xs text-gray-500 mt-1 truncate px-2">Loading...</p>
-                                </div>
-                                <div class="p-1">
-                                    <a href="professor-profile.html" onclick="showViewProfile(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-xs">
-                                        <i class="bi bi-person-circle text-blue-500 text-base"></i>
-                                        <span class="font-medium text-gray-700">View Profile</span>
-                                    </a>
-                                    <div class="h-px bg-gray-200 my-1"></div>
-                                    <div onclick="handleLogout(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500 text-xs">
-                                        <i class="fas fa-sign-out-alt text-base"></i>
-                                        <span class="font-medium">Logout</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Hamburger Menu -->
-                        <div class="hamburger" id="hamburger">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Mobile Drawer Overlay -->
-            <div class="drawer-overlay" id="drawerOverlay"></div>
-
-            <!-- Mobile Drawer -->
-            <div class="mobile-drawer" id="mobileDrawer">
-                <div class="p-5 pt-6">
-                    <!-- Drawer Header -->
-                    <div class="flex items-center gap-2 mb-6 pb-4 border-b border-white/20">
-                        <div class="w-10 h-10 flex items-center justify-center overflow-visible">
-                            <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-12 h-12 object-contain">
-                        </div>
-                        <span class="text-xl font-extrabold font-montserrat gradient-text">
-                            UMakFIT
-                        </span>
-                    </div>
-
-                    <!-- Mobile Navigation Links -->
-                    <nav class="space-y-1 mb-6">
-                        <a href="professor.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
-                        </a>
-                        <a href="studentmanagement.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-users mr-2"></i>Student Management
-                        </a>
-                        <a href="addactivities.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-dumbbell mr-2"></i>Add Activities
-                        </a>
-                        <a href="addlesson.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-book-open mr-2"></i>Add Lesson
-                        </a>
-                        <a href="monitoringactivities.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-chart-bar mr-2"></i>Monitoring
-                        </a>
-                        <a href="grades.html" class="mobile-nav-link block text-white font-medium py-2 px-3 rounded-lg text-sm" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);">
-                            <i class="fas fa-graduation-cap mr-2"></i>Grades
-                        </a>
-                        <a href="sectionranklist.html" class="mobile-nav-link block text-white/80 hover:text-white font-medium py-2 px-3 rounded-lg hover:bg-white/10 transition-all text-sm">
-                            <i class="fas fa-trophy mr-2"></i>Section Rank
-                        </a>
-                    </nav>
-                </div>
-            </div>
-        </header>
-
-
-        <!-- Main Content - with top padding to account for fixed header -->
-        <div class="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen pt-32 pb-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Page Header -->
-                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-8 mb-10">
-                    <div class="flex items-center mb-5">
-                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mr-4">
-                            <i class="fas fa-graduation-cap text-white text-2xl"></i>
-                        </div>
-                        <div>
-                            <h1 class="text-blue-900 font-bold text-3xl">Grades Management</h1>
-                            <p class="text-gray-600 font-medium text-base mt-2">View final grades and student performance overview</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats Overview -->
-                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6 mb-8">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-                        <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
-                            <i class="fas fa-chart-pie"></i>
-                            Grades Overview
-                        </h3>
-                        <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="calculateFinalGrades()">
-                            <i class="fas fa-calculator"></i>
-                            <span>Calculate Final</span>
-                        </button>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
-                            <div class="text-blue-900 font-bold text-3xl mb-2" id="totalStudents">0</div>
-                            <div class="text-blue-700 font-medium text-sm">Total Students</div>
-                        </div>
-                        
-                        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
-                            <div class="text-green-900 font-bold text-3xl mb-2" id="passedStudents">0</div>
-                            <div class="text-green-700 font-medium text-sm">Passed</div>
-                        </div>
-                        
-                        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border border-yellow-200">
-                            <div class="text-yellow-900 font-bold text-3xl mb-2" id="failedStudents">0</div>
-                            <div class="text-yellow-700 font-medium text-sm">Failed</div>
-                        </div>
-                        
-                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
-                            <div class="text-purple-900 font-bold text-3xl mb-2" id="overallAverage">0.0%</div>
-                            <div class="text-purple-700 font-medium text-sm">Overall Average</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Final Grades Summary - WITH FILTERS -->
-                <div class="bg-white rounded-2xl card-shadow border border-gray-200 p-6">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-                        <h3 class="text-gray-900 font-bold text-xl flex items-center gap-2">
-                            <i class="fas fa-graduation-cap"></i>
-                            Score Summary
-                        </h3>
-                        <div class="flex gap-2 mt-2 sm:mt-0">
-                            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="exportGrades()">
-                                <i class="fas fa-download"></i>
-                                <span>Export Grades</span>
-                            </button>
-                            <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" onclick="saveFinalGradesToPDF()" id="savePdfBtn" style="display: none;">
-                                <i class="fas fa-file-pdf"></i>
-                                <span>Save as PDF</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- ⭐ FILTER SECTION -->
-                    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-xl border-2 border-gray-200">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                <i class="fas fa-filter text-blue-600"></i>
-                                Filter by Section
-                            </label>
-                            <select id="filterSection" class="filter-select w-full" onchange="applyFilters()">
-                                <option value="">All Sections</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                <i class="fas fa-sort text-blue-600"></i>
-                                Sort by
-                            </label>
-                            <select id="sortBy" class="filter-select w-full" onchange="applyFilters()">
-                                <option value="highest">Highest to Lowest Score</option>
-                                <option value="lowest">Lowest to Highest Score</option>
-                                <option value="name-asc">Name (A-Z)</option>
-                                <option value="name-desc">Name (Z-A)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <!-- ⭐ SUMMARY STATISTICS -->
-                    <div id="resultsSummary" class="summary-card" style="display: none; margin-bottom: 20px;">
-                        <div class="grid grid-cols-3 gap-4">
-                            <div class="summary-stat">
-                                <div class="summary-stat-label">Total Results</div>
-                                <div class="summary-stat-value" id="totalResults">0</div>
-                            </div>
-                            <div class="summary-stat">
-                                <div class="summary-stat-label">Unique Students</div>
-                                <div class="summary-stat-value" id="uniqueStudents">0</div>
-                            </div>
-                            <div class="summary-stat">
-                                <div class="summary-stat-label">Average Score</div>
-                                <div class="summary-stat-value" id="averageScore">0%</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- ⭐ FINAL GRADES TABLE - CLICKABLE -->
-                    <div class="table-responsive">
-                        <table class="custom-table" id="finalGradesTable">
-                            <thead>
-                                <tr>
-                                    <th>Student Name</th>
-                                    <th>Section</th>
-                                    <th>Total Activities</th>
-                                    <th>Average Score</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="finalGradesBody">
-                                <tr>
-                                    <td colspan="7">
-                                        <div class="empty-state">
-                                            <div class="empty-icon">⏳</div>
-                                            <div class="empty-title">Calculating Final Grades...</div>
-                                            <div class="empty-text">Please wait while we calculate final grades from student activity scores.</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ✅ UPDATED FOOTER - MATCHING LANDING PAGE DESIGN -->
-        <footer class="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 sm:py-12">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
-                    <!-- About UmakFit & College of Human Kinetics -->
-                    <div>
-                        <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                            <img src="Umaklogo.png" 
-                                 alt="UMak Logo" class="h-12 w-auto object-contain">
-                            <div>
-                                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
-                                <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
-                            </div>
-                        </div>
-                        <p class="text-sm lg:text-base leading-relaxed text-blue-100">
-                            UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati. 
-                            Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
-                        </p>
-                        <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
-                            <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Fitness Tracking</span>
-                            <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Performance Assessment</span>
-                            <span class="bg-blue-700/50 px-3 py-1 rounded-full text-xs font-semibold">Health & Wellness</span>
-                        </div>
-                    </div>
-
-                    <!-- Quick Links -->
-                    <div>
-                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
-                        <div class="grid grid-cols-2 gap-4 lg:gap-6">
-                            <div class="space-y-3">
-                                <a href="professor.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-tachometer mr-2"></i>Dashboard
-                                </a>
-                                <a href="studentmanagement.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-people mr-2"></i>Students
-                                </a>
-                                <a href="addactivities.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-dumbbell mr-2"></i>Activities
-                                </a>
-                            </div>
-                            <div class="space-y-3">
-                                <a href="addlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-book mr-2"></i>Lessons
-                                </a>
-                                <a href="monitoringactivities.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-graph-up mr-2"></i>Monitoring
-                                </a>
-                                <a href="grades.html" class="block text-yellow-300 hover:text-yellow-200 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base font-semibold">
-                                    <i class="bi bi-mortarboard mr-2"></i>Grades
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Contact & Social -->
-                    <div>
-                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
-                        <div class="space-y-4 lg:space-y-5">
-                            <div class="flex items-start gap-3">
-                                <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
-                                <p class="text-sm lg:text-base text-blue-100">
-                                    College of Human Kinetics<br>
-                                    University of Makati<br>
-                                   3rd floor, Administration Building, University of Makati, 
-                                   JP Rizal Ext., West Rembo, Taguig City
-                                </p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
-                                <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">
-                                    chk@umak.edu.ph
-                                </a>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
-                                <span class="text-blue-100 text-sm lg:text-base">+63 933 189 7230</span>
-                            </div>
-                            <div class="flex items-center gap-4 pt-3 justify-center lg:justify-start">
-                                <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                                    <i class="bi bi-facebook text-white text-lg lg:text-xl"></i>
-                                </a>
-                                <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                                    <i class="bi bi-twitter text-white text-lg lg:text-xl"></i>
-                                </a>
-                                <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                                    <i class="bi bi-instagram text-white text-lg lg:text-xl"></i>
-                                </a>
-                                <a href="#" class="bg-blue-700 hover:bg-blue-600 p-2.5 rounded-lg transition-all duration-200 hover:scale-110">
-                                    <i class="bi bi-youtube text-white text-lg lg:text-xl"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Divider -->
-                <div class="border-t border-blue-600/50 mt-8 lg:mt-12 pt-6 lg:pt-8">
-                    <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
-                        <!-- Copyright -->
-                        <div class="text-center lg:text-left">
-                            <p class="text-xs lg:text-sm text-blue-200">
-                                © 2025 University of Makati - College of Human Kinetics. All Rights Reserved.
-                            </p>
-                        </div>
-                        
-                        <!-- University Links -->
-                        <div class="flex flex-wrap justify-center gap-3 lg:gap-4">
-                            <a href="https://umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                                University of Makati
-                            </a>
-                            <span class="text-blue-400">•</span>
-                            <a href="https://library.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                                UMak Online Library
-                            </a>
-                            <span class="text-blue-400">•</span>
-                            <a href="https://tbl.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                                TBL Hub
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Student Grades Details Modal -->
-    <div id="studentGradesModal" class="modal-overlay" style="display: none;" onclick="closeStudentGradesModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-                    <i class="fas fa-clipboard-list"></i> 
-                    <span id="modalStudentName">Student Grades Details</span>
-                </h3>
-                <button class="modal-close-btn" onclick="closeStudentGradesModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body" id="modalBodyContent">
-                <div id="studentInfoHeader" class="student-info-header" style="display: none;">
-                    <div class="student-avatar" id="studentAvatar">??</div>
-                    <div class="student-basic-info">
-                        <div class="student-name" id="studentNameDetail">Student Name</div>
-                        <div class="student-id" id="studentSectionDetail">Section</div>
-                    </div>
-                </div>
-                
-                <div class="table-responsive">
-                    <table class="custom-table" style="min-width: 100%;">
-                        <thead style="position: sticky; top: 0; background: linear-gradient(90deg, rgba(30, 58, 138, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%); z-index: 10;">
-                            <tr>
-                                <th>Date</th>
-                                <th>Activity</th>
-                                <th>Result</th>
-                                <th>Score</th>
-                                <th>Rating</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentGradesTableBody">
-                            <!-- Grades will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="modal-footer">
-                <button class="px-6 py-2.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg font-semibold transition-all" onclick="closeStudentGradesModal()">
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Grade Modal -->
-    <div id="editGradeModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="text-xl font-bold text-gray-900">Edit Grade</h3>
-                <button class="modal-close-btn" onclick="closeEditModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-medium mb-2">Student</label>
-                    <input type="text" id="editStudentName" readonly 
-                           class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-medium mb-2">Activity</label>
-                    <input type="text" id="editActivityName" readonly 
-                           class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-medium mb-2" for="editScore">Score (0-100)</label>
-                    <input type="number" id="editScore" min="0" max="100" step="0.1" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-medium mb-2" for="editRemarks">Remarks</label>
-                    <textarea id="editRemarks" rows="3" placeholder="Add remarks about this grade..."
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
-                </div>
-                
-                <input type="hidden" id="editGradeId">
-            </div>
-            <div class="modal-footer">
-                <button onclick="closeEditModal()" 
-                        class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-all duration-300 mr-2">
-                    Cancel
-                </button>
-                <button onclick="saveGrade()" 
-                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300 hover:shadow-lg">
-                    Save Changes
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, collection, getDocs, query, where, doc, getDoc, updateDoc, addDoc, orderBy, writeBatch } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
-            authDomain: "umakfit-e3b1d.firebaseapp.com",
-            projectId: "umakfit-e3b1d",
-            storageBucket: "umakfit-e3b1d.appspot.com",
-            messagingSenderId: "276569891504",
-            appId: "1:276569891504:web:39b1732b519f4d8b785175"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let currentProfessor = null;
-        let assignedSections = [];
-        let allGrades = [];
-        let allActivities = [];
-        let allStudents = [];
-        let currentFinalGrades = [];
-        let filteredFinalGrades = [];
-
-        // DOM Elements for navigation
-        const hamburger = document.getElementById('hamburger');
-        const mobileDrawer = document.getElementById('mobileDrawer');
-        const drawerOverlay = document.getElementById('drawerOverlay');
-        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-        const profilePictureBtn = document.getElementById('profilePictureBtn');
-        const profilePictureBtnMobile = document.getElementById('profilePictureBtnMobile');
-        const profileDropdown = document.getElementById('profileDropdown');
-        const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-
-        // ============ DASHBOARD-STYLE ALERT FUNCTIONS ============
-        function showSuccessModal(message, onOk) {
-            const modal = document.getElementById('successModal');
-            const messageEl = document.getElementById('successMessage');
-            const okBtn = document.getElementById('successOkBtn');
-            
-            messageEl.textContent = message;
-            
-            // Clone button to remove previous listeners
-            const newOkBtn = okBtn.cloneNode(true);
-            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-            
-            newOkBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onOk) onOk();
-            });
-            
-            modal.style.display = 'flex';
-        }
-
-        function showInfoModal(message, onOk) {
-            const modal = document.getElementById('infoModal');
-            const messageEl = document.getElementById('infoMessage');
-            const okBtn = document.getElementById('infoOkBtn');
-            
-            messageEl.textContent = message;
-            
-            const newOkBtn = okBtn.cloneNode(true);
-            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-            
-            newOkBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onOk) onOk();
-            });
-            
-            modal.style.display = 'flex';
-        }
-
-        function showWarningModal(message, onConfirm, onCancel) {
-            const modal = document.getElementById('warningModal');
-            const messageEl = document.getElementById('warningMessage');
-            const confirmBtn = document.getElementById('warningConfirmBtn');
-            const cancelBtn = document.getElementById('warningCancelBtn');
-            
-            messageEl.textContent = message;
-            
-            const newConfirmBtn = confirmBtn.cloneNode(true);
-            const newCancelBtn = cancelBtn.cloneNode(true);
-            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
-            
-            newConfirmBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onConfirm) onConfirm();
-            });
-            
-            newCancelBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onCancel) onCancel();
-            });
-            
-            modal.style.display = 'flex';
-        }
-
-        function showErrorModal(message, onOk) {
-            const modal = document.getElementById('errorModal');
-            const messageEl = document.getElementById('errorMessage');
-            const okBtn = document.getElementById('errorOkBtn');
-            
-            messageEl.textContent = message;
-            
-            const newOkBtn = okBtn.cloneNode(true);
-            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-            
-            newOkBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onOk) onOk();
-            });
-            
-            modal.style.display = 'flex';
-        }
-
-        function showConfirmModal(message, onYes, onNo) {
-            const modal = document.getElementById('confirmModal');
-            const messageEl = document.getElementById('confirmMessage');
-            const yesBtn = document.getElementById('confirmYesBtn');
-            const noBtn = document.getElementById('confirmNoBtn');
-            
-            messageEl.textContent = message;
-            
-            const newYesBtn = yesBtn.cloneNode(true);
-            const newNoBtn = noBtn.cloneNode(true);
-            yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
-            noBtn.parentNode.replaceChild(newNoBtn, noBtn);
-            
-            newYesBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onYes) onYes();
-            });
-            
-            newNoBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (onNo) onNo();
-            });
-            
-            modal.style.display = 'flex';
-        }
-
-        // ============ ⭐ EXACT SCORING FUNCTION FROM STUDENT GRADES PAGE ============
-        function calculateActivityScore(testName, result, testTarget = null) {
-            const normalized = testName.toLowerCase().trim();
-            
-            // ⭐ CRITICAL: Check if this is a professor override with pre-calculated score
-            if (result && typeof result === 'object' && result !== null) {
-                if (result.score !== undefined && result.score !== null) {
-                    const score = parseFloat(result.score);
-                    if (!isNaN(score) && score >= 0 && score <= 100) {
-                        console.log(`✅ Using stored professor score: ${score} for ${testName}`);
-                        return score;
-                    }
-                }
-            }
-            
-            // Extract numeric value from result
-            let numericValue = 0;
-            
-            if (typeof result === 'object' && result !== null) {
-                numericValue = result.repetitions || result.time || result.distance || 
-                              result.value || result.result || result.count || 
-                              result.score || 0;
-            } else if (typeof result === 'string') {
-                const match = result.match(/(\d+\.?\d*)/);
-                if (match) {
-                    numericValue = parseFloat(match[1]);
-                } else {
-                    numericValue = parseFloat(result) || 0;
-                }
-            } else {
-                numericValue = parseFloat(result) || 0;
-            }
-            
-            console.log(`🎯 Calculating: ${testName} | Value: ${numericValue} | Target: ${testTarget}`);
-            
-            // Use test target if available
-            if (testTarget && testTarget > 0) {
-                if (normalized.includes('push-up') || normalized.includes('pushup') || 
-                    normalized.includes('sit-up') || normalized.includes('situp') ||
-                    normalized.includes('curl-up')) {
-                    
-                    const reps = numericValue;
-                    if (reps >= testTarget) return 100;
-                    
-                    const percentage = (reps / testTarget) * 100;
-                    let score = Math.min(100, Math.max(50, percentage));
-                    
-                    if (percentage >= 100) score = 100;
-                    else if (percentage >= 90) score = 95;
-                    else if (percentage >= 80) score = 90;
-                    else if (percentage >= 70) score = 85;
-                    else if (percentage >= 60) score = 80;
-                    else if (percentage >= 50) score = 75;
-                    
-                    return Math.round(score);
-                }
-                
-                if (normalized.includes('plank')) {
-                    let seconds = numericValue;
-                    if (seconds >= testTarget) return 100;
-                    
-                    const percentage = (seconds / testTarget) * 100;
-                    let score = Math.min(100, Math.max(50, percentage));
-                    
-                    if (percentage >= 100) score = 100;
-                    else if (percentage >= 90) score = 95;
-                    else if (percentage >= 80) score = 90;
-                    else if (percentage >= 70) score = 85;
-                    else if (percentage >= 60) score = 80;
-                    else if (percentage >= 50) score = 75;
-                    
-                    return Math.round(score);
-                }
-                
-                if (normalized.includes('sit-and-reach')) {
-                    const distance = numericValue;
-                    if (distance >= testTarget) return 100;
-                    
-                    const percentage = (distance / testTarget) * 100;
-                    let score = Math.min(100, Math.max(50, percentage));
-                    
-                    if (percentage >= 100) score = 100;
-                    else if (percentage >= 90) score = 95;
-                    else if (percentage >= 80) score = 90;
-                    else if (percentage >= 70) score = 85;
-                    else if (percentage >= 60) score = 80;
-                    else if (percentage >= 50) score = 75;
-                    
-                    return Math.round(score);
-                }
-                
-                if (normalized.includes('grip')) {
-                    if (numericValue >= testTarget) return 100;
-                    
-                    const percentage = (numericValue / testTarget) * 100;
-                    let score = Math.min(100, Math.max(50, percentage));
-                    
-                    if (percentage >= 90) score = 95;
-                    else if (percentage >= 80) score = 90;
-                    else if (percentage >= 70) score = 85;
-                    else if (percentage >= 60) score = 80;
-                    else if (percentage >= 50) score = 75;
-                    
-                    return Math.round(score);
-                }
-                
-                if (normalized.includes('mile') || normalized.includes('run')) {
-                    if (numericValue <= testTarget) return 100;
-                    
-                    const percentage = (testTarget / numericValue) * 100;
-                    let score = Math.min(100, Math.max(50, percentage));
-                    
-                    if (percentage >= 90) score = 95;
-                    else if (percentage >= 80) score = 90;
-                    else if (percentage >= 70) score = 85;
-                    else if (percentage >= 60) score = 80;
-                    else if (percentage >= 50) score = 75;
-                    
-                    return Math.round(score);
-                }
-                
-                if (normalized.includes('step test') || normalized.includes('3-minute')) {
-                    if (numericValue <= testTarget) return 100;
-                    
-                    const percentage = (testTarget / numericValue) * 100;
-                    let score = Math.min(100, Math.max(50, percentage));
-                    
-                    if (percentage >= 90) score = 95;
-                    else if (percentage >= 80) score = 90;
-                    else if (percentage >= 70) score = 85;
-                    else if (percentage >= 60) score = 80;
-                    else if (percentage >= 50) score = 75;
-                    
-                    return Math.round(score);
-                }
-            }
-            
-            // ============ FALLBACK DEFAULT SCORING ============
-            
-            if (normalized.includes('push-up') || normalized.includes('pushup')) {
-                const reps = numericValue;
-                if (reps >= 40) return 100;
-                if (reps >= 35) return 95;
-                if (reps >= 30) return 90;
-                if (reps >= 25) return 85;
-                if (reps >= 20) return 80;
-                if (reps >= 15) return 75;
-                if (reps >= 10) return 70;
-                if (reps >= 5) return 65;
-                return 60;
-            }
-            
-            if (normalized.includes('sit-up') || normalized.includes('situp')) {
-                const reps = numericValue;
-                if (reps >= 50) return 100;
-                if (reps >= 45) return 95;
-                if (reps >= 40) return 90;
-                if (reps >= 35) return 85;
-                if (reps >= 30) return 80;
-                if (reps >= 25) return 75;
-                if (reps >= 20) return 70;
-                if (reps >= 15) return 65;
-                return 60;
-            }
-            
-            if (normalized.includes('curl-up')) {
-                const reps = numericValue;
-                if (reps >= 75) return 100;
-                if (reps >= 60) return 95;
-                if (reps >= 50) return 90;
-                if (reps >= 40) return 85;
-                if (reps >= 30) return 80;
-                if (reps >= 25) return 75;
-                if (reps >= 20) return 70;
-                return 65;
-            }
-            
-            if (normalized.includes('plank')) {
-                let seconds = 0;
-                if (typeof numericValue === 'string' && numericValue.includes(':')) {
-                    const [mins, secs] = numericValue.split(':').map(Number);
-                    seconds = (mins * 60) + (secs || 0);
-                } else {
-                    seconds = numericValue;
-                }
-                
-                if (seconds >= 180) return 100;
-                if (seconds >= 150) return 95;
-                if (seconds >= 120) return 90;
-                if (seconds >= 100) return 85;
-                if (seconds >= 80) return 80;
-                if (seconds >= 60) return 75;
-                if (seconds >= 45) return 70;
-                if (seconds >= 30) return 65;
-                return 60;
-            }
-            
-            if (normalized.includes('step test') || normalized.includes('3-minute')) {
-                const heartRate = numericValue;
-                if (heartRate <= 70) return 100;
-                if (heartRate <= 80) return 95;
-                if (heartRate <= 90) return 90;
-                if (heartRate <= 100) return 85;
-                if (heartRate <= 110) return 80;
-                if (heartRate <= 120) return 75;
-                if (heartRate <= 130) return 70;
-                return 65;
-            }
-            
-            if (normalized.includes('mile') || normalized.includes('run')) {
-                let totalSeconds = 0;
-                if (typeof numericValue === 'string' && numericValue.includes(':')) {
-                    const [minutes, seconds] = numericValue.split(':').map(Number);
-                    totalSeconds = (minutes * 60) + (seconds || 0);
-                } else {
-                    totalSeconds = numericValue;
-                }
-                
-                if (totalSeconds <= 360) return 100;
-                if (totalSeconds <= 420) return 95;
-                if (totalSeconds <= 480) return 90;
-                if (totalSeconds <= 540) return 85;
-                if (totalSeconds <= 600) return 80;
-                if (totalSeconds <= 660) return 75;
-                if (totalSeconds <= 720) return 70;
-                if (totalSeconds <= 780) return 65;
-                return 60;
-            }
-            
-            if (normalized.includes('sit-and-reach')) {
-                const distance = numericValue;
-                if (distance >= 25) return 100;
-                if (distance >= 20) return 95;
-                if (distance >= 15) return 90;
-                if (distance >= 10) return 85;
-                if (distance >= 5) return 80;
-                if (distance >= 0) return 75;
-                if (distance >= -5) return 70;
-                return 65;
-            }
-            
-            if (normalized.includes('grip')) {
-                const strength = numericValue;
-                if (strength >= 60) return 100;
-                if (strength >= 55) return 95;
-                if (strength >= 50) return 90;
-                if (strength >= 45) return 85;
-                if (strength >= 40) return 80;
-                if (strength >= 35) return 75;
-                if (strength >= 30) return 70;
-                return 65;
-            }
-            
-            if (normalized.includes('bmi')) {
-                const bmi = numericValue;
-                if (bmi >= 18.5 && bmi <= 24.9) return 100;
-                if (bmi >= 17.5 && bmi < 18.5) return 85;
-                if (bmi >= 25 && bmi <= 27) return 85;
-                if (bmi >= 15 && bmi < 17.5) return 70;
-                if (bmi > 27 && bmi <= 30) return 70;
-                return 60;
-            }
-            
-            return 75;
-        }
-
-        // Hamburger Menu Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            if (hamburger && mobileDrawer && drawerOverlay) {
-                hamburger.addEventListener('click', () => {
-                    hamburger.classList.toggle('active');
-                    mobileDrawer.classList.toggle('active');
-                    drawerOverlay.classList.toggle('active');
-                    document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-                });
-
-                drawerOverlay.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    mobileDrawer.classList.remove('active');
-                    drawerOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-
-                mobileNavLinks.forEach(link => {
-                    link.addEventListener('click', () => {
-                        hamburger.classList.remove('active');
-                        mobileDrawer.classList.remove('active');
-                        drawerOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    });
-                });
-            }
-            
-            if (profilePictureBtn) {
-                profilePictureBtn.addEventListener('click', toggleProfileDropdown);
-            }
-            
-            if (profilePictureBtnMobile) {
-                profilePictureBtnMobile.addEventListener('click', toggleProfileDropdown);
-            }
-            
-            document.addEventListener('click', closeAllDropdowns);
-        });
-
-        function toggleProfileDropdown(event) {
-            event?.stopPropagation();
-            const isMobile = window.innerWidth < 768;
-            const dropdown = isMobile ? profileDropdownMobile : profileDropdown;
-            
-            const isHidden = dropdown.classList.contains('hidden');
-            
-            if (isHidden) {
-                dropdown.classList.remove('hidden');
-            } else {
-                dropdown.classList.add('hidden');
-            }
-        }
-
-        function closeProfileDropdown() {
-            if (profileDropdown) profileDropdown.classList.add('hidden');
-            if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
-        }
-
-        function closeAllDropdowns(event) {
-            if (!event.target.closest('#profilePictureBtn') && 
-                !event.target.closest('#profilePictureBtnMobile') && 
-                !event.target.closest('#profileDropdown') && 
-                !event.target.closest('#profileDropdownMobile')) {
-                closeProfileDropdown();
-            }
-        }
-        window.handleLogout = async function(event) {
-            if (event) event.preventDefault();
-            closeProfileDropdown();
-            
-            showConfirmModal('Are you sure you want to logout?', async () => {
-                try {
-                    await signOut(auth);
-                    window.location.href = '/login/index.html';
-                } catch (error) {
-                    console.error('Error logging out:', error);
-                    window.location.href = '/login/index.html';
-                }
-            });
-        };
-
-        function updateProfilePicture(photoURL, userName) {
-            const profileBtn = document.getElementById('profilePictureBtn');
-            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-            const dropdownPic = document.getElementById('profileDropdownPicture');
-            const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
-            
-            const displayName = currentProfessor?.name || currentProfessor?.fullName || userName || 'Professor';
-            const email = currentProfessor?.email || 'professor@umak.edu.ph';
-            
-            const photoUrlToUse = photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=3b82f6&color=fff&size=128`;
-            
-            if (profileBtn) profileBtn.src = photoUrlToUse;
-            if (profileBtnMobile) profileBtnMobile.src = photoUrlToUse;
-            if (dropdownPic) dropdownPic.src = photoUrlToUse;
-            if (dropdownPicMobile) dropdownPicMobile.src = photoUrlToUse;
-            
-            const dropdownName = document.getElementById('profileDropdownName');
-            const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
-            if (dropdownName) dropdownName.textContent = displayName;
-            if (dropdownNameMobile) dropdownNameMobile.textContent = displayName;
-            
-            const dropdownEmail = document.getElementById('profileDropdownEmail');
-            const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
-            if (dropdownEmail) dropdownEmail.textContent = email;
-            if (dropdownEmailMobile) dropdownEmailMobile.textContent = email;
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-            const loadingScreen = document.getElementById('loadingScreen');
-            const mainContent = document.getElementById('mainContent');
-
-            if (user) {
-                try {
-                    console.log('User authenticated:', user.email);
-                    
-                    await loadProfessorData(user);
-                    updateProfilePicture(user.photoURL, user.displayName);
-                    await loadAssignedSections();
-                    await loadAllData();
-                    
-                    loadingScreen.style.display = 'none';
-                    mainContent.classList.remove('hidden');
-                    
-                } catch (error) {
-                    console.error('Error loading grades:', error);
-                    loadingScreen.style.display = 'none';
-                    mainContent.classList.remove('hidden');
-                    showErrorModal('Error loading grades data: ' + error.message);
-                }
-            } else {
-                window.location.href = '/login/index.html';
-            }
-        });
-
-        async function loadProfessorData(user) {
-            try {
-                console.log('Loading professor data for:', user.email);
-                
-                const userEmail = user.email.toLowerCase();
-                
-                const professorsQuery = query(
-                    collection(db, 'professors'),
-                    where('email', '==', userEmail)
-                );
-                const professorsSnapshot = await getDocs(professorsQuery);
-                
-                if (!professorsSnapshot.empty) {
-                    const professorDoc = professorsSnapshot.docs[0];
-                    currentProfessor = { id: professorDoc.id, ...professorDoc.data() };
-                    console.log('✓ Professor found in professors collection:', currentProfessor);
-                } else {
-                    const usersQuery = query(
-                        collection(db, 'users'),
-                        where('email', '==', userEmail),
-                        where('role', '==', 'professor')
-                    );
-                    const usersSnapshot = await getDocs(usersQuery);
-                    
-                    if (!usersSnapshot.empty) {
-                        const userDoc = usersSnapshot.docs[0];
-                        currentProfessor = { id: userDoc.id, ...userDoc.data() };
-                        console.log('✓ Professor found in users collection:', currentProfessor);
-                    } else {
-                        currentProfessor = {
-                            name: user.displayName || 'Professor',
-                            email: user.email
-                        };
-                        console.log('⚠️ Using minimal professor data');
-                    }
-                }
-                
-            } catch (error) {
-                console.error('Error loading professor data:', error);
-                currentProfessor = {
-                    name: user.displayName || 'Professor',
-                    email: user.email
-                };
-            }
-        }
-
-        async function loadAssignedSections() {
-            try {
-                assignedSections = [];
-                const sectionSet = new Set();
-                
-                console.log('Loading sections for professor:', currentProfessor.email);
-
-                const methods = [
-                    async () => {
-                        const professorQuery = query(
-                            collection(db, 'professorProfiles'),
-                            where('email', '==', currentProfessor.email)
-                        );
-                        const professorSnapshot = await getDocs(professorQuery);
-                        
-                        if (!professorSnapshot.empty) {
-                            const professorData = professorSnapshot.docs[0].data();
-                            const professorName = professorData.fullName || professorData.name || '';
-                            
-                            const sectionsQuery = query(
-                                collection(db, 'sections'),
-                                where('professor', '==', professorName)
-                            );
-                            const sectionsSnapshot = await getDocs(sectionsQuery);
-                            
-                            sectionsSnapshot.forEach(doc => {
-                                const data = doc.data();
-                                if (data.name && !sectionSet.has(data.name)) {
-                                    sectionSet.add(data.name);
-                                    assignedSections.push({ 
-                                        section: data.name,
-                                        professorName: professorName 
-                                    });
-                                }
-                            });
-                        }
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0a1628',
+                        'navy-mid': '#112240',
+                        'navy-light': '#1a3a5c',
+                        royal: '#1e4d8c',
+                        blue: '#2d6fc4',
+                        accent: '#c8a84b',
+                        'accent-light': '#e8c96a',
+                        'accent-pale': '#f5edd6',
+                        surface: '#f4f6fa',
+                        border: '#e1e6ef',
+                        'border-strong': '#c5cfe0',
+                        'text-primary': '#0a1628',
+                        'text-secondary': '#4a5a72',
+                        'text-muted': '#8a98ae',
+                        success: '#0e8a5f',
+                        'success-bg': '#d4f0e6',
+                        danger: '#c0392b',
+                        'danger-bg': '#fce8e6',
+                        warning: '#b07e16',
+                        'warning-bg': '#fef3d4',
+                        info: '#1a6fa8',
+                        'info-bg': '#d6eaf8',
+                        purple: '#6b21a8',
+                        'purple-bg': '#f3e8ff',
                     },
-                    
-                    async () => {
-                        const sectionsQuery = query(
-                            collection(db, 'sections'),
-                            where('professorEmail', '==', currentProfessor.email)
-                        );
-                        const sectionsSnapshot = await getDocs(sectionsQuery);
-                        
-                        sectionsSnapshot.forEach(doc => {
-                            const data = doc.data();
-                            if (data.name && !sectionSet.has(data.name)) {
-                                sectionSet.add(data.name);
-                                assignedSections.push({ 
-                                    section: data.name,
-                                    professorName: data.professor || currentProfessor.email 
-                                });
-                            }
-                        });
+                    fontFamily: {
+                        sans: ['DM Sans', 'sans-serif'],
+                        display: ['Playfair Display', 'serif'],
+                        mono: ['DM Mono', 'monospace'],
                     },
-                    
-                    async () => {
-                        const testResultsQuery = query(
-                            collection(db, 'testResults'),
-                            where('professorEmail', '==', currentProfessor.email)
-                        );
-                        const testResultsSnapshot = await getDocs(testResultsQuery);
-                        
-                        const uniqueSections = new Set();
-                        testResultsSnapshot.forEach(doc => {
-                            const data = doc.data();
-                            if (data.section) {
-                                uniqueSections.add(data.section);
-                            }
-                        });
-                        
-                        uniqueSections.forEach(sectionName => {
-                            if (!sectionSet.has(sectionName)) {
-                                sectionSet.add(sectionName);
-                                assignedSections.push({ 
-                                    section: sectionName,
-                                    professorName: currentProfessor.email 
-                                });
-                            }
-                        });
-                    }
-                ];
-
-                for (const method of methods) {
-                    try {
-                        await method();
-                    } catch (error) {
-                        console.warn('Method failed:', error.message);
-                    }
                 }
-
-                const sectionSelect = document.getElementById('filterSection');
-                sectionSelect.innerHTML = '<option value="">All Sections</option>';
-
-                if (assignedSections.length === 0) {
-                    console.log('No sections found. Loading all sections for debugging.');
-                    const allSectionsQuery = query(collection(db, 'sections'));
-                    const allSectionsSnapshot = await getDocs(allSectionsQuery);
-                    
-                    allSectionsSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        if (data.name && !sectionSet.has(data.name)) {
-                            sectionSet.add(data.name);
-                            assignedSections.push({ 
-                                section: data.name,
-                                professorName: data.professor || 'Unknown' 
-                            });
-                        }
-                    });
-                }
-
-                assignedSections.forEach(sec => {
-                    const option = document.createElement('option');
-                    option.value = sec.section;
-                    option.textContent = sec.section;
-                    sectionSelect.appendChild(option.cloneNode(true));
-                });
-
-                console.log('Assigned sections:', assignedSections);
-
-            } catch (error) {
-                console.error('Error in loadAssignedSections:', error);
-            }
-        }
-
-        async function loadAllData() {
-            await loadActivities();
-            await loadStudents();
-            await loadGrades();
-            if (allGrades.length > 0) {
-                setTimeout(() => {
-                    calculateAndDisplayFinalGrades();
-                }, 500);
-            }
-        }
-
-        async function loadGrades() {
-            try {
-                allGrades = [];
-                console.log('Loading grades for', assignedSections.length, 'sections');
-
-                if (assignedSections.length === 0) {
-                    return;
-                }
-
-                const bestScoresMap = new Map();
-
-                for (const section of assignedSections) {
-                    try {
-                        const gradesQuery = query(
-                            collection(db, 'testResults'),
-                            where('section', '==', section.section),
-                            where('status', '==', 'completed')
-                        );
-                        
-                        const gradesSnapshot = await getDocs(gradesQuery);
-                        
-                        gradesSnapshot.forEach(docSnap => {
-                            const data = docSnap.data();
-                            
-                            if (data.status !== 'completed') return;
-                            
-                            const studentEmail = data.studentEmail;
-                            const testId = data.testId || docSnap.id;
-                            const testName = data.testName || 'Unknown Activity';
-                            
-                            const testKey = `${studentEmail}_${testId}`;
-                            
-                            const score = calculateActivityScore(
-                                testName,
-                                data.result || data.resultData || data.repetitions || data,
-                                data.testTarget || null
-                            );
-                            
-                            const validScore = Math.max(0, Math.min(100, score));
-                            
-                            let submittedDate = new Date();
-                            if (data.submittedAt) {
-                                if (typeof data.submittedAt.toDate === 'function') {
-                                    submittedDate = data.submittedAt.toDate();
-                                } else if (typeof data.submittedAt === 'string') {
-                                    submittedDate = new Date(data.submittedAt);
-                                } else if (data.submittedAt.seconds) {
-                                    submittedDate = new Date(data.submittedAt.seconds * 1000);
-                                }
-                            }
-
-                            const dateKey = submittedDate.toISOString().split('T')[0];
-                            
-                            if (!bestScoresMap.has(testKey) || validScore > bestScoresMap.get(testKey).score) {
-                                
-                                let displayResult = '-';
-                                if (data.result !== undefined && data.result !== null) {
-                                    if (typeof data.result === 'number') {
-                                        displayResult = data.result;
-                                    } else if (typeof data.result === 'string') {
-                                        const match = data.result.match(/(\d+\.?\d*)/);
-                                        displayResult = match ? parseFloat(match[1]) : data.result;
-                                    } else if (typeof data.result === 'object') {
-                                        displayResult = data.result.value || data.result.repetitions || 
-                                                    data.result.time || data.result.distance || 0;
-                                    }
-                                } else if (data.resultData) {
-                                    if (typeof data.resultData === 'object') {
-                                        displayResult = data.resultData.value || data.resultData.repetitions || 
-                                                    data.resultData.time || 0;
-                                    } else {
-                                        displayResult = data.resultData;
-                                    }
-                                } else if (data.repetitions !== undefined) {
-                                    displayResult = data.repetitions;
-                                }
-
-                                bestScoresMap.set(testKey, {
-                                    id: docSnap.id,
-                                    studentName: data.studentName || 'Unknown Student',
-                                    section: data.section || section.section,
-                                    testName: testName,
-                                    result: displayResult,
-                                    testUnit: data.testUnit || '',
-                                    score: validScore,
-                                    date: submittedDate.toLocaleDateString('en-US', { 
-                                        year: 'numeric', 
-                                        month: 'long', 
-                                        day: 'numeric' 
-                                    }),
-                                    dateObject: submittedDate,
-                                    formattedDate: dateKey,
-                                    remarks: data.remarks || '',
-                                    studentEmail: studentEmail || '',
-                                    studentId: data.studentId || '',
-                                    professorEmail: data.professorEmail || '',
-                                    submittedAt: data.submittedAt || '',
-                                    isProfessorOverride: data.isProfessorOverride || false,
-                                    testTarget: data.testTarget || null
-                                });
-                            }
-                        });
-                        
-                    } catch (error) {
-                        console.error(`Error loading grades for ${section.section}:`, error);
-                    }
-                }
-
-                allGrades = Array.from(bestScoresMap.values());
-
-                allGrades.sort((a, b) => {
-                    try {
-                        const dateA = a.dateObject;
-                        const dateB = b.dateObject;
-                        return dateB - dateA;
-                    } catch (e) {
-                        return 0;
-                    }
-                });
-
-                console.log(`✅ Total unique best scores loaded: ${allGrades.length}`);
-
-            } catch (error) {
-                console.error('Error in loadGrades:', error);
-            }
-        }
-
-        function calculateAndDisplayFinalGrades() {
-            try {
-                if (allGrades.length === 0) {
-                    console.log('No grades available for final calculation');
-                    return;
-                }
-
-                console.log('Auto-calculating final grades from', allGrades.length, 'unique best scores');
-
-                const studentGradesMap = {};
-                
-                allGrades.forEach(grade => {
-                    const studentKey = grade.studentEmail || 
-                                    `${grade.studentName}_${grade.section}`.toLowerCase();
-                    
-                    if (!studentGradesMap[studentKey]) {
-                        studentGradesMap[studentKey] = {
-                            name: grade.studentName,
-                            section: grade.section,
-                            email: grade.studentEmail || '',
-                            studentId: grade.studentId || '',
-                            scores: [],
-                            totalScore: 0,
-                            activityCount: 0,
-                            activityNames: [],
-                            activityInstances: []
-                        };
-                    }
-                    
-                    if (grade.score !== undefined && grade.score !== null) {
-                        studentGradesMap[studentKey].scores.push(grade.score);
-                        studentGradesMap[studentKey].totalScore += grade.score;
-                        studentGradesMap[studentKey].activityCount++;
-                        
-                        studentGradesMap[studentKey].activityInstances.push({
-                            name: grade.testName,
-                            date: grade.date,
-                            formattedDate: grade.formattedDate,
-                            score: grade.score,
-                            result: grade.result || '',
-                            gradeStatus: getGradeStatus(grade.score)
-                        });
-                        
-                        const activityWithDate = `${grade.testName} (${grade.date})`;
-                        if (!studentGradesMap[studentKey].activityNames.includes(activityWithDate)) {
-                            studentGradesMap[studentKey].activityNames.push(activityWithDate);
-                        }
-                    }
-                });
-
-                console.log('✅ Found', Object.keys(studentGradesMap).length, 'unique students');
-
-                const finalGrades = [];
-                Object.keys(studentGradesMap).forEach(studentKey => {
-                    const student = studentGradesMap[studentKey];
-                    
-                    const averageScore = student.scores.length > 0 ? 
-                        student.totalScore / student.scores.length : 0;
-
-                    const finalGrade = averageScore.toFixed(2);
-                    const gradeStatus = getGradeStatus(averageScore);
-                    const statusText = averageScore >= 70 ? 'Passed' : 'Failed';
-                    const badgeClass = getBadgeClass(averageScore);
-                    
-                    finalGrades.push({
-                        studentKey: studentKey,
-                        name: student.name,
-                        section: student.section,
-                        totalActivities: student.activityCount,
-                        activityNames: student.activityNames,
-                        activityInstances: student.activityInstances,
-                        scores: student.scores,
-                        totalScore: student.totalScore,
-                        averageScore: parseFloat(averageScore.toFixed(2)),
-                        finalGrade: finalGrade,
-                        status: gradeStatus,
-                        statusText: statusText,
-                        badgeClass: badgeClass,
-                        email: student.email,
-                        studentId: student.studentId
-                    });
-                });
-
-                finalGrades.sort((a, b) => b.averageScore - a.averageScore);
-
-                console.log('✅ Auto-calculated final grades for', finalGrades.length, 'students');
-                
-                currentFinalGrades = finalGrades;
-                filteredFinalGrades = [...finalGrades];
-                
-                displayFinalGrades(filteredFinalGrades);
-                updateFinalGradesStats(filteredFinalGrades);
-                
-            } catch (error) {
-                console.error('Error auto-calculating final grades:', error);
-            }
-        }
-
-        window.applyFilters = function() {
-            const sectionFilter = document.getElementById('filterSection').value;
-            const sortBy = document.getElementById('sortBy').value;
-            
-            console.log('Applying filters - Section:', sectionFilter, 'Sort:', sortBy);
-            
-            let filtered = [...currentFinalGrades];
-            
-            if (sectionFilter) {
-                filtered = filtered.filter(grade => grade.section === sectionFilter);
-                console.log('After section filter:', filtered.length, 'students');
-            }
-            
-            if (sortBy === 'highest') {
-                filtered.sort((a, b) => b.averageScore - a.averageScore);
-            } else if (sortBy === 'lowest') {
-                filtered.sort((a, b) => a.averageScore - b.averageScore);
-            } else if (sortBy === 'name-asc') {
-                filtered.sort((a, b) => a.name.localeCompare(b.name));
-            } else if (sortBy === 'name-desc') {
-                filtered.sort((a, b) => b.name.localeCompare(a.name));
-            }
-            
-            filteredFinalGrades = filtered;
-            displayFinalGrades(filteredFinalGrades);
-            updateFinalGradesStats(filteredFinalGrades);
-        };
-
-        async function loadActivities() {
-            try {
-                allActivities = [];
-                
-                const scheduledQuery = query(
-                    collection(db, 'scheduledTests'),
-                    where('professorEmail', '==', currentProfessor.email)
-                );
-                const scheduledSnapshot = await getDocs(scheduledQuery);
-                
-                scheduledSnapshot.forEach(docSnap => {
-                    const activity = docSnap.data();
-                    if (!allActivities.find(a => a.testName === activity.testName)) {
-                        allActivities.push({
-                            id: docSnap.id,
-                            name: activity.testName,
-                            section: activity.section,
-                            type: 'scheduled'
-                        });
-                    }
-                });
-                
-                if (allGrades.length > 0) {
-                    const uniqueActivities = new Set();
-                    allGrades.forEach(grade => {
-                        if (grade.testName && !uniqueActivities.has(grade.testName)) {
-                            uniqueActivities.add(grade.testName);
-                            allActivities.push({
-                                id: `result_${grade.id}`,
-                                name: grade.testName,
-                                section: grade.section,
-                                type: 'completed'
-                            });
-                        }
-                    });
-                }
-                
-                console.log('Loaded activities:', allActivities.length);
-                
-            } catch (error) {
-                console.error('Error loading activities:', error);
-            }
-        }
-
-        async function loadStudents() {
-            try {
-                allStudents = [];
-                const studentIds = new Set();
-                
-                for (const section of assignedSections) {
-                    const studentsQuery = query(
-                        collection(db, 'students'),
-                        where('section', '==', section.section)
-                    );
-                    const studentsSnapshot = await getDocs(studentsQuery);
-                    
-                    studentsSnapshot.forEach(docSnap => {
-                        const student = docSnap.data();
-                        const uniqueId = student.email || student.umakId || docSnap.id;
-                        
-                        if (!studentIds.has(uniqueId)) {
-                            studentIds.add(uniqueId);
-                            allStudents.push({
-                                id: docSnap.id,
-                                ...student,
-                                section: section.section
-                            });
-                        }
-                    });
-                }
-                
-            } catch (error) {
-                console.error('Error loading students:', error);
-            }
-        }
-
-        function getGradeStatus(score) {
-            if (score >= 90) return 'grade-excellent';
-            if (score >= 80) return 'grade-good';
-            if (score >= 70) return 'grade-fair';
-            return 'grade-poor';
-        }
-
-        function getScoreClass(score) {
-            if (score >= 90) return 'score-excellent';
-            if (score >= 70) return 'score-good';
-            return 'score-poor';
-        }
-
-        function getBadgeClass(score) {
-            if (score >= 90) return 'badge-excellent';
-            if (score >= 80) return 'badge-good';
-            if (score >= 70) return 'badge-fair';
-            return 'badge-poor';
-        }
-
-        function getRating(score) {
-            if (score >= 90) return { text: 'Excellent', class: 'badge-excellent' };
-            if (score >= 80) return { text: 'Good', class: 'badge-good' };
-            if (score >= 70) return { text: 'Fair', class: 'badge-fair' };
-            return { text: 'Needs Improvement', class: 'badge-poor' };
-        }
-
-        function displayFinalGrades(finalGrades) {
-            const tableBody = document.getElementById('finalGradesBody');
-            
-            if (finalGrades.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7">
-                            <div class="empty-state">
-                                <div class="empty-icon">📈</div>
-                                <div class="empty-title">No Student Grades Found</div>
-                                <div class="empty-text">
-                                    No student grades match your current filters.<br>
-                                    Try adjusting your filter settings or add activities first.
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                
-                document.getElementById('savePdfBtn').style.display = 'none';
-                
-                return;
-            }
-            
-            const summaryCard = document.getElementById('resultsSummary');
-            if (finalGrades.length > 0) {
-                summaryCard.style.display = 'block';
-                
-                let totalResults = 0;
-                let totalScore = 0;
-                
-                finalGrades.forEach(grade => {
-                    totalResults += grade.totalActivities;
-                    totalScore += grade.averageScore;
-                });
-                
-                document.getElementById('totalResults').textContent = totalResults;
-                document.getElementById('uniqueStudents').textContent = finalGrades.length;
-                
-                const avgScore = totalScore / finalGrades.length;
-                document.getElementById('averageScore').textContent = avgScore.toFixed(2) + '%';
-            }
-            
-            let html = '';
-            finalGrades.forEach((grade, index) => {
-                const badgeClass = getBadgeClass(grade.averageScore);
-                const rating = getRating(grade.averageScore);
-                
-                html += `
-                    <tr onclick="showStudentGrades('${grade.studentKey}')" style="cursor: pointer;">
-                        <td data-label="Student Name">
-                            <div style="position: relative;">
-                                <strong>${grade.name || 'Unknown Student'}</strong>
-                                ${grade.email ? `<br><small class="text-gray-500">${grade.email}</small>` : ''}
-                            </div>
-                        </td>
-                        <td data-label="Section">${grade.section || 'N/A'}</td>
-                        <td data-label="Total Activities"><strong>${grade.totalActivities}</strong></td>
-                        <td data-label="Average Score">
-                            <span class="${grade.status}">${grade.averageScore.toFixed(2)}%</span>
-                        </td>
-                        <td data-label="Status">
-                            <span class="badge ${badgeClass}">
-                                ${grade.statusText}
-                            </span>
-                        </td>
-                        <td data-label="Actions">
-                            <button class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1 transition-all duration-300" onclick="event.stopPropagation(); showStudentGrades('${grade.studentKey}')">
-                                <i class="fas fa-eye"></i> View Details
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tableBody.innerHTML = html;
-            
-            document.getElementById('savePdfBtn').style.display = 'inline-flex';
-        }
-
-        window.showStudentGrades = function(studentKey) {
-            const studentData = currentFinalGrades.find(g => g.studentKey === studentKey);
-            if (!studentData) return;
-            
-            console.log('📋 Opening grades details for:', studentData.name);
-            
-            document.getElementById('modalStudentName').textContent = `${studentData.name}'s Grades Details (${studentData.totalActivities} activities)`;
-            
-            const nameParts = studentData.name.split(' ');
-            const initials = (nameParts[0]?.charAt(0) || '') + (nameParts[nameParts.length - 1]?.charAt(0) || '');
-            
-            document.getElementById('studentAvatar').textContent = initials.toUpperCase();
-            document.getElementById('studentNameDetail').textContent = studentData.name;
-            document.getElementById('studentSectionDetail').textContent = `${studentData.section} • ${studentData.email || ''}`;
-            document.getElementById('studentInfoHeader').style.display = 'flex';
-            
-            const sortedActivities = studentData.activityInstances.sort((a, b) => {
-                const dateA = new Date(a.date || a.formattedDate || '');
-                const dateB = new Date(b.date || b.formattedDate || '');
-                return dateB - dateA;
-            });
-            
-            let html = '';
-            sortedActivities.forEach((activity) => {
-                const dateFormatted = activity.date || activity.formattedDate || 'N/A';
-                const rating = getRating(activity.score);
-                const scoreClass = getScoreClass(activity.score);
-                
-                html += `
-                <tr>
-                    <td>${dateFormatted}</td>
-                    <td><strong>${activity.name}</strong></td>
-                    <td>${activity.result || '-'}</td>
-                    <td>
-                        <span class="score-badge ${scoreClass}">${activity.score.toFixed(1)}%</span>
-                    </td>
-                    <td>
-                        <span class="badge ${rating.class}">${rating.text}</span>
-                    </td>
-                </tr>
-                `;
-            });
-            
-            document.getElementById('studentGradesTableBody').innerHTML = html;
-            
-            document.getElementById('studentGradesModal').style.display = 'flex';
-            
-            const modalBody = document.getElementById('modalBodyContent');
-            if (modalBody) {
-                modalBody.scrollTop = 0;
-            }
-        };
-
-        window.closeStudentGradesModal = function() {
-            document.getElementById('studentGradesModal').style.display = 'none';
-        };
-        
-        function updateFinalGradesStats(finalGrades) {
-            if (finalGrades.length === 0) {
-                document.getElementById('totalStudents').textContent = '0';
-                document.getElementById('passedStudents').textContent = '0';
-                document.getElementById('failedStudents').textContent = '0';
-                document.getElementById('overallAverage').textContent = '0.00%';
-                return;
-            }
-            
-            const totalStudents = finalGrades.length;
-            const passedStudents = finalGrades.filter(g => g.averageScore >= 70).length;
-            const failedStudents = totalStudents - passedStudents;
-            
-            const totalAverage = finalGrades.reduce((sum, grade) => sum + grade.averageScore, 0);
-            const overallAverage = totalAverage / totalStudents;
-            
-            document.getElementById('totalStudents').textContent = totalStudents;
-            document.getElementById('passedStudents').textContent = passedStudents;
-            document.getElementById('failedStudents').textContent = failedStudents;
-            document.getElementById('overallAverage').textContent = overallAverage.toFixed(2) + '%';
-        }
-
-        window.calculateFinalGrades = function() {
-            try {
-                if (allGrades.length === 0) {
-                    showWarningModal('No grades available to calculate final grades.', () => {}, () => {});
-                    return;
-                }
-
-                calculateAndDisplayFinalGrades();
-                showSuccessModal(`✅ Successfully calculated final grades for ${currentFinalGrades.length} students using BEST scores!`);
-
-            } catch (error) {
-                console.error('Error calculating final grades:', error);
-                showErrorModal('Error calculating final grades: ' + error.message);
-            }
-        }
-
-        window.exportGrades = function() {
-            if (filteredFinalGrades.length === 0) {
-                showWarningModal('No final grades to export', () => {}, () => {});
-                return;
-            }
-            
-            let csv = 'Student Name,Section,Total Activities,Average Score,Status\n';
-            
-            filteredFinalGrades.forEach(grade => {
-                csv += `"${grade.name || ''}","${grade.section || ''}",${grade.totalActivities || 0},${grade.averageScore || 0},"${grade.statusText || ''}"\n`;
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `final_grades_${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-            
-            showSuccessModal('✅ Final grades exported successfully!');
-        }
-
-        window.saveFinalGradesToPDF = function() {
-            showInfoModal('PDF export feature would be implemented here.\nFor now, you can use the browser\'s Print function (Ctrl+P) and save as PDF.');
-        }
-
-        window.editGrade = editGrade;
-        window.closeEditModal = closeEditModal;
-        window.saveGrade = saveGrade;
-        window.calculateFinalGrades = calculateFinalGrades;
-        window.exportGrades = exportGrades;
-        window.saveFinalGradesToPDF = saveFinalGradesToPDF;
-        window.showStudentGrades = showStudentGrades;
-        window.closeStudentGradesModal = closeStudentGradesModal;
-
-        function editGrade(gradeId) {
-            const grade = allGrades.find(g => g.id === gradeId);
-            if (!grade) {
-                showErrorModal('Grade not found');
-                return;
-            }
-            
-            document.getElementById('editStudentName').value = grade.studentName || '';
-            document.getElementById('editActivityName').value = grade.testName || '';
-            document.getElementById('editScore').value = grade.score || 0;
-            document.getElementById('editRemarks').value = grade.remarks || '';
-            document.getElementById('editGradeId').value = gradeId;
-            
-            document.getElementById('editGradeModal').style.display = 'flex';
-        }
-
-        function closeEditModal() {
-            document.getElementById('editGradeModal').style.display = 'none';
-        }
-
-        async function saveGrade() {
-            const gradeId = document.getElementById('editGradeId').value;
-            const newScore = parseFloat(document.getElementById('editScore').value);
-            const remarks = document.getElementById('editRemarks').value;
-            
-            if (isNaN(newScore) || newScore < 0 || newScore > 100) {
-                showWarningModal('Please enter a valid score between 0 and 100', () => {}, () => {});
-                return;
-            }
-            
-            try {
-                const gradeRef = doc(db, 'testResults', gradeId);
-                await updateDoc(gradeRef, {
-                    score: newScore,
-                    remarks: remarks,
-                    isProfessorOverride: true,
-                    updatedAt: new Date()
-                });
-                
-                showSuccessModal('✅ Grade updated successfully!');
-                closeEditModal();
-                await loadGrades();
-                
-            } catch (error) {
-                console.error('Error updating grade:', error);
-                showErrorModal('Error updating grade: ' + error.message);
             }
         }
     </script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c5cfe0; border-radius: 3px; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeSlide { animation: fadeSlide 0.3s ease; }
+        .spinner { width: 44px; height: 44px; border-radius: 50%; border: 3px solid rgba(200,168,75,0.2); border-top-color: #c8a84b; animation: spin 0.9s linear infinite; }
+
+        .nav-active { position: relative; }
+        .nav-active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #c8a84b; border-radius: 0 2px 2px 0; }
+
+        .stat-card { transition: all 0.22s; background: white; border: 1px solid #e1e6ef; border-radius: 16px; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.09); }
+
+        .profile-btn:hover { background: rgba(255,255,255,0.12); }
+        .profile-dropdown {
+            opacity: 0; visibility: hidden; transform: translateY(-8px);
+            transition: all 0.2s ease;
+        }
+        .profile-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        #hamburgerBtn { display: none; }
+        @media (max-width: 768px) {
+            #hamburgerBtn { display: flex !important; align-items: center; justify-content: center; }
+        }
+        #hamburgerBtn.hamburger-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        #hamburgerBtn.hamburger-open span:nth-child(2) { opacity: 0; }
+        #hamburgerBtn.hamburger-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        #hamburgerBtn span { transition: transform 0.25s ease, opacity 0.2s ease; }
+
+        .sidebar-transition { transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); }
+        @media (max-width: 768px) {
+            #mainSidebar { transform: translateX(-100%); }
+            #mainSidebar.sidebar-open { transform: translateX(0); }
+            main { margin-left: 0 !important; }
+        }
+
+        .modal-overlay { display: none; }
+        .modal-overlay.open { display: flex; }
+
+        @media (max-width: 768px) {
+            #headerDate, #headerDivider, #headerNameBlock { display: none; }
+        }
+
+        /* Table styling - exactly like the image */
+        .grades-table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
+        .grades-table thead tr {
+            background: linear-gradient(90deg, rgba(10,22,40,0.92) 0%, rgba(30,77,140,0.92) 100%);
+        }
+        .grades-table th {
+            color: white; font-weight: 600; font-size: 14px;
+            text-align: left; padding: 15px 12px; white-space: nowrap;
+        }
+        .grades-table td {
+            font-weight: 500; color: #1e293b; font-size: 14px;
+            padding: 16px 12px; border-bottom: 1px solid #f1f5f9;
+        }
+        .grades-table tbody tr { transition: all 0.3s; cursor: pointer; }
+        .grades-table tbody tr:hover { background-color: #f8fafc; }
+
+        /* Score badges */
+        .score-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .score-excellent { background-color: #d1fae5; color: #065f46; }
+        .score-good { background-color: #fef3c7; color: #92400e; }
+        .score-poor { background-color: #fee2e2; color: #991b1b; }
+
+        /* Status badges */
+        .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 12px; text-align: center; min-width: 80px; }
+        .status-active { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .status-warning { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .status-danger { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        /* Button styles */
+        .btn-action { padding: 6px 12px; border: none; border-radius: 20px; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .btn-view { background: linear-gradient(135deg, #4a5a72 0%, #2d3d52 100%); color: white; }
+        .btn-view:hover { background: linear-gradient(135deg, #2d3d52 0%, #1a2b3c 100%); transform: translateY(-2px); }
+
+        /* Filter select */
+        .filter-select {
+            padding: 8px 36px 8px 14px; border: 1px solid #e1e6ef; border-radius: 6px;
+            font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+            color: #0a1628; background: white; cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%232d6fc4'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 10px center; background-size: 18px;
+            transition: all 0.2s;
+        }
+        .filter-select:hover { border-color: #2d6fc4; }
+        .filter-select:focus { outline: none; border-color: #2d6fc4; box-shadow: 0 0 0 3px rgba(45,111,196,0.1); }
+
+        /* Detail modal table */
+        .detail-table { width: 100%; border-collapse: collapse; }
+        .detail-table thead { background: linear-gradient(90deg, rgba(10,22,40,0.92) 0%, rgba(30,77,140,0.92) 100%); }
+        .detail-table th { color: white; font-weight: 600; font-size: 13px; text-align: left; padding: 12px 14px; }
+        .detail-table td { font-size: 13px; padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
+        .detail-table tbody tr:last-child td { border-bottom: none; }
+        .detail-table tbody tr:hover { background: #f8fafc; }
+
+        /* Empty state */
+        .empty-state { padding: 60px 40px; text-align: center; background: #f8fafc; border-radius: 12px; margin: 20px; }
+        .empty-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.4; color: #64748b; }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .grades-table thead { display: none; }
+            .grades-table tbody tr {
+                display: block; margin-bottom: 16px;
+                border: 1px solid #e1e6ef; border-radius: 12px;
+                background: white; padding: 16px;
+            }
+            .grades-table tbody td {
+                display: flex; justify-content: space-between; align-items: center;
+                padding: 10px 8px; border-bottom: 1px solid #f1f5f9;
+            }
+            .grades-table tbody td:last-child { border-bottom: none; }
+            .grades-table tbody td::before {
+                content: attr(data-label);
+                font-weight: 600; color: #4a5a72; font-size: 12px;
+                min-width: 100px;
+            }
+            .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body class="font-sans bg-surface text-text-primary min-h-screen m-0 p-0">
+
+<!-- LOADING -->
+<div id="loadingScreen" class="fixed inset-0 bg-navy flex flex-col items-center justify-center z-[9999] gap-6">
+    <div class="font-display text-3xl font-extrabold text-accent tracking-widest">UMakFit</div>
+    <div class="text-white/50 text-sm tracking-[3px] uppercase">Professor Grades</div>
+    <div class="spinner"></div>
+</div>
+
+<!-- ALERT MODAL -->
+<div id="alertModal" class="modal-overlay fixed inset-0 bg-black/55 justify-center items-center z-[10000] backdrop-blur-sm p-5">
+    <div class="bg-white rounded-2xl max-w-[440px] w-full shadow-[0_30px_80px_rgba(0,0,0,0.25)] animate-fadeSlide overflow-hidden">
+        <div class="flex items-center justify-between px-6 pt-5">
+            <h3 class="font-display text-[19px] font-bold text-navy" id="alertModalTitle">Alert</h3>
+            <button onclick="closeAlertModal()" class="w-8 h-8 rounded-full bg-surface border-0 flex items-center justify-center cursor-pointer text-text-muted text-sm hover:bg-danger-bg hover:text-danger transition-all">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="px-6 py-5 text-center">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center text-[28px] mx-auto mb-4" id="alertModalIcon"></div>
+            <p class="text-sm text-text-secondary leading-relaxed" id="alertModalMsg"></p>
+        </div>
+        <div class="flex justify-center gap-2 px-6 pb-5 pt-4 border-t border-border">
+            <button onclick="closeAlertModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-royal to-blue text-white border-0 rounded-lg font-sans text-sm font-semibold cursor-pointer transition-all hover:-translate-y-px hover:shadow-lg">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" class="modal-overlay fixed inset-0 bg-black/55 justify-center items-center z-[10000] backdrop-blur-sm p-5">
+    <div class="bg-white rounded-2xl max-w-[440px] w-full shadow-[0_30px_80px_rgba(0,0,0,0.25)] animate-fadeSlide overflow-hidden">
+        <div class="flex items-center justify-between px-6 pt-5">
+            <h3 class="font-display text-[19px] font-bold text-navy">Confirm Action</h3>
+            <button onclick="closeConfirmModal()" class="w-8 h-8 rounded-full bg-surface border-0 flex items-center justify-center cursor-pointer text-text-muted text-sm hover:bg-danger-bg hover:text-danger transition-all">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="px-6 py-5 text-center">
+            <div class="w-16 h-16 rounded-full bg-warning-bg text-warning flex items-center justify-center text-[28px] mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <p class="text-sm text-text-secondary leading-relaxed" id="confirmModalMsg"></p>
+        </div>
+        <div class="flex justify-center gap-2 px-6 pb-5 pt-4 border-t border-border">
+            <button onclick="closeConfirmModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-transparent text-text-secondary border border-border rounded-lg font-sans text-sm font-semibold cursor-pointer hover:bg-surface transition-all">Cancel</button>
+            <button id="confirmModalYesBtn" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-[#991b1b] to-danger text-white border-0 rounded-lg font-sans text-sm font-semibold cursor-pointer transition-all">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- STUDENT DETAIL MODAL -->
+<div id="studentDetailModal" class="modal-overlay fixed inset-0 bg-black/55 justify-center items-center z-[10000] backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl w-full max-w-[800px] max-h-[88vh] flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.25)] animate-fadeSlide overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-border bg-white flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-sm flex-shrink-0" id="detailAvatar">?</div>
+                <div>
+                    <div class="font-display text-[17px] font-bold text-navy" id="detailStudentName">Student</div>
+                    <div class="text-xs text-text-muted" id="detailStudentSection">Section</div>
+                </div>
+            </div>
+            <button onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-surface border-0 flex items-center justify-center cursor-pointer text-text-muted hover:bg-danger-bg hover:text-danger transition-all text-sm">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="bg-gradient-to-br from-navy to-navy-light rounded-xl p-4 text-center text-white">
+                    <div class="text-2xl font-bold font-mono" id="detailTotalAct">0</div>
+                    <div class="text-[11px] text-white/55 mt-1 uppercase tracking-wide">Activities</div>
+                </div>
+                <div class="bg-gradient-to-br from-royal to-blue rounded-xl p-4 text-center text-white">
+                    <div class="text-2xl font-bold font-mono" id="detailAvgScore">0%</div>
+                    <div class="text-[11px] text-white/55 mt-1 uppercase tracking-wide">Average</div>
+                </div>
+                <div class="rounded-xl p-4 text-center text-white" id="detailStatusCard">
+                    <div class="text-2xl font-bold" id="detailStatusText">—</div>
+                    <div class="text-[11px] text-white/55 mt-1 uppercase tracking-wide">Status</div>
+                </div>
+            </div>
+            
+            <!-- Activities Table -->
+            <h4 class="text-navy font-display font-bold text-lg mb-4 flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white text-[11px]">
+                    <i class="fas fa-history"></i>
+                </div>
+                Activity History
+            </h4>
+            <div class="rounded-xl border border-border overflow-hidden">
+                <table class="detail-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Activity</th>
+                            <th>Result</th>
+                            <th>Score</th>
+                            <th>Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="flex justify-end px-6 py-4 border-t border-border bg-surface flex-shrink-0">
+            <button onclick="closeDetailModal()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-navy text-white rounded-lg font-sans text-sm font-semibold cursor-pointer hover:bg-navy-light transition-all">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="mainContent" style="display:none;">
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div id="sidebarOverlay" onclick="closeSidebar()" class="hidden fixed inset-0 bg-navy/60 backdrop-blur-sm z-[399]"></div>
+
+    <!-- TOP HEADER -->
+    <header class="fixed top-0 left-0 right-0 h-[70px] bg-navy flex items-center px-4 md:px-8 z-[500] border-b border-white/[0.06] shadow-[0_2px_20px_rgba(0,0,0,0.25)]">
+        <button id="hamburgerBtn" onclick="toggleSidebar()"
+            class="flex-col gap-[5px] w-10 h-10 bg-white/[0.08] border border-white/[0.12] rounded-lg cursor-pointer mr-3 flex-shrink-0">
+            <span class="block w-[18px] h-0.5 bg-white/80 rounded"></span>
+            <span class="block w-[18px] h-0.5 bg-white/80 rounded"></span>
+            <span class="block w-[18px] h-0.5 bg-white/80 rounded"></span>
+        </button>
+
+        <div class="flex items-center gap-3.5 flex-1 min-w-0">
+            <div class="w-10 h-10 bg-accent/15 border border-accent/30 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+                <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="w-8 h-8 object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="font-display font-extrabold text-accent text-lg hidden items-center justify-center">U</div>
+            </div>
+            <div class="min-w-0">
+                <div class="text-[13px] font-semibold text-white/85 tracking-[0.3px] truncate">University of Makati</div>
+                <div class="text-[11px] text-accent tracking-[1.5px] uppercase font-medium truncate">UMakFit — Professor Portal</div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 md:gap-4 flex-shrink-0">
+            <div id="headerDate" class="text-xs text-white/40 tracking-[0.5px]"></div>
+            <div id="headerDivider" class="w-px h-7 bg-white/10"></div>
+            <div class="relative">
+                <div id="profileCircle" onclick="toggleProfileDropdown()"
+                    class="profile-btn flex items-center gap-2.5 bg-white/[0.07] border border-white/10 rounded-xl px-3 py-1.5 cursor-pointer transition-all">
+                    <div id="profileAvatarSmall" class="w-8 h-8 rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-sm overflow-hidden flex-shrink-0">P</div>
+                    <div id="headerNameBlock">
+                        <div class="text-[13px] font-semibold text-white" id="headerName">Professor</div>
+                        <div class="text-[11px] text-white/45">Faculty Member</div>
+                    </div>
+                    <i class="fas fa-chevron-down text-[10px] text-white/40 ml-1"></i>
+                </div>
+
+                <div id="profileDropdown" class="profile-dropdown absolute top-[calc(100%+12px)] right-0 w-[280px] bg-white rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] border border-border z-[1000]">
+                    <div class="bg-gradient-to-br from-navy to-navy-light p-5 rounded-t-2xl text-center">
+                        <div id="profileDropdownAvatar" class="w-[52px] h-[52px] rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-xl mx-auto mb-2.5 overflow-hidden">P</div>
+                        <div class="text-[15px] font-bold text-white" id="dropdownName">Professor</div>
+                        <div class="text-xs text-white/55 mt-1 break-all" id="dropdownEmail">professor@umak.edu.ph</div>
+                        <div class="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent/20 border border-accent/30 text-accent-light text-[11px] font-semibold tracking-[0.5px]">
+                            <i class="fas fa-chalkboard-teacher mr-1"></i> Faculty Member
+                        </div>
+                    </div>
+                    <div class="p-2">
+                        <a href="professor-profile.html" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg no-underline text-text-secondary text-[13px] font-medium hover:bg-surface hover:text-text-primary transition-all">
+                            <i class="fas fa-user-circle w-4 text-center"></i><span>View Profile</span>
+                        </a>
+                        <div class="h-px bg-border my-1 mx-2"></div>
+                        <a href="#" onclick="handleLogout(event)" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg no-underline text-danger text-[13px] font-medium hover:bg-danger-bg transition-all">
+                            <i class="fas fa-sign-out-alt w-4 text-center"></i><span>Sign Out</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <aside id="mainSidebar"
+        class="sidebar-transition fixed top-[70px] left-0 w-[260px] h-[calc(100vh-70px)] bg-navy-mid border-r border-white/[0.06] flex flex-col overflow-y-auto overflow-x-hidden z-[400] py-6">
+
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mb-2">Main</div>
+        <a href="professor.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-tachometer-alt"></i></div>
+            <span>Dashboard</span>
+        </a>
+
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mt-5 mb-2">Classes</div>
+        <a href="studentmanagement.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-users"></i></div>
+            <span>Students</span>
+        </a>
+
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mt-5 mb-2">Content</div>
+        <a href="addactivities.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-dumbbell"></i></div>
+            <span>Activities</span>
+        </a>
+        <a href="addlesson.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-book-open"></i></div>
+            <span>Lessons</span>
+        </a>
+
+        <div class="text-[10px] font-bold text-white/25 uppercase tracking-[1.5px] px-5 mt-5 mb-2">Analytics</div>
+        <a href="monitoringactivities.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-chart-bar"></i></div>
+            <span>Monitoring</span>
+        </a>
+        <a href="professorgrades.html" class="nav-active flex items-center gap-3 px-5 py-2.5 text-white bg-gradient-to-r from-accent/12 to-accent/[0.04] no-underline text-[13.5px] font-medium">
+            <div class="w-8 h-8 rounded-lg bg-accent/20 text-accent flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-graduation-cap"></i></div>
+            <span>Grades</span>
+        </a>
+        <a href="sectionranklist.html" class="flex items-center gap-3 px-5 py-2.5 text-white/55 no-underline text-[13.5px] font-medium hover:text-white/90 hover:bg-white/5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-[13px] flex-shrink-0"><i class="fas fa-trophy"></i></div>
+            <span>Section Rank</span>
+        </a>
+
+        <div class="mt-auto px-5 pt-4">
+            <div class="bg-accent/10 border border-accent/20 rounded-xl p-3 flex items-center gap-2.5">
+                <div class="w-[30px] h-[30px] rounded-lg bg-accent/15 flex items-center justify-center text-accent text-[13px]"><i class="fas fa-shield-alt"></i></div>
+                <div>
+                    <div class="text-[12px] font-semibold text-white/70">UMakFit</div>
+                    <div class="text-[10px] text-white/35 mt-0.5">College of Human Kinetics</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="ml-[260px] pt-[70px] min-h-screen" style="margin-left: 260px;">
+        <div class="px-6 md:px-10 py-8 pb-20">
+
+            <!-- Page Hero - exactly like the image -->
+            <div class="relative bg-gradient-to-br from-navy via-[#1a4580] to-navy-light rounded-2xl p-7 mb-7 overflow-hidden">
+                <div class="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-accent/[0.07] pointer-events-none"></div>
+                <div class="absolute -bottom-10 right-20 w-36 h-36 rounded-full bg-blue/10 pointer-events-none"></div>
+                <div class="relative flex items-center justify-between gap-5 flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="w-[52px] h-[52px] rounded-2xl bg-accent/15 border border-accent/25 flex items-center justify-center text-accent text-[22px] flex-shrink-0">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-white/50 uppercase tracking-[2px] mb-1">Faculty Member</div>
+                            <div class="font-display text-2xl font-bold text-white mb-1">Grades Management</div>
+                            <div class="text-[13px] text-white/45">View student performance across all sections</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="recalculateGrades()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-royal to-blue hover:from-navy-light hover:to-royal text-white rounded-xl text-sm font-semibold transition-all hover:-translate-y-px hover:shadow-lg">
+                            <i class="fas fa-calculator"></i> Recalculate
+                        </button>
+                        <button onclick="exportGrades()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/15 hover:bg-white/25 text-white rounded-xl text-sm font-semibold border border-white/20 transition-all hover:-translate-y-px">
+                            <i class="fas fa-download"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards - navy themed -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-7">
+                <div class="stat-card p-5">
+                    <div class="w-[42px] h-[42px] rounded-xl bg-navy/10 text-navy flex items-center justify-center text-[17px] mb-3.5">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="text-[11px] font-semibold text-text-muted uppercase tracking-[0.8px] mb-1.5">Total Students</div>
+                    <div class="text-[34px] font-bold font-mono text-text-primary leading-none" id="statTotal">0</div>
+                </div>
+                <div class="stat-card p-5">
+                    <div class="w-[42px] h-[42px] rounded-xl bg-success-bg text-success flex items-center justify-center text-[17px] mb-3.5">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="text-[11px] font-semibold text-text-muted uppercase tracking-[0.8px] mb-1.5">Passed (≥70%)</div>
+                    <div class="text-[34px] font-bold font-mono text-text-primary leading-none" id="statPassed">0</div>
+                </div>
+                <div class="stat-card p-5">
+                    <div class="w-[42px] h-[42px] rounded-xl bg-danger-bg text-danger flex items-center justify-center text-[17px] mb-3.5">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="text-[11px] font-semibold text-text-muted uppercase tracking-[0.8px] mb-1.5">Failed</div>
+                    <div class="text-[34px] font-bold font-mono text-text-primary leading-none" id="statFailed">0</div>
+                </div>
+                <div class="stat-card p-5">
+                    <div class="w-[42px] h-[42px] rounded-xl bg-info-bg text-blue flex items-center justify-center text-[17px] mb-3.5">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="text-[11px] font-semibold text-text-muted uppercase tracking-[0.8px] mb-1.5">Overall Average</div>
+                    <div class="text-[34px] font-bold font-mono text-text-primary leading-none" id="statAvg">0%</div>
+                </div>
+            </div>
+
+            <!-- Grades Table Card -->
+            <div class="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-border flex items-center justify-between flex-wrap gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white text-[13px]">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <span class="text-[15px] font-semibold text-navy">Score Summary</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-info-bg text-blue text-xs font-semibold" id="tableCount">0 students</span>
+                    </div>
+                    <!-- Filters -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <select id="filterSection" class="filter-select" onchange="applyFilters()">
+                            <option value="">All Sections</option>
+                        </select>
+                        <select id="sortBy" class="filter-select" onchange="applyFilters()">
+                            <option value="highest">Highest Score First</option>
+                            <option value="lowest">Lowest Score First</option>
+                            <option value="name-asc">Name A–Z</option>
+                            <option value="name-desc">Name Z–A</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Loading state -->
+                <div id="tableLoading" class="py-16 flex flex-col items-center gap-3">
+                    <div class="spinner" style="width:32px;height:32px;border-width:3px;"></div>
+                    <div class="text-sm text-text-muted">Loading grades...</div>
+                </div>
+
+                <!-- Empty state -->
+                <div id="tableEmpty" class="hidden py-16 px-8 text-center">
+                    <div class="empty-state">
+                        <div class="empty-icon">📊</div>
+                        <div class="font-semibold text-gray-700 mb-1">No Grades Found</div>
+                        <div class="text-gray-500 text-sm">No grades match your current filters, or no activities have been completed yet.</div>
+                    </div>
+                </div>
+
+                <!-- Table - exactly like the image -->
+                <div id="tableWrapper" class="hidden overflow-x-auto">
+                    <table class="grades-table">
+                        <thead>
+                            <tr>
+                                <th style="width:40px">#</th>
+                                <th>Student Name</th>
+                                <th>Section</th>
+                                <th>Activities</th>
+                                <th>Average Score</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function updateHeaderDate() {
+        const el = document.getElementById('headerDate');
+        if (el) el.textContent = new Date().toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+    }
+    updateHeaderDate(); setInterval(updateHeaderDate, 60000);
+
+    function toggleSidebar() {
+        const sb = document.getElementById('mainSidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        const hb = document.getElementById('hamburgerBtn');
+        sb.classList.toggle('sidebar-open');
+        ov.classList.toggle('hidden');
+        hb.classList.toggle('hamburger-open');
+    }
+    function closeSidebar() {
+        document.getElementById('mainSidebar').classList.remove('sidebar-open');
+        document.getElementById('sidebarOverlay').classList.add('hidden');
+        document.getElementById('hamburgerBtn').classList.remove('hamburger-open');
+    }
+
+    window.toggleProfileDropdown = function() {
+        document.getElementById('profileDropdown').classList.toggle('show');
+    };
+    document.addEventListener('click', e => {
+        const dd = document.getElementById('profileDropdown');
+        if (dd && !e.target.closest('#profileCircle') && !dd.contains(e.target)) dd.classList.remove('show');
+    });
+
+    window.showAlert = function(msg, type='info', title='') {
+        const icons  = { success:'check-circle', error:'times-circle', warning:'exclamation-triangle', info:'info-circle' };
+        const titles = { success:'Success', error:'Error', warning:'Warning', info:'Information' };
+        const colors = { success:'bg-success-bg text-success', error:'bg-danger-bg text-danger', warning:'bg-warning-bg text-warning', info:'bg-info-bg text-info' };
+        document.getElementById('alertModalTitle').textContent = title || titles[type];
+        document.getElementById('alertModalMsg').textContent   = msg;
+        const iconWrap = document.getElementById('alertModalIcon');
+        iconWrap.className = `w-16 h-16 rounded-full flex items-center justify-center text-[28px] mx-auto mb-4 ${colors[type]}`;
+        iconWrap.innerHTML = `<i class="fas fa-${icons[type]||'info-circle'}"></i>`;
+        document.getElementById('alertModal').classList.add('open');
+    };
+    window.closeAlertModal = () => document.getElementById('alertModal').classList.remove('open');
+
+    window.showConfirm = function(msg, onYes) {
+        document.getElementById('confirmModalMsg').textContent = msg;
+        const yesBtn = document.getElementById('confirmModalYesBtn');
+        yesBtn.onclick = () => { closeConfirmModal(); onYes(); };
+        document.getElementById('confirmModal').classList.add('open');
+    };
+    window.closeConfirmModal = () => document.getElementById('confirmModal').classList.remove('open');
+
+    window.closeDetailModal = () => document.getElementById('studentDetailModal').classList.remove('open');
+</script>
+
+<script type="module">
+    import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getFirestore, collection, getDocs, query, where, doc, updateDoc, orderBy, Timestamp }
+        from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+        authDomain: "umakfit-e3b1d.firebaseapp.com",
+        projectId: "umakfit-e3b1d",
+        storageBucket: "umakfit-e3b1d.appspot.com",
+        messagingSenderId: "276569891504",
+        appId: "1:276569891504:web:39b1732b519f4d8b785175"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    let currentUser = null, currentProfessor = null;
+    let assignedSections = [];
+    let allGrades = [];
+    let currentFinalGrades = [];
+    let filteredFinalGrades = [];
+
+    // Test categories (same as student grades)
+    const testCategories = {
+        'Cardiorespiratory Endurance': {
+            tests: ['3-Minute Step Test', 'Step Test', '1-Mile Run', 'Mile Run', 'Run'],
+            icon: '❤️',
+            color: 'from-red-500 to-pink-500'
+        },
+        'Muscular Strength and Endurance': {
+            tests: ['Curl-Up Test', 'Curl Up', 'Curl-up', 'Push-Up Test', 'Push Up', 'Push-up', 'Plank', 'Sit-up', 'Sit-up Test'],
+            icon: '💪',
+            color: 'from-blue-500 to-indigo-500'
+        },
+        'Flexibility': {
+            tests: ['Sit-and-Reach', 'Sit and Reach', 'Reach Test'],
+            icon: '🤸',
+            color: 'from-green-500 to-emerald-500'
+        },
+        'Body Composition': {
+            tests: ['Skinfold Caliper Measurements', 'SkinFold', 'Skinfold', 'BMI', 'BMI Test'],
+            icon: '⚖️',
+            color: 'from-purple-500 to-violet-500'
+        }
+    };
+
+    function getCategoryForTest(testName) {
+        if (!testName) return 'Cardiorespiratory Endurance';
+        
+        const testLower = testName.toLowerCase().trim();
+        
+        for (const [category, data] of Object.entries(testCategories)) {
+            for (const testPattern of data.tests) {
+                const patternLower = testPattern.toLowerCase();
+                if (testLower.includes(patternLower) || patternLower.includes(testLower)) {
+                    return category;
+                }
+            }
+        }
+        
+        // Special case handling
+        if (testLower.includes('step') || testLower.includes('mile') || testLower.includes('run') || testLower.includes('cardio')) {
+            return 'Cardiorespiratory Endurance';
+        }
+        if (testLower.includes('push') || testLower.includes('curl') || testLower.includes('plank') || testLower.includes('sit')) {
+            return 'Muscular Strength and Endurance';
+        }
+        if (testLower.includes('reach') || testLower.includes('flexibility')) {
+            return 'Flexibility';
+        }
+        if (testLower.includes('skin') || testLower.includes('bmi') || testLower.includes('body')) {
+            return 'Body Composition';
+        }
+        
+        return 'Cardiorespiratory Endurance';
+    }
+
+    // ========== EXACT SAME CALCULATION FUNCTION AS STUDENT GRADES ==========
+    function calculateActivityScore(testName, result, testTarget = null) {
+        const normalized = testName.toLowerCase().trim();
+        
+        // Always return 100 for these tests regardless of result
+        if (normalized.includes('skinfold') || 
+            normalized.includes('step test') || 
+            normalized.includes('3-minute') ||
+            normalized.includes('skin fold')) {
+            return 100;
+        }
+        
+        // Check if professor already set a final score
+        if (result && typeof result === 'object' && result !== null) {
+            if (result.score !== undefined && result.score !== null) {
+                const score = parseFloat(result.score);
+                if (!isNaN(score) && score >= 0 && score <= 100) {
+                    console.log(`✅ Using stored professor score: ${score} for ${testName}`);
+                    return score;
+                }
+            }
+        }
+        
+        // Extract numeric value from result
+        let numericValue = 0;
+        
+        if (typeof result === 'object' && result !== null) {
+            numericValue = result.repetitions || result.time || result.distance || 
+                          result.value || result.result || result.count || 
+                          result.score || 0;
+        } else if (typeof result === 'string') {
+            const match = result.match(/(\d+\.?\d*)/);
+            if (match) {
+                numericValue = parseFloat(match[1]);
+            } else {
+                numericValue = parseFloat(result) || 0;
+            }
+        } else {
+            numericValue = parseFloat(result) || 0;
+        }
+        
+        console.log(`🎯 Calculating: ${testName} | Value: ${numericValue} | Target: ${testTarget}`);
+        
+        // Use test target if available
+        if (testTarget && testTarget > 0) {
+            if (normalized.includes('push-up') || normalized.includes('pushup') || 
+                normalized.includes('sit-up') || normalized.includes('situp') ||
+                normalized.includes('curl-up') || normalized.includes('curl up')) {
+                
+                const reps = numericValue;
+                if (reps >= testTarget) return 100;
+                
+                const percentage = (reps / testTarget) * 100;
+                let score = Math.min(100, Math.max(50, percentage));
+                
+                if (percentage >= 100) score = 100;
+                else if (percentage >= 90) score = 95;
+                else if (percentage >= 80) score = 90;
+                else if (percentage >= 70) score = 85;
+                else if (percentage >= 60) score = 80;
+                else if (percentage >= 50) score = 75;
+                
+                return Math.round(score);
+            }
+            
+            if (normalized.includes('plank')) {
+                let seconds = numericValue;
+                if (seconds >= testTarget) return 100;
+                
+                const percentage = (seconds / testTarget) * 100;
+                let score = Math.min(100, Math.max(50, percentage));
+                
+                if (percentage >= 100) score = 100;
+                else if (percentage >= 90) score = 95;
+                else if (percentage >= 80) score = 90;
+                else if (percentage >= 70) score = 85;
+                else if (percentage >= 60) score = 80;
+                else if (percentage >= 50) score = 75;
+                
+                return Math.round(score);
+            }
+            
+            if (normalized.includes('sit-and-reach') || normalized.includes('reach')) {
+                const distance = numericValue;
+                if (distance >= testTarget) return 100;
+                
+                const percentage = (distance / testTarget) * 100;
+                let score = Math.min(100, Math.max(50, percentage));
+                
+                if (percentage >= 100) score = 100;
+                else if (percentage >= 90) score = 95;
+                else if (percentage >= 80) score = 90;
+                else if (percentage >= 70) score = 85;
+                else if (percentage >= 60) score = 80;
+                else if (percentage >= 50) score = 75;
+                
+                return Math.round(score);
+            }
+            
+            if (normalized.includes('grip')) {
+                if (numericValue >= testTarget) return 100;
+                
+                const percentage = (numericValue / testTarget) * 100;
+                let score = Math.min(100, Math.max(50, percentage));
+                
+                if (percentage >= 90) score = 95;
+                else if (percentage >= 80) score = 90;
+                else if (percentage >= 70) score = 85;
+                else if (percentage >= 60) score = 80;
+                else if (percentage >= 50) score = 75;
+                
+                return Math.round(score);
+            }
+            
+            if (normalized.includes('mile') || normalized.includes('run')) {
+                if (numericValue <= testTarget) return 100;
+                
+                const percentage = (testTarget / numericValue) * 100;
+                let score = Math.min(100, Math.max(50, percentage));
+                
+                if (percentage >= 90) score = 95;
+                else if (percentage >= 80) score = 90;
+                else if (percentage >= 70) score = 85;
+                else if (percentage >= 60) score = 80;
+                else if (percentage >= 50) score = 75;
+                
+                return Math.round(score);
+            }
+            
+            if (normalized.includes('step test') || normalized.includes('3-minute')) {
+                if (numericValue <= testTarget) return 100;
+                
+                const percentage = (testTarget / numericValue) * 100;
+                let score = Math.min(100, Math.max(50, percentage));
+                
+                if (percentage >= 90) score = 95;
+                else if (percentage >= 80) score = 90;
+                else if (percentage >= 70) score = 85;
+                else if (percentage >= 60) score = 80;
+                else if (percentage >= 50) score = 75;
+                
+                return Math.round(score);
+            }
+        }
+        
+        // Fallback scoring
+        return calculateDefaultScore(normalized, numericValue);
+    }
+
+    function calculateDefaultScore(normalized, numericValue) {
+        if (normalized.includes('push-up') || normalized.includes('pushup')) {
+            if (numericValue >= 40) return 100;
+            if (numericValue >= 30) return 90;
+            if (numericValue >= 20) return 80;
+            if (numericValue >= 15) return 70;
+            return 60;
+        }
+        
+        if (normalized.includes('curl-up') || normalized.includes('curl up')) {
+            if (numericValue >= 75) return 100;
+            if (numericValue >= 50) return 90;
+            if (numericValue >= 30) return 80;
+            if (numericValue >= 20) return 70;
+            return 60;
+        }
+        
+        if (normalized.includes('plank')) {
+            if (numericValue >= 120) return 100;
+            if (numericValue >= 90) return 90;
+            if (numericValue >= 60) return 80;
+            if (numericValue >= 45) return 70;
+            return 60;
+        }
+        
+        if (normalized.includes('grip')) {
+            if (numericValue >= 60) return 100;
+            if (numericValue >= 50) return 90;
+            if (numericValue >= 40) return 80;
+            if (numericValue >= 30) return 70;
+            return 60;
+        }
+        
+        if (normalized.includes('sit-and-reach') || normalized.includes('reach')) {
+            if (numericValue >= 20) return 100;
+            if (numericValue >= 15) return 90;
+            if (numericValue >= 10) return 80;
+            if (numericValue >= 5) return 70;
+            return 60;
+        }
+        
+        if (normalized.includes('mile') || normalized.includes('run')) {
+            if (numericValue <= 360) return 100;
+            if (numericValue <= 480) return 90;
+            if (numericValue <= 600) return 80;
+            if (numericValue <= 720) return 70;
+            return 60;
+        }
+        
+        if (normalized.includes('step test') || normalized.includes('3-minute')) {
+            if (numericValue <= 70) return 100;
+            if (numericValue <= 90) return 90;
+            if (numericValue <= 110) return 80;
+            if (numericValue <= 130) return 70;
+            return 60;
+        }
+        
+        if (normalized.includes('bmi')) {
+            if (numericValue >= 18.5 && numericValue <= 24.9) return 100;
+            if (numericValue >= 17 && numericValue <= 27) return 85;
+            return 65;
+        }
+        
+        return 75;
+    }
+
+    // ─── AUTH ───
+    onAuthStateChanged(auth, async user => {
+        if (!user) { window.location.href = '/login/index.html'; return; }
+        try {
+            currentUser = user;
+            await loadProfessorData(user);
+            setupUI(user);
+            await loadAssignedSections();
+            await loadGrades();
+            buildFinalGrades();
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        } catch(err) {
+            console.error(err);
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            showAlert('Error loading grades: ' + err.message, 'error');
+        }
+    });
+
+    // ─── PROFESSOR DATA ───
+    async function loadProfessorData(user) {
+        const email = user.email.toLowerCase();
+        const q1 = await getDocs(query(collection(db,'professors'), where('email','==',email)));
+        if (!q1.empty) { currentProfessor = { id: q1.docs[0].id, ...q1.docs[0].data() }; return; }
+        const q2 = await getDocs(query(collection(db,'users'), where('email','==',email), where('role','==','professor')));
+        if (!q2.empty) { currentProfessor = { id: q2.docs[0].id, ...q2.docs[0].data() }; return; }
+        currentProfessor = { name: user.displayName || 'Professor', email: user.email };
+    }
+
+    // ─── UI SETUP ───
+    function setupUI(user) {
+        const profName  = currentProfessor.fullName || currentProfessor.name || user.displayName || 'Professor';
+        const email     = currentProfessor.email || user.email;
+        const initial   = profName.charAt(0).toUpperCase();
+        const shortName = profName.split(',')[0]?.trim() || profName;
+        const photoURL  = user.photoURL || null;
+
+        document.getElementById('headerName').textContent   = shortName;
+        document.getElementById('dropdownName').textContent = profName;
+        document.getElementById('dropdownEmail').textContent = email;
+
+        const setAvatar = (el, src, init) => {
+            if (!el) return;
+            if (src) { el.innerHTML = `<img src="${src}" class="w-full h-full object-cover rounded-full" alt="">`; }
+            else { el.textContent = init; }
+        };
+        setAvatar(document.getElementById('profileAvatarSmall'), photoURL, initial);
+        setAvatar(document.getElementById('profileDropdownAvatar'), photoURL, initial);
+    }
+
+    // ─── LOAD SECTIONS ───
+    async function loadAssignedSections() {
+        assignedSections = [];
+        const profEmail = (currentProfessor.email || currentUser.email).toLowerCase();
+        const sectionSet = new Set();
+
+        // Collect all name variations
+        const nameVariations = new Set();
+        ['fullName','name','displayName'].forEach(f => {
+            if (currentProfessor[f]) nameVariations.add(currentProfessor[f].toUpperCase().trim());
+        });
+        if (currentUser.displayName) nameVariations.add(currentUser.displayName.toUpperCase().trim());
+
+        const profSnap = await getDocs(query(collection(db,'professors'), where('email','==',profEmail)));
+        profSnap.forEach(d => {
+            ['fullName','name','displayName'].forEach(f => {
+                if (d.data()[f]) nameVariations.add(d.data()[f].toUpperCase().trim());
+            });
+        });
+
+        const usersSnap = await getDocs(query(collection(db,'users'), where('email','==',profEmail)));
+        usersSnap.forEach(d => {
+            ['fullName','name','displayName'].forEach(f => {
+                if (d.data()[f]) nameVariations.add(d.data()[f].toUpperCase().trim());
+            });
+        });
+
+        nameVariations.add(profEmail.split('@')[0].toUpperCase().trim());
+        nameVariations.delete('');
+
+        const nameTokens = new Set();
+        nameVariations.forEach(name => name.split(/[\s,\.]+/).forEach(w => { if (w.length >= 3) nameTokens.add(w); }));
+
+        // Scan all sections
+        const secSnap = await getDocs(collection(db,'sections'));
+        secSnap.forEach(d => {
+            const data = d.data();
+            const dbProf      = (data.professor || '').toString().trim().toUpperCase();
+            const dbProfEmail = (data.professorEmail || '').toString().trim().toLowerCase();
+            let isMatch = false;
+
+            if (dbProfEmail && dbProfEmail === profEmail) isMatch = true;
+            if (!isMatch) { for (const v of nameVariations) { if (v && v.length >= 3 && dbProf === v) { isMatch = true; break; } } }
+            if (!isMatch) { for (const v of nameVariations) { if (v && v.length >= 3 && (dbProf.includes(v) || v.includes(dbProf))) { isMatch = true; break; } } }
+            if (!isMatch) { for (const v of nameVariations) { if (v && v.length >= 3) { const ln = v.split(',')[0].trim(); if (ln.length >= 3 && dbProf.includes(ln)) { isMatch = true; break; } } } }
+            if (!isMatch && dbProf.length >= 3) { const dbWords = dbProf.split(/[\s,\.]+/).filter(w => w.length >= 3); for (const w of dbWords) { if (nameTokens.has(w)) { isMatch = true; break; } } }
+            if (!isMatch) { const eu = profEmail.split('@')[0].toUpperCase(); if (eu.length > 3 && dbProf.includes(eu)) isMatch = true; }
+
+            if (isMatch && data.name && !sectionSet.has(data.name)) {
+                sectionSet.add(data.name);
+                assignedSections.push({ id: d.id, section: data.name });
+            }
+        });
+
+        console.log('✅ Sections found:', assignedSections.map(s => s.section));
+
+        // Populate section filter
+        const sel = document.getElementById('filterSection');
+        sel.innerHTML = '<option value="">All Sections</option>';
+        assignedSections.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.section; opt.textContent = s.section;
+            sel.appendChild(opt);
+        });
+    }
+
+    // ─── LOAD GRADES ───
+    async function loadGrades() {
+        allGrades = [];
+        if (!assignedSections.length) return;
+
+        const bestScoresMap = new Map();
+
+        // Load from each assigned section
+        for (const sec of assignedSections) {
+            try {
+                const snap = await getDocs(query(
+                    collection(db,'testResults'),
+                    where('section','==', sec.section),
+                    where('status','==','completed')
+                ));
+
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const studentEmail = data.studentEmail || '';
+                    const testId = data.testId || docSnap.id;
+                    const testName = data.testName || 'Unknown Activity';
+                    const testKey  = `${studentEmail}_${testId}`;
+
+                    // Use the SAME calculation function as student grades
+                    const score = calculateActivityScore(
+                        testName, 
+                        data.result || data.resultData || data.repetitions || data, 
+                        data.testTarget || null
+                    );
+                    
+                    const validScore = Math.max(0, Math.min(100, Math.round(score)));
+
+                    let submittedDate = new Date();
+                    if (data.submittedAt) {
+                        if (typeof data.submittedAt.toDate === 'function') submittedDate = data.submittedAt.toDate();
+                        else if (data.submittedAt.seconds) submittedDate = new Date(data.submittedAt.seconds * 1000);
+                        else if (typeof data.submittedAt === 'string') submittedDate = new Date(data.submittedAt);
+                    }
+
+                    let displayResult = extractResult(data);
+
+                    // Keep only the best score per test per student
+                    if (!bestScoresMap.has(testKey) || validScore > bestScoresMap.get(testKey).score) {
+                        bestScoresMap.set(testKey, {
+                            id: docSnap.id, 
+                            studentName: data.studentName || 'Unknown',
+                            section: data.section || sec.section,
+                            testName, 
+                            result: displayResult, 
+                            score: validScore,
+                            date: submittedDate.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }),
+                            dateObject: submittedDate,
+                            studentEmail, 
+                            studentId: data.studentId || '',
+                            testTarget: data.testTarget || null,
+                            isProfessorOverride: data.isProfessorOverride || false
+                        });
+                    }
+                });
+            } catch(e) { console.error(`Error loading grades for ${sec.section}:`, e); }
+        }
+
+        allGrades = Array.from(bestScoresMap.values()).sort((a,b) => b.dateObject - a.dateObject);
+        console.log(`✅ Loaded ${allGrades.length} unique best scores`);
+    }
+
+    function extractResult(data) {
+        if (data.result !== undefined && data.result !== null) {
+            if (typeof data.result === 'number') return data.result;
+            if (typeof data.result === 'string') { const m = data.result.match(/(\d+\.?\d*)/); return m ? parseFloat(m[1]) : data.result; }
+            if (typeof data.result === 'object') return data.result.value || data.result.repetitions || data.result.time || data.result.distance || 0;
+        }
+        if (data.resultData) {
+            if (typeof data.resultData === 'object') return data.resultData.value || data.resultData.repetitions || data.resultData.time || 0;
+            return data.resultData;
+        }
+        if (data.repetitions !== undefined) return data.repetitions;
+        return '-';
+    }
+
+    // ─── BUILD FINAL GRADES ───
+    function buildFinalGrades() {
+        const map = {};
+        allGrades.forEach(g => {
+            const key = g.studentEmail || `${g.studentName}_${g.section}`.toLowerCase();
+            if (!map[key]) {
+                map[key] = { 
+                    key, 
+                    name: g.studentName, 
+                    section: g.section, 
+                    email: g.studentEmail, 
+                    scores: [], 
+                    instances: [],
+                    categories: {}
+                };
+            }
+            map[key].scores.push(g.score);
+            map[key].instances.push({ 
+                name: g.testName, 
+                date: g.date, 
+                score: g.score, 
+                result: g.result,
+                category: getCategoryForTest(g.testName)
+            });
+        });
+
+        currentFinalGrades = Object.values(map).map(s => {
+            const avg = s.scores.length ? s.scores.reduce((a,b) => a+b, 0) / s.scores.length : 0;
+            return {
+                ...s,
+                averageScore: parseFloat(avg.toFixed(2)),
+                totalActivities: s.scores.length
+            };
+        }).sort((a,b) => b.averageScore - a.averageScore);
+
+        filteredFinalGrades = [...currentFinalGrades];
+        renderTable(filteredFinalGrades);
+        updateStats(filteredFinalGrades);
+    }
+
+    // ─── RENDER TABLE ───
+    function renderTable(grades) {
+        const loading = document.getElementById('tableLoading');
+        const empty   = document.getElementById('tableEmpty');
+        const wrapper = document.getElementById('tableWrapper');
+        const body    = document.getElementById('gradesTableBody');
+        const count   = document.getElementById('tableCount');
+
+        loading.style.display = 'none';
+
+        if (!grades.length) {
+            empty.classList.remove('hidden'); wrapper.classList.add('hidden');
+            count.textContent = '0 students';
+            return;
+        }
+
+        empty.classList.add('hidden'); wrapper.classList.remove('hidden');
+        count.textContent = `${grades.length} student${grades.length !== 1 ? 's' : ''}`;
+
+        body.innerHTML = grades.map((g, i) => {
+            const { badgeClass, statusText, scoreClass } = getGradeInfo(g.averageScore);
+            return `
+            <tr onclick="showDetail('${escKey(g.key)}')">
+                <td data-label="#" style="color:#64748b; font-family:monospace;">${i+1}</td>
+                <td data-label="Student">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, #1e4d8c 0%, #2d6fc4 100%); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:12px; flex-shrink:0;">
+                            ${(g.name || '?').charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <div style="font-weight:600; color:#0a1628;">${g.name || 'Unknown'}</div>
+                            ${g.email ? `<div style="color:#64748b; font-size:11px;">${g.email}</div>` : ''}
+                        </div>
+                    </div>
+                </td>
+                <td data-label="Section">
+                    <span style="display:inline-flex; align-items:center; padding:4px 8px; background:#d6eaf8; color:#1a6fa8; border-radius:12px; font-size:11px; font-weight:600;">${g.section || 'N/A'}</span>
+                </td>
+                <td data-label="Activities">
+                    <span style="font-weight:700; color:#0a1628; font-size:15px;">${g.totalActivities}</span>
+                </td>
+                <td data-label="Average Score">
+                    <span style="font-weight:700; font-size:15px; ${scoreClass}">${g.averageScore.toFixed(2)}%</span>
+                </td>
+                <td data-label="Status">
+                    <span style="display:inline-block; padding:4px 12px; border-radius:20px; font-weight:600; font-size:11px; ${badgeClass}">${statusText}</span>
+                </td>
+                <td>
+                    <button onclick="event.stopPropagation(); showDetail('${escKey(g.key)}')"
+                        style="padding:6px 12px; border:none; border-radius:20px; font-weight:600; font-size:11px; cursor:pointer; background:linear-gradient(135deg, #4a5a72 0%, #2d3d52 100%); color:white; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="fas fa-eye" style="font-size:11px;"></i> View
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function escKey(k) { return (k || '').replace(/'/g, "\\'"); }
+
+    function getGradeInfo(score) {
+        if (score >= 90) return { badgeClass: 'score-excellent', statusText: 'Excellent', scoreClass: 'color:#0e8a5f;' };
+        if (score >= 80) return { badgeClass: 'bg-info-bg text-blue', statusText: 'Good', scoreClass: 'color:#2d6fc4;' };
+        if (score >= 70) return { badgeClass: 'bg-warning-bg text-warning', statusText: 'Passed', scoreClass: 'color:#b07e16;' };
+        return { badgeClass: 'bg-danger-bg text-danger', statusText: 'Failed', scoreClass: 'color:#c0392b;' };
+    }
+
+    function getRating(score) {
+        if (score >= 90) return { text: 'Excellent', cls: 'score-excellent' };
+        if (score >= 80) return { text: 'Good',      cls: 'bg-info-bg text-blue' };
+        if (score >= 70) return { text: 'Fair',      cls: 'bg-warning-bg text-warning' };
+        return { text: 'Needs Work', cls: 'bg-danger-bg text-danger' };
+    }
+
+    // ─── STATS ───
+    function updateStats(grades) {
+        const total  = grades.length;
+        const passed = grades.filter(g => g.averageScore >= 70).length;
+        const failed = total - passed;
+        const avg    = total ? grades.reduce((s,g) => s + g.averageScore, 0) / total : 0;
+        document.getElementById('statTotal').textContent  = total;
+        document.getElementById('statPassed').textContent = passed;
+        document.getElementById('statFailed').textContent = failed;
+        document.getElementById('statAvg').textContent    = avg.toFixed(1) + '%';
+    }
+
+    // ─── DETAIL MODAL ───
+    window.showDetail = function(key) {
+        const g = currentFinalGrades.find(x => x.key === key);
+        if (!g) return;
+
+        document.getElementById('detailAvatar').textContent = (g.name || '?').charAt(0).toUpperCase();
+        document.getElementById('detailStudentName').textContent = g.name || 'Student';
+        document.getElementById('detailStudentSection').textContent = `Section: ${g.section} • ${g.email || ''}`;
+        document.getElementById('detailTotalAct').textContent = g.totalActivities;
+        document.getElementById('detailAvgScore').textContent = g.averageScore.toFixed(2) + '%';
+
+        const { badgeClass, statusText } = getGradeInfo(g.averageScore);
+        const statusCard = document.getElementById('detailStatusCard');
+        
+        // Set gradient based on score
+        if (g.averageScore >= 90) statusCard.style.background = 'linear-gradient(135deg, #0e8a5f, #0a6646)';
+        else if (g.averageScore >= 80) statusCard.style.background = 'linear-gradient(135deg, #2d6fc4, #1e4d8c)';
+        else if (g.averageScore >= 70) statusCard.style.background = 'linear-gradient(135deg, #b07e16, #8a6010)';
+        else statusCard.style.background = 'linear-gradient(135deg, #c0392b, #922b21)';
+        
+        document.getElementById('detailStatusText').textContent = statusText;
+
+        const sorted = [...g.instances].sort((a,b) => new Date(b.date) - new Date(a.date));
+        document.getElementById('detailTableBody').innerHTML = sorted.map(act => {
+            const rat = getRating(act.score);
+            return `
+            <tr>
+                <td style="color:#64748b;">${act.date || '—'}</td>
+                <td style="font-weight:600; color:#0a1628;">${act.name}</td>
+                <td style="font-family:monospace;">${act.result !== undefined ? act.result : '—'}</td>
+                <td><span style="font-weight:700; color:#0a1628;">${act.score.toFixed(1)}%</span></td>
+                <td><span style="display:inline-block; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:600; ${rat.cls}">${rat.text}</span></td>
+            </tr>`;
+        }).join('');
+
+        document.getElementById('studentDetailModal').classList.add('open');
+    };
+
+    // ─── FILTERS ───
+    window.applyFilters = function() {
+        const sec  = document.getElementById('filterSection').value;
+        const sort = document.getElementById('sortBy').value;
+
+        let filtered = [...currentFinalGrades];
+        if (sec) filtered = filtered.filter(g => g.section === sec);
+
+        if      (sort === 'highest')   filtered.sort((a,b) => b.averageScore - a.averageScore);
+        else if (sort === 'lowest')    filtered.sort((a,b) => a.averageScore - b.averageScore);
+        else if (sort === 'name-asc')  filtered.sort((a,b) => a.name.localeCompare(b.name));
+        else if (sort === 'name-desc') filtered.sort((a,b) => b.name.localeCompare(a.name));
+
+        filteredFinalGrades = filtered;
+        renderTable(filtered);
+        updateStats(filtered);
+    };
+
+    // ─── RECALCULATE ───
+    window.recalculateGrades = async function() {
+        document.getElementById('tableLoading').style.display = 'flex';
+        document.getElementById('tableWrapper').classList.add('hidden');
+        document.getElementById('tableEmpty').classList.add('hidden');
+        await loadGrades();
+        buildFinalGrades();
+        showAlert(`Recalculated grades for ${currentFinalGrades.length} students.`, 'success', 'Done');
+    };
+
+    // ─── EXPORT ───
+    window.exportGrades = function() {
+        if (!filteredFinalGrades.length) { showAlert('No grades to export.', 'warning'); return; }
+        let csv = 'Student Name,Email,Section,Total Activities,Average Score,Status\n';
+        filteredFinalGrades.forEach(g => {
+            const { statusText } = getGradeInfo(g.averageScore);
+            csv += `"${g.name || ''}","${g.email || ''}","${g.section || ''}",${g.totalActivities},${g.averageScore},"${statusText}"\n`;
+        });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
+        a.download = `grades_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        showAlert('Grades exported successfully!', 'success');
+    };
+
+    // ─── LOGOUT ───
+    window.handleLogout = async function(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        document.getElementById('profileDropdown').classList.remove('show');
+        showConfirm('Are you sure you want to sign out?', async () => {
+            try { await signOut(auth); } catch(err) {}
+            window.location.href = '/login/index.html';
+        });
+    };
+</script>
 </body>
 </html>
