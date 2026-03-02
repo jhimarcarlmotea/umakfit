@@ -1259,7 +1259,7 @@
                                     <th>College</th>
                                     <th>Professor</th>
                                     <th>Students</th>
-                                    <th>Pre-Test Avg</th>
+                                    <th>BMI Avg (Pre)</th>
                                     <th>Post-Test Avg</th>
                                     <th>Improvement</th>
                                     <th>Avg Score</th>
@@ -1375,7 +1375,7 @@
                                     <th>Section</th>
                                     <th>Student ID</th>
                                     <th>Tests Taken</th>
-                                    <th>Pre-Test Avg</th>
+                                    <th>BMI Avg (Pre)</th>
                                     <th>Post-Test Avg</th>
                                     <th>Improvement</th>
                                     <th>Avg Score</th>
@@ -1914,6 +1914,10 @@
     function getBMICategory(bmi) { if (bmi < 18.5) return 'underweight'; if (bmi < 25) return 'normal'; if (bmi < 30) return 'overweight'; return 'obese'; }
     function getBMICategoryDisplay(c) { return { underweight:'Underweight', normal:'Normal', overweight:'Overweight', obese:'Obese' }[c] || 'Unknown'; }
     function getBMICategoryClass(c) { return { underweight:'bmi-underweight', normal:'bmi-normal', overweight:'bmi-overweight', obese:'bmi-obese' }[c] || ''; }
+    function resolveBMICat(cat, bmi) {
+        if (cat) { const c=cat.toLowerCase(); if(c.includes('underweight'))return 'underweight'; if(c.includes('overweight'))return 'overweight'; if(c.includes('obese'))return 'obese'; if(c.includes('normal'))return 'normal'; }
+        return getBMICategory(bmi||0);
+    }
 
     window.handleLogout = async function(e) {
         if (e) { e.preventDefault(); e.stopPropagation(); }
@@ -2013,16 +2017,29 @@
             });
             document.getElementById('totalProfessors').textContent = prof;
             document.getElementById('totalStudents').textContent = stud;
-            const preQ = query(collection(db,'assessments'), where('type','==','pre'));
-            const preS = await getDocs(preQ);
-            document.getElementById('totalPreAssessments').textContent = preS.size;
-            const postS = await getDocs(query(collection(db,'assessments'), where('type','==','post')));
-            document.getElementById('totalPostAssessments').textContent = postS.size;
-            let uw=0,nm=0,ow=0,ob=0;
-            preS.forEach(d => {
-                const bmi = d.data().bmi;
-                if (bmi) { const c=getBMICategory(bmi); if(c==='underweight')uw++; else if(c==='normal')nm++; else if(c==='overweight')ow++; else ob++; }
+            // Count BMI records from users collection
+            const bmiSnap = await getDocs(collection(db, 'BMI'));
+            let preCount = 0, postCount = 0, uw=0, nm=0, ow=0, ob=0;
+            bmiSnap.forEach(d => {
+                const data = d.data();
+                if (!data.bmi) return;
+                const tt = (data.testType || data.type || '').toLowerCase();
+                if (tt === 'pre') {
+                    preCount++;
+                    const cat = (data.category || '').toLowerCase();
+                    if (cat.includes('underweight')) uw++;
+                    else if (cat.includes('overweight')) ow++;
+                    else if (cat.includes('obese')) ob++;
+                    else if (cat.includes('normal')) nm++;
+                    else {
+                        const bmi = parseFloat(data.bmi)||0;
+                        if(bmi>0&&bmi<18.5)uw++; else if(bmi<25)nm++; else if(bmi<30)ow++; else if(bmi>=30)ob++;
+                    }
+                }
+                if (tt === 'post') postCount++;
             });
+            document.getElementById('totalPreAssessments').textContent = preCount;
+            document.getElementById('totalPostAssessments').textContent = postCount;
             document.getElementById('underweightCount').textContent = uw;
             document.getElementById('normalCount').textContent = nm;
             document.getElementById('overweightCount').textContent = ow;
@@ -2182,7 +2199,10 @@
                 <td><span style="font-size:13px;">${s.college}</span></td>
                 <td><span style="font-size:13px;">${s.professor||'Unassigned'}</span></td>
                 <td>${s.studentCount}</td>
-                <td>${s.preTestAvg>0?s.preTestAvg.toFixed(1):'—'}</td>
+                <td>
+                    ${s.bmiAvg>0 ? `<span style="font-weight:600;font-family:'DM Mono',monospace;">${s.bmiAvg.toFixed(2)}</span>
+                    <span class="bmi-pill ${getBMICategoryClass(resolveBMICat(s.bmiCategory, s.bmiAvg))}" style="font-size:9px;padding:2px 5px;margin-left:4px;">${getBMICategoryDisplay(resolveBMICat(s.bmiCategory,s.bmiAvg))}</span>` : '—'}
+                </td>
                 <td>${s.postTestAvg>0?s.postTestAvg.toFixed(1):'—'}</td>
                 <td>${hasData ? `<span class="${impCls}"><i class="fas fa-${impIcon}" style="margin-right:4px;"></i>${s.improvement>0?'+':''}${s.improvement.toFixed(1)}</span>` : '<span style="color:var(--text-muted);">—</span>'}</td>
                 <td><strong>${s.avgScore>0?s.avgScore.toFixed(1):'—'}</strong></td>
@@ -2270,26 +2290,39 @@
             const stuData = {}; studentSections.clear();
 
             // ── Step 1: Load ALL students from users collection
+            // Key by Firebase doc ID (which = Firebase UID = testResults.studentId)
+            const uidToSid = {}; // Firebase UID -> canonical sid
             try {
                 const stuSnap = await getDocs(query(collection(db,'users'), where('role','==','student')));
                 stuSnap.forEach(d => {
                     const data = d.data();
-                    const sid  = data.studentId || data.uid || d.id;
+                    const firebaseUid = d.id; // doc ID = Firebase UID
+                    const umakId = data.umakId || (data.studentId||'').replace(/^student_/i,'') || '';
+                    // Use umakId as canonical key so "BULATAO, JEROME" and "JEROME BULATAO" merge
+                    const sid = umakId || firebaseUid;
                     const name = data.name || data.displayName || data.firstName || data.email?.split('@')[0] || 'Unknown Student';
                     const sec  = data.section || data.assignedSection || data.class || data.sectionName || 'N/A';
-                    if (!stuData[sid]) stuData[sid] = { name, id: sid, section: sec, email: data.email||'', tests:[], preScores:[], postScores:[], allScores:[], hasData: false };
+                    if (!stuData[sid]) stuData[sid] = { name, id: sid, umakId, firebaseUid, section: sec, email: data.email||'', tests:[], preScores:[], postScores:[], allScores:[], hasData: false };
+                    // Register Firebase UID -> sid so testResults can find this entry
+                    uidToSid[firebaseUid] = sid;
+                    if (data.email) uidToSid[data.email.toLowerCase()] = sid;
+                    if (umakId) uidToSid[umakId.toUpperCase()] = sid;
                     if (sec !== 'N/A') studentSections.add(sec);
                 });
             } catch(e) { console.log('Student load failed:', e); }
 
-            // ── Step 2: Overlay test results
+            // ── Step 2: Overlay test results - match by Firebase UID, email, or umakId
             testResults.forEach(t => {
-                const sid  = t.studentId || t.studentEmail || t.studentName;
+                const rawSid = t.studentId || t.studentEmail || t.studentName;
+                const tEmail = (t.studentEmail || t.email || '').toLowerCase();
+                const tUmak  = (t.umakId || '').toUpperCase();
+                // testResults.studentId IS the Firebase UID - look it up in uidToSid map
+                const sid = uidToSid[rawSid] || uidToSid[tEmail] || uidToSid[tUmak] || rawSid;
                 const name = t.studentName || 'Unknown Student';
                 const sec  = t.section || 'N/A';
                 const score = t.score || 0;
                 const type  = t.type  || 'unknown';
-                if (!stuData[sid]) stuData[sid] = { name, id:sid, section:sec, email:'', tests:[], preScores:[], postScores:[], allScores:[], hasData:false };
+                if (!stuData[sid]) stuData[sid] = { name, id:sid, section:sec, email:tEmail, tests:[], preScores:[], postScores:[], allScores:[], hasData:false };
                 stuData[sid].tests.push({ name: t.testName||'Unknown', type, score, date: t.submittedAt });
                 stuData[sid].allScores.push(score);
                 stuData[sid].hasData = true;
@@ -2315,6 +2348,26 @@
                     allScores: data.allScores, tests: data.tests
                 });
             }
+
+            // ── Inject BMI averages from preAssessments into studentRankings
+            studentRankings.forEach(s => {
+                // Match by umakId, email, or studentId
+                const bmiRecords = preAssessments.filter(a => {
+                    const aUmak = a.umakId || (a.studentId||'').replace(/^student_/i,'');
+                    const sUmak = s.id.replace(/^student_/i,'');
+                    return aUmak && aUmak === sUmak ||
+                           (a.email && a.email === s.email) ||
+                           a.studentId === s.id;
+                });
+                if (bmiRecords.length) {
+                    const bmiVals = bmiRecords.map(a => parseFloat(a.bmi)).filter(v => v > 0);
+                    s.bmiAvg = bmiVals.length ? parseFloat((bmiVals.reduce((a,b)=>a+b,0)/bmiVals.length).toFixed(2)) : 0;
+                    s.bmiCategory = bmiRecords[0].category || '';
+                    s.bmiCount = bmiRecords.length;
+                } else {
+                    s.bmiAvg = 0; s.bmiCategory = ''; s.bmiCount = 0;
+                }
+            });
 
             // Students WITH scores ranked desc, then no-score students alphabetically
             const withData    = studentRankings.filter(s=>s.hasData).sort((a,b)=>b.avgScore-a.avgScore);
@@ -2375,7 +2428,10 @@
                 <td><span style="font-size:13px;">${s.section}</span></td>
                 <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${s.id}</span></td>
                 <td>${s.testsTaken || '—'}</td>
-                <td>${s.preTestAvg>0?s.preTestAvg.toFixed(1):'—'}</td>
+                <td>
+                    ${s.bmiAvg>0 ? `<span style="font-weight:600;font-family:'DM Mono',monospace;">${s.bmiAvg.toFixed(2)}</span>
+                    <span class="bmi-pill ${getBMICategoryClass(resolveBMICat(s.bmiCategory, s.bmiAvg))}" style="font-size:9px;padding:2px 5px;margin-left:4px;">${getBMICategoryDisplay(resolveBMICat(s.bmiCategory,s.bmiAvg))}</span>` : '—'}
+                </td>
                 <td>${s.postTestAvg>0?s.postTestAvg.toFixed(1):'—'}</td>
                 <td>${hasData ? `<span class="${ic}"><i class="fas fa-${ii}" style="margin-right:4px;"></i>${s.improvement>0?'+':''}${s.improvement.toFixed(1)}</span>` : '<span style="color:var(--text-muted);">—</span>'}</td>
                 <td><strong>${hasData ? s.avgScore.toFixed(1) : '—'}</strong></td>
@@ -2453,110 +2509,245 @@
     window.closeStudentDetailsModal = function() { document.getElementById('studentDetailsModal').style.display='none'; };
 
     // ── ASSESSMENTS ──
-    async function loadPreAssessments() {
+
+    // Parse date from BMI record - handles ISO strings and Firestore timestamps
+    function parseBMIDate(a) {
+        const raw = a.recordedAt || a.updatedAt || a.assessmentDate || null;
+        if (!raw) return 'N/A';
         try {
-            const q = query(collection(db,'assessments'),where('type','==','pre'),orderBy('assessmentDate','desc'));
-            const snap = await getDocs(q);
-            preAssessments = []; snap.forEach(d => preAssessments.push({id:d.id,...d.data()}));
-            renderPreAssessmentsTable();
-        } catch(e) { preAssessments = []; renderPreAssessmentsTable(); }
+            if (raw && typeof raw.toDate === 'function') return raw.toDate().toLocaleDateString();
+            const d = new Date(raw);
+            if (!isNaN(d)) return d.toLocaleDateString();
+        } catch(e) {}
+        return 'N/A';
     }
 
-    function renderPreAssessmentsTable() {
-        const tbody = document.getElementById('preAssessmentsTableBody'); if (!tbody) return;
-        if (!preAssessments.length) {
-            tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon"><i class="fas fa-clipboard"></i></div><div class="empty-title">No Records</div><div class="empty-sub">No pre-assessment data found.</div></div></td></tr>`;
+    // Resolve BMI category from stored string field first, then calculate
+    function resolveBMICategory(a) {
+        if (a.category) {
+            const c = a.category.toLowerCase();
+            if (c.includes('underweight')) return 'underweight';
+            if (c.includes('overweight')) return 'overweight';
+            if (c.includes('obese')) return 'obese';
+            if (c.includes('normal')) return 'normal';
+        }
+        return getBMICategory(parseFloat(a.bmi) || 0);
+    }
+
+    async function loadPreAssessments() {
+        try {
+            showAlert('preAssessmentAlert', 'Loading pre-assessments...', 'success');
+            preAssessments = [];
+
+            // Scan entire BMI collection and filter client-side (avoids Firestore index requirement)
+            const allSnap = await getDocs(collection(db, 'BMI'));
+            allSnap.forEach(d => {
+                const data = d.data();
+                const tt = (data.testType || data.type || '').toLowerCase();
+                if (tt === 'pre') {
+                    preAssessments.push({ id: d.id, ...data });
+                }
+            });
+
+            // Sort newest first
+            preAssessments.sort((a, b) => {
+                return new Date(b.recordedAt || b.updatedAt || b.assessmentDate || 0) -
+                       new Date(a.recordedAt || a.updatedAt || a.assessmentDate || 0);
+            });
+
+            console.log('Pre-assessments loaded:', preAssessments.length);
+            document.getElementById('totalPreAssessments').textContent = preAssessments.length;
+            renderPreAssessmentsTable();
+            showAlert('preAssessmentAlert', `Loaded ${preAssessments.length} pre-assessment record(s).`, 'success');
+        } catch(e) {
+            console.error('loadPreAssessments error:', e);
+            preAssessments = [];
+            renderPreAssessmentsTable();
+            showAlert('preAssessmentAlert', 'Error: ' + e.message, 'error');
+        }
+    }
+
+    function renderPreAssessmentsTable(data) {
+        const rows = data !== undefined ? data : preAssessments;
+        const tbody = document.getElementById('preAssessmentsTableBody');
+        if (!tbody) return;
+        if (!rows.length) {
+            tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon"><i class="fas fa-clipboard"></i></div><div class="empty-title">No Records</div><div class="empty-sub">No pre-assessment data found in the database.</div></div></td></tr>`;
             return;
         }
-        tbody.innerHTML = preAssessments.map(a => {
-            const bmi = a.bmi||0; const cat = getBMICategory(bmi);
-            const date = a.assessmentDate ? (a.assessmentDate.toDate ? a.assessmentDate.toDate().toLocaleDateString() : new Date(a.assessmentDate).toLocaleDateString()) : 'N/A';
-            return `<tr><td><span class="cell-primary">${a.studentName||'Unknown'}</span></td><td>${a.section||'N/A'}</td><td>${a.height||'N/A'}</td><td>${a.weight||'N/A'}</td><td><strong>${bmi.toFixed(1)}</strong></td><td><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td><td>${date}</td><td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewAssessmentDetails('${a.id}','pre')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
+        tbody.innerHTML = rows.map(a => {
+            const bmi = parseFloat(a.bmi) || 0;
+            const cat = resolveBMICategory(a);
+            const date = parseBMIDate(a);
+            const name = (a.studentName || a.name || a.displayName || 'Unknown').replace(/\b\w/g, c => c.toUpperCase());
+            const section = a.section || a.assignedSection || 'N/A';
+            const umakId = a.umakId || (a.studentId||'').replace(/^student_/i,'') || '';
+            return `<tr>
+                <td>
+                    <div style="font-weight:600;color:var(--navy);">${name}</div>
+                    ${umakId ? `<div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;">${umakId}</div>` : ''}
+                </td>
+                <td>${section}</td>
+                <td>${a.height || 'N/A'}</td>
+                <td>${a.weight || 'N/A'}</td>
+                <td><strong style="font-family:'DM Mono',monospace;">${bmi > 0 ? bmi.toFixed(2) : 'N/A'}</strong></td>
+                <td><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td>
+                <td style="font-size:12px;">${date}</td>
+                <td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewBMIDetails('${a.id}','pre')"><i class="fas fa-eye"></i> View</button></div></td>
+            </tr>`;
         }).join('');
     }
 
     async function loadPostAssessments() {
         try {
-            const q = query(collection(db,'assessments'),where('type','==','post'),orderBy('assessmentDate','desc'));
-            const snap = await getDocs(q);
-            postAssessments = []; snap.forEach(d => postAssessments.push({id:d.id,...d.data()}));
+            showAlert('postAssessmentAlert', 'Loading post-assessments...', 'success');
+            postAssessments = [];
+
+            // Scan entire BMI collection and filter client-side (avoids Firestore index requirement)
+            const allSnap = await getDocs(collection(db, 'BMI'));
+            allSnap.forEach(d => {
+                const data = d.data();
+                const tt = (data.testType || data.type || '').toLowerCase();
+                if (tt === 'post') {
+                    postAssessments.push({ id: d.id, ...data });
+                }
+            });
+
+            // Sort newest first
+            postAssessments.sort((a, b) => {
+                return new Date(b.recordedAt || b.updatedAt || b.assessmentDate || 0) -
+                       new Date(a.recordedAt || a.updatedAt || a.assessmentDate || 0);
+            });
+
+            // Compute BMI change vs matching pre-assessment record
+            postAssessments.forEach(post => {
+                const pre = preAssessments.find(p =>
+                    (p.studentId && p.studentId === post.studentId) ||
+                    (p.email && p.email === post.email) ||
+                    (p.umakId && p.umakId === post.umakId)
+                );
+                if (pre && pre.bmi && post.bmi) {
+                    post._bmiChange = parseFloat(post.bmi) - parseFloat(pre.bmi);
+                }
+            });
+
+            console.log('Post-assessments loaded:', postAssessments.length);
+            document.getElementById('totalPostAssessments').textContent = postAssessments.length;
             renderPostAssessmentsTable();
-        } catch(e) { postAssessments = []; renderPostAssessmentsTable(); }
+            showAlert('postAssessmentAlert', `Loaded ${postAssessments.length} post-assessment record(s).`, 'success');
+        } catch(e) {
+            console.error('loadPostAssessments error:', e);
+            postAssessments = [];
+            renderPostAssessmentsTable();
+            showAlert('postAssessmentAlert', 'Error: ' + e.message, 'error');
+        }
     }
 
-    function renderPostAssessmentsTable() {
-        const tbody = document.getElementById('postAssessmentsTableBody'); if (!tbody) return;
-        if (!postAssessments.length) {
-            tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon"><i class="fas fa-chart-line"></i></div><div class="empty-title">No Records</div><div class="empty-sub">No post-assessment data found.</div></div></td></tr>`;
+    function renderPostAssessmentsTable(data) {
+        const rows = data !== undefined ? data : postAssessments;
+        const tbody = document.getElementById('postAssessmentsTableBody');
+        if (!tbody) return;
+        if (!rows.length) {
+            tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon"><i class="fas fa-chart-line"></i></div><div class="empty-title">No Records</div><div class="empty-sub">No post-assessment data found in the database.</div></div></td></tr>`;
             return;
         }
-        tbody.innerHTML = postAssessments.map(a => {
-            const bmi = a.bmi||0; const cat = getBMICategory(bmi);
-            const date = a.assessmentDate ? (a.assessmentDate.toDate ? a.assessmentDate.toDate().toLocaleDateString() : new Date(a.assessmentDate).toLocaleDateString()) : 'N/A';
-            return `<tr><td><span class="cell-primary">${a.studentName||'Unknown'}</span></td><td>${a.section||'N/A'}</td><td>${a.height||'N/A'}</td><td>${a.weight||'N/A'}</td><td><strong>${bmi.toFixed(1)}</strong></td><td><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td><td>${a.improvement||'No data'}</td><td>${date}</td><td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewAssessmentDetails('${a.id}','post')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
+        tbody.innerHTML = rows.map(a => {
+            const bmi = parseFloat(a.bmi) || 0;
+            const cat = resolveBMICategory(a);
+            const date = parseBMIDate(a);
+            const name = (a.studentName || a.name || a.displayName || 'Unknown').replace(/\b\w/g, c => c.toUpperCase());
+            const section = a.section || a.assignedSection || 'N/A';
+            const umakId = a.umakId || (a.studentId||'').replace(/^student_/i,'') || '';
+            let bmiChangeHtml = '<span style="color:var(--text-muted);">—</span>';
+            if (typeof a._bmiChange === 'number') {
+                const ch = a._bmiChange;
+                const icon = ch < 0 ? 'arrow-down' : ch > 0 ? 'arrow-up' : 'minus';
+                const color = ch < 0 ? 'var(--success)' : ch > 0 ? 'var(--danger)' : 'var(--text-muted)';
+                bmiChangeHtml = `<span style="color:${color};font-weight:600;"><i class="fas fa-${icon}" style="margin-right:3px;"></i>${ch > 0 ? '+' : ''}${ch.toFixed(2)}</span>`;
+            }
+            return `<tr>
+                <td>
+                    <div style="font-weight:600;color:var(--navy);">${name}</div>
+                    ${umakId ? `<div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;">${umakId}</div>` : ''}
+                </td>
+                <td>${section}</td>
+                <td>${a.height || 'N/A'}</td>
+                <td>${a.weight || 'N/A'}</td>
+                <td><strong style="font-family:'DM Mono',monospace;">${bmi > 0 ? bmi.toFixed(2) : 'N/A'}</strong></td>
+                <td><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td>
+                <td>${bmiChangeHtml}</td>
+                <td style="font-size:12px;">${date}</td>
+                <td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewBMIDetails('${a.id}','post')"><i class="fas fa-eye"></i> View</button></div></td>
+            </tr>`;
         }).join('');
     }
 
-    window.refreshPreAssessments = function() { showAlert('preAssessmentAlert','Refreshing…','success'); loadPreAssessments(); };
-    window.refreshPostAssessments = function() { showAlert('postAssessmentAlert','Refreshing…','success'); loadPostAssessments(); };
+    window.refreshPreAssessments = function() { loadPreAssessments(); };
+    window.refreshPostAssessments = function() { loadPostAssessments(); };
 
-    window.viewAssessmentDetails = async function(id, type) {
-        try {
-            const snap = await getDoc(doc(db,'assessments',id));
-            if (!snap.exists()) return;
-            const a = snap.data(); const bmi = a.bmi||0; const cat = getBMICategory(bmi);
-            const date = a.assessmentDate ? (a.assessmentDate.toDate ? a.assessmentDate.toDate().toLocaleDateString() : new Date(a.assessmentDate).toLocaleDateString()) : 'N/A';
-            let html = `<div class="detail-grid">
-                <div class="detail-block"><div class="detail-block-label">Student Name</div><div class="detail-block-val">${a.studentName||'Unknown'}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Section</div><div class="detail-block-val">${a.section||'N/A'}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Assessment Date</div><div class="detail-block-val">${date}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Test Score</div><div class="detail-block-val">${a.testScore||'N/A'}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Height (cm)</div><div class="detail-block-val">${a.height||'N/A'}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Weight (kg)</div><div class="detail-block-val">${a.weight||'N/A'}</div></div>
-                <div class="detail-block"><div class="detail-block-label">BMI</div><div class="detail-block-val big">${bmi.toFixed(1)}</div></div>
-                <div class="detail-block"><div class="detail-block-label">Category</div><div class="detail-block-val"><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></div></div>`;
-            if (type==='post'&&a.improvement) html += `<div class="detail-block detail-block-full"><div class="detail-block-label">Improvement</div><div class="detail-block-val">${a.improvement}</div></div>`;
-            if (a.notes) html += `<div class="detail-block detail-block-full"><div class="detail-block-label">Notes</div><div class="detail-block-val" style="font-size:14px;line-height:1.6;">${a.notes}</div></div>`;
-            html += '</div>';
-            document.getElementById('assessmentDetailContent').innerHTML = html;
-            document.getElementById('assessmentDetailModal').style.display = 'flex';
-        } catch(e) { alert('Error loading assessment details: '+e.message); }
+    window.viewBMIDetails = function(id, type) {
+        const list = type === 'pre' ? preAssessments : postAssessments;
+        const a = list.find(r => r.id === id);
+        if (!a) return;
+        const bmi = parseFloat(a.bmi) || 0;
+        const cat = resolveBMICategory(a);
+        const date = parseBMIDate(a);
+        const name = a.studentName || a.name || a.displayName || 'Unknown';
+        const section = a.section || a.assignedSection || 'N/A';
+        const umakId = a.umakId || a.studentId || '';
+        const email = a.email || '';
+        let html = `<div class="detail-grid">
+            <div class="detail-block"><div class="detail-block-label">Student Name</div><div class="detail-block-val">${name}</div></div>
+            <div class="detail-block"><div class="detail-block-label">UMAK ID</div><div class="detail-block-val" style="font-family:'DM Mono',monospace;font-size:13px;">${umakId || 'N/A'}</div></div>
+            <div class="detail-block"><div class="detail-block-label">Section</div><div class="detail-block-val">${section}</div></div>
+            <div class="detail-block"><div class="detail-block-label">Email</div><div class="detail-block-val" style="font-size:13px;word-break:break-all;">${email || 'N/A'}</div></div>
+            <div class="detail-block"><div class="detail-block-label">Assessment Date</div><div class="detail-block-val">${date}</div></div>
+            <div class="detail-block"><div class="detail-block-label">Recorded By</div><div class="detail-block-val" style="text-transform:capitalize;">${a.recordedBy || 'N/A'}</div></div>
+            <div class="detail-block"><div class="detail-block-label">Height (cm)</div><div class="detail-block-val">${a.height || 'N/A'}</div></div>
+            <div class="detail-block"><div class="detail-block-label">Weight (kg)</div><div class="detail-block-val">${a.weight || 'N/A'}</div></div>
+            <div class="detail-block"><div class="detail-block-label">BMI</div><div class="detail-block-val big">${bmi > 0 ? bmi.toFixed(2) : 'N/A'}</div></div>
+            <div class="detail-block"><div class="detail-block-label">Category</div><div class="detail-block-val"><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></div></div>
+            <div class="detail-block"><div class="detail-block-label">Test Type</div><div class="detail-block-val" style="text-transform:capitalize;">${a.testType || type || 'N/A'}</div></div>`;
+        if (type === 'post' && typeof a._bmiChange === 'number') {
+            const ch = a._bmiChange;
+            const style = ch < 0 ? 'color:var(--success)' : ch > 0 ? 'color:var(--danger)' : 'color:var(--text-muted)';
+            html += `<div class="detail-block"><div class="detail-block-label">BMI Change vs Pre</div><div class="detail-block-val" style="${style};font-weight:700;">${ch > 0 ? '+' : ''}${ch.toFixed(2)}</div></div>`;
+        }
+        html += '</div>';
+        document.getElementById('assessmentDetailContent').innerHTML = html;
+        document.getElementById('assessmentDetailModal').style.display = 'flex';
     };
 
-    window.closeAssessmentDetailModal = function() { document.getElementById('assessmentDetailModal').style.display='none'; };
+    window.viewAssessmentDetails = window.viewBMIDetails; // legacy alias
+
+    window.closeAssessmentDetailModal = function() { document.getElementById('assessmentDetailModal').style.display = 'none'; };
 
     window.filterPreAssessments = function() {
-        const search = (document.getElementById('searchPreAssessments')?.value||'').toLowerCase();
-        const cat = document.getElementById('preAssessmentFilter')?.value||'all';
+        const search = (document.getElementById('searchPreAssessments')?.value || '').toLowerCase();
+        const cat = document.getElementById('preAssessmentFilter')?.value || 'all';
         const filtered = preAssessments.filter(a => {
-            const ms = (a.studentName||'').toLowerCase().includes(search)||(a.section||'').toLowerCase().includes(search);
-            const mc = cat==='all'||getBMICategory(a.bmi||0)===cat;
+            const name = (a.studentName || a.name || a.displayName || '').toLowerCase();
+            const section = (a.section || a.assignedSection || '').toLowerCase();
+            const id = (a.umakId || a.studentId || '').toLowerCase();
+            const ms = name.includes(search) || section.includes(search) || id.includes(search);
+            const mc = cat === 'all' || resolveBMICategory(a) === cat;
             return ms && mc;
         });
-        const tbody = document.getElementById('preAssessmentsTableBody'); if (!tbody) return;
-        if (!filtered.length) { tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-sub">No results match your search.</div></div></td></tr>`; return; }
-        tbody.innerHTML = filtered.map(a => {
-            const bmi=a.bmi||0; const cat2=getBMICategory(bmi);
-            const date = a.assessmentDate?(a.assessmentDate.toDate?a.assessmentDate.toDate().toLocaleDateString():new Date(a.assessmentDate).toLocaleDateString()):'N/A';
-            return `<tr><td><span class="cell-primary">${a.studentName||'Unknown'}</span></td><td>${a.section||'N/A'}</td><td>${a.height||'N/A'}</td><td>${a.weight||'N/A'}</td><td><strong>${bmi.toFixed(1)}</strong></td><td><span class="bmi-pill ${getBMICategoryClass(cat2)}">${getBMICategoryDisplay(cat2)}</span></td><td>${date}</td><td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewAssessmentDetails('${a.id}','pre')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
-        }).join('');
+        renderPreAssessmentsTable(filtered);
     };
 
     window.filterPostAssessments = function() {
-        const search = (document.getElementById('searchPostAssessments')?.value||'').toLowerCase();
-        const cat = document.getElementById('postAssessmentFilter')?.value||'all';
+        const search = (document.getElementById('searchPostAssessments')?.value || '').toLowerCase();
+        const cat = document.getElementById('postAssessmentFilter')?.value || 'all';
         const filtered = postAssessments.filter(a => {
-            const ms = (a.studentName||'').toLowerCase().includes(search)||(a.section||'').toLowerCase().includes(search);
-            const mc = cat==='all'||getBMICategory(a.bmi||0)===cat;
+            const name = (a.studentName || a.name || a.displayName || '').toLowerCase();
+            const section = (a.section || a.assignedSection || '').toLowerCase();
+            const id = (a.umakId || a.studentId || '').toLowerCase();
+            const ms = name.includes(search) || section.includes(search) || id.includes(search);
+            const mc = cat === 'all' || resolveBMICategory(a) === cat;
             return ms && mc;
         });
-        const tbody = document.getElementById('postAssessmentsTableBody'); if (!tbody) return;
-        if (!filtered.length) { tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-sub">No results match your search.</div></div></td></tr>`; return; }
-        tbody.innerHTML = filtered.map(a => {
-            const bmi=a.bmi||0; const cat2=getBMICategory(bmi);
-            const date = a.assessmentDate?(a.assessmentDate.toDate?a.assessmentDate.toDate().toLocaleDateString():new Date(a.assessmentDate).toLocaleDateString()):'N/A';
-            return `<tr><td><span class="cell-primary">${a.studentName||'Unknown'}</span></td><td>${a.section||'N/A'}</td><td>${a.height||'N/A'}</td><td>${a.weight||'N/A'}</td><td><strong>${bmi.toFixed(1)}</strong></td><td><span class="bmi-pill ${getBMICategoryClass(cat2)}">${getBMICategoryDisplay(cat2)}</span></td><td>${a.improvement||'No data'}</td><td>${date}</td><td><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewAssessmentDetails('${a.id}','post')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
-        }).join('');
+        renderPostAssessmentsTable(filtered);
     };
 
     // ── ACCOUNTS ──
@@ -2706,11 +2897,24 @@
     }
 
     function downloadCSV(content, filename) {
-        const blob = new Blob([content], {type:'text/csv'});
+        const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href=url; a.download=filename; a.click();
+        const a = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
+
+
+        const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a); URL.revokeObjectURL(url);
+    
+
 </script>
 </body>
 </html>
