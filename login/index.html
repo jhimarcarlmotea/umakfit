@@ -1240,6 +1240,14 @@
                     console.log('Redirect sign-in successful:', result.user.email);
                     showLoading('Sign in successful! Checking your account...');
                     await processUserAfterLogin(result.user);
+                } else {
+                    // Fallback: if user is already signed in but no redirect result, process based on currentUser
+                    const currentUser = window.auth && window.auth.currentUser;
+                    if (currentUser) {
+                        console.log('Existing signed-in user detected, processing login redirect for:', currentUser.email);
+                        showLoading('Sign in successful! Checking your account...');
+                        await processUserAfterLogin(currentUser);
+                    }
                 }
             } catch (error) {
                 console.error('Redirect result error:', error);
