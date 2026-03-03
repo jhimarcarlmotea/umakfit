@@ -1051,7 +1051,7 @@ if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
     <!-- ─── FIREBASE (module — completely unchanged) ─── -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         import { getDatabase, ref, set, onDisconnect, serverTimestamp, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
@@ -1079,8 +1079,8 @@ if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
         window.db = db;
         window.database = database;
         window.googleProvider = googleProvider;
-        window.signInWithPopup = signInWithPopup;
         window.signInWithRedirect = signInWithRedirect;
+        window.signInWithPopup = signInWithPopup;
         window.getRedirectResult = getRedirectResult;
         window.signOut = signOut;
         window.doc = doc;
@@ -1358,13 +1358,6 @@ if (studentData) {
             } catch (error) { console.error('Debug error:', error); }
         }
 
-        function isIOSDevice() {
-            const ua = navigator.userAgent || '';
-            const isIOS = /iPad|iPhone|iPod/i.test(ua);
-            const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-            return isIOS || isIPadOS;
-        }
-
         async function processRedirectSignInResult() {
             try {
                 if (!window.getRedirectResult || !window.auth) return;
@@ -1428,50 +1421,46 @@ if (studentData) {
         async function handleGoogleSignIn() {
             showLoading('Connecting to Google...');
             try {
-                try { await window.signOut(window.auth); } catch (e) {}
-
                 window.googleProvider.setCustomParameters({
                     prompt: 'select_account',
                     hd: 'umak.edu.ph'
                 });
 
-                if (isIOSDevice() && window.signInWithRedirect) {
+                // Primary: redirect flow (works best on iOS and most browsers)
+                try {
                     try { sessionStorage.setItem('umakfit_pending_redirect', '1'); } catch (e) {}
                     showLoading('Redirecting to Google...');
                     await window.signInWithRedirect(window.auth, window.googleProvider);
-                    return;
-                }
+                    return; // navigation will happen, no further code runs here
+                } catch (redirectError) {
+                    console.warn('signInWithRedirect not supported, falling back to popup:', redirectError);
 
-                const result = await window.signInWithPopup(window.auth, window.googleProvider);
-                
-                if (!result.user.email.endsWith('@umak.edu.ph')) {
-                    await window.signOut(window.auth);
-                    hideLoading();
-                    showError('Please use your UMak Gmail account (@umak.edu.ph)');
-                    return;
-                }
-                
-                await debugUserLogin(result.user);
-                await checkUserStatus(result.user);
+                    // Fallback: popup only when redirect truly unsupported
+                    if (redirectError && redirectError.code === 'auth/operation-not-supported-in-this-environment' && window.signInWithPopup) {
+                        hideLoading();
+                        showLoading('Opening Google sign-in...');
+                        const result = await window.signInWithPopup(window.auth, window.googleProvider);
 
-            } catch (error) {
-                console.error('Sign in error:', error);
-                if (
-                    (error && error.code === 'auth/popup-blocked') ||
-                    (error && error.code === 'auth/operation-not-supported-in-this-environment')
-                ) {
-                    if (window.signInWithRedirect) {
-                        try { sessionStorage.setItem('umakfit_pending_redirect', '1'); } catch (e) {}
-                        showLoading('Redirecting to Google...');
-                        await window.signInWithRedirect(window.auth, window.googleProvider);
+                        if (!result.user.email.endsWith('@umak.edu.ph')) {
+                            await window.signOut(window.auth);
+                            hideLoading();
+                            showError('Please use your UMak Gmail account (@umak.edu.ph)');
+                            return;
+                        }
+
+                        await debugUserLogin(result.user);
+                        await checkUserStatus(result.user);
                         return;
                     }
-                }
 
+                    throw redirectError;
+                }
+            } catch (error) {
+                console.error('Sign in error:', error);
                 hideLoading();
                 let errorMessage = 'Failed to sign in with Google';
                 if (error.code === 'auth/popup-closed-by-user') errorMessage = 'Sign in was cancelled. Please try again.';
-                else if (error.code === 'auth/popup-blocked') errorMessage = 'Popup blocked. Redirecting instead...';
+                else if (error.code === 'auth/popup-blocked') errorMessage = 'Popup blocked. Please allow popups or try again.';
                 else if (error.code === 'auth/account-exists-with-different-credential') errorMessage = 'An account already exists with the same email but different sign-in credentials.';
                 else if (error.code === 'auth/invalid-domain') errorMessage = 'Please use your UMak Gmail account (@umak.edu.ph)';
                 showError(errorMessage);
