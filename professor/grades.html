@@ -107,7 +107,7 @@
             }
         }
 
-        /* Table styling - exactly like the image */
+        /* Table styling */
         .grades-table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
         .grades-table thead tr {
             background: linear-gradient(90deg, rgba(10,22,40,0.92) 0%, rgba(30,77,140,0.92) 100%);
@@ -164,7 +164,7 @@
         .empty-state { padding: 60px 40px; text-align: center; background: #f8fafc; border-radius: 12px; margin: 20px; }
         .empty-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.4; color: #64748b; }
 
-        /* Mobile responsive */
+        /* ===================== MOBILE RESPONSIVE - FIXED ===================== */
         @media (max-width: 768px) {
             #tableWrapper { overflow-x: visible; }
             .grades-table thead { display: none; }
@@ -176,16 +176,93 @@
                 background: white; padding: 16px;
             }
             .grades-table tbody td {
-                display: flex; justify-content: space-between; align-items: center;
-                padding: 10px 8px; border-bottom: 1px solid #f1f5f9;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 8px;
+                border-bottom: 1px solid #f1f5f9;
+                gap: 8px;
+                min-width: 0;
+                overflow: hidden;
             }
             .grades-table tbody td:last-child { border-bottom: none; }
             .grades-table tbody td::before {
                 content: attr(data-label);
-                font-weight: 600; color: #4a5a72; font-size: 12px;
-                min-width: 100px;
+                font-weight: 600;
+                color: #4a5a72;
+                font-size: 12px;
+                min-width: 85px;
+                flex-shrink: 0;
+            }
+            /* Value side: right-aligned, constrained width */
+            .grades-table tbody td > span,
+            .grades-table tbody td > div,
+            .grades-table tbody td > button {
+                max-width: calc(100% - 95px);
+                text-align: right;
+                word-break: break-word;
             }
             .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+
+            /* Detail modal summary cards - fix on small screens */
+            #studentDetailModal .grid.grid-cols-3 {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 8px !important;
+            }
+            #studentDetailModal .grid.grid-cols-3 > div {
+                padding: 10px 6px !important;
+                border-radius: 10px !important;
+            }
+            #studentDetailModal .grid.grid-cols-3 .text-2xl {
+                font-size: 16px !important;
+                line-height: 1.2 !important;
+            }
+            #studentDetailModal .grid.grid-cols-3 .text-\[11px\] {
+                font-size: 9px !important;
+                letter-spacing: 0 !important;
+            }
+        }
+
+        /* Extra small screens (390px and below) */
+        @media (max-width: 420px) {
+            main > div {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            .grades-table tbody td::before {
+                min-width: 75px;
+                font-size: 11px;
+            }
+            .grades-table tbody td > span,
+            .grades-table tbody td > div,
+            .grades-table tbody td > button {
+                max-width: calc(100% - 83px);
+                font-size: 13px;
+            }
+            /* Student detail modal: stack to 1 column on very small screens */
+            #studentDetailModal .grid.grid-cols-3 {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 6px !important;
+            }
+            #studentDetailModal .grid.grid-cols-3 > div {
+                padding: 8px 4px !important;
+            }
+            #studentDetailModal .grid.grid-cols-3 .text-2xl {
+                font-size: 14px !important;
+            }
+            #studentDetailModal .grid.grid-cols-3 .text-\[11px\] {
+                font-size: 8px !important;
+            }
+            /* Detail modal padding */
+            #studentDetailModal .p-6 {
+                padding: 1rem !important;
+            }
+            /* Detail table font size */
+            .detail-table th,
+            .detail-table td {
+                font-size: 11px !important;
+                padding: 10px 8px !important;
+            }
         }
     </style>
 </head>
@@ -419,7 +496,7 @@
     <main class="ml-[260px] pt-[70px] min-h-screen" style="margin-left: 260px;">
         <div class="px-6 md:px-10 py-8 pb-20">
 
-            <!-- Page Hero - exactly like the image -->
+            <!-- Page Hero -->
             <div class="relative bg-gradient-to-br from-navy via-[#1a4580] to-navy-light rounded-2xl p-7 mb-7 overflow-hidden">
                 <div class="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-accent/[0.07] pointer-events-none"></div>
                 <div class="absolute -bottom-10 right-20 w-36 h-36 rounded-full bg-blue/10 pointer-events-none"></div>
@@ -445,7 +522,7 @@
                 </div>
             </div>
 
-            <!-- Stats Cards - navy themed -->
+            <!-- Stats Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-7">
                 <div class="stat-card p-5">
                     <div class="w-[42px] h-[42px] rounded-xl bg-navy/10 text-navy flex items-center justify-center text-[17px] mb-3.5">
@@ -516,7 +593,7 @@
                     </div>
                 </div>
 
-                <!-- Table - exactly like the image -->
+                <!-- Table -->
                 <div id="tableWrapper" class="hidden overflow-x-auto">
                     <table class="grades-table">
                         <thead>
@@ -616,7 +693,6 @@
     let currentFinalGrades = [];
     let filteredFinalGrades = [];
 
-    // Test categories (same as student grades)
     const testCategories = {
         'Cardiorespiratory Endurance': {
             tests: ['3-Minute Step Test', 'Step Test', '1-Mile Run', 'Mile Run', 'Run'],
@@ -642,251 +718,98 @@
 
     function getCategoryForTest(testName) {
         if (!testName) return 'Cardiorespiratory Endurance';
-        
         const testLower = testName.toLowerCase().trim();
-        
         for (const [category, data] of Object.entries(testCategories)) {
             for (const testPattern of data.tests) {
                 const patternLower = testPattern.toLowerCase();
-                if (testLower.includes(patternLower) || patternLower.includes(testLower)) {
-                    return category;
-                }
+                if (testLower.includes(patternLower) || patternLower.includes(testLower)) return category;
             }
         }
-        
-        // Special case handling
-        if (testLower.includes('step') || testLower.includes('mile') || testLower.includes('run') || testLower.includes('cardio')) {
-            return 'Cardiorespiratory Endurance';
-        }
-        if (testLower.includes('push') || testLower.includes('curl') || testLower.includes('plank') || testLower.includes('sit')) {
-            return 'Muscular Strength and Endurance';
-        }
-        if (testLower.includes('reach') || testLower.includes('flexibility')) {
-            return 'Flexibility';
-        }
-        if (testLower.includes('skin') || testLower.includes('bmi') || testLower.includes('body')) {
-            return 'Body Composition';
-        }
-        
+        if (testLower.includes('step') || testLower.includes('mile') || testLower.includes('run') || testLower.includes('cardio')) return 'Cardiorespiratory Endurance';
+        if (testLower.includes('push') || testLower.includes('curl') || testLower.includes('plank') || testLower.includes('sit')) return 'Muscular Strength and Endurance';
+        if (testLower.includes('reach') || testLower.includes('flexibility')) return 'Flexibility';
+        if (testLower.includes('skin') || testLower.includes('bmi') || testLower.includes('body')) return 'Body Composition';
         return 'Cardiorespiratory Endurance';
     }
 
-    // ========== EXACT SAME CALCULATION FUNCTION AS STUDENT GRADES ==========
     function calculateActivityScore(testName, result, testTarget = null) {
         const normalized = testName.toLowerCase().trim();
-        
-        // Always return 100 for these tests regardless of result
-        if (normalized.includes('skinfold') || 
-            normalized.includes('step test') || 
-            normalized.includes('3-minute') ||
-            normalized.includes('skin fold')) {
-            return 100;
-        }
-        
-        // Check if professor already set a final score
+        if (normalized.includes('skinfold') || normalized.includes('step test') || normalized.includes('3-minute') || normalized.includes('skin fold')) return 100;
         if (result && typeof result === 'object' && result !== null) {
             if (result.score !== undefined && result.score !== null) {
                 const score = parseFloat(result.score);
-                if (!isNaN(score) && score >= 0 && score <= 100) {
-                    console.log(`✅ Using stored professor score: ${score} for ${testName}`);
-                    return score;
-                }
+                if (!isNaN(score) && score >= 0 && score <= 100) return score;
             }
         }
-        
-        // Extract numeric value from result
         let numericValue = 0;
-        
         if (typeof result === 'object' && result !== null) {
-            numericValue = result.repetitions || result.time || result.distance || 
-                          result.value || result.result || result.count || 
-                          result.score || 0;
+            numericValue = result.repetitions || result.time || result.distance || result.value || result.result || result.count || result.score || 0;
         } else if (typeof result === 'string') {
             const match = result.match(/(\d+\.?\d*)/);
-            if (match) {
-                numericValue = parseFloat(match[1]);
-            } else {
-                numericValue = parseFloat(result) || 0;
-            }
+            if (match) numericValue = parseFloat(match[1]);
+            else numericValue = parseFloat(result) || 0;
         } else {
             numericValue = parseFloat(result) || 0;
         }
-        
-        console.log(`🎯 Calculating: ${testName} | Value: ${numericValue} | Target: ${testTarget}`);
-        
-        // Use test target if available
         if (testTarget && testTarget > 0) {
-            if (normalized.includes('push-up') || normalized.includes('pushup') || 
-                normalized.includes('sit-up') || normalized.includes('situp') ||
-                normalized.includes('curl-up') || normalized.includes('curl up')) {
-                
-                const reps = numericValue;
-                if (reps >= testTarget) return 100;
-                
-                const percentage = (reps / testTarget) * 100;
-                let score = Math.min(100, Math.max(50, percentage));
-                
-                if (percentage >= 100) score = 100;
-                else if (percentage >= 90) score = 95;
-                else if (percentage >= 80) score = 90;
-                else if (percentage >= 70) score = 85;
-                else if (percentage >= 60) score = 80;
-                else if (percentage >= 50) score = 75;
-                
-                return Math.round(score);
-            }
-            
-            if (normalized.includes('plank')) {
-                let seconds = numericValue;
-                if (seconds >= testTarget) return 100;
-                
-                const percentage = (seconds / testTarget) * 100;
-                let score = Math.min(100, Math.max(50, percentage));
-                
-                if (percentage >= 100) score = 100;
-                else if (percentage >= 90) score = 95;
-                else if (percentage >= 80) score = 90;
-                else if (percentage >= 70) score = 85;
-                else if (percentage >= 60) score = 80;
-                else if (percentage >= 50) score = 75;
-                
-                return Math.round(score);
-            }
-            
-            if (normalized.includes('sit-and-reach') || normalized.includes('reach')) {
-                const distance = numericValue;
-                if (distance >= testTarget) return 100;
-                
-                const percentage = (distance / testTarget) * 100;
-                let score = Math.min(100, Math.max(50, percentage));
-                
-                if (percentage >= 100) score = 100;
-                else if (percentage >= 90) score = 95;
-                else if (percentage >= 80) score = 90;
-                else if (percentage >= 70) score = 85;
-                else if (percentage >= 60) score = 80;
-                else if (percentage >= 50) score = 75;
-                
-                return Math.round(score);
-            }
-            
-            if (normalized.includes('grip')) {
+            if (normalized.includes('push-up') || normalized.includes('pushup') || normalized.includes('sit-up') || normalized.includes('situp') || normalized.includes('curl-up') || normalized.includes('curl up')) {
                 if (numericValue >= testTarget) return 100;
-                
                 const percentage = (numericValue / testTarget) * 100;
                 let score = Math.min(100, Math.max(50, percentage));
-                
-                if (percentage >= 90) score = 95;
-                else if (percentage >= 80) score = 90;
-                else if (percentage >= 70) score = 85;
-                else if (percentage >= 60) score = 80;
-                else if (percentage >= 50) score = 75;
-                
+                if (percentage >= 100) score = 100; else if (percentage >= 90) score = 95; else if (percentage >= 80) score = 90; else if (percentage >= 70) score = 85; else if (percentage >= 60) score = 80; else if (percentage >= 50) score = 75;
                 return Math.round(score);
             }
-            
+            if (normalized.includes('plank')) {
+                if (numericValue >= testTarget) return 100;
+                const percentage = (numericValue / testTarget) * 100;
+                let score = Math.min(100, Math.max(50, percentage));
+                if (percentage >= 100) score = 100; else if (percentage >= 90) score = 95; else if (percentage >= 80) score = 90; else if (percentage >= 70) score = 85; else if (percentage >= 60) score = 80; else if (percentage >= 50) score = 75;
+                return Math.round(score);
+            }
+            if (normalized.includes('sit-and-reach') || normalized.includes('reach')) {
+                if (numericValue >= testTarget) return 100;
+                const percentage = (numericValue / testTarget) * 100;
+                let score = Math.min(100, Math.max(50, percentage));
+                if (percentage >= 100) score = 100; else if (percentage >= 90) score = 95; else if (percentage >= 80) score = 90; else if (percentage >= 70) score = 85; else if (percentage >= 60) score = 80; else if (percentage >= 50) score = 75;
+                return Math.round(score);
+            }
+            if (normalized.includes('grip')) {
+                if (numericValue >= testTarget) return 100;
+                const percentage = (numericValue / testTarget) * 100;
+                let score = Math.min(100, Math.max(50, percentage));
+                if (percentage >= 90) score = 95; else if (percentage >= 80) score = 90; else if (percentage >= 70) score = 85; else if (percentage >= 60) score = 80; else if (percentage >= 50) score = 75;
+                return Math.round(score);
+            }
             if (normalized.includes('mile') || normalized.includes('run')) {
                 if (numericValue <= testTarget) return 100;
-                
                 const percentage = (testTarget / numericValue) * 100;
                 let score = Math.min(100, Math.max(50, percentage));
-                
-                if (percentage >= 90) score = 95;
-                else if (percentage >= 80) score = 90;
-                else if (percentage >= 70) score = 85;
-                else if (percentage >= 60) score = 80;
-                else if (percentage >= 50) score = 75;
-                
+                if (percentage >= 90) score = 95; else if (percentage >= 80) score = 90; else if (percentage >= 70) score = 85; else if (percentage >= 60) score = 80; else if (percentage >= 50) score = 75;
                 return Math.round(score);
             }
-            
             if (normalized.includes('step test') || normalized.includes('3-minute')) {
                 if (numericValue <= testTarget) return 100;
-                
                 const percentage = (testTarget / numericValue) * 100;
                 let score = Math.min(100, Math.max(50, percentage));
-                
-                if (percentage >= 90) score = 95;
-                else if (percentage >= 80) score = 90;
-                else if (percentage >= 70) score = 85;
-                else if (percentage >= 60) score = 80;
-                else if (percentage >= 50) score = 75;
-                
+                if (percentage >= 90) score = 95; else if (percentage >= 80) score = 90; else if (percentage >= 70) score = 85; else if (percentage >= 60) score = 80; else if (percentage >= 50) score = 75;
                 return Math.round(score);
             }
         }
-        
-        // Fallback scoring
         return calculateDefaultScore(normalized, numericValue);
     }
 
     function calculateDefaultScore(normalized, numericValue) {
-        if (normalized.includes('push-up') || normalized.includes('pushup')) {
-            if (numericValue >= 40) return 100;
-            if (numericValue >= 30) return 90;
-            if (numericValue >= 20) return 80;
-            if (numericValue >= 15) return 70;
-            return 60;
-        }
-        
-        if (normalized.includes('curl-up') || normalized.includes('curl up')) {
-            if (numericValue >= 75) return 100;
-            if (numericValue >= 50) return 90;
-            if (numericValue >= 30) return 80;
-            if (numericValue >= 20) return 70;
-            return 60;
-        }
-        
-        if (normalized.includes('plank')) {
-            if (numericValue >= 120) return 100;
-            if (numericValue >= 90) return 90;
-            if (numericValue >= 60) return 80;
-            if (numericValue >= 45) return 70;
-            return 60;
-        }
-        
-        if (normalized.includes('grip')) {
-            if (numericValue >= 60) return 100;
-            if (numericValue >= 50) return 90;
-            if (numericValue >= 40) return 80;
-            if (numericValue >= 30) return 70;
-            return 60;
-        }
-        
-        if (normalized.includes('sit-and-reach') || normalized.includes('reach')) {
-            if (numericValue >= 20) return 100;
-            if (numericValue >= 15) return 90;
-            if (numericValue >= 10) return 80;
-            if (numericValue >= 5) return 70;
-            return 60;
-        }
-        
-        if (normalized.includes('mile') || normalized.includes('run')) {
-            if (numericValue <= 360) return 100;
-            if (numericValue <= 480) return 90;
-            if (numericValue <= 600) return 80;
-            if (numericValue <= 720) return 70;
-            return 60;
-        }
-        
-        if (normalized.includes('step test') || normalized.includes('3-minute')) {
-            if (numericValue <= 70) return 100;
-            if (numericValue <= 90) return 90;
-            if (numericValue <= 110) return 80;
-            if (numericValue <= 130) return 70;
-            return 60;
-        }
-        
-        if (normalized.includes('bmi')) {
-            if (numericValue >= 18.5 && numericValue <= 24.9) return 100;
-            if (numericValue >= 17 && numericValue <= 27) return 85;
-            return 65;
-        }
-        
+        if (normalized.includes('push-up') || normalized.includes('pushup')) { if (numericValue >= 40) return 100; if (numericValue >= 30) return 90; if (numericValue >= 20) return 80; if (numericValue >= 15) return 70; return 60; }
+        if (normalized.includes('curl-up') || normalized.includes('curl up')) { if (numericValue >= 75) return 100; if (numericValue >= 50) return 90; if (numericValue >= 30) return 80; if (numericValue >= 20) return 70; return 60; }
+        if (normalized.includes('plank')) { if (numericValue >= 120) return 100; if (numericValue >= 90) return 90; if (numericValue >= 60) return 80; if (numericValue >= 45) return 70; return 60; }
+        if (normalized.includes('grip')) { if (numericValue >= 60) return 100; if (numericValue >= 50) return 90; if (numericValue >= 40) return 80; if (numericValue >= 30) return 70; return 60; }
+        if (normalized.includes('sit-and-reach') || normalized.includes('reach')) { if (numericValue >= 20) return 100; if (numericValue >= 15) return 90; if (numericValue >= 10) return 80; if (numericValue >= 5) return 70; return 60; }
+        if (normalized.includes('mile') || normalized.includes('run')) { if (numericValue <= 360) return 100; if (numericValue <= 480) return 90; if (numericValue <= 600) return 80; if (numericValue <= 720) return 70; return 60; }
+        if (normalized.includes('step test') || normalized.includes('3-minute')) { if (numericValue <= 70) return 100; if (numericValue <= 90) return 90; if (numericValue <= 110) return 80; if (numericValue <= 130) return 70; return 60; }
+        if (normalized.includes('bmi')) { if (numericValue >= 18.5 && numericValue <= 24.9) return 100; if (numericValue >= 17 && numericValue <= 27) return 85; return 65; }
         return 75;
     }
 
-    // ─── AUTH ───
     onAuthStateChanged(auth, async user => {
         if (!user) { window.location.href = '/login/index.html'; return; }
         try {
@@ -906,7 +829,6 @@
         }
     });
 
-    // ─── PROFESSOR DATA ───
     async function loadProfessorData(user) {
         const email = user.email.toLowerCase();
         const q1 = await getDocs(query(collection(db,'professors'), where('email','==',email)));
@@ -916,18 +838,15 @@
         currentProfessor = { name: user.displayName || 'Professor', email: user.email };
     }
 
-    // ─── UI SETUP ───
     function setupUI(user) {
         const profName  = currentProfessor.fullName || currentProfessor.name || user.displayName || 'Professor';
         const email     = currentProfessor.email || user.email;
         const initial   = profName.charAt(0).toUpperCase();
         const shortName = profName.split(',')[0]?.trim() || profName;
         const photoURL  = user.photoURL || null;
-
         document.getElementById('headerName').textContent   = shortName;
         document.getElementById('dropdownName').textContent = profName;
         document.getElementById('dropdownEmail').textContent = email;
-
         const setAvatar = (el, src, init) => {
             if (!el) return;
             if (src) { el.innerHTML = `<img src="${src}" class="w-full h-full object-cover rounded-full" alt="">`; }
@@ -937,136 +856,69 @@
         setAvatar(document.getElementById('profileDropdownAvatar'), photoURL, initial);
     }
 
-    // ─── LOAD SECTIONS ───
     async function loadAssignedSections() {
         assignedSections = [];
         const profEmail = (currentProfessor.email || currentUser.email).toLowerCase();
         const sectionSet = new Set();
-
-        // Collect all name variations
         const nameVariations = new Set();
-        ['fullName','name','displayName'].forEach(f => {
-            if (currentProfessor[f]) nameVariations.add(currentProfessor[f].toUpperCase().trim());
-        });
+        ['fullName','name','displayName'].forEach(f => { if (currentProfessor[f]) nameVariations.add(currentProfessor[f].toUpperCase().trim()); });
         if (currentUser.displayName) nameVariations.add(currentUser.displayName.toUpperCase().trim());
-
         const profSnap = await getDocs(query(collection(db,'professors'), where('email','==',profEmail)));
-        profSnap.forEach(d => {
-            ['fullName','name','displayName'].forEach(f => {
-                if (d.data()[f]) nameVariations.add(d.data()[f].toUpperCase().trim());
-            });
-        });
-
+        profSnap.forEach(d => { ['fullName','name','displayName'].forEach(f => { if (d.data()[f]) nameVariations.add(d.data()[f].toUpperCase().trim()); }); });
         const usersSnap = await getDocs(query(collection(db,'users'), where('email','==',profEmail)));
-        usersSnap.forEach(d => {
-            ['fullName','name','displayName'].forEach(f => {
-                if (d.data()[f]) nameVariations.add(d.data()[f].toUpperCase().trim());
-            });
-        });
-
+        usersSnap.forEach(d => { ['fullName','name','displayName'].forEach(f => { if (d.data()[f]) nameVariations.add(d.data()[f].toUpperCase().trim()); }); });
         nameVariations.add(profEmail.split('@')[0].toUpperCase().trim());
         nameVariations.delete('');
-
         const nameTokens = new Set();
         nameVariations.forEach(name => name.split(/[\s,\.]+/).forEach(w => { if (w.length >= 3) nameTokens.add(w); }));
-
-        // Scan all sections
         const secSnap = await getDocs(collection(db,'sections'));
         secSnap.forEach(d => {
             const data = d.data();
             const dbProf      = (data.professor || '').toString().trim().toUpperCase();
             const dbProfEmail = (data.professorEmail || '').toString().trim().toLowerCase();
             let isMatch = false;
-
             if (dbProfEmail && dbProfEmail === profEmail) isMatch = true;
             if (!isMatch) { for (const v of nameVariations) { if (v && v.length >= 3 && dbProf === v) { isMatch = true; break; } } }
             if (!isMatch) { for (const v of nameVariations) { if (v && v.length >= 3 && (dbProf.includes(v) || v.includes(dbProf))) { isMatch = true; break; } } }
             if (!isMatch) { for (const v of nameVariations) { if (v && v.length >= 3) { const ln = v.split(',')[0].trim(); if (ln.length >= 3 && dbProf.includes(ln)) { isMatch = true; break; } } } }
             if (!isMatch && dbProf.length >= 3) { const dbWords = dbProf.split(/[\s,\.]+/).filter(w => w.length >= 3); for (const w of dbWords) { if (nameTokens.has(w)) { isMatch = true; break; } } }
             if (!isMatch) { const eu = profEmail.split('@')[0].toUpperCase(); if (eu.length > 3 && dbProf.includes(eu)) isMatch = true; }
-
-            if (isMatch && data.name && !sectionSet.has(data.name)) {
-                sectionSet.add(data.name);
-                assignedSections.push({ id: d.id, section: data.name });
-            }
+            if (isMatch && data.name && !sectionSet.has(data.name)) { sectionSet.add(data.name); assignedSections.push({ id: d.id, section: data.name }); }
         });
-
-        console.log('✅ Sections found:', assignedSections.map(s => s.section));
-
-        // Populate section filter
         const sel = document.getElementById('filterSection');
         sel.innerHTML = '<option value="">All Sections</option>';
-        assignedSections.forEach(s => {
-            const opt = document.createElement('option');
-            opt.value = s.section; opt.textContent = s.section;
-            sel.appendChild(opt);
-        });
+        assignedSections.forEach(s => { const opt = document.createElement('option'); opt.value = s.section; opt.textContent = s.section; sel.appendChild(opt); });
     }
 
-    // ─── LOAD GRADES ───
     async function loadGrades() {
         allGrades = [];
         if (!assignedSections.length) return;
-
         const bestScoresMap = new Map();
-
-        // Load from each assigned section
         for (const sec of assignedSections) {
             try {
-                const snap = await getDocs(query(
-                    collection(db,'testResults'),
-                    where('section','==', sec.section),
-                    where('status','==','completed')
-                ));
-
+                const snap = await getDocs(query(collection(db,'testResults'), where('section','==', sec.section), where('status','==','completed')));
                 snap.forEach(docSnap => {
                     const data = docSnap.data();
                     const studentEmail = data.studentEmail || '';
                     const testId = data.testId || docSnap.id;
                     const testName = data.testName || 'Unknown Activity';
                     const testKey  = `${studentEmail}_${testId}`;
-
-                    // Use the SAME calculation function as student grades
-                    const score = calculateActivityScore(
-                        testName, 
-                        data.result || data.resultData || data.repetitions || data, 
-                        data.testTarget || null
-                    );
-                    
+                    const score = calculateActivityScore(testName, data.result || data.resultData || data.repetitions || data, data.testTarget || null);
                     const validScore = Math.max(0, Math.min(100, Math.round(score)));
-
                     let submittedDate = new Date();
                     if (data.submittedAt) {
                         if (typeof data.submittedAt.toDate === 'function') submittedDate = data.submittedAt.toDate();
                         else if (data.submittedAt.seconds) submittedDate = new Date(data.submittedAt.seconds * 1000);
                         else if (typeof data.submittedAt === 'string') submittedDate = new Date(data.submittedAt);
                     }
-
                     let displayResult = extractResult(data);
-
-                    // Keep only the best score per test per student
                     if (!bestScoresMap.has(testKey) || validScore > bestScoresMap.get(testKey).score) {
-                        bestScoresMap.set(testKey, {
-                            id: docSnap.id, 
-                            studentName: data.studentName || 'Unknown',
-                            section: data.section || sec.section,
-                            testName, 
-                            result: displayResult, 
-                            score: validScore,
-                            date: submittedDate.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }),
-                            dateObject: submittedDate,
-                            studentEmail, 
-                            studentId: data.studentId || '',
-                            testTarget: data.testTarget || null,
-                            isProfessorOverride: data.isProfessorOverride || false
-                        });
+                        bestScoresMap.set(testKey, { id: docSnap.id, studentName: data.studentName || 'Unknown', section: data.section || sec.section, testName, result: displayResult, score: validScore, date: submittedDate.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }), dateObject: submittedDate, studentEmail, studentId: data.studentId || '', testTarget: data.testTarget || null, isProfessorOverride: data.isProfessorOverride || false });
                     }
                 });
             } catch(e) { console.error(`Error loading grades for ${sec.section}:`, e); }
         }
-
         allGrades = Array.from(bestScoresMap.values()).sort((a,b) => b.dateObject - a.dateObject);
-        console.log(`✅ Loaded ${allGrades.length} unique best scores`);
     }
 
     function extractResult(data) {
@@ -1075,91 +927,56 @@
             if (typeof data.result === 'string') { const m = data.result.match(/(\d+\.?\d*)/); return m ? parseFloat(m[1]) : data.result; }
             if (typeof data.result === 'object') return data.result.value || data.result.repetitions || data.result.time || data.result.distance || 0;
         }
-        if (data.resultData) {
-            if (typeof data.resultData === 'object') return data.resultData.value || data.resultData.repetitions || data.resultData.time || 0;
-            return data.resultData;
-        }
+        if (data.resultData) { if (typeof data.resultData === 'object') return data.resultData.value || data.resultData.repetitions || data.resultData.time || 0; return data.resultData; }
         if (data.repetitions !== undefined) return data.repetitions;
         return '-';
     }
 
-    // ─── BUILD FINAL GRADES ───
     function buildFinalGrades() {
         const map = {};
         allGrades.forEach(g => {
             const key = g.studentEmail || `${g.studentName}_${g.section}`.toLowerCase();
-            if (!map[key]) {
-                map[key] = { 
-                    key, 
-                    name: g.studentName, 
-                    section: g.section, 
-                    email: g.studentEmail, 
-                    scores: [], 
-                    instances: [],
-                    categories: {}
-                };
-            }
+            if (!map[key]) { map[key] = { key, name: g.studentName, section: g.section, email: g.studentEmail, scores: [], instances: [], categories: {} }; }
             map[key].scores.push(g.score);
-            map[key].instances.push({ 
-                name: g.testName, 
-                date: g.date, 
-                score: g.score, 
-                result: g.result,
-                category: getCategoryForTest(g.testName)
-            });
+            map[key].instances.push({ name: g.testName, date: g.date, score: g.score, result: g.result, category: getCategoryForTest(g.testName) });
         });
-
         currentFinalGrades = Object.values(map).map(s => {
             const avg = s.scores.length ? s.scores.reduce((a,b) => a+b, 0) / s.scores.length : 0;
-            return {
-                ...s,
-                averageScore: parseFloat(avg.toFixed(2)),
-                totalActivities: s.scores.length
-            };
+            return { ...s, averageScore: parseFloat(avg.toFixed(2)), totalActivities: s.scores.length };
         }).sort((a,b) => b.averageScore - a.averageScore);
-
         filteredFinalGrades = [...currentFinalGrades];
         renderTable(filteredFinalGrades);
         updateStats(filteredFinalGrades);
     }
 
-    // ─── RENDER TABLE ───
     function renderTable(grades) {
         const loading = document.getElementById('tableLoading');
         const empty   = document.getElementById('tableEmpty');
         const wrapper = document.getElementById('tableWrapper');
         const body    = document.getElementById('gradesTableBody');
         const count   = document.getElementById('tableCount');
-
         loading.style.display = 'none';
-
-        if (!grades.length) {
-            empty.classList.remove('hidden'); wrapper.classList.add('hidden');
-            count.textContent = '0 students';
-            return;
-        }
-
+        if (!grades.length) { empty.classList.remove('hidden'); wrapper.classList.add('hidden'); count.textContent = '0 students'; return; }
         empty.classList.add('hidden'); wrapper.classList.remove('hidden');
         count.textContent = `${grades.length} student${grades.length !== 1 ? 's' : ''}`;
-
         body.innerHTML = grades.map((g, i) => {
             const { badgeClass, statusText, scoreClass } = getGradeInfo(g.averageScore);
             return `
             <tr onclick="showDetail('${escKey(g.key)}')">
                 <td data-label="#" style="color:#64748b; font-family:monospace;">${i+1}</td>
                 <td data-label="Student">
-                    <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:8px; max-width:100%;">
                         <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, #1e4d8c 0%, #2d6fc4 100%); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:12px; flex-shrink:0;">
                             ${(g.name || '?').charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                            <div style="font-weight:600; color:#0a1628;">${g.name || 'Unknown'}</div>
-                            ${g.email ? `<div style="color:#64748b; font-size:11px;">${g.email}</div>` : ''}
+                        <div style="min-width:0; overflow:hidden;">
+                            <div style="font-weight:600; color:#0a1628; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${g.name || 'Unknown'}</div>
+                            ${g.email ? `<div style="color:#64748b; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${g.email}</div>` : ''}
                         </div>
                     </div>
                 </td>
                 <td data-label="Section">
-                    <span style="display:inline-flex; align-items:center; padding:4px 8px; background:#d6eaf8; color:#1a6fa8; border-radius:12px; font-size:11px; font-weight:600;">${g.section || 'N/A'}</span>
+                    <span style="display:inline-flex; align-items:center; padding:4px 8px; background:#d6eaf8; color:#1a6fa8; border-radius:12px; font-size:11px; font-weight:600; white-space:nowrap;">${g.section || 'N/A'}</span>
                 </td>
                 <td data-label="Activities">
                     <span style="font-weight:700; color:#0a1628; font-size:15px;">${g.totalActivities}</span>
@@ -1168,11 +985,11 @@
                     <span style="font-weight:700; font-size:15px; ${scoreClass}">${g.averageScore.toFixed(2)}%</span>
                 </td>
                 <td data-label="Status">
-                    <span style="display:inline-block; padding:4px 12px; border-radius:20px; font-weight:600; font-size:11px; ${badgeClass}">${statusText}</span>
+                    <span style="display:inline-block; padding:4px 12px; border-radius:20px; font-weight:600; font-size:11px; white-space:nowrap; ${badgeClass}">${statusText}</span>
                 </td>
-                <td>
+                <td data-label="Action">
                     <button onclick="event.stopPropagation(); showDetail('${escKey(g.key)}')"
-                        style="padding:6px 12px; border:none; border-radius:20px; font-weight:600; font-size:11px; cursor:pointer; background:linear-gradient(135deg, #4a5a72 0%, #2d3d52 100%); color:white; display:inline-flex; align-items:center; gap:4px;">
+                        style="padding:6px 12px; border:none; border-radius:20px; font-weight:600; font-size:11px; cursor:pointer; background:linear-gradient(135deg, #4a5a72 0%, #2d3d52 100%); color:white; display:inline-flex; align-items:center; gap:4px; white-space:nowrap;">
                         <i class="fas fa-eye" style="font-size:11px;"></i> View
                     </button>
                 </td>
@@ -1183,20 +1000,19 @@
     function escKey(k) { return (k || '').replace(/'/g, "\\'"); }
 
     function getGradeInfo(score) {
-        if (score >= 90) return { badgeClass: 'score-excellent', statusText: 'Excellent', scoreClass: 'color:#0e8a5f;' };
-        if (score >= 80) return { badgeClass: 'bg-info-bg text-blue', statusText: 'Good', scoreClass: 'color:#2d6fc4;' };
-        if (score >= 70) return { badgeClass: 'bg-warning-bg text-warning', statusText: 'Passed', scoreClass: 'color:#b07e16;' };
-        return { badgeClass: 'bg-danger-bg text-danger', statusText: 'Failed', scoreClass: 'color:#c0392b;' };
+        if (score >= 90) return { badgeClass: 'background:#d1fae5; color:#065f46;', statusText: 'Excellent', scoreClass: 'color:#0e8a5f;' };
+        if (score >= 80) return { badgeClass: 'background:#d6eaf8; color:#1a6fa8;', statusText: 'Good', scoreClass: 'color:#2d6fc4;' };
+        if (score >= 70) return { badgeClass: 'background:#fef3d4; color:#b07e16;', statusText: 'Passed', scoreClass: 'color:#b07e16;' };
+        return { badgeClass: 'background:#fce8e6; color:#c0392b;', statusText: 'Failed', scoreClass: 'color:#c0392b;' };
     }
 
     function getRating(score) {
-        if (score >= 90) return { text: 'Excellent', cls: 'score-excellent' };
-        if (score >= 80) return { text: 'Good',      cls: 'bg-info-bg text-blue' };
-        if (score >= 70) return { text: 'Fair',      cls: 'bg-warning-bg text-warning' };
-        return { text: 'Needs Work', cls: 'bg-danger-bg text-danger' };
+        if (score >= 90) return { text: 'Excellent', cls: 'background:#d1fae5; color:#065f46;' };
+        if (score >= 80) return { text: 'Good',      cls: 'background:#d6eaf8; color:#1a6fa8;' };
+        if (score >= 70) return { text: 'Fair',      cls: 'background:#fef3d4; color:#b07e16;' };
+        return { text: 'Needs Work', cls: 'background:#fce8e6; color:#c0392b;' };
     }
 
-    // ─── STATS ───
     function updateStats(grades) {
         const total  = grades.length;
         const passed = grades.filter(g => g.averageScore >= 70).length;
@@ -1208,28 +1024,21 @@
         document.getElementById('statAvg').textContent    = avg.toFixed(1) + '%';
     }
 
-    // ─── DETAIL MODAL ───
     window.showDetail = function(key) {
         const g = currentFinalGrades.find(x => x.key === key);
         if (!g) return;
-
         document.getElementById('detailAvatar').textContent = (g.name || '?').charAt(0).toUpperCase();
         document.getElementById('detailStudentName').textContent = g.name || 'Student';
         document.getElementById('detailStudentSection').textContent = `Section: ${g.section} • ${g.email || ''}`;
         document.getElementById('detailTotalAct').textContent = g.totalActivities;
         document.getElementById('detailAvgScore').textContent = g.averageScore.toFixed(2) + '%';
-
-        const { badgeClass, statusText } = getGradeInfo(g.averageScore);
+        const { statusText } = getGradeInfo(g.averageScore);
         const statusCard = document.getElementById('detailStatusCard');
-        
-        // Set gradient based on score
         if (g.averageScore >= 90) statusCard.style.background = 'linear-gradient(135deg, #0e8a5f, #0a6646)';
         else if (g.averageScore >= 80) statusCard.style.background = 'linear-gradient(135deg, #2d6fc4, #1e4d8c)';
         else if (g.averageScore >= 70) statusCard.style.background = 'linear-gradient(135deg, #b07e16, #8a6010)';
         else statusCard.style.background = 'linear-gradient(135deg, #c0392b, #922b21)';
-        
         document.getElementById('detailStatusText').textContent = statusText;
-
         const sorted = [...g.instances].sort((a,b) => new Date(b.date) - new Date(a.date));
         document.getElementById('detailTableBody').innerHTML = sorted.map(act => {
             const rat = getRating(act.score);
@@ -1242,29 +1051,23 @@
                 <td><span style="display:inline-block; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:600; ${rat.cls}">${rat.text}</span></td>
             </tr>`;
         }).join('');
-
         document.getElementById('studentDetailModal').classList.add('open');
     };
 
-    // ─── FILTERS ───
     window.applyFilters = function() {
         const sec  = document.getElementById('filterSection').value;
         const sort = document.getElementById('sortBy').value;
-
         let filtered = [...currentFinalGrades];
         if (sec) filtered = filtered.filter(g => g.section === sec);
-
         if      (sort === 'highest')   filtered.sort((a,b) => b.averageScore - a.averageScore);
         else if (sort === 'lowest')    filtered.sort((a,b) => a.averageScore - b.averageScore);
         else if (sort === 'name-asc')  filtered.sort((a,b) => a.name.localeCompare(b.name));
         else if (sort === 'name-desc') filtered.sort((a,b) => b.name.localeCompare(a.name));
-
         filteredFinalGrades = filtered;
         renderTable(filtered);
         updateStats(filtered);
     };
 
-    // ─── RECALCULATE ───
     window.recalculateGrades = async function() {
         document.getElementById('tableLoading').style.display = 'flex';
         document.getElementById('tableWrapper').classList.add('hidden');
@@ -1274,7 +1077,6 @@
         showAlert(`Recalculated grades for ${currentFinalGrades.length} students.`, 'success', 'Done');
     };
 
-    // ─── EXPORT ───
     window.exportGrades = function() {
         if (!filteredFinalGrades.length) { showAlert('No grades to export.', 'warning'); return; }
         let csv = 'Student Name,Email,Section,Total Activities,Average Score,Status\n';
@@ -1289,120 +1091,39 @@
         showAlert('Grades exported successfully!', 'success');
     };
 
-    // ─── LOGOUT (styled popup) ───
     function showLogoutConfirmPopup() {
         const existing = document.getElementById('logoutOverlay');
         if (existing) existing.remove();
-
         const overlay = document.createElement('div');
         overlay.id = 'logoutOverlay';
-        overlay.style.cssText = `
-            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 99999; padding: 1rem;
-            animation: fadeInLogout 0.2s ease;
-        `;
-
+        overlay.style.cssText = `position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 1rem; animation: fadeInLogout 0.2s ease;`;
         overlay.innerHTML = `
             <style>
                 @keyframes fadeInLogout { from { opacity:0; } to { opacity:1; } }
                 @keyframes slideUpLogout { from { opacity:0; transform:translateY(24px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
             </style>
-            <div style="
-                background:#fff;
-                border-radius:24px;
-                padding:2rem 1.5rem 1.5rem;
-                max-width:360px;
-                width:100%;
-                box-shadow:0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
-                animation:slideUpLogout 0.35s cubic-bezier(.4,0,.2,1);
-                text-align:center;
-                font-family:'Inter',sans-serif;
-            ">
-                <div style="
-                    width:68px; height:68px;
-                    background:#fce8e6;
-                    border-radius:50%;
-                    display:flex; align-items:center; justify-content:center;
-                    margin:0 auto 1.25rem;
-                ">
-                    <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
-                        <path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                        <path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                    </svg>
+            <div style="background:#fff; border-radius:24px; padding:2rem 1.5rem 1.5rem; max-width:360px; width:100%; box-shadow:0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10); animation:slideUpLogout 0.35s cubic-bezier(.4,0,.2,1); text-align:center; font-family:'Inter',sans-serif;">
+                <div style="width:68px; height:68px; background:#fce8e6; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem;">
+                    <svg width="34" height="34" viewBox="0 0 48 48" fill="none"><path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/><path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/></svg>
                 </div>
-
-                <div style="font-size:1.25rem; font-weight:600; color:#202124; margin-bottom:0.35rem; letter-spacing:-0.01em;">
-                    Log Out
-                </div>
-
-                <div style="font-size:0.875rem; color:#5f6368; margin-bottom:1.5rem; line-height:1.5;">
-                    Are you sure you want to log out of your account?
-                </div>
-
+                <div style="font-size:1.25rem; font-weight:600; color:#202124; margin-bottom:0.35rem; letter-spacing:-0.01em;">Log Out</div>
+                <div style="font-size:0.875rem; color:#5f6368; margin-bottom:1.5rem; line-height:1.5;">Are you sure you want to log out of your account?</div>
                 <div style="height:1px; background:#e8eaed; margin:0 -1.5rem 1.25rem;"></div>
-
                 <div style="display:flex; gap:0.75rem;">
-                    <button id="logoutCancelBtn" style="
-                        flex:1;
-                        padding:0.75rem 0.5rem;
-                        border-radius:100px;
-                        border:1.5px solid #dadce0;
-                        background:#fff;
-                        color:#3c4043;
-                        font-size:0.9375rem;
-                        font-weight:500;
-                        cursor:pointer;
-                        font-family:'Inter',sans-serif;
-                        transition:background 0.15s;
-                        min-height:48px;
-                    ">Cancel</button>
-                    <button id="logoutConfirmBtn" style="
-                        flex:1;
-                        padding:0.75rem 0.5rem;
-                        border-radius:100px;
-                        border:none;
-                        background:#ea4335;
-                        color:#fff;
-                        font-size:0.9375rem;
-                        font-weight:500;
-                        cursor:pointer;
-                        font-family:'Inter',sans-serif;
-                        transition:background 0.15s, box-shadow 0.15s;
-                        min-height:48px;
-                    ">Log Out</button>
+                    <button id="logoutCancelBtn" style="flex:1; padding:0.75rem 0.5rem; border-radius:100px; border:1.5px solid #dadce0; background:#fff; color:#3c4043; font-size:0.9375rem; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; min-height:48px;">Cancel</button>
+                    <button id="logoutConfirmBtn" style="flex:1; padding:0.75rem 0.5rem; border-radius:100px; border:none; background:#ea4335; color:#fff; font-size:0.9375rem; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; min-height:48px;">Log Out</button>
                 </div>
-            </div>
-        `;
-
+            </div>`;
         document.body.appendChild(overlay);
-
         const profileDropdown = document.getElementById('profileDropdown');
         if (profileDropdown) profileDropdown.classList.remove('show');
-
-        document.getElementById('logoutCancelBtn').addEventListener('click', () => {
-            overlay.remove();
-        });
-
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) overlay.remove();
-        });
-
+        document.getElementById('logoutCancelBtn').addEventListener('click', () => overlay.remove());
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
         document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
             const confirmBtn = document.getElementById('logoutConfirmBtn');
-            confirmBtn.textContent = 'Logging out...';
-            confirmBtn.disabled = true;
-            confirmBtn.style.opacity = '0.7';
-
-            try {
-                await signOut(auth);
-                window.location.href = '/login/index.html';
-            } catch (error) {
-                console.error('Logout error:', error);
-                overlay.remove();
-                alert('Error logging out. Please try again.');
-            }
+            confirmBtn.textContent = 'Logging out...'; confirmBtn.disabled = true; confirmBtn.style.opacity = '0.7';
+            try { await signOut(auth); window.location.href = '/login/index.html'; }
+            catch (error) { console.error('Logout error:', error); overlay.remove(); alert('Error logging out. Please try again.'); }
         });
     }
 

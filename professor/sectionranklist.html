@@ -116,8 +116,8 @@
         @media (max-width: 768px) {
             #rankTableHead { display: none; }
             #rankTableBody tr { display: block; margin-bottom: 14px; border: 1px solid #e1e6ef; border-radius: 12px; background: white; padding: 14px; }
-            #rankTableBody td { display: flex; padding: 8px 8px 8px 42%; border: none; border-bottom: 1px solid #f1f5f9; position: relative; min-height: 40px; align-items: center; font-size: 13px; }
-            #rankTableBody td:before { content: attr(data-label); position: absolute; left: 10px; width: 38%; font-weight: 600; color: #4a5a72; font-size: 12px; }
+            #rankTableBody td { display: flex; justify-content: space-between; align-items: center; padding: 9px 8px; border: none; border-bottom: 1px solid #f1f5f9; font-size: 13px; gap: 8px; min-width: 0; }
+            #rankTableBody td:before { content: attr(data-label); font-weight: 600; color: #4a5a72; font-size: 12px; flex-shrink: 0; min-width: 90px; }
             #rankTableBody td:last-child { border-bottom: none; }
         }
 
@@ -368,7 +368,7 @@
 
             <!-- Assigned Sections Panel -->
             <div class="bg-white rounded-2xl border border-border shadow-sm mb-7 overflow-hidden">
-                <div class="px-6 py-4 border-b border-border flex items-center justify-between flex-wrap gap-3">
+                <div class="px-4 md:px-6 py-4 border-b border-border flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <div class="flex items-center gap-2.5 text-[15px] font-semibold text-navy">
                         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0d7a5a] to-success flex items-center justify-center text-white text-[13px]">
                             <i class="fas fa-layer-group"></i>
@@ -376,7 +376,7 @@
                         My Assigned Sections
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-info-bg text-blue text-xs font-semibold" id="sectionsCount">0</span>
                     </div>
-                    <div class="flex items-center gap-2.5 flex-wrap">
+                   <div class="flex flex-col gap-2 w-full md:w-auto md:flex-row md:items-center md:flex-wrap">
                         <div id="activeFilterBadge" class="hidden">
                             <div class="inline-flex items-center gap-1.5 bg-info-bg text-info text-xs font-semibold px-2.5 py-1 rounded-full border border-info/20">
                                 <i class="fas fa-filter text-[11px]"></i>
@@ -384,19 +384,19 @@
                                 <span onclick="clearSectionFilter()" class="cursor-pointer text-blue text-sm leading-none hover:text-danger ml-1 transition-colors">✕</span>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2.5 flex-wrap">
-                            <div class="relative flex items-center">
-                                <i class="fas fa-search absolute left-3 text-text-muted text-[13px] pointer-events-none"></i>
-                                <input type="text" id="sectionSearchInput" placeholder="Search sections..."
-                                    oninput="filterSections()"
-                                    class="pl-9 pr-3.5 py-2 border border-border rounded-lg font-sans text-[13px] text-text-primary bg-surface w-[220px] focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/10 focus:bg-white transition-all">
-                            </div>
+                        <div class="relative flex items-center">
+                            <i class="fas fa-search absolute left-3 text-text-muted text-[13px] pointer-events-none"></i>
+                            <input type="text" id="sectionSearchInput" placeholder="Search sections..."
+                                oninput="filterSections()"
+                                class="pl-9 pr-3.5 py-2 border border-border rounded-lg font-sans text-[13px] text-text-primary bg-surface w-full md:w-[220px] focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/10 focus:bg-white transition-all">
+                        </div>
+                        <div class="flex items-center gap-2 flex-wrap">
                             <select id="sectionNameFilter" onchange="filterSections()"
-                                class="px-3.5 py-2 border border-border rounded-lg font-sans text-[13px] text-text-primary bg-surface cursor-pointer focus:outline-none focus:border-blue">
+                                class="flex-1 px-3.5 py-2 border border-border rounded-lg font-sans text-[13px] text-text-primary bg-surface cursor-pointer focus:outline-none focus:border-blue">
                                 <option value="">All Sections</option>
                             </select>
                             <select id="yearFilter" onchange="filterSections()"
-                                class="px-3.5 py-2 border border-border rounded-lg font-sans text-[13px] text-text-primary bg-surface cursor-pointer focus:outline-none focus:border-blue">
+                                class="flex-1 px-3.5 py-2 border border-border rounded-lg font-sans text-[13px] text-text-primary bg-surface cursor-pointer focus:outline-none focus:border-blue">
                                 <option value="">All Years</option>
                                 <option value="1">1st Year</option>
                                 <option value="2">2nd Year</option>
@@ -406,7 +406,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="sectionsGrid" class="grid gap-4 p-6" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));"></div>
+                <div id="sectionsGrid" class="grid gap-4 p-4 md:p-6" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));"></div>
                 <div id="noSectionsMsg" class="hidden py-12 px-8 text-center">
                     <div class="w-[60px] h-[60px] rounded-2xl bg-surface flex items-center justify-center text-2xl text-text-muted mx-auto mb-4">
                         <i class="fas fa-layer-group"></i>
@@ -441,7 +441,7 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-border">
+                <div class="rounded-xl border border-border">
                     <table class="w-full border-collapse">
                         <thead id="rankTableHead">
                             <tr class="bg-gradient-to-r from-navy/90 to-royal/90 text-white">

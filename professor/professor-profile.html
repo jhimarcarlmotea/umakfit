@@ -125,6 +125,29 @@
         /* Modal */
         .pro-modal { display: none; }
         .pro-modal.open { display: flex; }
+
+        /* Students modal: enable horizontal scroll if needed */
+        #studentsModal .students-modal-scroll {
+            overflow-x: auto;
+        }
+        #studentsModal table {
+            min-width: 720px;
+        }
+
+        /* Students modal table: avoid horizontal scroll, allow wrapping */
+        #studentsModal table {
+            table-layout: fixed;
+            width: 100%;
+        }
+        #studentsModal th,
+        #studentsModal td {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        /* Email column can be long; break aggressively */
+        #studentsModal td:nth-child(2) {
+            word-break: break-all;
+        }
     </style>
 </head>
 <body class="font-sans bg-surface text-text-primary min-h-screen m-0 p-0">
@@ -178,7 +201,7 @@
 </div>
 
 <!-- ─── ALL STUDENTS MODAL ─── -->
-<div id="studentsModal" class="pro-modal fixed inset-0 bg-black/55 justify-center items-center z-[9000] backdrop-blur-sm p-4">
+<div id="studentsModal" class="pro-modal fixed inset-0 bg-black/50 justify-center items-center z-[9000] p-4">
     <div class="bg-white rounded-2xl w-full max-w-[900px] max-h-[85vh] flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.2)] animate-fadeIn overflow-hidden">
         <div class="flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
             <div>
@@ -205,7 +228,7 @@
                 </button>
             </div>
         </div>
-        <div class="flex-1 overflow-y-auto">
+        <div class="flex-1 overflow-y-auto students-modal-scroll">
             <table class="w-full">
                 <thead class="sticky top-0 bg-surface border-b border-border">
                     <tr>
@@ -228,7 +251,7 @@
 </div>
 
 <!-- ─── ALL SECTIONS MODAL ─── -->
-<div id="sectionsModal" class="pro-modal fixed inset-0 bg-black/55 justify-center items-center z-[9000] backdrop-blur-sm p-4">
+<div id="sectionsModal" class="pro-modal fixed inset-0 bg-black/50 justify-center items-center z-[9000] p-4">
     <div class="bg-white rounded-2xl w-full max-w-[900px] max-h-[85vh] flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.2)] animate-fadeIn overflow-hidden">
         <div class="flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
             <div>
@@ -254,7 +277,7 @@
 </div>
 
 <!-- ─── ACTIVITY HISTORY MODAL ─── -->
-<div id="historyModal" class="pro-modal fixed inset-0 bg-black/55 justify-center items-center z-[9000] backdrop-blur-sm p-4">
+<div id="historyModal" class="pro-modal fixed inset-0 bg-black/50 justify-center items-center z-[9000] p-4">
     <div class="bg-white rounded-2xl w-full max-w-[700px] max-h-[85vh] flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.2)] animate-fadeIn overflow-hidden">
         <div class="flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
             <div>
@@ -489,7 +512,7 @@
 
                 <!-- Sections Panel -->
                 <div class="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 border-b border-border flex items-center justify-between">
+                    <div class="px-6 py-4 border-b border-border flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex items-center gap-2 text-[15px] font-semibold text-navy">
                             <div class="w-8 h-8 rounded-lg bg-purple-bg text-[#7c3aed] flex items-center justify-center text-[13px]">
                                 <i class="fas fa-layer-group"></i>
@@ -510,7 +533,7 @@
 
                 <!-- Students Panel -->
                 <div class="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 border-b border-border flex items-center justify-between">
+                    <div class="px-6 py-4 border-b border-border flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex items-center gap-2 text-[15px] font-semibold text-navy">
                             <div class="w-8 h-8 rounded-lg bg-info-bg text-blue flex items-center justify-center text-[13px]">
                                 <i class="fas fa-user-graduate"></i>
@@ -518,12 +541,12 @@
                             Students
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-info-bg text-blue text-xs font-bold" id="studentsBadge">0</span>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 sm:justify-end">
                             <select id="sectionFilter" onchange="filterStudentsBySection()"
                                 class="px-2.5 py-1.5 border border-border rounded-lg text-[12px] font-sans bg-surface focus:outline-none focus:border-blue cursor-pointer">
                                 <option value="">All Sections</option>
                             </select>
-                            <button onclick="openStudentsModal()" class="text-[12px] font-semibold text-blue hover:text-royal transition-colors flex items-center gap-1">
+                            <button onclick="openStudentsModal()" class="text-[12px] font-semibold text-blue hover:text-royal transition-colors flex items-center gap-1 mr-2">
                                 <i class="fas fa-expand-alt text-[10px]"></i> View All
                             </button>
                         </div>
