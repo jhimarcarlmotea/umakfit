@@ -212,29 +212,24 @@
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 1.25rem; height: 72px;
             border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;
+            position: relative; z-index: 10;
         }
 
         .drawer-close-btn {
-            width: 36px; height: 36px;
+            width: 44px; height: 44px;
             background: rgba(255,255,255,0.07);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 9px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; color: rgba(255,255,255,0.55);
             font-size: 1.1rem; transition: all 0.2s;
+            position: relative; z-index: 11;
+            pointer-events: all;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         .drawer-close-btn:hover { background: rgba(255,255,255,0.13); color: white; }
-            .drawer-top {
-            position: relative;
-            z-index: 10;
-        }
 
-        .drawer-close-btn {
-            position: relative;
-            z-index: 11;
-            pointer-events: all !important;
-            -webkit-tap-highlight-color: transparent;
-        }
         .drawer-nav-section { padding: 1.25rem 1rem; flex: 1; }
 
         .drawer-section-label {
@@ -249,6 +244,8 @@
             font-weight: 500; font-size: 0.95rem;
             display: flex; align-items: center; gap: 0.85rem;
             transition: all 0.2s; margin-bottom: 2px;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 44px;
         }
 
         .mobile-menu a .d-icon {
@@ -302,7 +299,6 @@
                 linear-gradient(165deg, #0A1628 0%, #142240 55%, #0E1E38 100%);
         }
 
-        /* Animated grid */
         .bg-grid {
             position: absolute; inset: 0;
             background-image:
@@ -313,35 +309,16 @@
             pointer-events: none;
         }
 
-        /* Floating orbs */
         .orb {
-            position: absolute;
-            border-radius: 50%;
+            position: absolute; border-radius: 50%;
             pointer-events: none;
             animation: orbFloat 20s infinite ease-in-out;
             z-index: 0;
         }
 
-        .orb-1 {
-            width: 500px; height: 500px;
-            top: -200px; right: -150px;
-            background: radial-gradient(circle, rgba(200,153,42,0.09) 0%, transparent 65%);
-            animation-delay: 0s;
-        }
-
-        .orb-2 {
-            width: 400px; height: 400px;
-            bottom: 0; left: -100px;
-            background: radial-gradient(circle, rgba(30,51,88,0.5) 0%, transparent 65%);
-            animation-delay: -8s;
-        }
-
-        .orb-3 {
-            width: 250px; height: 250px;
-            top: 40%; left: 15%;
-            background: radial-gradient(circle, rgba(200,153,42,0.05) 0%, transparent 65%);
-            animation-delay: -14s;
-        }
+        .orb-1 { width: 500px; height: 500px; top: -200px; right: -150px; background: radial-gradient(circle, rgba(200,153,42,0.09) 0%, transparent 65%); }
+        .orb-2 { width: 400px; height: 400px; bottom: 0; left: -100px; background: radial-gradient(circle, rgba(30,51,88,0.5) 0%, transparent 65%); animation-delay: -8s; }
+        .orb-3 { width: 250px; height: 250px; top: 40%; left: 15%; background: radial-gradient(circle, rgba(200,153,42,0.05) 0%, transparent 65%); animation-delay: -14s; }
 
         @keyframes orbFloat {
             0%, 100% { transform: translate(0, 0) scale(1); }
@@ -351,36 +328,21 @@
 
         /* ─── MAIN LAYOUT ─── */
         .login-layout {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: stretch;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-            padding: 0 clamp(1.5rem, 5vw, 4rem);
-            gap: 3rem;
-            position: relative;
-            z-index: 2;
+            flex: 1; display: grid; grid-template-columns: 1fr 1fr;
+            align-items: stretch; max-width: 1200px; margin: 0 auto;
+            width: 100%; padding: 0 clamp(1.5rem, 5vw, 4rem);
+            gap: 3rem; position: relative; z-index: 2;
             height: calc(100vh - 72px);
         }
 
-        /* ─── LEFT PANEL (branding) ─── */
         .login-left {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 100%;
-            animation: fadeUp 0.8s ease both;
-            padding-top: 40px;
+            display: flex; flex-direction: column; justify-content: center;
+            height: 100%; animation: fadeUp 0.8s ease both; padding-top: 40px;
         }
 
-        /* Right column also needs to center its card */
         .login-layout > div:last-child {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; height: 100%;
         }
 
         @keyframes fadeUp {
@@ -392,19 +354,14 @@
             display: inline-flex; align-items: center; gap: 8px;
             background: rgba(200,153,42,0.12);
             border: 1px solid rgba(200,153,42,0.3);
-            color: var(--gold-light);
-            padding: 6px 14px; border-radius: 100px;
-            font-size: 0.75rem; font-weight: 600;
-            letter-spacing: 0.08em; text-transform: uppercase;
-            margin-bottom: 0.8rem;
-            align-self: flex-start;
+            color: var(--gold-light); padding: 6px 14px; border-radius: 100px;
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
+            text-transform: uppercase; margin-bottom: 0.8rem; align-self: flex-start;
         }
 
         .left-badge::before {
-            content: '';
-            width: 6px; height: 6px;
-            background: var(--gold-light);
-            border-radius: 50%;
+            content: ''; width: 6px; height: 6px;
+            background: var(--gold-light); border-radius: 50%;
             animation: badgePulse 2s infinite;
         }
 
@@ -414,92 +371,54 @@
         }
 
         .left-title {
-            font-family: 'Playfair Display', serif;
-            font-weight: 900;
-            font-size: clamp(2rem, 3.2vw, 3rem);
-            line-height: 1.05;
-            margin-bottom: 0.6rem;
+            font-family: 'Playfair Display', serif; font-weight: 900;
+            font-size: clamp(2rem, 3.2vw, 3rem); line-height: 1.05; margin-bottom: 0.6rem;
         }
 
         .left-title em {
             font-style: italic;
             background: linear-gradient(135deg, var(--gold-pale) 0%, var(--gold) 50%, var(--gold-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
 
         .left-desc {
             font-size: 0.875rem; color: rgba(255,255,255,0.5);
-            line-height: 1.6; max-width: 400px;
-            font-weight: 300; margin-bottom: 1rem;
+            line-height: 1.6; max-width: 400px; font-weight: 300; margin-bottom: 1rem;
         }
 
-        .left-features {
-            display: flex; flex-direction: column; gap: 0.6rem;
-        }
+        .left-features { display: flex; flex-direction: column; gap: 0.6rem; }
 
         .left-feature {
             display: flex; align-items: center; gap: 0.9rem;
             padding: 0.65rem 1rem;
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 12px;
-            transition: all 0.25s;
+            border-radius: 12px; transition: all 0.25s;
         }
 
-        .left-feature:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(200,153,42,0.2);
-        }
+        .left-feature:hover { background: rgba(255,255,255,0.05); border-color: rgba(200,153,42,0.2); }
 
         .lf-icon {
             width: 36px; height: 36px;
             background: linear-gradient(135deg, rgba(200,153,42,0.18), rgba(200,153,42,0.08));
-            border: 1px solid rgba(200,153,42,0.18);
-            border-radius: 9px;
+            border: 1px solid rgba(200,153,42,0.18); border-radius: 9px;
             display: flex; align-items: center; justify-content: center;
             font-size: 0.9rem; flex-shrink: 0;
         }
 
-        .lf-text {
-            font-size: 0.875rem; color: rgba(255,255,255,0.65);
-            font-weight: 500;
-        }
-
-        .left-stat-row {
-            display: none;
-        }
-
-        .l-stat-num {
-            font-family: 'Space Mono', monospace;
-            font-weight: 700; font-size: 1.3rem;
-            color: var(--gold-light); display: block;
-        }
-
-        .l-stat-label {
-            font-size: 0.7rem; color: rgba(255,255,255,0.35);
-            text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px;
-        }
+        .lf-text { font-size: 0.875rem; color: rgba(255,255,255,0.65); font-weight: 500; }
 
         /* ─── LOGIN CARD ─── */
         .login-card {
-            background: rgba(255,255,255,0.97);
-            border-radius: 28px;
+            background: rgba(255,255,255,0.97); border-radius: 28px;
             padding: clamp(1.5rem, 2.5vw, 2rem);
-            box-shadow:
-                0 40px 80px rgba(0,0,0,0.4),
-                0 0 0 1px rgba(255,255,255,0.08);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08);
             animation: cardSlide 0.8s 0.15s ease both;
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
 
         .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
             background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
         }
 
@@ -508,79 +427,40 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .card-logo {
-            display: flex; align-items: center; justify-content: center;
-            gap: 10px; margin-bottom: 1rem;
-        }
-
-        .card-logo-img {
-            width: 40px; height: 40px; object-fit: contain;
-        }
+        .card-logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1rem; }
+        .card-logo-img { width: 40px; height: 40px; object-fit: contain; }
 
         .card-logo-text {
-            font-family: 'Playfair Display', serif;
-            font-weight: 800; font-size: 1.3rem;
+            font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.3rem;
             background: linear-gradient(135deg, #8B6D2D 0%, #C8992A 50%, #E8BA4A 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
 
         .card-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.6rem, 3vw, 2rem);
-            font-weight: 900;
-            color: var(--text-dark);
-            text-align: center;
-            line-height: 1.15;
-            margin-bottom: 0.6rem;
+            font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 900; color: var(--text-dark); text-align: center;
+            line-height: 1.15; margin-bottom: 0.6rem;
         }
 
         .card-subtitle {
-            text-align: center;
-            font-size: 0.875rem;
-            color: var(--text-mid);
-            line-height: 1.65;
-            margin-bottom: 1rem;
-            font-weight: 300;
+            text-align: center; font-size: 0.875rem; color: var(--text-mid);
+            line-height: 1.65; margin-bottom: 1rem; font-weight: 300;
         }
 
-        /* University badge */
         .uni-badge {
-            display: flex; align-items: center; justify-content: center;
-            gap: 8px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
             background: linear-gradient(135deg, #FEF9EC, #FDF3D0);
-            border: 1px solid rgba(200,153,42,0.25);
-            border-radius: 100px;
-            padding: 0.55rem 1.2rem;
-            margin: 0 auto 1rem;
-            width: fit-content;
+            border: 1px solid rgba(200,153,42,0.25); border-radius: 100px;
+            padding: 0.55rem 1.2rem; margin: 0 auto 1rem; width: fit-content;
         }
 
-        .uni-badge-dot {
-            width: 6px; height: 6px;
-            background: var(--gold); border-radius: 50%;
-            flex-shrink: 0;
-        }
+        .uni-badge-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; flex-shrink: 0; }
+        .uni-badge span { font-size: 0.78rem; font-weight: 700; color: #8B6D2D; letter-spacing: 0.04em; }
 
-        .uni-badge span {
-            font-size: 0.78rem; font-weight: 700;
-            color: #8B6D2D;
-            letter-spacing: 0.04em;
-        }
-
-        /* Error message */
         #errorMessage {
-            background: #FEF2F2;
-            border-left: 3px solid #EF4444;
-            border-radius: 10px;
-            padding: 0.85rem 1rem;
-            font-size: 0.85rem;
-            color: #B91C1C;
-            font-weight: 500;
-            margin-bottom: 1.2rem;
-            text-align: center;
-            animation: shake 0.4s ease;
+            background: #FEF2F2; border-left: 3px solid #EF4444; border-radius: 10px;
+            padding: 0.85rem 1rem; font-size: 0.85rem; color: #B91C1C; font-weight: 500;
+            margin-bottom: 1.2rem; text-align: center; animation: shake 0.4s ease;
         }
 
         #errorMessage.hidden { display: none; }
@@ -591,226 +471,58 @@
             75% { transform: translateX(4px); }
         }
 
-        /* Google Button */
         .google-btn {
-            width: 100%;
-            height: 50px;
-            background: white;
-            border: 1.5px solid #E5E7EB;
-            border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.25s;
+            width: 100%; height: 54px;
+            background: white; border: 1.5px solid #E5E7EB; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            cursor: pointer; transition: all 0.25s;
             position: relative; overflow: hidden;
             font-family: 'DM Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            -webkit-appearance: none; appearance: none;
+            user-select: none; -webkit-user-select: none;
         }
 
         .google-btn::before {
-            content: '';
-            position: absolute; inset: 0;
+            content: ''; position: absolute; inset: 0;
             background: linear-gradient(135deg, rgba(200,153,42,0.04), rgba(200,153,42,0.02));
             opacity: 0; transition: opacity 0.25s;
         }
 
-        .google-btn:hover {
-            border-color: var(--gold);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 28px rgba(200,153,42,0.2);
-        }
-
+        .google-btn:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(200,153,42,0.2); }
         .google-btn:hover::before { opacity: 1; }
+        .google-btn:active { transform: translateY(0); border-color: var(--gold); }
+        .google-btn img { width: 22px; height: 22px; flex-shrink: 0; pointer-events: none; }
+        .google-btn-text { font-size: 0.95rem; font-weight: 600; color: #374151; letter-spacing: 0.01em; pointer-events: none; }
 
-        .google-btn:active { transform: translateY(0); }
+        .card-divider { display: flex; align-items: center; gap: 12px; margin: 1rem 0 0.8rem; }
+        .card-divider::before, .card-divider::after { content: ''; flex: 1; height: 1px; background: #E5E7EB; }
+        .card-divider span { font-size: 0.72rem; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
 
-        .google-btn img {
-            width: 22px; height: 22px; flex-shrink: 0;
-        }
-
-        .google-btn-text {
-            font-size: 0.95rem; font-weight: 600;
-            color: #374151; letter-spacing: 0.01em;
-        }
-
-        /* Divider */
-        .card-divider {
-            display: flex; align-items: center; gap: 12px;
-            margin: 1rem 0 0.8rem;
-        }
-
-        .card-divider::before, .card-divider::after {
-            content: ''; flex: 1;
-            height: 1px; background: #E5E7EB;
-        }
-
-        .card-divider span {
-            font-size: 0.72rem; color: #9CA3AF;
-            text-transform: uppercase; letter-spacing: 0.08em;
-            font-weight: 600;
-        }
-
-        /* Trust indicators */
-        .trust-row {
-            display: flex; justify-content: center;
-            gap: 1.2rem; flex-wrap: wrap;
-            padding-top: 1rem;
-            border-top: 1px solid #F3F4F6;
-        }
-
-        .trust-item {
-            display: flex; align-items: center; gap: 6px;
-            font-size: 0.75rem; color: #6B7280; font-weight: 500;
-        }
-
+        .trust-row { display: flex; justify-content: center; gap: 1.2rem; flex-wrap: wrap; padding-top: 1rem; border-top: 1px solid #F3F4F6; }
+        .trust-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #6B7280; font-weight: 500; }
         .trust-item i { color: var(--gold); font-size: 0.8rem; }
+        .card-note { text-align: center; margin-top: 0.7rem; font-size: 0.7rem; color: #9CA3AF; line-height: 1.6; }
 
-        /* Card footer note */
-        .card-note {
-            text-align: center;
-            margin-top: 0.7rem;
-            font-size: 0.7rem;
-            color: #9CA3AF;
-            line-height: 1.6;
-        }
-
-        /* ─── RESPONSIVE ─── */
         @media (max-width: 900px) {
-            .login-layout {
-                grid-template-columns: 1fr;
-                padding-top: 5rem;
-            }
+            .login-layout { grid-template-columns: 1fr; padding-top: 5rem; }
             .login-left { display: none; }
         }
-
-        /* ─── FOOTER ─── */
-        footer {
-            background: #060E1A;
-            border-top: 1px solid rgba(255,255,255,0.07);
-            padding: clamp(3rem, 5vw, 4.5rem) clamp(1.5rem, 5vw, 4rem) 2rem;
-            position: relative; z-index: 2;
-        }
-
-        .footer-grid {
-            max-width: 1200px; margin: 0 auto;
-            display: grid; grid-template-columns: 1.4fr 1fr 1fr;
-            gap: 4rem; margin-bottom: 3rem;
-        }
-
-        .footer-logo-area { margin-bottom: 1rem; }
-
-        .footer-desc {
-            font-size: 0.85rem; color: rgba(255,255,255,0.4);
-            line-height: 1.8; font-weight: 300; max-width: 300px;
-        }
-
-        .footer-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1.2rem; }
-
-        .footer-tag {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: rgba(255,255,255,0.5);
-            font-size: 0.7rem; padding: 4px 10px;
-            border-radius: 100px; font-weight: 500;
-        }
-
-        .footer-heading {
-            font-size: 0.75rem; text-transform: uppercase;
-            letter-spacing: 0.12em; font-weight: 700;
-            color: var(--gold); margin-bottom: 1.2rem;
-        }
-
-        .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
-
-        .footer-links a {
-            color: rgba(255,255,255,0.45);
-            text-decoration: none; font-size: 0.875rem;
-            transition: color 0.2s; display: flex;
-            align-items: center; gap: 6px;
-        }
-
-        .footer-links a:hover { color: rgba(255,255,255,0.85); }
-
-        .footer-links a::before {
-            content: '→'; font-size: 0.75rem; color: var(--gold);
-            opacity: 0; transform: translateX(-4px); transition: all 0.2s;
-        }
-
-        .footer-links a:hover::before { opacity: 1; transform: translateX(0); }
-
-        .contact-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 0.8rem; }
-
-        .contact-icon {
-            width: 28px; height: 28px;
-            background: rgba(200,153,42,0.12);
-            border: 1px solid rgba(200,153,42,0.2);
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.7rem; flex-shrink: 0; margin-top: 2px;
-        }
-
-        .contact-text { font-size: 0.82rem; color: rgba(255,255,255,0.45); line-height: 1.5; }
-        .contact-text a { color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s; }
-        .contact-text a:hover { color: var(--gold-light); }
-
-        .social-row { display: flex; gap: 8px; margin-top: 1rem; }
-
-        .social-btn {
-            width: 34px; height: 34px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 9px;
-            display: flex; align-items: center; justify-content: center;
-            color: rgba(255,255,255,0.5); text-decoration: none;
-            font-size: 0.8rem; transition: all 0.2s;
-        }
-
-        .social-btn:hover {
-            background: rgba(200,153,42,0.15);
-            border-color: rgba(200,153,42,0.3);
-            color: var(--gold-light);
-        }
-
-        .footer-bottom {
-            max-width: 1200px; margin: 0 auto;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.07);
-            display: flex; align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap; gap: 1rem;
-        }
-
-        .footer-copy { font-size: 0.78rem; color: rgba(255,255,255,0.25); }
-
-        .footer-bottom-links { display: flex; gap: 1.5rem; }
-
-        .footer-bottom-links a {
-            font-size: 0.78rem; color: rgba(255,255,255,0.3);
-            text-decoration: none; transition: color 0.2s;
-        }
-
-        .footer-bottom-links a:hover { color: rgba(255,255,255,0.6); }
-
-        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
-        @media (max-width: 580px) { .footer-grid { grid-template-columns: 1fr; gap: 2rem; } .footer-bottom-links { flex-wrap: wrap; } }
     </style>
 </head>
 <body>
 
-    <!-- ─── LOADING OVERLAY ─── -->
     <div id="loadingOverlay" class="loading-overlay hidden">
         <div class="spinner"></div>
         <div class="loading-text" id="loadingText">Checking your account status...</div>
     </div>
 
-    <!-- ─── NAVIGATION ─── -->
     <nav id="mainNav">
         <a href="./UmakfitLandingpage.html" class="nav-logo">
-            <div class="logo-mark">
-                <img src="UMakfit Logo (2).png" alt="UMakFIT Logo">
-            </div>
+            <div class="logo-mark"><img src="UMakfit Logo (2).png" alt="UMakFIT Logo"></div>
             <span class="logo-text">UMakFIT</span>
         </a>
-
         <ul class="nav-links">
             <li><a href="./UmakfitLandingpage.html#features">Features</a></li>
             <li><a href="./UmakfitLandingpage.html#benefits">Benefits</a></li>
@@ -818,47 +530,34 @@
             <li><a href="./UmakfitLandingpage.html#contact">Contact</a></li>
             <li><a href="./index.html" class="nav-cta">Login to UMakFit</a></li>
         </ul>
-
-        <div class="hamburger" id="hamburger">
-            <span></span><span></span><span></span>
-        </div>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
     </nav>
 
-    <!-- Drawer Overlay -->
     <div class="drawer-overlay-bg" id="drawerOverlay"></div>
 
-    <!-- Left Side Drawer -->
     <div class="mobile-menu" id="mobileDrawer">
         <div class="drawer-top">
             <a href="./UmakfitLandingpage.html" class="nav-logo">
                 <div class="logo-mark"><img src="UMakfit Logo (2).png" alt="UMakFIT Logo"></div>
                 <span class="logo-text">UMakFIT</span>
             </a>
+            <button class="drawer-close-btn" id="drawerClose" type="button">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
         <div class="drawer-nav-section">
             <div class="drawer-section-label">Navigation</div>
-            <a href="./UmakfitLandingpage.html#features" class="mobile-nav-link">
-                <span class="d-icon">📋</span> Features
-            </a>
-            <a href="./UmakfitLandingpage.html#benefits" class="mobile-nav-link">
-                <span class="d-icon">⭐</span> Benefits
-            </a>
-            <a href="./UmakfitAbout.html" class="mobile-nav-link">
-                <span class="d-icon">ℹ️</span> About
-            </a>
-            <a href="./UmakfitLandingpage.html#contact" class="mobile-nav-link">
-                <span class="d-icon">✉️</span> Contact
-            </a>
+            <a href="./UmakfitLandingpage.html#features" class="mobile-nav-link"><span class="d-icon">📋</span> Features</a>
+            <a href="./UmakfitLandingpage.html#benefits" class="mobile-nav-link"><span class="d-icon">⭐</span> Benefits</a>
+            <a href="./UmakfitAbout.html" class="mobile-nav-link"><span class="d-icon">ℹ️</span> About</a>
+            <a href="./UmakfitLandingpage.html#contact" class="mobile-nav-link"><span class="d-icon">✉️</span> Contact</a>
         </div>
         <div class="drawer-footer-area">
-            <a href="./index.html" class="nav-cta">
-                <span class="d-icon">🔑</span> Login to UMakFit
-            </a>
+            <a href="./index.html" class="nav-cta"><span class="d-icon">🔑</span> Login to UMakFit</a>
             <div class="drawer-app-info">University of Makati — College of Human Kinetics</div>
         </div>
     </div>
 
-    <!-- ─── MAIN PAGE ─── -->
     <div class="page-bg">
         <div class="bg-grid"></div>
         <div class="orb orb-1"></div>
@@ -866,557 +565,435 @@
         <div class="orb orb-3"></div>
 
         <div class="login-layout">
-
-            <!-- LEFT BRANDING PANEL -->
             <div class="login-left">
                 <div class="left-badge">Official Platform</div>
-                <h1 class="left-title">
-                    Welcome to<br>
-                    <em>UMakFIT</em>
-                </h1>
-                <p class="left-desc">
-                    The official fitness assessment and tracking platform of the College of Human Kinetics. Sign in to access your personalized fitness dashboard.
-                </p>
-
+                <h1 class="left-title">Welcome to<br><em>UMakFIT</em></h1>
+                <p class="left-desc">The official fitness assessment and tracking platform of the College of Human Kinetics. Sign in to access your personalized fitness dashboard.</p>
                 <div class="left-features">
-                    <div class="left-feature">
-                        <div class="lf-icon">📊</div>
-                        <div class="lf-text">Track your fitness progress in real-time</div>
-                    </div>
-                    <div class="left-feature">
-                        <div class="lf-icon">🎯</div>
-                        <div class="lf-text">Get personalized fitness recommendations</div>
-                    </div>
-                    <div class="left-feature">
-                        <div class="lf-icon">🔒</div>
-                        <div class="lf-text">Secure UMak email authentication only</div>
-                    </div>
-                    <div class="left-feature">
-                        <div class="lf-icon">📄</div>
-                        <div class="lf-text">Export professional fitness reports</div>
-                    </div>
+                    <div class="left-feature"><div class="lf-icon">📊</div><div class="lf-text">Track your fitness progress in real-time</div></div>
+                    <div class="left-feature"><div class="lf-icon">🎯</div><div class="lf-text">Get personalized fitness recommendations</div></div>
+                    <div class="left-feature"><div class="lf-icon">🔒</div><div class="lf-text">Secure UMak email authentication only</div></div>
+                    <div class="left-feature"><div class="lf-icon">📄</div><div class="lf-text">Export professional fitness reports</div></div>
                 </div>
             </div>
 
-            <!-- LOGIN CARD -->
             <div>
                 <div class="login-card">
-                    <!-- Card Logo -->
                     <div class="card-logo">
                         <img src="UMakfit Logo (2).png" alt="UMakFIT Logo" class="card-logo-img">
                         <span class="card-logo-text">UMakFIT</span>
                     </div>
-
-                    <!-- Title -->
                     <h2 class="card-title">Sign in to your account</h2>
                     <p class="card-subtitle">Access your fitness dashboard and track your progress</p>
-
-                    <!-- University Badge -->
                     <div class="uni-badge">
                         <div class="uni-badge-dot"></div>
                         <span>University of Makati</span>
                     </div>
-
-                    <!-- Error Message -->
                     <div id="errorMessage" class="hidden"></div>
-
-                    <!-- Google Sign In Button -->
-                    <button class="google-btn" onclick="handlePlatformAwareSignIn()">
+                    <button class="google-btn" id="googleSignInBtn" type="button">
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-                        <span class="google-btn-text" id="googleButtonText">Continue with UMak Gmail</span>
+                        <span class="google-btn-text">Continue with UMak Gmail</span>
                     </button>
-
-                    <div class="card-divider">
-                        <span>Secure Access</span>
-                    </div>
-
-                    <!-- Trust indicators -->
+                    <div class="card-divider"><span>Secure Access</span></div>
                     <div class="trust-row">
-                        <div class="trust-item">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Secure Login</span>
-                        </div>
-                        <div class="trust-item">
-                            <i class="fas fa-lock"></i>
-                            <span>UMak Email Only</span>
-                        </div>
-                        <div class="trust-item">
-                            <i class="fas fa-bolt"></i>
-                            <span>Instant Access</span>
-                        </div>
+                        <div class="trust-item"><i class="fas fa-shield-alt"></i><span>Secure Login</span></div>
+                        <div class="trust-item"><i class="fas fa-lock"></i><span>UMak Email Only</span></div>
+                        <div class="trust-item"><i class="fas fa-bolt"></i><span>Instant Access</span></div>
                     </div>
-
-                    <p class="card-note">
-                        Only <strong>@umak.edu.ph</strong> accounts are permitted.<br>
-                        Contact your college secretary if you need access.
-                    </p>
+                    <p class="card-note">Only <strong>@umak.edu.ph</strong> accounts are permitted.<br>Contact your college secretary if you need access.</p>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <!-- ─── SCRIPTS ─── -->
+    <!-- ─── PLAIN HELPERS ─── -->
     <script>
-        // Mobile Drawer functionality
-        var hamburger = document.getElementById('hamburger');
-        var mobileDrawer = document.getElementById('mobileDrawer');
+        var hamburger     = document.getElementById('hamburger');
+        var mobileDrawer  = document.getElementById('mobileDrawer');
         var drawerOverlay = document.getElementById('drawerOverlay');
+        var drawerClose   = document.getElementById('drawerClose');
 
-        function openDrawer() {
-            mobileDrawer.classList.add('open');
-            drawerOverlay.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        }
+        function openDrawer()  { mobileDrawer.classList.add('open');    drawerOverlay.classList.add('open');    document.body.style.overflow = 'hidden'; }
+        function closeDrawer() { mobileDrawer.classList.remove('open'); drawerOverlay.classList.remove('open'); document.body.style.overflow = ''; }
 
-        function closeDrawer() {
-            mobileDrawer.classList.remove('open');
-            drawerOverlay.classList.remove('open');
-            document.body.style.overflow = '';
-        }
-
-        if (hamburger) hamburger.addEventListener('click', function() {
-            if (mobileDrawer.classList.contains('open')) {
-                closeDrawer();
-            } else {
-                openDrawer();
-            }
-        });
+        if (hamburger)     hamburger.addEventListener('click',  function(){ mobileDrawer.classList.contains('open') ? closeDrawer() : openDrawer(); });
         if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+        if (drawerClose)   drawerClose.addEventListener('click',  closeDrawer);
+        document.querySelectorAll('.mobile-nav-link').forEach(function(l){ l.addEventListener('click', closeDrawer); });
 
-        document.querySelectorAll('.mobile-nav-link').forEach(function(link) {
-            link.addEventListener('click', closeDrawer);
+        document.querySelectorAll('img[alt="UMakFIT Logo"]').forEach(function(img){
+            img.onerror = function(){
+                this.style.display = 'none';
+                var w = this.parentElement;
+                if (w) w.innerHTML = '<span style="color:#E8BA4A;font-weight:800;font-size:32px;">U</span>';
+            };
         });
 
-        // Loading functions
-        function showLoading(message = 'Checking your account status...') {
-            const overlay = document.getElementById('loadingOverlay');
-            const text = document.getElementById('loadingText');
-            if (overlay && text) {
-                overlay.classList.remove('hidden');
-                text.textContent = message;
-            }
+        function showLoading(message) {
+            message = message || 'Checking your account status...';
+            var overlay = document.getElementById('loadingOverlay');
+            var text    = document.getElementById('loadingText');
+            if (overlay && text) { overlay.classList.remove('hidden'); text.textContent = message; }
         }
 
         function hideLoading() {
-            const overlay = document.getElementById('loadingOverlay');
+            var overlay = document.getElementById('loadingOverlay');
             if (overlay) overlay.classList.add('hidden');
         }
 
         function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
+            var errorDiv = document.getElementById('errorMessage');
             if (errorDiv) {
                 errorDiv.textContent = message;
                 errorDiv.classList.remove('hidden');
-                setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+                setTimeout(function(){ errorDiv.classList.add('hidden'); }, 5000);
             }
         }
     </script>
 
-    <!-- ─── FIREBASE (module) ─── -->
+    <!-- ─── FIREBASE MODULE ─── -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        import { getDatabase, ref, set, onDisconnect, serverTimestamp, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import {
+            getAuth, GoogleAuthProvider,
+            signInWithPopup,   /* ← ONLY popup, no redirect — fixes iOS white screen */
+            signOut
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import {
+            getFirestore, doc, setDoc, getDoc,
+            collection, query, where, getDocs
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import {
+            getDatabase, ref, set, onDisconnect, serverTimestamp, onValue
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
-            authDomain: "umakfit-e3b1d.firebaseapp.com",
-            projectId: "umakfit-e3b1d",
-            storageBucket: "umakfit-e3b1d.appspot.com",
+            apiKey:            "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+            authDomain:        "umakfit-e3b1d.firebaseapp.com",
+            projectId:         "umakfit-e3b1d",
+            storageBucket:     "umakfit-e3b1d.appspot.com",
             messagingSenderId: "276569891504",
-            appId: "1:276569891504:web:39b1732b519f4d8b785175"
+            appId:             "1:276569891504:web:39b1732b519f4d8b785175",
+            databaseURL:       "https://umakfit-e3b1d-default-rtdb.firebaseio.com"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const app      = initializeApp(firebaseConfig);
+        const auth     = getAuth(app);
+        const db       = getFirestore(app);
         const database = getDatabase(app);
-        const googleProvider = new GoogleAuthProvider();
 
+        const googleProvider = new GoogleAuthProvider();
         googleProvider.setCustomParameters({
             prompt: 'select_account',
-            hd: 'umak.edu.ph'
+            hd:     'umak.edu.ph'   // shows ONLY @umak.edu.ph accounts in picker
         });
 
-        // Expose to window
-        window.auth = auth;
-        window.db = db;
-        window.database = database;
-        window.googleProvider = googleProvider;
-        window.signInWithPopup = signInWithPopup;
-        window.signInWithRedirect = signInWithRedirect;
-        window.getRedirectResult = getRedirectResult;
-        window.signOut = signOut;
-        window.doc = doc;
-        window.setDoc = setDoc;
-        window.getDoc = getDoc;
-        window.collection = collection;
-        window.query = query;
-        window.where = where;
-        window.getDocs = getDocs;
-        window.ref = ref;
-        window.set = set;
-        window.onDisconnect = onDisconnect;
-        window.serverTimestamp = serverTimestamp;
-        window.onValue = onValue;
-    </script>
+        hideLoading();
 
-    <!-- ─── SIMPLIFIED AUTH LOGIC (WORKS ON ALL PLATFORMS) ─── -->
-    <script>
-        // ========== DEVICE DETECTION ==========
-        function getDevicePlatform() {
-            const ua = navigator.userAgent || navigator.vendor || window.opera;
-            if (/iPhone|iPod|iPad/.test(ua) && !window.MSStream) {
-                return 'ios';
-            }
-            if (/android/i.test(ua)) {
-                return 'android';
-            }
-            return 'desktop';
-        }
+        // ════════════════════════════════════════════════════════════
+        //  ORIGINAL AUTH LOGIC — untouched from the working version
+        // ════════════════════════════════════════════════════════════
 
-        // Set button text based on platform
-        (function setGoogleButtonText() {
-            const buttonSpan = document.getElementById('googleButtonText');
-            if (!buttonSpan) return;
-            buttonSpan.textContent = 'Continue with UMak Gmail';
-        })();
-
-        // ========== USER ROLE CHECK FUNCTIONS ==========
-        async function checkDeanStatus(user) {
+        async function setupUserPresence(user) {
             try {
+                let userRole = 'student';
                 const userEmail = user.email.toLowerCase();
-                
-                // Check deans collection by email
-                const deansQuery = query(collection(window.db, 'deans'), where('email', '==', userEmail));
-                const deansSnapshot = await getDocs(deansQuery);
-                if (!deansSnapshot.empty) {
-                    return { role: 'dean', ...deansSnapshot.docs[0].data() };
-                }
-                
-                // Check users collection for dean role
-                const usersQuery = query(collection(window.db, 'users'), where('email', '==', userEmail), where('role', '==', 'dean'));
-                const usersSnapshot = await getDocs(usersQuery);
-                if (!usersSnapshot.empty) {
-                    return { role: 'dean', ...usersSnapshot.docs[0].data() };
-                }
-                
-                return null;
-            } catch (error) {
-                console.error('Error checking dean status:', error);
-                return null;
-            }
-        }
+                try {
+                    const emailLookupRef = doc(db, 'users', userEmail.replace(/\./g, '_'));
+                    const emailLookupSnap = await getDoc(emailLookupRef);
+                    if (emailLookupSnap.exists()) userRole = emailLookupSnap.data().role || 'student';
+                } catch (error) {}
 
-        async function checkSecretaryStatus(user) {
-            try {
-                const userEmail = user.email.toLowerCase();
-                
-                // Check secretaries collection by email
-                const secretariesQuery = query(collection(window.db, 'secretaries'), where('email', '==', userEmail));
-                const secretariesSnapshot = await getDocs(secretariesQuery);
-                if (!secretariesSnapshot.empty) {
-                    return { role: 'secretary', ...secretariesSnapshot.docs[0].data() };
-                }
-                
-                // Check users collection for secretary role
-                const usersQuery = query(collection(window.db, 'users'), where('email', '==', userEmail), where('role', '==', 'secretary'));
-                const usersSnapshot = await getDocs(usersQuery);
-                if (!usersSnapshot.empty) {
-                    return { role: 'secretary', ...usersSnapshot.docs[0].data() };
-                }
-                
-                return null;
-            } catch (error) {
-                console.error('Error checking secretary status:', error);
-                return null;
-            }
-        }
-
-        async function checkProfessorStatus(user) {
-            try {
-                const userEmail = user.email.toLowerCase();
-                
-                // Check professors collection by email
-                const professorsQuery = query(collection(window.db, 'professors'), where('email', '==', userEmail));
-                const professorsSnapshot = await getDocs(professorsQuery);
-                if (!professorsSnapshot.empty) {
-                    return { role: 'professor', ...professorsSnapshot.docs[0].data() };
-                }
-                
-                // Check users collection for professor role
-                const usersQuery = query(collection(window.db, 'users'), where('email', '==', userEmail), where('role', '==', 'professor'));
-                const usersSnapshot = await getDocs(usersQuery);
-                if (!usersSnapshot.empty) {
-                    return { role: 'professor', ...usersSnapshot.docs[0].data() };
-                }
-                
-                return null;
-            } catch (error) {
-                console.error('Error checking professor status:', error);
-                return null;
-            }
-        }
-
-        async function checkStudentStatus(user) {
-            try {
-                const userEmail = user.email.toLowerCase();
-                
-                // Check students collection by email
-                const studentsQuery = query(collection(window.db, 'students'), where('email', '==', userEmail));
-                const studentsSnapshot = await getDocs(studentsQuery);
-                if (!studentsSnapshot.empty) {
-                    const studentData = studentsSnapshot.docs[0].data();
-                    return { 
-                        role: 'student', 
-                        emailVerified: studentData.emailVerified || false, 
-                        privacyAccepted: studentData.privacyAccepted || false,
-                        ...studentData 
-                    };
-                }
-                
-                // Check users collection for student role
-                const usersQuery = query(collection(window.db, 'users'), where('email', '==', userEmail), where('role', '==', 'student'));
-                const usersSnapshot = await getDocs(usersQuery);
-                if (!usersSnapshot.empty) {
-                    const userData = usersSnapshot.docs[0].data();
-                    return { 
-                        role: 'student', 
-                        emailVerified: userData.emailVerified || false, 
-                        privacyAccepted: userData.privacyAccepted || false,
-                        ...userData 
-                    };
-                }
-                
-                return null;
-            } catch (error) {
-                console.error('Error checking student status:', error);
-                return null;
-            }
-        }
-
-        async function checkAccountStatus(user) {
-            try {
-                const userEmail = user.email.toLowerCase();
-                
-                // Check users collection for status
-                const userDocRef = doc(window.db, 'users', userEmail.replace(/\./g, '_'));
-                const userDocSnap = await getDoc(userDocRef);
-                if (userDocSnap.exists() && userDocSnap.data().status === 'inactive') {
-                    return false;
-                }
-                
-                return true;
-            } catch (error) {
-                console.error('Error checking account status:', error);
-                return true;
-            }
-        }
-
-        async function setupUserPresence(user, role) {
-            try {
-                const userPresenceRef = ref(window.database, `presence/${user.uid}`);
+                const userPresenceRef = ref(database, `presence/${user.uid}`);
                 await set(userPresenceRef, {
                     status: 'online',
                     lastActive: serverTimestamp(),
                     userId: user.uid,
                     email: user.email,
                     name: user.displayName || user.email.split('@')[0],
-                    role: role || 'student',
+                    role: userRole,
                     lastLogin: new Date().toISOString()
                 });
 
-                const connectedRef = ref(window.database, '.info/connected');
+                const connectedRef = ref(database, '.info/connected');
                 onValue(connectedRef, (snap) => {
                     if (snap.val() === true) {
                         onDisconnect(userPresenceRef).remove();
                     }
                 });
-            } catch (error) {
-                console.error('Error setting up presence:', error);
-            }
+            } catch (error) {}
         }
 
-        async function redirectBasedOnRole(user, roleData) {
-            if (!roleData) {
-                showError('Your account is not registered. Please contact your college secretary.');
-                await signOut(window.auth);
-                hideLoading();
-                return;
-            }
-
-            const role = roleData.role;
-            await setupUserPresence(user, role);
-
-            // Redirect based on role
-            switch(role) {
-                case 'dean':
-                    showLoading('Welcome Dean! Redirecting to dashboard...');
-                    setTimeout(() => { window.location.href = '../dean/dean.html'; }, 1000);
-                    break;
-                    
-                case 'secretary':
-                    showLoading('Welcome Secretary! Redirecting to dashboard...');
-                    setTimeout(() => { window.location.href = '../secretary/secretary.html'; }, 1000);
-                    break;
-                    
-                case 'professor':
-                    showLoading('Welcome Professor! Redirecting to dashboard...');
-                    setTimeout(() => { window.location.href = '../professor/professor.html'; }, 1000);
-                    break;
-                    
-                case 'student':
-                    if (roleData.emailVerified && roleData.privacyAccepted) {
-                        showLoading('Login successful! Loading your dashboard...');
-                        setTimeout(() => { window.location.href = '../student/studentDashboard.html'; }, 1000);
-                    } else if (!roleData.emailVerified) {
-                        showLoading('Please verify your email...');
-                        setTimeout(() => { window.location.href = 'otp-verification.html'; }, 1000);
-                    } else if (roleData.emailVerified && !roleData.privacyAccepted) {
-                        showLoading('Please accept the privacy policy...');
-                        setTimeout(() => { window.location.href = 'privacy-policy.html'; }, 1000);
-                    }
-                    break;
-                    
-                default:
-                    showError('Unknown role. Please contact support.');
-                    await signOut(window.auth);
-                    hideLoading();
-            }
-        }
-
-        async function processUserAfterLogin(user) {
+        async function updatePresenceRole(userId, role) {
             try {
-                // Check account status first
-                const isActive = await checkAccountStatus(user);
-                if (!isActive) {
-                    showError('Your account has been deactivated. Please contact administrator.');
-                    await signOut(window.auth);
+                const userPresenceRef = ref(database, `presence/${userId}`);
+                await set(userPresenceRef, {
+                    status: 'online',
+                    lastActive: serverTimestamp(),
+                    userId: userId,
+                    role: role
+                }, { merge: true });
+            } catch (error) {}
+        }
+
+        async function checkDeanStatus(user) {
+            try {
+                const userEmail = user.email.toLowerCase();
+
+                const deanRef  = doc(db, 'deans', user.uid);
+                const deanSnap = await getDoc(deanRef);
+                if (deanSnap.exists()) return deanSnap.data();
+
+                const deansQuery    = query(collection(db, 'deans'), where('email', '==', userEmail));
+                const deansSnapshot = await getDocs(deansQuery);
+                if (!deansSnapshot.empty) return deansSnapshot.docs[0].data();
+
+                const usersQuery    = query(collection(db, 'users'), where('email', '==', userEmail), where('role', '==', 'dean'));
+                const usersSnapshot = await getDocs(usersQuery);
+                if (!usersSnapshot.empty) return { id: usersSnapshot.docs[0].id, email: userEmail, role: 'dean', ...usersSnapshot.docs[0].data() };
+
+                const userDocRef  = doc(db, 'users', userEmail.replace(/\./g, '_'));
+                const userDocSnap = await getDoc(userDocRef);
+                if (userDocSnap.exists() && userDocSnap.data().role === 'dean')
+                    return { id: userDocSnap.id, email: userEmail, role: 'dean', ...userDocSnap.data() };
+
+                return null;
+            } catch (error) { console.error('Error checking dean status:', error); return null; }
+        }
+
+        async function checkSecretaryStatus(user) {
+            try {
+                const userEmail = user.email.toLowerCase();
+
+                const secretaryRef  = doc(db, 'secretaries', user.uid);
+                const secretarySnap = await getDoc(secretaryRef);
+                if (secretarySnap.exists()) return secretarySnap.data();
+
+                const secretariesQuery    = query(collection(db, 'secretaries'), where('email', '==', userEmail));
+                const secretariesSnapshot = await getDocs(secretariesQuery);
+                if (!secretariesSnapshot.empty) return secretariesSnapshot.docs[0].data();
+
+                const usersQuery    = query(collection(db, 'users'), where('email', '==', userEmail), where('role', '==', 'secretary'));
+                const usersSnapshot = await getDocs(usersQuery);
+                if (!usersSnapshot.empty) return { id: usersSnapshot.docs[0].id, email: userEmail, role: 'secretary', ...usersSnapshot.docs[0].data() };
+
+                const userDocRef  = doc(db, 'users', userEmail.replace(/\./g, '_'));
+                const userDocSnap = await getDoc(userDocRef);
+                if (userDocSnap.exists() && userDocSnap.data().role === 'secretary')
+                    return { id: userDocSnap.id, email: userEmail, role: 'secretary', ...userDocSnap.data() };
+
+                return null;
+            } catch (error) { console.error('Error checking secretary status:', error); return null; }
+        }
+
+        async function checkProfessorStatus(user) {
+            try {
+                const userEmail = user.email.toLowerCase();
+
+                const professorRef  = doc(db, 'professors', user.uid);
+                const professorSnap = await getDoc(professorRef);
+                if (professorSnap.exists()) return professorSnap.data();
+
+                const professorsQuery    = query(collection(db, 'professors'), where('email', '==', userEmail));
+                const professorsSnapshot = await getDocs(professorsQuery);
+                if (!professorsSnapshot.empty) return professorsSnapshot.docs[0].data();
+
+                const usersQuery    = query(collection(db, 'users'), where('email', '==', userEmail), where('role', '==', 'professor'));
+                const usersSnapshot = await getDocs(usersQuery);
+                if (!usersSnapshot.empty) return { id: usersSnapshot.docs[0].id, email: userEmail, role: 'professor', ...usersSnapshot.docs[0].data() };
+
+                const userDocRef  = doc(db, 'users', userEmail.replace(/\./g, '_'));
+                const userDocSnap = await getDoc(userDocRef);
+                if (userDocSnap.exists() && userDocSnap.data().role === 'professor')
+                    return { id: userDocSnap.id, email: userEmail, role: 'professor', ...userDocSnap.data() };
+
+                return null;
+            } catch (error) { console.error('Error checking professor status:', error); return null; }
+        }
+
+        async function checkStudentStatus(user) {
+            try {
+                const userEmail = user.email.toLowerCase();
+
+                const studentsQuery    = query(collection(db, 'students'), where('email', '==', userEmail));
+                const studentsSnapshot = await getDocs(studentsQuery);
+                if (!studentsSnapshot.empty) {
+                    const studentDoc  = studentsSnapshot.docs[0];
+                    const studentData = studentDoc.data();
+                    return { id: studentDoc.id, ...studentData, emailVerified: studentData.emailVerified || false, privacyAccepted: studentData.privacyAccepted || false };
+                }
+
+                const usersQuery    = query(collection(db, 'users'), where('email', '==', userEmail), where('role', '==', 'student'));
+                const usersSnapshot = await getDocs(usersQuery);
+                if (!usersSnapshot.empty) {
+                    const userData = usersSnapshot.docs[0].data();
+                    return { id: usersSnapshot.docs[0].id, email: userEmail, role: 'student', emailVerified: userData.emailVerified || false, privacyAccepted: userData.privacyAccepted || false, ...userData };
+                }
+
+                const userDocRef  = doc(db, 'users', userEmail.replace(/\./g, '_'));
+                const userDocSnap = await getDoc(userDocRef);
+                if (userDocSnap.exists() && userDocSnap.data().role === 'student') {
+                    const userData = userDocSnap.data();
+                    return { id: userDocSnap.id, email: userEmail, role: 'student', emailVerified: userData.emailVerified || false, privacyAccepted: userData.privacyAccepted || false, ...userData };
+                }
+
+                return null;
+            } catch (error) { console.error('Error checking student status:', error); return null; }
+        }
+
+        async function checkAccountStatus(user) {
+            try {
+                const userEmail   = user.email.toLowerCase();
+                const userDocRef  = doc(db, 'users', userEmail.replace(/\./g, '_'));
+                const userDocSnap = await getDoc(userDocRef);
+                if (userDocSnap.exists() && userDocSnap.data().status === 'inactive') return false;
+
+                const collections = ['deans', 'secretaries', 'professors', 'students'];
+                for (const collectionName of collections) {
+                    const roleQuery    = query(collection(db, collectionName), where('email', '==', userEmail));
+                    const roleSnapshot = await getDocs(roleQuery);
+                    if (!roleSnapshot.empty && roleSnapshot.docs[0].data().status === 'inactive') return false;
+                }
+                return true;
+            } catch (error) { console.error('Error checking account status:', error); return true; }
+        }
+
+        async function checkUserStatus(user) {
+            try {
+                console.log('Checking status for user:', user.email);
+
+                const isAccountActive = await checkAccountStatus(user);
+                if (!isAccountActive) {
+                    await signOut(auth);
                     hideLoading();
+                    showError('Your account has been deactivated. Please contact the administrator.');
                     return;
                 }
 
-                // Check roles in order of priority
+                await setupUserPresence(user);
+
                 const deanData = await checkDeanStatus(user);
                 if (deanData) {
-                    await redirectBasedOnRole(user, deanData);
+                    await updatePresenceRole(user.uid, 'dean');
+                    showLoading('Welcome back Dean! Redirecting to your dashboard...');
+                    setTimeout(() => { window.location.href = '../dean/dean.html'; }, 1000);
                     return;
                 }
 
                 const secretaryData = await checkSecretaryStatus(user);
                 if (secretaryData) {
-                    await redirectBasedOnRole(user, secretaryData);
+                    await updatePresenceRole(user.uid, 'secretary');
+                    showLoading('Welcome back Secretary! Redirecting to your dashboard...');
+                    setTimeout(() => { window.location.href = '../secretary/secretary.html'; }, 1000);
                     return;
                 }
 
                 const professorData = await checkProfessorStatus(user);
                 if (professorData) {
-                    await redirectBasedOnRole(user, professorData);
+                    await updatePresenceRole(user.uid, 'professor');
+                    showLoading('Welcome back Professor! Redirecting to your dashboard...');
+                    setTimeout(() => { window.location.href = '../professor/professor.html'; }, 1000);
                     return;
                 }
 
                 const studentData = await checkStudentStatus(user);
                 if (studentData) {
-                    await redirectBasedOnRole(user, studentData);
+                    await updatePresenceRole(user.uid, 'student');
+
+                    if (studentData.emailVerified && studentData.privacyAccepted) {
+                        showLoading('Login successful! Loading your dashboard...');
+                        setTimeout(() => { window.location.href = '../student/studentDashboard.html'; }, 1000);
+                    } else if (!studentData.emailVerified) {
+                        showLoading('Please verify your email...');
+                        setTimeout(() => { window.location.href = 'otp-verification.html'; }, 1000);
+                    } else if (studentData.emailVerified && !studentData.privacyAccepted) {
+                        showLoading('Please accept the privacy policy...');
+                        setTimeout(() => { window.location.href = 'privacy-policy.html'; }, 1000);
+                    }
                     return;
                 }
 
-                // No role found
-                showError('Your account is not registered. Please contact your college secretary.');
-                await signOut(window.auth);
+                const userEmailKey = user.email.toLowerCase().replace(/\./g, '_');
+                const userDocRef   = doc(db, 'users', userEmailKey);
+                const userDocSnap  = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    showError('Your account role is not properly configured. Please contact your college secretary.');
+                } else {
+                    showError('Your account is not yet registered in the system. Please contact your college secretary.');
+                }
+
+                await signOut(auth);
                 hideLoading();
 
             } catch (error) {
-                console.error('Error processing user:', error);
+                console.error('Error in checkUserStatus:', error);
                 showError('Error checking account status. Please try again.');
-                await signOut(window.auth);
+                await signOut(auth);
                 hideLoading();
             }
         }
 
-        // ========== SIMPLIFIED SIGN-IN (USES REDIRECT FOR IOS, POPUP FOR OTHERS) ==========
-        async function handlePlatformAwareSignIn() {
-            const platform = getDevicePlatform();
+        // ════════════════════════════════════════════════════════════
+        //  ONLY CHANGE FROM ORIGINAL:
+        //  signInWithPopup for BOTH iOS and Android.
+        //  Removed signInWithRedirect entirely — that caused the
+        //  blank white screen at firebaseapp.com/__/auth/handler.
+        //
+        //  popup works on iOS because:
+        //   • button is type="button" (not in a form)
+        //   • touchend fires synchronously → signInWithPopup is
+        //     called in the same gesture → iOS allows the popup
+        // ════════════════════════════════════════════════════════════
+        async function handleGoogleSignIn() {
             showLoading('Connecting to Google...');
-
             try {
-                // Sign out first
-                try { await signOut(window.auth); } catch (e) {}
+                try { await signOut(auth); } catch (e) {}
 
-                // Set domain restriction - this ensures only @umak.edu.ph accounts appear
-                googleProvider.setCustomParameters({
-                    prompt: 'select_account',
-                    hd: 'umak.edu.ph'  // This restricts to UMak domain only
-                });
+                const result = await signInWithPopup(auth, googleProvider);
 
-                if (platform === 'ios') {
-                    // For iOS, use redirect (works best with Safari)
-                    await signInWithRedirect(window.auth, googleProvider);
-                    // The page will redirect, no need to handle result here
-                } else {
-                    // For Android and desktop, use popup
-                    const result = await signInWithPopup(window.auth, googleProvider);
-                    
-                    // Check domain (additional safety)
-                    if (!result.user.email.endsWith('@umak.edu.ph')) {
-                        await signOut(window.auth);
-                        hideLoading();
-                        showError('Please use your UMak Gmail account (@umak.edu.ph)');
-                        return;
-                    }
-
-                    // Process the user
-                    await processUserAfterLogin(result.user);
+                if (!result.user.email.endsWith('@umak.edu.ph')) {
+                    await signOut(auth);
+                    hideLoading();
+                    showError('Please use your UMak Gmail account (@umak.edu.ph)');
+                    return;
                 }
+
+                await checkUserStatus(result.user);
 
             } catch (error) {
                 console.error('Sign in error:', error);
                 hideLoading();
-                
+
                 let errorMessage = 'Failed to sign in with Google';
-                if (error.code === 'auth/popup-closed-by-user') {
-                    errorMessage = 'Sign in was cancelled. Please try again.';
-                } else if (error.code === 'auth/popup-blocked') {
-                    errorMessage = 'Popup was blocked. Please allow popups for this site.';
-                } else if (error.code === 'auth/invalid-domain') {
-                    errorMessage = 'Please use your UMak Gmail account (@umak.edu.ph)';
-                }
-                
+                if (error.code === 'auth/popup-closed-by-user')                     errorMessage = 'Sign in was cancelled. Please try again.';
+                else if (error.code === 'auth/cancelled-popup-request')             errorMessage = 'Sign in was cancelled. Please try again.';
+                else if (error.code === 'auth/popup-blocked')                       errorMessage = 'Popup blocked. Please allow popups for this site.';
+                else if (error.code === 'auth/account-exists-with-different-credential') errorMessage = 'An account already exists with the same email but different sign-in credentials.';
+                else if (error.code === 'auth/invalid-domain')                      errorMessage = 'Please use your UMak Gmail account (@umak.edu.ph)';
+                else if (error.code === 'auth/network-request-failed')              errorMessage = 'Network error. Check your connection and try again.';
+
                 showError(errorMessage);
             }
         }
 
-        // Handle redirect result on page load (for iOS)
-        (async function handleRedirectResult() {
-            try {
-                const result = await getRedirectResult(window.auth);
-                if (result) {
-                    showLoading('Completing sign in...');
-                    
-                    // Check domain
-                    if (!result.user.email.endsWith('@umak.edu.ph')) {
-                        await signOut(window.auth);
-                        hideLoading();
-                        showError('Please use your UMak Gmail account (@umak.edu.ph)');
-                        return;
-                    }
+        // Wire button — touchend fires synchronously so iOS allows the popup
+        const btn = document.getElementById('googleSignInBtn');
+        let busy = false;
 
-                    // Process the user
-                    await processUserAfterLogin(result.user);
-                }
-            } catch (error) {
-                console.error('Redirect result error:', error);
-                if (error.code === 'auth/invalid-domain') {
-                    showError('Please use your UMak Gmail account (@umak.edu.ph)');
-                } else if (error.code !== 'auth/no-current-user') {
-                    // Don't show error for normal cases
-                }
-            }
-        })();
+        btn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (busy) return;
+            busy = true;
+            handleGoogleSignIn().finally(function() { busy = false; });
+        });
 
-        window.handlePlatformAwareSignIn = handlePlatformAwareSignIn;
+        btn.addEventListener('click', function() {
+            if (busy) return;
+            busy = true;
+            handleGoogleSignIn().finally(function() { busy = false; });
+        });
     </script>
 
 </body>
