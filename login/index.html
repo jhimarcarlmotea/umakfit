@@ -1016,7 +1016,7 @@
     <!-- ─── FIREBASE (module) ─── -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         import { getDatabase, ref, set, onDisconnect, serverTimestamp, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
@@ -1046,6 +1046,8 @@
         window.database = database;
         window.googleProvider = googleProvider;
         window.signInWithPopup = signInWithPopup;
+        window.signInWithRedirect = signInWithRedirect;
+        window.getRedirectResult = getRedirectResult;
         window.signOut = signOut;
         window.doc = doc;
         window.setDoc = setDoc;
@@ -1061,7 +1063,7 @@
         window.onValue = onValue;
     </script>
 
-    <!-- ─── ALL AUTH LOGIC (WITH NEW TAB FOR IPHONE) ─── -->
+    <!-- ─── SIMPLIFIED AUTH LOGIC (WORKS ON ALL PLATFORMS) ─── -->
     <script>
         // ========== DEVICE DETECTION ==========
         function getDevicePlatform() {
@@ -1079,14 +1081,7 @@
         (function setGoogleButtonText() {
             const buttonSpan = document.getElementById('googleButtonText');
             if (!buttonSpan) return;
-            const platform = getDevicePlatform();
-            if (platform === 'ios') {
-                buttonSpan.textContent = 'Continue with UMak Gmail (opens new tab)';
-            } else if (platform === 'android') {
-                buttonSpan.textContent = 'Continue with UMak Gmail';
-            } else {
-                buttonSpan.textContent = 'Continue with UMak Gmail';
-            }
+            buttonSpan.textContent = 'Continue with UMak Gmail';
         })();
 
         // ========== USER ROLE CHECK FUNCTIONS ==========
@@ -1341,82 +1336,40 @@
             }
         }
 
-        // ========== NEW TAB SIGN-IN FOR IPHONE ==========
-        function signInWithNewTab() {
-            // Save the current page URL to return to
-            localStorage.setItem('umakfit_auth_return_url', window.location.href);
-            
-            // Build the Google OAuth URL manually
-            const clientId = '276569891504-xxx.apps.googleusercontent.com'; // You need to get this from Firebase
-            const redirectUri = encodeURIComponent(window.location.origin + '/__/auth/handler');
-            const scope = encodeURIComponent('email profile');
-            const responseType = 'code';
-            const hd = 'umak.edu.ph';
-            
-            // For Firebase Auth, we need to use the Firebase Auth domain
-            const authDomain = 'umakfit-e3b1d.firebaseapp.com';
-            const apiKey = 'AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo';
-            
-            // Use Firebase Auth sign-in URL
-            const signInUrl = `https://${authDomain}/__/auth/handler?apiKey=${apiKey}&authType=signInViaRedirect&providerId=google.com&redirectUrl=${redirectUri}&v=10.7.1`;
-            
-            // Open in new tab
-            const newTab = window.open(signInUrl, '_blank');
-            
-            if (!newTab) {
-                showError('Popup blocked. Please allow popups or try manually.');
-            }
-            
-            // Show instructions
-            showLoading('Please complete sign-in in the new tab. This page will automatically refresh once you\'re done.');
-            
-            // Check for return every 2 seconds
-            const checkInterval = setInterval(() => {
-                // Check if we have auth data in localStorage (set by the redirect page)
-                const authResult = localStorage.getItem('umakfit_auth_result');
-                if (authResult) {
-                    clearInterval(checkInterval);
-                    localStorage.removeItem('umakfit_auth_result');
-                    window.location.reload();
-                }
-            }, 2000);
-        }
-
-        // ========== PLATFORM-AWARE SIGN-IN ==========
+        // ========== SIMPLIFIED SIGN-IN (USES REDIRECT FOR IOS, POPUP FOR OTHERS) ==========
         async function handlePlatformAwareSignIn() {
             const platform = getDevicePlatform();
-            
-            if (platform === 'ios') {
-                // For iPhone, open in new tab to avoid popup blocking
-                signInWithNewTab();
-                return;
-            }
-
-            // For Android and desktop, use popup
             showLoading('Connecting to Google...');
 
             try {
                 // Sign out first
                 try { await signOut(window.auth); } catch (e) {}
 
-                // Set domain restriction
+                // Set domain restriction - this ensures only @umak.edu.ph accounts appear
                 googleProvider.setCustomParameters({
                     prompt: 'select_account',
-                    hd: 'umak.edu.ph'
+                    hd: 'umak.edu.ph'  // This restricts to UMak domain only
                 });
 
-                const result = await signInWithPopup(window.auth, googleProvider);
-                
-                // Check domain
-                if (!result.user.email.endsWith('@umak.edu.ph')) {
-                    await signOut(window.auth);
-                    hideLoading();
-                    showError('Please use your UMak Gmail account (@umak.edu.ph)');
-                    return;
-                }
+                if (platform === 'ios') {
+                    // For iOS, use redirect (works best with Safari)
+                    await signInWithRedirect(window.auth, googleProvider);
+                    // The page will redirect, no need to handle result here
+                } else {
+                    // For Android and desktop, use popup
+                    const result = await signInWithPopup(window.auth, googleProvider);
+                    
+                    // Check domain (additional safety)
+                    if (!result.user.email.endsWith('@umak.edu.ph')) {
+                        await signOut(window.auth);
+                        hideLoading();
+                        showError('Please use your UMak Gmail account (@umak.edu.ph)');
+                        return;
+                    }
 
-                // Process the user
-                await processUserAfterLogin(result.user);
+                    // Process the user
+                    await processUserAfterLogin(result.user);
+                }
 
             } catch (error) {
                 console.error('Sign in error:', error);
@@ -1435,17 +1388,30 @@
             }
         }
 
-        // Check for return from new tab sign-in
-        (function checkForAuthReturn() {
-            const returnUrl = localStorage.getItem('umakfit_auth_return_url');
-            if (returnUrl && window.location.href !== returnUrl) {
-                // We've been redirected back
-                localStorage.removeItem('umakfit_auth_return_url');
-                
-                // Check if we have user data
-                if (window.auth?.currentUser) {
-                    showLoading('Sign in successful!');
-                    processUserAfterLogin(window.auth.currentUser);
+        // Handle redirect result on page load (for iOS)
+        (async function handleRedirectResult() {
+            try {
+                const result = await getRedirectResult(window.auth);
+                if (result) {
+                    showLoading('Completing sign in...');
+                    
+                    // Check domain
+                    if (!result.user.email.endsWith('@umak.edu.ph')) {
+                        await signOut(window.auth);
+                        hideLoading();
+                        showError('Please use your UMak Gmail account (@umak.edu.ph)');
+                        return;
+                    }
+
+                    // Process the user
+                    await processUserAfterLogin(result.user);
+                }
+            } catch (error) {
+                console.error('Redirect result error:', error);
+                if (error.code === 'auth/invalid-domain') {
+                    showError('Please use your UMak Gmail account (@umak.edu.ph)');
+                } else if (error.code !== 'auth/no-current-user') {
+                    // Don't show error for normal cases
                 }
             }
         })();
