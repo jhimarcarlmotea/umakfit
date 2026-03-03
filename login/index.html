@@ -975,64 +975,70 @@
             }
         }
 
-        async function handleGoogleSignIn() {
-            // ── iOS LOOP FIX: Set the session flag BEFORE calling signInWithPopup.
-            // This tells the onAuthStateChanged listener to stay hands-off while
-            // this async flow is in control. We clear it when done (or on error).
-            sessionStorage.setItem(SESSION_HANDLING_KEY, '1');
-
-            showLoading('Connecting to Google...');
-            try {
-                try { await signOut(auth); } catch (e) {}
-
-                const result = await signInWithPopup(auth, googleProvider);
-
-                if (!result.user.email.endsWith('@umak.edu.ph')) {
-                    await signOut(auth);
-                    sessionStorage.removeItem(SESSION_HANDLING_KEY);
-                    hideLoading();
-                    showError('Please use your UMak Gmail account (@umak.edu.ph)');
-                    return;
-                }
-
-                // checkUserStatus will call window.location.href on success,
-                // so the flag doesn't need to be cleared on the happy path —
-                // the page will navigate away. But clear it on all error paths.
-                await checkUserStatus(result.user);
-
-            } catch (error) {
-                console.error('Sign in error:', error);
-                sessionStorage.removeItem(SESSION_HANDLING_KEY);
-                hideLoading();
-
-                let errorMessage = 'Failed to sign in with Google';
-                if (error.code === 'auth/popup-closed-by-user')                          errorMessage = 'Sign in was cancelled. Please try again.';
-                else if (error.code === 'auth/cancelled-popup-request')                  errorMessage = 'Sign in was cancelled. Please try again.';
-                else if (error.code === 'auth/popup-blocked')                            errorMessage = 'Popup blocked. Please allow popups for this site.';
-                else if (error.code === 'auth/account-exists-with-different-credential') errorMessage = 'An account already exists with the same email but different sign-in credentials.';
-                else if (error.code === 'auth/invalid-domain')                           errorMessage = 'Please use your UMak Gmail account (@umak.edu.ph)';
-                else if (error.code === 'auth/network-request-failed')                   errorMessage = 'Network error. Check your connection and try again.';
-
-                showError(errorMessage);
-            }
-        }
-
-        // Wire button — touchend fires synchronously so iOS allows the popup
+        // Wire button
         const btn = document.getElementById('googleSignInBtn');
         let busy = false;
+
+        function triggerSignIn() {
+            if (busy) return;
+            busy = true;
+
+            // ── iOS POPUP FIX ──────────────────────────────────────────────────
+            // iOS Safari only allows window.open (popups) when called in the
+            // SAME synchronous call stack as the user gesture.
+            // Any await/async before signInWithPopup breaks that chain and Safari
+            // silently blocks the popup, forcing users to disable popup blocking.
+            //
+            // Solution: call signInWithPopup() IMMEDIATELY — no awaits before it.
+            // Then handle all logic (.then/.catch) after the popup is already open.
+            // ──────────────────────────────────────────────────────────────────
+
+            sessionStorage.setItem(SESSION_HANDLING_KEY, '1');
+            showLoading('Connecting to Google...');
+
+            // signInWithPopup called synchronously — popup opens before any async work
+            signInWithPopup(auth, googleProvider)
+                .then(async (result) => {
+                    if (!result.user.email.endsWith('@umak.edu.ph')) {
+                        await signOut(auth);
+                        sessionStorage.removeItem(SESSION_HANDLING_KEY);
+                        hideLoading();
+                        showError('Please use your UMak Gmail account (@umak.edu.ph)');
+                        busy = false;
+                        return;
+                    }
+                    await checkUserStatus(result.user);
+                    // on success checkUserStatus navigates away; no need to clear flag
+                })
+                .catch((error) => {
+                    console.error('Sign in error:', error);
+                    sessionStorage.removeItem(SESSION_HANDLING_KEY);
+                    hideLoading();
+                    busy = false;
+
+                    let errorMessage = 'Failed to sign in with Google';
+                    if (error.code === 'auth/popup-closed-by-user')                          errorMessage = 'Sign in was cancelled. Please try again.';
+                    else if (error.code === 'auth/cancelled-popup-request')                  errorMessage = 'Sign in was cancelled. Please try again.';
+                    else if (error.code === 'auth/popup-blocked')                            errorMessage = 'Popup blocked. Please allow popups for this site and try again.';
+                    else if (error.code === 'auth/account-exists-with-different-credential') errorMessage = 'An account already exists with the same email but different sign-in credentials.';
+                    else if (error.code === 'auth/invalid-domain')                           errorMessage = 'Please use your UMak Gmail account (@umak.edu.ph)';
+                    else if (error.code === 'auth/network-request-failed')                   errorMessage = 'Network error. Check your connection and try again.';
+
+                    showError(errorMessage);
+                });
+        }
 
         btn.addEventListener('touchend', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            if (busy) return;
-            busy = true;
-            handleGoogleSignIn().finally(function() { busy = false; });
+            triggerSignIn();
         });
 
-        btn.addEventListener('click', function() {
-            if (busy) return;
-            busy = true;
-            handleGoogleSignIn().finally(function() { busy = false; });
+        btn.addEventListener('click', function(e) {
+            // On desktop and Android this fires normally.
+            // On iOS, touchend already handled it — skip to avoid double-trigger.
+            if (e.detail === 0) return; // synthetic click, skip
+            triggerSignIn();
         });
     </script>
 
