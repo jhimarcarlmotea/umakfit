@@ -1181,6 +1181,104 @@ function getAgeGroupFromStudent(studentData) {
             return 'Poor';
         }
     }
+    async function loadScheduledTests(userEmail, userId) {
+    try {
+        let professorName = '';
+        const professorsQuery = query(collection(db, 'professors'), where('email', '==', userEmail));
+        const professorsSnapshot = await getDocs(professorsQuery);
+        if (!professorsSnapshot.empty) professorName = professorsSnapshot.docs[0].data().name || '';
+
+        if (!professorName) {
+            const usersQuery = query(collection(db, 'users'), where('email', '==', userEmail));
+            const usersSnapshot = await getDocs(usersQuery);
+            if (!usersSnapshot.empty) professorName = usersSnapshot.docs[0].data().name || '';
+        }
+
+        window.assignedSections = [];
+        const sectionsSnapshot = await getDocs(collection(db, 'sections'));
+        const profNameLower = (professorName || '').toLowerCase().trim();
+        const profEmailLower = (userEmail || '').toLowerCase().trim();
+        const allProfNameVariants = new Set();
+        if (profNameLower) allProfNameVariants.add(profNameLower);
+
+        const profAliasSnap = await getDocs(query(collection(db, 'professors'), where('email', '==', userEmail)));
+        profAliasSnap.forEach(d => { const n = (d.data().name || '').toLowerCase().trim(); if (n) allProfNameVariants.add(n); });
+        const userAliasSnap = await getDocs(query(collection(db, 'users'), where('email', '==', userEmail)));
+        userAliasSnap.forEach(d => { const n = (d.data().name || '').toLowerCase().trim(); if (n) allProfNameVariants.add(n); });
+
+        const seenSections = new Set();
+        for (const docSnap of sectionsSnapshot.docs) {
+            const sectionData = docSnap.data();
+            const sectionProfLower = (sectionData.professor || '').trim().toLowerCase();
+            const sectionProfEmailLower = (sectionData.professorEmail || '').toLowerCase().trim();
+            let isProfessorAssigned = sectionProfEmailLower === profEmailLower;
+
+            if (!isProfessorAssigned && sectionProfLower) {
+                for (const variant of allProfNameVariants) {
+                    if (!variant) continue;
+                    if (sectionProfLower === variant || sectionProfLower.includes(variant) || variant.includes(sectionProfLower)) {
+                        isProfessorAssigned = true; break;
+                    }
+                }
+            }
+            if (!isProfessorAssigned && profEmailLower) {
+                const emailUsername = profEmailLower.split('@')[0].toLowerCase();
+                if (emailUsername.length > 3 && sectionProfLower.includes(emailUsername)) isProfessorAssigned = true;
+            }
+
+            if (isProfessorAssigned && !seenSections.has(sectionData.name)) {
+                seenSections.add(sectionData.name);
+                const actualStudentCount = sectionData.students ? sectionData.students.length : 0;
+                window.assignedSections.push({
+                    section: sectionData.name,
+                    students: actualStudentCount,
+                    courseCode: sectionData.courseCode || 'PE 3',
+                    time: sectionData.time || 'Not Set',
+                    day: sectionData.day || 'Not Set',
+                    room: sectionData.room || 'Not Set'
+                });
+            }
+        }
+
+        let testsQuery, testsSnapshot;
+        if (window.assignedSections.length > 0) {
+            const sectionNames = window.assignedSections.map(s => s.section).slice(0, 10);
+            testsQuery = query(collection(db, 'scheduledTests'), where('professorEmail', '==', userEmail), where('section', 'in', sectionNames));
+            testsSnapshot = await getDocs(testsQuery);
+        } else {
+            testsQuery = query(collection(db, 'scheduledTests'), where('professorEmail', '==', userEmail));
+            testsSnapshot = await getDocs(testsQuery);
+        }
+        if (testsSnapshot.empty) {
+            testsSnapshot = await getDocs(query(collection(db, 'scheduledTests'), where('professorId', '==', userId)));
+        }
+
+        const permissionsSnapshot = await getDocs(query(collection(db, 'testPermissions'), where('grantedBy', '==', userEmail)));
+        const enabledTestsMap = new Map();
+        permissionsSnapshot.forEach(doc => {
+            const perm = doc.data();
+            if (!enabledTestsMap.has(perm.testId)) enabledTestsMap.set(perm.testId, []);
+            enabledTestsMap.get(perm.testId).push(perm.studentEmail);
+        });
+
+        window.allScheduledTests = [];
+        testsSnapshot.forEach(docSnap => { 
+            window.allScheduledTests.push({ id: docSnap.id, ...docSnap.data() }); 
+        });
+
+        // ===== I-LAGAY MO DITO ANG INITIALIZATION =====
+        lastStatusSnapshot = new Map();
+        window.allScheduledTests.forEach(test => {
+            lastStatusSnapshot.set(test.id, test.status || 'scheduled');
+        });
+
+        populateSectionSortDropdown();
+        renderScheduleTable(window.allScheduledTests, enabledTestsMap);
+    } catch (error) {
+        console.error('Error loading scheduled tests:', error);
+        document.getElementById('scheduleTableBody').innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">❌</div><div class="empty-title">Error Loading Tests</div><div class="empty-text">${error.message}</div></div></td></tr>`;
+    }
+}
 
     function getNormCategory(testName, result, genderKey = 'male', ageGroup = '19-22') {
         const normalized = (testName || '').toLowerCase();
@@ -1247,6 +1345,7 @@ function getAgeGroupFromStudent(studentData) {
     window.overdueStudents = [];
     window.filteredOverdueStudents = [];
     window.currentTab = 'all';
+    let lastStatusSnapshot = new Map();
     window.currentStudentTests = [];
     window.currentStudentTestsFiltered = [];
     window.currentSort = 'newest-first';
@@ -1478,6 +1577,35 @@ window.loadStudents = async function() {
         showErrorModal('Error loading students: ' + error.message);
     }
 };
+
+// ===== REAL-TIME STATUS AUTO REFRESH =====
+setInterval(() => {
+    if (!window.allScheduledTests?.length) return;
+    const now = new Date();
+    let changed = false;
+
+    window.allScheduledTests.forEach(test => {
+        const prevStatus = lastStatusSnapshot.get(test.id);
+        if (prevStatus === 'completed') return;
+
+        const deadlineDateTime = new Date(test.deadlineDateTime);
+        const testDateTime = new Date(test.dateTime || `${test.date}T${test.time || '00:00'}`);
+
+        let newStatus = 'scheduled';
+        if (testDateTime <= now && deadlineDateTime >= now) newStatus = 'active';
+        else if (deadlineDateTime < now) newStatus = 'completed';
+
+        if (newStatus !== prevStatus) {
+            test.status = newStatus;
+            lastStatusSnapshot.set(test.id, newStatus);
+            changed = true;
+        }
+    });
+
+    if (changed && window.renderScheduleTable) {
+        window.renderScheduleTable(window.allScheduledTests, window._enabledTestsMap || new Map());
+    }
+}, 1000);
     function populateSectionsTable() {
         const tableBody = document.getElementById('sectionsTableBody');
         document.getElementById('sectionCount').textContent = window.filteredSections.length;

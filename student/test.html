@@ -1791,122 +1791,89 @@
             return streak;
         }
 
-        async function loadAvailableTests() {
-            try {
-                if (!studentData || !studentData.section || studentData.section === 'Not Assigned') {
-                    renderEmptyState();
-                    return;
+async function loadAvailableTests() {
+    try {
+        if (!studentData || !studentData.section || studentData.section === 'Not Assigned') {
+            renderEmptyState();
+            return;
+        }
+
+        const testsQuery = query(
+            collection(db, 'scheduledTests'),
+            where('section', '==', studentData.section)
+        );
+
+        let testsSnapshot = await getDocs(testsQuery);
+        availableTests = [];
+        overdueTests = [];
+        const now = new Date();
+        const seenTestIds = new Set();
+
+        let scheduledTestDocs = testsSnapshot.docs;
+        if (testsSnapshot.empty) {
+            const allVisibleSnapshot = await getDocs(
+                query(collection(db, 'scheduledTests'), where('visibleToStudents', '==', true))
+            );
+            const studentSectionNorm = (studentData.section || '').toLowerCase().trim();
+            scheduledTestDocs = allVisibleSnapshot.docs.filter(docSnap => {
+                const data = docSnap.data();
+                const testSectionNorm = (data.section || '').toLowerCase().trim();
+                if (!testSectionNorm || !studentSectionNorm) return false;
+                return (
+                    testSectionNorm === studentSectionNorm ||
+                    testSectionNorm.includes(studentSectionNorm) ||
+                    studentSectionNorm.includes(testSectionNorm)
+                );
+            });
+        }
+
+        if (scheduledTestDocs.length > 0) {
+            for (const docSnap of scheduledTestDocs) {
+                const test = { id: docSnap.id, ...docSnap.data() };
+
+                if (seenTestIds.has(test.id)) continue;
+                seenTestIds.add(test.id);
+
+                // Check if student is in selectedStudents list
+                let isStudentSelected = true;
+                if (test.selectedStudents && Array.isArray(test.selectedStudents) && test.selectedStudents.length > 0) {
+                    isStudentSelected = test.selectedStudents.some(email =>
+                        (email || '').trim().toLowerCase() === (studentData.email || '').trim().toLowerCase()
+                    );
+                }
+                test.isViewOnly = !isStudentSelected;
+
+                // Compute deadline
+                let deadlineDateTime;
+                if (test.deadlineDateTime) {
+                    deadlineDateTime = new Date(test.deadlineDateTime);
+                } else {
+                    deadlineDateTime = new Date(test.deadline);
+                    if (test.deadlineTime) {
+                        const [hours, minutes] = test.deadlineTime.split(':').map(Number);
+                        deadlineDateTime.setHours(hours, minutes, 0, 0);
+                    } else {
+                        deadlineDateTime.setHours(23, 59, 59, 999);
+                    }
                 }
 
-                console.log('📋 Loading tests for section:', studentData.section);
-                console.log('📧 Student email:', studentData.email);
-                
-                const testsQuery = query(
-                    collection(db, 'scheduledTests'),
-                    where('section', '==', studentData.section)
-                );
-                
-                let testsSnapshot = await getDocs(testsQuery);
-                availableTests = [];
-                overdueTests = [];
-                const now = new Date();
-                const seenTestIds = new Set();
-                
-                console.log(`📊 Found ${testsSnapshot.size} total tests for section ${studentData.section}`);
-                
-                // If there are no tests found strictly by section, fall back to all visible tests
-                // and do a more flexible section match on the client side.
-                let scheduledTestDocs = testsSnapshot.docs;
-                if (testsSnapshot.empty) {
-                    console.log('⚠️ No tests found with exact section match. Falling back to visible tests for flexible matching.');
-                    const allVisibleSnapshot = await getDocs(
-                        query(
-                            collection(db, 'scheduledTests'),
-                            where('visibleToStudents', '==', true)
-                        )
-                    );
-                    const studentSectionNorm = (studentData.section || '').toLowerCase().trim();
-                    scheduledTestDocs = allVisibleSnapshot.docs.filter(docSnap => {
-                        const data = docSnap.data();
-                        const testSectionNorm = (data.section || '').toLowerCase().trim();
-                        if (!testSectionNorm || !studentSectionNorm) return false;
-                        return (
-                            testSectionNorm === studentSectionNorm ||
-                            testSectionNorm.includes(studentSectionNorm) ||
-                            studentSectionNorm.includes(testSectionNorm)
-                        );
-                    });
-                    console.log(`📊 Fallback loaded ${scheduledTestDocs.length} test(s) after flexible section matching.`);
-                }
-                
-                if (scheduledTestDocs.length > 0) {
-                    for (const doc of scheduledTestDocs) {
-                        const test = { id: doc.id, ...doc.data() };
-                        
-                        if (seenTestIds.has(test.id)) {
-                            console.log(`🔄 Skipping duplicate test: ${test.testName} (ID: ${test.id})`);
-                            continue;
-                        }
-                        seenTestIds.add(test.id);
-                        
-                        let isStudentSelected = false;
-                        
-                        if (test.selectedStudents && Array.isArray(test.selectedStudents) && test.selectedStudents.length > 0) {
-                            isStudentSelected = test.selectedStudents.some(email =>
-                                (email || '').trim().toLowerCase() === (studentData.email || '').trim().toLowerCase()
-                            );
-                            console.log(`📋 Test: ${test.testName} - Student ${isStudentSelected ? 'IS' : 'NOT'} selected`);
-                        } else {
-                            isStudentSelected = true;
-                            console.log(`📋 Test: ${test.testName} - No student filter (visible to all)`);
-                        }
-                        
-                        // Mark view-only but still show the card even if not selected.
-                        test.isViewOnly = !isStudentSelected;
-                        
-                        console.log(`🔍 Processing test: ${test.testName}`, {
-                            isVisible: test.isVisible,
-                            isActive: test.isActive,
-                            section: test.section,
-                            isStudentSelected: isStudentSelected
-                        });
-                        
-                        // Classify purely by deadline: upcoming/active vs overdue.
-                        let deadlineDateTime;
-                        if (test.deadlineDateTime) {
-                            deadlineDateTime = new Date(test.deadlineDateTime);
-                        } else {
-                            deadlineDateTime = new Date(test.deadline);
-                            if (test.deadlineTime) {
-                                const [hours, minutes] = test.deadlineTime.split(':').map(Number);
-                                deadlineDateTime.setHours(hours, minutes, 0, 0);
-                            } else {
-                                deadlineDateTime.setHours(23, 59, 59, 999);
-                            }
-                        }
-                        
-                        console.log(`⏰ Test deadline: ${deadlineDateTime}, Now: ${now}`);
-                        
-                        if (deadlineDateTime < now) {
-                            overdueTests.push(test);
-                        } else {
-                            availableTests.push(test);
-                        }
-                    }
+                if (deadlineDateTime < now) {
+                    overdueTests.push(test);
                 } else {
-                    console.log('⚠️ No tests found for section:', studentData.section);
+                    availableTests.push(test);
                 }
-                
-                console.log(`🎯 Total available tests: ${availableTests.length}, Overdue: ${overdueTests.length}`);
-                await renderCategoryCards();
-                renderOverdueTests(overdueTests);
-                
-            } catch (error) {
-                console.error('❌ Error loading tests:', error);
-                console.error('Error details:', error.message);
-                renderEmptyState();
             }
         }
+
+        await renderCategoryCards();
+        renderOverdueTests(overdueTests);
+
+    } catch (error) {
+        console.error('Error loading tests:', error);
+        renderEmptyState();
+    }
+}
+
 
         function setupTestUpdatesForStudent() {
             try {
@@ -2315,184 +2282,188 @@
             }
         }
     };
-        async function renderOverdueTests(overdueTestsArray) {
-            const container = document.getElementById('overdueTestsContent');
-            const countBadge = document.getElementById('overdueCount');
-            
-             const uniqueOverdueTests = [];
-        const seenIds = new Set();
+ async function renderOverdueTests(overdueTestsArray) {
+    const container = document.getElementById('overdueTestsContent');
+    const countBadge = document.getElementById('overdueCount');
 
-        overdueTestsArray.forEach(test => {
-            if (!seenIds.has(test.id)) {
-                seenIds.add(test.id);
-                uniqueOverdueTests.push(test);
-            }
+    // Deduplicate
+    const uniqueOverdueTests = [];
+    const seenIds = new Set();
+    overdueTestsArray.forEach(test => {
+        if (!seenIds.has(test.id)) {
+            seenIds.add(test.id);
+            uniqueOverdueTests.push(test);
+        }
+    });
+
+    countBadge.textContent = uniqueOverdueTests.length;
+
+    if (uniqueOverdueTests.length === 0) {
+        countBadge.classList.add('hidden');
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <div class="w-20 h-20 mx-auto mb-4 bg-green-100 rounded-2xl flex items-center justify-center">
+                    <i class="bi bi-check-circle-fill text-4xl text-green-600"></i>
+                </div>
+                <p class="text-lg font-bold text-gray-800 mb-2">All Caught Up!</p>
+                <small class="text-sm text-gray-500">No overdue tests</small>
+            </div>
+        `;
+        return;
+    }
+
+    countBadge.classList.remove('hidden');
+
+    // ✅ FIX: Check testPermissions collection (where professor grants access)
+    // Professor calls addDoc(collection(db, 'testPermissions'), { studentEmail, testId, status:'active' })
+    let enabledTestIds = new Set();
+    try {
+        const permQuery = query(
+            collection(db, 'testPermissions'),
+            where('studentEmail', '==', studentData.email),
+            where('status', '==', 'active')
+        );
+        const permSnapshot = await getDocs(permQuery);
+        permSnapshot.forEach(docSnap => {
+            const perm = docSnap.data();
+            if (perm.testId) enabledTestIds.add(perm.testId);
         });
-            
-            countBadge.textContent = uniqueOverdueTests.length;
-            
-            if (uniqueOverdueTests.length === 0) {
-                countBadge.classList.add('hidden');
-                container.innerHTML = `
-                    <div class="text-center py-12">
-                        <div class="w-20 h-20 mx-auto mb-4 bg-green-100 rounded-2xl flex items-center justify-center">
-                            <i class="bi bi-check-circle-fill text-4xl text-green-600"></i>
-                        </div>
-                        <p class="text-lg font-bold text-gray-800 mb-2">All Caught Up!</p>
-                        <small class="text-sm text-gray-500">No overdue tests</small>
-                    </div>
-                `;
-                return;
-            }
-            
-            countBadge.classList.remove('hidden');
-            
-            const completionPromises = uniqueOverdueTests.map(async (test) => {
-                try {
-                    const resultsQuery = query(
-                        collection(db, 'testResults'),
-                        where('testId', '==', test.id),
-                        where('studentEmail', '==', studentData.email)
-                    );
-                    const resultsSnapshot = await getDocs(resultsQuery);
-                    
-                    let bestScore = 0;
-                    let attempts = 0;
-                    const attemptsAllowed = test.attemptsAllowed || 1;
-                    
-                    resultsSnapshot.forEach(doc => {
-                        const result = doc.data();
-                        const score = calculateTestScore(result.testName, result.result, result.testTarget);
-                        attempts++;
-                        if (score > bestScore) bestScore = score;
-                    });
-                    
-                    return {
-                        testId: test.id,
-                        completed: attempts >= attemptsAllowed,
-                        bestScore: bestScore,
-                        attempts: attempts,
-                        attemptsAllowed: attemptsAllowed
-                    };
-                } catch (error) {
-                    const attemptsAllowed = test.attemptsAllowed || 1;
-                    return {
-                        testId: test.id,
-                        completed: false,
-                        bestScore: 0,
-                        attempts: 0,
-                        attemptsAllowed: attemptsAllowed
-                    };
-                }
-            });
-            
-            const completionData = await Promise.all(completionPromises);
-            const completionMap = new Map();
-            completionData.forEach(data => {
-                completionMap.set(data.testId, data);
-            });
-            
-            let html = '<div class="space-y-3">';
-            
-            uniqueOverdueTests.forEach((test) => {
-                const isProfessorEnabled = test.professorEnabled === true;
-                const completion = completionMap.get(test.id) || { completed: false, bestScore: 0, attempts: 0, attemptsAllowed: test.attemptsAllowed || 1 };
-                const isCompleted = completion.completed;
-                const isViewOnly = test.isViewOnly === true;
-                
-                html += `
-                    <div class="bg-white border-2 ${isCompleted ? 'border-red-200' : 'border-red-300'} rounded-xl p-4 hover:shadow-md transition-all">
-                        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
-                            <!-- Test Info -->
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-start gap-3 mb-2">
-                                    <div class="flex-shrink-0 w-10 h-10 ${isCompleted ? 'bg-red-500' : 'bg-red-500'} rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-${isCompleted ? 'check-circle-fill' : isProfessorEnabled ? 'unlock-fill' : isViewOnly ? 'eye-fill' : 'exclamation-triangle-fill'} text-white"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <h4 class="font-bold text-gray-900 text-base mb-1">${test.testName}</h4>
-                                        <div class="flex flex-wrap items-center gap-2 text-sm">
-                                            ${isViewOnly ? `
-                                                <span class="bg-gray-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                                                    <i class="bi bi-eye"></i> View Only
-                                                </span>
-                                            ` : ''}
-                                            ${isProfessorEnabled && !isCompleted && !isViewOnly ? `
-                                                <span class="bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                                                    <i class="bi bi-unlock"></i> Enabled
-                                                </span>
-                                            ` : ''}
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="ml-13 text-sm">
+        console.log('✅ Enabled test IDs from testPermissions:', [...enabledTestIds]);
+    } catch (e) {
+        console.warn('Could not load testPermissions:', e);
+    }
+
+    // Load completion data
+    const completionPromises = uniqueOverdueTests.map(async (test) => {
+        try {
+            const resultsQuery = query(
+                collection(db, 'testResults'),
+                where('testId', '==', test.id),
+                where('studentEmail', '==', studentData.email)
+            );
+            const resultsSnapshot = await getDocs(resultsQuery);
+            const attemptsAllowed = test.attemptsAllowed || 1;
+            const attempts = resultsSnapshot.size;
+            const isUnlimited = test.attemptsAllowed === 0;
+            return {
+                testId: test.id,
+                completed: !isUnlimited && attempts >= attemptsAllowed,
+                attempts,
+                attemptsAllowed
+            };
+        } catch (error) {
+            return { testId: test.id, completed: false, attempts: 0, attemptsAllowed: test.attemptsAllowed || 1 };
+        }
+    });
+
+    const completionData = await Promise.all(completionPromises);
+    const completionMap = new Map();
+    completionData.forEach(d => completionMap.set(d.testId, d));
+
+    let html = '<div class="space-y-3">';
+
+    uniqueOverdueTests.forEach((test) => {
+        const completion = completionMap.get(test.id) || { completed: false, attempts: 0, attemptsAllowed: 1 };
+        const isCompleted = completion.completed;
+        const isViewOnly = test.isViewOnly === true;
+
+        // ✅ FIX: Check enabledTestIds set (from testPermissions) OR test-level flag
+        const isProfessorEnabled = enabledTestIds.has(test.id) || test.professorEnabled === true;
+
+        console.log(`Test: ${test.testName} | enabled: ${isProfessorEnabled} | viewOnly: ${isViewOnly} | completed: ${isCompleted}`);
+
+        html += `
+            <div class="bg-white border-2 ${isCompleted ? 'border-green-200' : isProfessorEnabled ? 'border-blue-200' : isViewOnly ? 'border-gray-200' : 'border-red-300'} rounded-xl p-4 hover:shadow-md transition-all overdue-test-card">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
+                    <!-- Test Info -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start gap-3 mb-2">
+                            <div class="flex-shrink-0 w-10 h-10 ${isCompleted ? 'bg-green-500' : isProfessorEnabled ? 'bg-blue-500' : isViewOnly ? 'bg-gray-400' : 'bg-red-500'} rounded-lg flex items-center justify-center">
+                                <i class="bi bi-${isCompleted ? 'check-circle-fill' : isProfessorEnabled ? 'unlock-fill' : isViewOnly ? 'eye-fill' : 'exclamation-triangle-fill'} text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-900 text-base mb-1">${test.testName}</h4>
+                                <div class="flex flex-wrap items-center gap-2 text-sm">
+                                    ${isViewOnly ? `
+                                        <span class="bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded-full">
+                                            <i class="bi bi-eye"></i> View Only
+                                        </span>
+                                    ` : ''}
+                                    ${isProfessorEnabled && !isCompleted && !isViewOnly ? `
+                                        <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded-full">
+                                            <i class="bi bi-unlock"></i> Enabled by Professor
+                                        </span>
+                                    ` : ''}
                                     ${isCompleted ? `
-                                        <p class="text-red-600 font-semibold">
-                                            Score: ${completion.bestScore}/100 • ${completion.attempts} Attempt${completion.attempts > 1 ? 's' : ''}
-                                        </p>
-                                    ` : `
-                                        <p class="text-red-600 font-semibold">
-                                            ${isViewOnly ? 'Not selected for this test' : `Overdue: ${formatDeadline(test.deadline, test.deadlineTime)}`}
-                                        </p>
-                                    `}
+                                        <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
+                                            <i class="bi bi-check-circle"></i> Completed
+                                        </span>
+                                    ` : ''}
                                 </div>
                             </div>
-                            
-                            <!-- Action Button -->
-                            <div class="w-full lg:w-auto lg:min-w-[140px]">
-                                ${isCompleted ? `
-                                    <div class="w-full px-4 py-2.5 bg-red-500 text-white rounded-lg font-bold text-sm text-center">
-                                        <i class="bi bi-check-circle-fill mr-1"></i>
-                                        Done
-                                    </div>
-                                ` : isViewOnly ? `
-                                    <div class="w-full px-4 py-2.5 bg-gray-300 text-gray-600 rounded-lg font-semibold text-sm text-center cursor-not-allowed">
-                                        <i class="bi bi-eye-slash"></i> View Only
-                                    </div>
-                                ` : isProfessorEnabled ? `
-                                    <button onclick="startOverdueTest('${test.id}', '${encodeURIComponent(test.testName)}')" 
-                                        class="w-full px-4 py-2.5 bg-blue-500 text-white rounded-lg font-bold text-sm hover:bg-blue-600 transition-all">
-                                        <i class="bi bi-play-fill mr-1"></i>
-                                        Take Test
-                                    </button>
-                                ` : `
-                                    <div class="w-full px-4 py-2.5 bg-gray-300 text-gray-700 rounded-lg font-semibold text-sm text-center">
-                                        <i class="bi bi-lock-fill mr-1"></i>
-                                        Locked
-                                    </div>
-                                `}
+                        </div>
+                        <div class="ml-13 text-sm pl-0">
+                            ${isCompleted
+                                ? `<p class="text-green-600 font-semibold">${completion.attempts} Attempt${completion.attempts !== 1 ? 's' : ''} submitted</p>`
+                                : isViewOnly
+                                    ? `<p class="text-gray-500">You are not selected for this test</p>`
+                                    : isProfessorEnabled
+                                        ? `<p class="text-blue-600 font-semibold">Your professor enabled this overdue test for you</p>`
+                                        : `<p class="text-red-600 font-semibold">Overdue: ${formatDeadline(test.deadline, test.deadlineTime)}</p>`
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="w-full lg:w-auto lg:min-w-[140px]">
+                        ${isCompleted ? `
+                            <div class="w-full px-4 py-2.5 bg-green-500 text-white rounded-lg font-bold text-sm text-center">
+                                <i class="bi bi-check-circle-fill mr-1"></i> Done
                             </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            
-            if (uniqueOverdueTests.length > 3) {
-                html += `
-                    <div class="overdue-scroll-indicator">
-                        <i class="bi bi-chevron-down"></i>
-                    </div>
-                `;
-            }
-            
-            html += `
-                <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div class="flex items-start gap-3">
-                        <i class="bi bi-info-circle text-blue-600 text-xl flex-shrink-0"></i>
-                        <div class="text-sm text-blue-800">
-                            <p class="font-semibold mb-1">Need Help?</p>
-                            <p>Contact your professor to request access to overdue tests.</p>
-                        </div>
+                        ` : isViewOnly ? `
+                            <div class="w-full px-4 py-2.5 bg-gray-200 text-gray-500 rounded-lg font-semibold text-sm text-center cursor-not-allowed">
+                                <i class="bi bi-eye-slash mr-1"></i> View Only
+                            </div>
+                        ` : isProfessorEnabled ? `
+                            <button onclick="startOverdueTest('${test.id}', '${encodeURIComponent(test.testName)}')"
+                                class="w-full px-4 py-2.5 bg-blue-500 text-white rounded-lg font-bold text-sm hover:bg-blue-600 hover:shadow-md transition-all flex items-center justify-center gap-2">
+                                <i class="bi bi-play-fill"></i> Take Test
+                            </button>
+                        ` : `
+                            <div class="w-full px-4 py-2.5 bg-gray-100 text-gray-500 rounded-lg font-semibold text-sm text-center border border-gray-200">
+                                <i class="bi bi-lock-fill mr-1"></i> Locked
+                            </div>
+                        `}
                     </div>
                 </div>
-            `;
-            
-            container.innerHTML = html;
-        }
+            </div>
+        `;
+    });
 
+    html += '</div>';
+
+    if (uniqueOverdueTests.length > 3) {
+        html += `
+            <div class="overdue-scroll-indicator">
+                <i class="bi bi-chevron-down"></i>
+            </div>
+        `;
+    }
+
+    html += `
+        <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div class="flex items-start gap-3">
+                <i class="bi bi-info-circle text-blue-600 text-xl flex-shrink-0"></i>
+                <div class="text-sm text-blue-800">
+                    <p class="font-semibold mb-1">Need Help?</p>
+                    <p>Contact your professor to request access to overdue tests.</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+}
         window.toggleOverdueSection = function() {
             const section = document.getElementById('overdue-section');
             const container = document.getElementById('overdueTestsContainer');

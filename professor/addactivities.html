@@ -1515,14 +1515,53 @@
 
                 window.allScheduledTests = [];
                 testsSnapshot.forEach(docSnap => { window.allScheduledTests.push({ id: docSnap.id, ...docSnap.data() }); });
+                // Initialize status snapshot for real-time tracking
+lastStatusSnapshot = new Map();
+window.allScheduledTests.forEach(test => {
+    lastStatusSnapshot.set(test.id, test.status || 'scheduled');
+});
 
                 populateSectionSortDropdown();
-                renderScheduleTable(window.allScheduledTests, enabledTestsMap);
-            } catch (error) {
+window._enabledTestsMap = enabledTestsMap;
+renderScheduleTable(window.allScheduledTests, enabledTestsMap);            
+} catch (error) {
                 console.error('Error loading scheduled tests:', error);
                 document.getElementById('scheduleTableBody').innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">❌</div><div class="empty-title">Error Loading Tests</div><div class="empty-text">${error.message}</div></div></td></tr>`;
             }
         }
+        // ===== REAL-TIME AUTO REFRESH =====
+let lastStatusSnapshot = new Map(); // track previous statuses
+setInterval(() => {
+    if (!window.allScheduledTests?.length) return;
+    const now = new Date();
+    let changed = false;
+
+    window.allScheduledTests.forEach(test => {
+        const prevStatus = lastStatusSnapshot.get(test.id);
+        if (prevStatus === 'completed') return; // already overdue, skip
+
+        const deadlineDateTime = new Date(test.deadlineDateTime);
+        const testDateTime = new Date(test.dateTime || `${test.date}T${test.time || '00:00'}`);
+
+        let newStatus = 'scheduled';
+        if (testDateTime <= now && deadlineDateTime >= now) newStatus = 'active';
+        else if (deadlineDateTime < now) newStatus = 'completed';
+
+        if (newStatus !== prevStatus) {
+            test.status = newStatus;
+            lastStatusSnapshot.set(test.id, newStatus);
+            changed = true;
+        }
+    });
+
+    if (changed) {
+        renderScheduleTable(window.allScheduledTests, window._enabledTestsMap || new Map());
+    }
+}, 1000);
+// Initialize snapshot on first load
+window.allScheduledTests?.forEach(test => {
+    lastStatusSnapshot.set(test.id, test.status || 'scheduled');
+});
 
 async function loadTestResults(userEmail, userId) {
     try {
@@ -2279,11 +2318,10 @@ function getAgeGroupFromStudent(studentData) {
         };
 
         function generateReports() { showInfoModal('Report generation feature coming soon!'); }
-
-        window.filterScheduleTable = function() {
-            if (!window.allScheduledTests || window.allScheduledTests.length === 0) return;
-            if (window.renderScheduleTable) window.renderScheduleTable(window.allScheduledTests, new Map());
-        };
+window.filterScheduleTable = async function() {
+    if (!window.allScheduledTests || window.allScheduledTests.length === 0) return;
+    if (window.renderScheduleTable) window.renderScheduleTable(window.allScheduledTests, window._enabledTestsMap || new Map());
+};
 
         function showInfoModal(message) {
             const modal = document.getElementById('infoModal');
