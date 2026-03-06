@@ -247,8 +247,7 @@
                     <span class="hidden xl:inline">Lessons</span>
                 </a>
                 <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                    <i class="bi bi-award"></i> 
-                    <span class="hidden xl:inline">Grades</span>
+                    <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
                 </a>
                 <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
                     <i class="bi bi-graph-up"></i> 
@@ -414,7 +413,7 @@
                     <i class="bi bi-book mr-3"></i>Lessons
                 </a>
                 <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                    <i class="bi bi-award mr-3"></i>Grades
+                    <i class="bi bi-activity mr-3"></i>Performance
                 </a>
                 <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
                     <i class="bi bi-graph-up mr-3"></i>Progress
@@ -479,7 +478,7 @@
                 </div>
                 <div id="avgScore" class="text-5xl sm:text-6xl font-black text-gray-900">0.00</div>
             </div>
-            <p class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider">Average Score</p>
+            <p class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider">Overall Performance</p>
         </div>
         
         <!-- Best Score -->
@@ -536,7 +535,7 @@
                     </div>
                     Overall Progress
                 </h2>
-                <span class="text-sm text-gray-500 font-medium">Weekly Performance</span>
+                <a href="./progress.html" class="text-sm text-green-600 font-semibold hover:text-green-700 hover:underline flex items-center gap-1">View full progress <i class="bi bi-arrow-right"></i></a>
             </div>
             
             <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
@@ -844,6 +843,70 @@
                 subtitle: 'Body fat and mass tests'
             }
         };
+
+        // Norm rank system for Overall Progress (aligned with progress.html)
+        const NORM_RANKS = { 'Excellent': 5, 'Good': 4, 'Average': 3, 'Below Average': 2, 'Poor': 1, 'Athletic': 5, 'Fitness': 4, 'Essential Fat': 3, 'Overfat': 2, 'Obese': 1, 'Completed': 3 };
+        function getStudentAgeForNorm() {
+            if (!studentData) return null;
+            if (studentData.birthday) { try { const b = studentData.birthday.toDate ? studentData.birthday.toDate() : new Date(studentData.birthday); const t = new Date(); let a = t.getFullYear() - b.getFullYear(); const m = t.getMonth() - b.getMonth(); if (m < 0 || (m === 0 && t.getDate() < b.getDate())) a--; if (!isNaN(a)) return a; } catch(e) {} }
+            if (typeof studentData.age === 'number') return studentData.age;
+            if (typeof studentData.age === 'string') { const m = String(studentData.age).match(/(\d+)/); if (m) return parseInt(m[1], 10); }
+            return null;
+        }
+        function getAgeGroupForNorm(age) { if (age == null) return null; if (age <= 18) return '15-18'; if (age <= 22) return '19-22'; if (age <= 26) return '23-26'; return '27-30'; }
+        function getGenderForNorm() { return (studentData?.gender || '').toLowerCase().startsWith('f') ? 'female' : 'male'; }
+        function extractNumForNorm(result) {
+            if (typeof result === 'object' && result !== null) return result.value ?? result.result ?? result.score ?? result.count ?? result.repetitions ?? 0;
+            if (typeof result === 'string') { const m = result.match(/(\d+\.?\d*)/); return m ? parseFloat(m[1]) : parseFloat(result) || 0; }
+            return parseFloat(result) || 0;
+        }
+        function pushUpCatNorm(ag, gender, reps) {
+            const male = {'15-18':[40,31,21,11],'19-22':[38,28,18,9],'23-26':[35,25,16,8],'27-30':[32,23,14,6]};
+            const female = {'15-18':[25,19,13,7],'19-22':[23,17,11,6],'23-26':[20,15,9,5],'27-30':[18,13,8,4]};
+            const t = (gender==='female'?female:male)[ag] || (gender==='female'?female:male)['27-30'];
+            if (reps>=t[0]) return 'Excellent'; if (reps>=t[1]) return 'Good'; if (reps>=t[2]) return 'Average'; if (reps>=t[3]) return 'Below Average'; return 'Poor';
+        }
+        function curlUpCatNorm(ag, gender, reps) {
+            const male = {'15-18':[50,41,31,21],'19-22':[47,38,28,19],'23-26':[44,35,25,17],'27-30':[40,32,22,15]};
+            const female = {'15-18':[45,36,26,16],'19-22':[42,34,24,15],'23-26':[39,31,21,13],'27-30':[36,28,19,11]};
+            const t = (gender==='female'?female:male)[ag] || (gender==='female'?female:male)['27-30'];
+            if (reps>=t[0]) return 'Excellent'; if (reps>=t[1]) return 'Good'; if (reps>=t[2]) return 'Average'; if (reps>=t[3]) return 'Below Average'; return 'Poor';
+        }
+        function sitReachCatNorm(ag, gender, v) {
+            const male = {'15-18':[38,33,26,18],'19-22':[37,32,25,17],'23-26':[35.5,30.5,23.5,15.5],'27-30':[34,29,22,14]};
+            const female = {'15-18':[39,34,27,19],'19-22':[38,33,26,18],'23-26':[37,32,25,17],'27-30':[36,31,24,16]};
+            const t = (gender==='female'?female:male)[ag] || (gender==='female'?female:male)['27-30'];
+            if (v>=t[0]) return 'Excellent'; if (v>=t[1]) return 'Good'; if (v>=t[2]) return 'Average'; if (v>=t[3]) return 'Below Average'; return 'Poor';
+        }
+        function stepTestCatNorm(ag, gender, hr) {
+            const male = {'15-18':[84,97,108,118],'19-22':[79,89,105,116],'23-26':[80,90,106,117],'27-30':[81,91,107,118]};
+            const female = {'15-18':[89,103,113,124],'19-22':[85,98,109,118],'23-26':[86,99,110,119],'27-30':[88,101,112,121]};
+            const t = (gender==='female'?female:male)[ag] || (gender==='female'?female:male)['27-30'];
+            if (hr<=t[0]) return 'Excellent'; if (hr<=t[1]) return 'Good'; if (hr<=t[2]) return 'Average'; if (hr<=t[3]) return 'Below Average'; return 'Poor';
+        }
+        function getNormCategoryForProgress(testName, result) {
+            if (!testName) return null;
+            const n = testName.toLowerCase();
+            const num = extractNumForNorm(result);
+            const age = getStudentAgeForNorm();
+            const ag = getAgeGroupForNorm(age);
+            const gender = getGenderForNorm();
+            if (n.includes('skinfold')) { if (typeof result === 'string') { const m = result.match(/\(([^)]+)\)/); if (m) return m[1]; } return 'Completed'; }
+            if (n.includes('step test') || n.includes('3-minute')) { if (!ag) return 'Completed'; return stepTestCatNorm(ag, gender, num); }
+            if (n.includes('push-up') || n.includes('pushup')) { if (!ag) return null; return pushUpCatNorm(ag, gender, num); }
+            if (n.includes('curl-up') || n.includes('curl up')) { if (!ag) return null; return curlUpCatNorm(ag, gender, num); }
+            if (n.includes('sit-and-reach') || n.includes('sit and reach')) { if (!ag) return null; return sitReachCatNorm(ag, gender, num); }
+            return null;
+        }
+        function normRankForProgress(cat) { return NORM_RANKS[cat] ?? 3; }
+        function getCategoryForTestProgress(testName) {
+            const n = testName.toLowerCase().trim();
+            if (['push-up','pushup','grip','curl-up','curl up','sit-up','situp','plank'].some(k => n.includes(k))) return 'Muscular Strength and Endurance';
+            if (n.includes('step') || n.includes('minute') || n.includes('run')) return 'Cardiorespiratory Endurance';
+            if (n.includes('sit-and-reach') || n.includes('sit and reach') || n.includes('shoulder')) return 'Flexibility';
+            if (n.includes('bmi') || n.includes('skinfold') || n.includes('body mass')) return 'Body Composition';
+            return 'Cardiorespiratory Endurance';
+        }
         
         // DOM Elements
         const loadingScreen = document.getElementById('loadingScreen');
@@ -1791,281 +1854,156 @@ function closeNotificationDropdown() {
             }
         }
         
+        let overallProgressChartInstance = null;
+
         async function createOverallProgressChart() {
             try {
                 const container = document.getElementById('overallProgressChart');
-                if (!container) {
-                    console.error('Overall progress chart container not found');
-                    return;
-                }
+                if (!container) return;
 
                 if (!studentData || !studentData.email) {
-                    container.innerHTML = `
-                        <div class="text-center py-12">
-                            <i class="bi bi-graph-up text-6xl text-gray-300 mb-3"></i>
-                            <p class="text-gray-600 font-semibold mb-1">No student data</p>
-                            <small class="text-gray-400">Please log in</small>
-                        </div>
-                    `;
+                    container.innerHTML = `<div class="text-center py-12"><i class="bi bi-graph-up text-6xl text-gray-300 mb-3"></i><p class="text-gray-600 font-semibold mb-1">No student data</p><small class="text-gray-400">Please log in</small></div>`;
                     return;
                 }
 
                 const resultsQuery = query(
                     collection(db, 'testResults'),
                     where('studentEmail', '==', studentData.email),
-                    where('status', '==', 'completed')
+                    where('status', 'in', ['completed', 'overdue', 'late'])
                 );
-
                 const resultsSnapshot = await getDocs(resultsQuery);
 
-                // Sort in JavaScript instead
                 const allResults = [];
-                resultsSnapshot.forEach((doc) => {
-                    allResults.push(doc.data());
-                });
-
-                // Sort by date in JavaScript
+                resultsSnapshot.forEach((doc) => allResults.push({ id: doc.id, ...doc.data() }));
                 allResults.sort((a, b) => {
-                    const dateA = a.submittedAt?.toDate?.() || new Date(a.date);
-                    const dateB = b.submittedAt?.toDate?.() || new Date(b.date);
+                    const dateA = a.submittedAt?.toDate?.() || (a.submittedAt?.seconds ? new Date(a.submittedAt.seconds * 1000) : new Date(a.date || 0));
+                    const dateB = b.submittedAt?.toDate?.() || (b.submittedAt?.seconds ? new Date(b.submittedAt.seconds * 1000) : new Date(b.date || 0));
                     return dateA - dateB;
                 });
-                
-                allResults.forEach((result) => {
+
+                if (allResults.length === 0) {
                     container.innerHTML = `
                         <div class="text-center py-12">
                             <i class="bi bi-graph-up text-6xl text-gray-300 mb-3"></i>
                             <p class="text-gray-600 font-semibold mb-1">No test results yet</p>
-                            <small class="text-gray-400">Complete tests to see your progress</small>
+                            <small class="text-gray-400">Complete tests to see your overall performance per week</small>
                             <div class="mt-4">
-                                <a href="./test.html" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-sm hover:from-blue-600 hover:to-blue-700 transition-all inline-block">
-                                    Take Your First Test
-                                </a>
+                                <a href="./test.html" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-sm hover:from-blue-600 hover:to-blue-700 transition-all inline-block">Take Your First Test</a>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                     return;
+                }
+
+                // Build (rank, date) per result then group by week
+                const weekMap = new Map();
+                allResults.forEach((r) => {
+                    const normCat = getNormCategoryForProgress(r.testName, r.result || r.resultData) || 'Completed';
+                    const rank = normRankForProgress(normCat);
+                    let testDate = new Date();
+                    if (r.submittedAt) { if (r.submittedAt.toDate) testDate = r.submittedAt.toDate(); else if (r.submittedAt.seconds) testDate = new Date(r.submittedAt.seconds * 1000); else testDate = new Date(r.submittedAt); }
+                    const year = testDate.getFullYear();
+                    const weekNum = getWeekNumber(testDate);
+                    const weekKey = `${year}-W${String(weekNum).padStart(2,'0')}`;
+                    if (!weekMap.has(weekKey)) weekMap.set(weekKey, { ranks: [], date: testDate });
+                    weekMap.get(weekKey).ranks.push(rank);
+                    weekMap.get(weekKey).date = testDate;
                 });
 
-                // Process results by week
-                const weeklyData = new Map();
-                
-                resultsSnapshot.forEach((doc) => {
-                const result = doc.data();
-                let testDate;
-                if (result.submittedAt?.toDate) {
-                    testDate = result.submittedAt.toDate();
-                } else if (result.submittedAt?.seconds) {
-                    testDate = new Date(result.submittedAt.seconds * 1000);
-                } else if (result.date) {
-                    testDate = new Date(result.date);
-                } else {
-                    testDate = new Date();
-                }
-                
-                if (isNaN(testDate.getTime())) testDate = new Date();
-                    
-                    // Get week number and year
-                    const weekNum = getWeekNumber(testDate);
-                    const year = testDate.getFullYear();
-                    const weekKey = `${year}-W${weekNum}`;
-                    
-                    // Calculate score
-                    const score = result.score || calculateTestScore(
-                        result.testName, 
-                        result.resultData || result.result, 
-                        result.testTarget
-                    );
-                    
-                    if (!weeklyData.has(weekKey)) {
-                        weeklyData.set(weekKey, {
-                            scores: [],
-                            tests: [],
-                            date: testDate,
-                            weekLabel: !isNaN(testDate.getTime()) ? testDate.toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric',
-                            year: 'numeric'
-                        }) : 'Unknown Date'
-                        });
-                    }
-                    
-                    const weekData = weeklyData.get(weekKey);
-                    weekData.scores.push(score);
-                    weekData.tests.push(result.testName);
+                const sortedWeeks = Array.from(weekMap.entries()).sort((a, b) => a[1].date - b[1].date);
+                const labels = sortedWeeks.map(([, data]) => {
+                    const d = data.date;
+                    const day = d.getDate();
+                    const mon = d.toLocaleDateString('en-US', { month: 'short' });
+                    const yr = d.getFullYear();
+                    return `${mon} ${day}, ${yr}`;
                 });
-                
-                // Convert to array and sort by date
-                const sortedWeeks = Array.from(weeklyData.entries())
-                    .sort((a, b) => a[1].date - b[1].date);
-                
-                if (sortedWeeks.length === 0) {
-                    container.innerHTML = `
-                        <div class="text-center py-12">
-                            <i class="bi bi-graph-up text-6xl text-gray-300 mb-3"></i>
-                            <p class="text-gray-600 font-semibold mb-1">No weekly data</p>
-                            <small class="text-gray-400">Complete tests to track progress</small>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                // Prepare chart data
-                const labels = sortedWeeks.map(([_, data]) => data.weekLabel);
-                const averageScores = sortedWeeks.map(([_, data]) => {
-                    const avg = data.scores.reduce((a, b) => a + b, 0) / data.scores.length;
-                    return Math.round(avg);
+                const ranks = sortedWeeks.map(([, data]) => {
+                    const r = data.ranks;
+                    const avg = r.reduce((a, b) => a + b, 0) / r.length;
+                    return Math.round(avg * 10) / 10;
                 });
-                const testCounts = sortedWeeks.map(([_, data]) => data.tests.length);
-                
-                // Clear container and create canvas
+                const normLabels = ['', 'Poor', 'Below Avg', 'Average', 'Good', 'Excellent'];
+                const rankColors = { 5: '#059669', 4: '#2563eb', 3: '#d97706', 2: '#ea580c', 1: '#dc2626' };
+                const pointColors = ranks.map(r => rankColors[Math.round(r)] || '#64748b');
+                const weekDataForTooltip = sortedWeeks.map(([key, data]) => ({ key, ...data }));
+
+                if (overallProgressChartInstance) { overallProgressChartInstance.destroy(); overallProgressChartInstance = null; }
                 container.innerHTML = '<canvas id="overallProgressCanvas"></canvas>';
                 const canvas = document.getElementById('overallProgressCanvas');
+                if (!canvas) return;
                 const ctx = canvas.getContext('2d');
-                
-                // Create gradient
-                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
-                gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
-                
-                // Create chart
-                new Chart(ctx, {
+                const grad = ctx.createLinearGradient(0, 0, 0, 350);
+                grad.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+                grad.addColorStop(1, 'rgba(16, 185, 129, 0.02)');
+
+                overallProgressChartInstance = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: labels,
+                        labels,
                         datasets: [{
-                            label: 'Average Score',
-                            data: averageScores,
-                            backgroundColor: gradient,
-                            borderColor: 'rgb(59, 130, 246)',
-                            borderWidth: 4,
-                            pointBackgroundColor: 'rgb(37, 99, 235)',
+                            label: 'Overall (avg classification)',
+                            data: ranks,
+                            backgroundColor: grad,
+                            borderColor: '#059669',
+                            borderWidth: 3,
+                            pointBackgroundColor: pointColors,
                             pointBorderColor: '#fff',
-                            pointBorderWidth: 4,
-                            pointRadius: 8,
-                            pointHoverRadius: 12,
-                            tension: 0.4,
-                            fill: true
+                            pointBorderWidth: 2,
+                            pointRadius: sortedWeeks.length === 1 ? 10 : 6,
+                            pointHoverRadius: 10,
+                            fill: true,
+                            tension: 0.35
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: {
-                                display: false
-                            },
+                            legend: { display: false },
                             tooltip: {
-                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                                titleColor: '#1f2937',
-                                bodyColor: '#6b7280',
-                                borderColor: 'rgb(59, 130, 246)',
-                                borderWidth: 2,
-                                padding: 16,
+                                backgroundColor: 'rgba(255,255,255,0.97)',
+                                titleColor: '#1e293b',
+                                bodyColor: '#475569',
+                                borderColor: '#e2e8f0',
+                                borderWidth: 1,
+                                padding: 12,
                                 displayColors: false,
-                                titleFont: {
-                                    size: 15,
-                                    weight: 'bold'
-                                },
-                                bodyFont: {
-                                    size: 14
-                                },
                                 callbacks: {
-                                    title: function(context) {
-                                        const index = context[0].dataIndex;
-                                        return `Week of ${labels[index]}`;
-                                    },
-                                    label: function(context) {
-                                        return `Average Score: ${context.parsed.y}/100`;
-                                    },
-                                    afterLabel: function(context) {
-                                        const index = context.dataIndex;
-                                        const count = testCounts[index];
-                                        const tests = sortedWeeks[index][1].tests;
-                                        return [
-                                            `Tests Taken: ${count}`,
-                                            '',
-                                            'Tests:',
-                                            ...tests.map(t => `• ${t}`)
-                                        ];
+                                    title: (ctx) => 'Week of ' + labels[ctx[0].dataIndex],
+                                    label: (ctx) => {
+                                        const w = weekDataForTooltip[ctx.dataIndex];
+                                        const avgRank = w.ranks.reduce((a, b) => a + b, 0) / w.ranks.length;
+                                        const label = normLabels[Math.round(avgRank)] || '—';
+                                        return `Overall: ${label} (${w.ranks.length} test${w.ranks.length !== 1 ? 's' : ''})`;
                                     }
                                 }
                             }
                         },
                         scales: {
                             y: {
-                                beginAtZero: true,
-                                max: 100,
+                                min: 0,
+                                max: 5,
                                 ticks: {
-                                    stepSize: 20,
-                                    callback: function(value) {
-                                        return value;
-                                    },
-                                    font: {
-                                        size: 12,
-                                        weight: '600'
-                                    },
-                                    color: '#64748b'
+                                    stepSize: 1,
+                                    callback: (v) => normLabels[v] || '',
+                                    font: { size: 10, weight: '600' },
+                                    color: '#94a3b8'
                                 },
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)',
-                                    drawBorder: false
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Average Score',
-                                    font: {
-                                        size: 13,
-                                        weight: '700'
-                                    },
-                                    color: '#1e293b'
-                                }
+                                grid: { color: 'rgba(0,0,0,0.04)' }
                             },
                             x: {
-                                ticks: {
-                                    font: {
-                                        size: 11,
-                                        weight: '600'
-                                    },
-                                    color: '#64748b',
-                                    maxRotation: 45,
-                                    minRotation: 45
-                                },
-                                grid: {
-                                    display: false,
-                                    drawBorder: false
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Week',
-                                    font: {
-                                        size: 13,
-                                        weight: '700'
-                                    },
-                                    color: '#1e293b'
-                                }
+                                ticks: { font: { size: 10, weight: '500' }, color: '#94a3b8', maxRotation: 35, minRotation: 0 },
+                                grid: { display: false }
                             }
-                        },
-                        interaction: {
-                            intersect: false,
-                            mode: 'index'
                         }
                     }
                 });
-                
-                console.log('✅ Overall progress chart created successfully');
-                
+                console.log('✅ Overall progress chart (per-week) created');
             } catch (error) {
                 console.error('❌ Error creating overall progress chart:', error);
                 const container = document.getElementById('overallProgressChart');
                 if (container) {
-                    container.innerHTML = `
-                        <div class="text-center py-12">
-                            <i class="bi bi-exclamation-circle text-red-500 text-6xl mb-3"></i>
-                            <p class="text-red-500 font-semibold mb-1">Error loading chart</p>
-                            <small class="text-gray-400">${error.message}</small>
-                        </div>
-                    `;
+                    container.innerHTML = `<div class="text-center py-12"><i class="bi bi-exclamation-circle text-red-500 text-6xl mb-3"></i><p class="text-red-500 font-semibold mb-1">Error loading chart</p><small class="text-gray-400">${error.message}</small></div>`;
                 }
             }
         }
@@ -2167,6 +2105,7 @@ function closeNotificationDropdown() {
                         firstName: data.firstName || '',
                         lastName: data.lastName || '',
                         age: data.age || 0,
+                        birthday: data.birthday || null,
                         gender: data.gender || 'Not Specified',
                         height: data.height || 0,
                         weight: data.weight || 0,
@@ -2293,7 +2232,50 @@ function closeNotificationDropdown() {
                 }
             }, 10000);
         }
-        
+        function getNormCategoryForDashboard(testName, result) {
+        if (!testName || !studentData) return null;
+        const normalized = testName.toLowerCase();
+
+        function extractNum(r) {
+            if (typeof r === 'object' && r !== null) return parseFloat(r.value ?? r.result ?? r.score ?? r.count ?? r.repetitions ?? 0) || 0;
+            if (typeof r === 'string') { const m = r.match(/(\d+\.?\d*)/); return m ? parseFloat(m[1]) : 0; }
+            return parseFloat(r) || 0;
+        }
+
+        function getAge() {
+            if (studentData.birthday) { try { let b = studentData.birthday.toDate ? studentData.birthday.toDate() : new Date(studentData.birthday); const t = new Date(); let a = t.getFullYear()-b.getFullYear(); const m=t.getMonth()-b.getMonth(); if(m<0||(m===0&&t.getDate()<b.getDate()))a--; if(!isNaN(a))return a; } catch(e){} }
+            if (typeof studentData.age === 'number') return studentData.age;
+            if (typeof studentData.age === 'string') { const m=studentData.age.match(/(\d+)/); if(m) return parseInt(m[1],10); }
+            return null;
+        }
+
+        function getAgeGrp(age) { if(age==null)return null; if(age<=18)return'15-18'; if(age<=22)return'19-22'; if(age<=26)return'23-26'; return'27-30'; }
+        function getGen() { const g=(studentData?.gender||'').toString().toLowerCase(); return g.startsWith('f')?'female':'male'; }
+
+        const val = extractNum(result);
+        const ag = getAgeGrp(getAge());
+        const gen = getGen();
+        if (!ag) return null;
+
+        if (normalized.includes('skinfold')) return 'Completed';
+        if (normalized.includes('step test') || normalized.includes('3-minute')) {
+            const n = { male: {'15-18':[84,97,108,118],'19-22':[79,89,105,116],'23-26':[80,90,106,117],'27-30':[81,91,107,118]}, female: {'15-18':[89,103,113,124],'19-22':[85,98,109,118],'23-26':[86,99,110,119],'27-30':[88,101,112,121]} };
+            const t=n[gen][ag]; if(val<=t[0])return'Excellent'; if(val<=t[1])return'Good'; if(val<=t[2])return'Average'; if(val<=t[3])return'Below Average'; return'Poor';
+        }
+        if (normalized.includes('push-up') || normalized.includes('pushup')) {
+            const n = { male: {'15-18':[40,31,21,11],'19-22':[38,28,18,9],'23-26':[35,25,16,8],'27-30':[32,23,14,6]}, female: {'15-18':[25,19,13,7],'19-22':[23,17,11,6],'23-26':[20,15,9,5],'27-30':[18,13,8,4]} };
+            const t=n[gen][ag]; if(val>=t[0])return'Excellent'; if(val>=t[1])return'Good'; if(val>=t[2])return'Average'; if(val>=t[3])return'Below Average'; return'Poor';
+        }
+        if (normalized.includes('curl-up') || normalized.includes('curl up')) {
+            const n = { male: {'15-18':[50,41,31,21],'19-22':[47,38,28,19],'23-26':[44,35,25,17],'27-30':[40,32,22,15]}, female: {'15-18':[45,36,26,16],'19-22':[42,34,24,15],'23-26':[39,31,21,13],'27-30':[36,28,19,11]} };
+            const t=n[gen][ag]; if(val>=t[0])return'Excellent'; if(val>=t[1])return'Good'; if(val>=t[2])return'Average'; if(val>=t[3])return'Below Average'; return'Poor';
+        }
+        if (normalized.includes('sit-and-reach') || normalized.includes('sit and reach')) {
+            const n = { male: {'15-18':[38,33,26,18],'19-22':[37,32,25,17],'23-26':[35.5,30.5,23.5,15.5],'27-30':[34,29,22,14]}, female: {'15-18':[39,34,27,19],'19-22':[38,33,26,18],'23-26':[37,32,25,17],'27-30':[36,31,24,16]} };
+            const t=n[gen][ag]; if(val>=t[0])return'Excellent'; if(val>=t[1])return'Good'; if(val>=t[2])return'Average'; if(val>=t[3])return'Below Average'; return'Poor';
+        }
+        return null;
+    }
         // Load upcoming tests
         async function loadUpcomingTests() {
             try {
@@ -2332,42 +2314,43 @@ function closeNotificationDropdown() {
                 // Map to store test completion status
                 const testStatus = new Map();
                 
-                completedTestsSnapshot.forEach(doc => {
-                    const result = doc.data();
-                    const testId = result.testId;
-                    const score = calculateTestScore(result.testName, result.result, result.testTarget);
-                    
-                    if (!testStatus.has(testId)) {
-                        testStatus.set(testId, {
-                            attempts: 0,
-                            bestScore: 0
-                        });
-                    }
-                    
-                    const status = testStatus.get(testId);
-                    status.attempts++;
-                    if (score > status.bestScore) {
-                        status.bestScore = score;
-                    }
-                });
+               completedTestsSnapshot.forEach(doc => {
+                const result = doc.data();
+                const testId = result.testId;
+                const score = calculateTestScore(result.testName, result.result, result.testTarget);
+                
+                // Get norm category
+                const normCat = getNormCategoryForDashboard(result.testName, result.result ?? result.resultData);
+
+                if (!testStatus.has(testId)) {
+                    testStatus.set(testId, {
+                        attempts: 0,
+                        bestScore: 0,
+                        bestNorm: '--'
+                    });
+                }
+                
+                const status = testStatus.get(testId);
+                status.attempts++;
+                if (score > status.bestScore) {
+                    status.bestScore = score;
+                    if (normCat) status.bestNorm = normCat;
+                }
+            });
                 
                 // Filter tests that can still be taken
                 const upcomingTests = [];
-                
+
                 if (!testsSnapshot.empty) {
                     testsSnapshot.forEach((doc) => {
                         const test = { id: doc.id, ...doc.data() };
                         
-                        // ⭐ NEW: Check if student is selected for this test
                         let isStudentSelected = false;
                         
                         if (test.selectedStudents && Array.isArray(test.selectedStudents)) {
                             isStudentSelected = test.selectedStudents.includes(studentData.email);
-                            console.log(`📋 Dashboard Test: ${test.testName} - Student ${isStudentSelected ? 'IS' : 'NOT'} selected`);
                         } else {
-                            // If no selectedStudents array exists, test is visible to all (backward compatibility)
                             isStudentSelected = true;
-                            console.log(`📋 Dashboard Test: ${test.testName} - No student filter (visible to all)`);
                         }
                         
                         let deadlineDateTime;
@@ -2378,22 +2361,18 @@ function closeNotificationDropdown() {
                             deadlineDateTime.setHours(23, 59, 59, 999);
                         }
                     
-                        // Check if deadline hasn't passed
                         if (deadlineDateTime >= now) {
                             const status = testStatus.get(test.id);
-                            
-                            // ⭐ Mark test as view-only if student not selected
-                            test.isViewOnly = !isStudentSelected;
+                            const isViewOnly = !isStudentSelected;
                             
                             if (!status) {
-                                upcomingTests.push(test);
+                                upcomingTests.push({ ...test, isViewOnly });
                             } else {
                                 const isUnlimited = test.attemptsAllowed === 0;
-                                const isPerfect = status.bestScore === 100;
                                 const hasAttemptsLeft = status.attempts < test.attemptsAllowed;
                                 
-                                if (!isPerfect && (isUnlimited || hasAttemptsLeft)) {
-                                    upcomingTests.push(test);
+                                if (isUnlimited || hasAttemptsLeft) {
+                                    upcomingTests.push({ ...test, isViewOnly });
                                 }
                             }
                         }
@@ -2432,7 +2411,7 @@ function closeNotificationDropdown() {
                         const status = testStatus.get(test.id);
                         const isUnlimited = test.attemptsAllowed === 0;
                         const hasAttempts = status && status.attempts > 0;
-                        const isViewOnly = test.isViewOnly === true; // ⭐ NEW
+                        const isViewOnly = test.isViewOnly === true;
                         
                         // ⭐ NEW: Different styling for view-only tests
                         const cardBgClass = isViewOnly ? 'from-gray-50 to-gray-100' : 'from-blue-50 to-blue-100';
@@ -2455,8 +2434,7 @@ function closeNotificationDropdown() {
                                 </p>
                                 ` : hasAttempts ? `
                                 <p class="text-orange-600 font-semibold text-xs mb-2">
-                                    🔄 ${isUnlimited ? `${status.attempts} Attempt${status.attempts > 1 ? 's' : ''} • Best: ${status.bestScore}` : `${status.attempts}/${test.attemptsAllowed} Attempts • Best: ${status.bestScore}`}
-                                </p>
+                                🔄 ${isUnlimited ? `${status.attempts} Attempt${status.attempts > 1 ? 's' : ''} • Best: ${status.bestNorm || status.bestScore}` : `${status.attempts}/${test.attemptsAllowed} Attempts • Best: ${status.bestNorm || status.bestScore}`}                                </p>
                                 ` : `
                                 <p class="text-green-600 font-semibold text-xs mb-2">
                                     ✨ ${isUnlimited ? 'Unlimited Attempts' : test.attemptsAllowed + ' Attempt' + (test.attemptsAllowed > 1 ? 's' : '') + ' Allowed'}
@@ -2531,15 +2509,10 @@ function closeNotificationDropdown() {
             }
         }
 
-        // ⭐ FIXED: Calculate and update stats using best scores per test
- // ⭐ FIXED: Calculate and update stats to match grades page exactly
-// ⭐ FIXED: Calculate stats with overdue penalties (matches grades page)
+      
 async function calculateAndUpdateStats() {
     try {
-        if (!studentData || !studentData.email) {
-            console.log('No student data available');
-            return;
-        }
+        if (!studentData || !studentData.email) return;
 
         const resultsQuery = query(
             collection(db, 'testResults'),
@@ -2547,102 +2520,184 @@ async function calculateAndUpdateStats() {
         );
         
         const resultsSnapshot = await getDocs(resultsQuery);
-        const OVERDUE_PENALTY = 0.10; // 10% penalty (matches grades page)
         
-        // Group by testId to get best scores per test
-        const testBestScores = new Map();
-        let overallBestScore = 0;
-        let overallBestTestName = '';
-        let hasOverdueWithPenalty = false;
-        
+        // Helper functions (same as test.html)
+        function getStudentAge() {
+            if (studentData.birthday) {
+                try {
+                    let birthDate = studentData.birthday.toDate ? studentData.birthday.toDate() : new Date(studentData.birthday);
+                    const today = new Date();
+                    let age = today.getFullYear() - birthDate.getFullYear();
+                    const m = today.getMonth() - birthDate.getMonth();
+                    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+                    if (!isNaN(age)) return age;
+                } catch(e) {}
+            }
+            if (typeof studentData.age === 'number') return studentData.age;
+            if (typeof studentData.age === 'string') {
+                const match = studentData.age.match(/(\d+)/);
+                if (match) return parseInt(match[1], 10);
+            }
+            return null;
+        }
+
+        function getAgeGroup(age) {
+            if (age == null) return null;
+            if (age <= 18) return '15-18';
+            if (age <= 22) return '19-22';
+            if (age <= 26) return '23-26';
+            return '27-30';
+        }
+
+        function getGenderKey() {
+            const g = (studentData?.gender || '').toString().toLowerCase();
+            return g.startsWith('f') ? 'female' : 'male';
+        }
+
+        function extractNumericResult(result) {
+            if (typeof result === 'object' && result !== null) {
+                return parseFloat(result.value ?? result.result ?? result.score ?? result.count ?? result.repetitions ?? 0) || 0;
+            }
+            if (typeof result === 'string') {
+                const match = result.match(/(\d+\.?\d*)/);
+                return match ? parseFloat(match[1]) : 0;
+            }
+            return parseFloat(result) || 0;
+        }
+
+        function getNormCategory(testName, result) {
+            if (!testName) return null;
+            const normalized = testName.toLowerCase();
+            const numericValue = extractNumericResult(result);
+            const age = getStudentAge();
+            const ageGroup = getAgeGroup(age);
+            const genderKey = getGenderKey();
+
+            if (normalized.includes('skinfold')) {
+                if (typeof result === 'string') {
+                    const match = result.match(/\(([^)]+)\)/);
+                    if (match) return match[1];
+                }
+                return 'Completed';
+            }
+            if (normalized.includes('step test') || normalized.includes('3-minute')) {
+                if (!ageGroup) return 'Completed';
+                const norms = {
+                    male:   { '15-18': [84,97,108,118], '19-22': [79,89,105,116], '23-26': [80,90,106,117], '27-30': [81,91,107,118] },
+                    female: { '15-18': [89,103,113,124], '19-22': [85,98,109,118], '23-26': [86,99,110,119], '27-30': [88,101,112,121] }
+                };
+                const t = norms[genderKey][ageGroup];
+                if (numericValue <= t[0]) return 'Excellent';
+                if (numericValue <= t[1]) return 'Good';
+                if (numericValue <= t[2]) return 'Average';
+                if (numericValue <= t[3]) return 'Below Average';
+                return 'Poor';
+            }
+            if (normalized.includes('push-up') || normalized.includes('pushup')) {
+                if (!ageGroup) return null;
+                const norms = {
+                    male:   { '15-18': [40,31,21,11], '19-22': [38,28,18,9], '23-26': [35,25,16,8], '27-30': [32,23,14,6] },
+                    female: { '15-18': [25,19,13,7],  '19-22': [23,17,11,6], '23-26': [20,15,9,5],  '27-30': [18,13,8,4] }
+                };
+                const t = norms[genderKey][ageGroup];
+                if (numericValue >= t[0]) return 'Excellent';
+                if (numericValue >= t[1]) return 'Good';
+                if (numericValue >= t[2]) return 'Average';
+                if (numericValue >= t[3]) return 'Below Average';
+                return 'Poor';
+            }
+            if (normalized.includes('curl-up') || normalized.includes('curl up')) {
+                if (!ageGroup) return null;
+                const norms = {
+                    male:   { '15-18': [50,41,31,21], '19-22': [47,38,28,19], '23-26': [44,35,25,17], '27-30': [40,32,22,15] },
+                    female: { '15-18': [45,36,26,16], '19-22': [42,34,24,15], '23-26': [39,31,21,13], '27-30': [36,28,19,11] }
+                };
+                const t = norms[genderKey][ageGroup];
+                if (numericValue >= t[0]) return 'Excellent';
+                if (numericValue >= t[1]) return 'Good';
+                if (numericValue >= t[2]) return 'Average';
+                if (numericValue >= t[3]) return 'Below Average';
+                return 'Poor';
+            }
+            if (normalized.includes('sit-and-reach') || normalized.includes('sit and reach')) {
+                if (!ageGroup) return null;
+                const norms = {
+                    male:   { '15-18': [38,33,26,18], '19-22': [37,32,25,17], '23-26': [35.5,30.5,23.5,15.5], '27-30': [34,29,22,14] },
+                    female: { '15-18': [39,34,27,19], '19-22': [38,33,26,18], '23-26': [37,32,25,17],          '27-30': [36,31,24,16] }
+                };
+                const t = norms[genderKey][ageGroup];
+                if (numericValue >= t[0]) return 'Excellent';
+                if (numericValue >= t[1]) return 'Good';
+                if (numericValue >= t[2]) return 'Average';
+                if (numericValue >= t[3]) return 'Below Average';
+                return 'Poor';
+            }
+            return null;
+        }
+
+        function normCategoryRank(category) {
+            if (!category) return 3;
+            const c = category.toLowerCase();
+            if (c === 'excellent') return 5;
+            if (c === 'good') return 4;
+            if (c === 'average') return 3;
+            if (c === 'below average') return 2;
+            if (c === 'poor' || c === 'obese') return 1;
+            return 3;
+        }
+
+        function rankToCategory(rank) {
+            if (rank >= 4.5) return 'Excellent';
+            if (rank >= 3.5) return 'Good';
+            if (rank >= 2.5) return 'Average';
+            if (rank >= 1.5) return 'Below Average';
+            return 'Poor';
+        }
+
+        const seenTestIds = new Set();
+        const allRanks = [];
+        let bestRank = 0;
+        let bestCat = '--';
+
         resultsSnapshot.forEach((doc) => {
             const result = doc.data();
-            const isProfessorOverride = result.isProfessorOverride === true;
-            
-            let score = 0;
-            
-            if (isProfessorOverride && typeof result.score === 'number' && !isNaN(result.score)) {
-                score = result.score;
-            } else {
-                score = calculateTestScore(
-                    result.testName, 
-                    result.result || result.resultData, 
-                    result.testTarget
-                );
-                
-                const isOverdue = (result.status === 'overdue' || result.status === 'late');
-                if (isOverdue && !isProfessorOverride) {
-                    const penalty = score * OVERDUE_PENALTY;
-                    score = Math.max(0, score - penalty);
-                    hasOverdueWithPenalty = true;
-                }
-            }
-            
-            score = Math.max(0, Math.min(100, score));
-            
             const testId = result.testId || doc.id;
-            
-            // Keep only the BEST score for each test
-            if (!testBestScores.has(testId) || score > testBestScores.get(testId)) {
-                testBestScores.set(testId, score);
+            const normCat = getNormCategory(result.testName, result.result ?? result.resultData ?? result.rawResult);
+            if (!normCat || normCat === 'Completed') return;
+
+            const rank = normCategoryRank(normCat);
+
+            if (!seenTestIds.has(testId)) {
+                seenTestIds.add(testId);
+                allRanks.push(rank);
             }
-            
-            // Track overall best score
-            if (score > overallBestScore) {
-                overallBestScore = score;
-                overallBestTestName = result.testName;
+
+            if (rank > bestRank) {
+                bestRank = rank;
+                bestCat = normCat;
             }
         });
-        
-        // Calculate average from BEST scores only
-        let totalScore = 0;
-        testBestScores.forEach(score => {
-            totalScore += score;
-        });
-        
-        const totalUniqueTests = testBestScores.size;
-        const avgScore = totalUniqueTests > 0 ? 
-            parseFloat((totalScore / totalUniqueTests).toFixed(2)) : 0;
-        
-        // Update the DOM elements
-         document.getElementById('testsDone').textContent = totalUniqueTests;
-        document.getElementById('avgScore').textContent = Math.round(avgScore);
-        
-        // Update best score with tooltip
-        const bestScoreElement = document.getElementById('bestScore');
-        bestScoreElement.textContent = overallBestScore;
-        
-        // Add warning if there are overdue penalties
-        if (hasOverdueWithPenalty) {
-            const avgScoreElement = document.getElementById('avgScore');
-            avgScoreElement.title = '⚠️ Includes 10% penalty for overdue tests';
-            avgScoreElement.style.cursor = 'help';
+
+        const totalUniqueTests = seenTestIds.size;
+
+        let overallLabel = '--';
+        if (allRanks.length > 0) {
+            const avgRank = allRanks.reduce((a, b) => a + b, 0) / allRanks.length;
+            overallLabel = rankToCategory(avgRank);
         }
-        
+
+        document.getElementById('testsDone').textContent = totalUniqueTests;
+        document.getElementById('avgScore').textContent = overallLabel;
+        document.getElementById('bestScore').textContent = bestCat;
+
         const bestScoreTestElement = document.getElementById('bestScoreTest');
-        if (bestScoreTestElement && overallBestTestName) {
-            bestScoreTestElement.textContent = overallBestTestName;
-            bestScoreTestElement.classList.remove('hidden');
-        }
-        
-        if (overallBestTestName) {
-            bestScoreElement.title = `Best score from: ${overallBestTestName}`;
-            bestScoreElement.style.cursor = 'help';
-        }
-        
-        console.log('Stats updated (matches grades page):', { 
-            totalUniqueTests, 
-            avgScore: avgScore.toFixed(2), 
-            overallBestScore,
-            overallBestTestName,
-            hasOverdueWithPenalty
-        });
-        
+        if (bestScoreTestElement) bestScoreTestElement.classList.add('hidden');
+
     } catch (error) {
         console.error('Error calculating stats:', error);
         document.getElementById('testsDone').textContent = '0';
-        document.getElementById('avgScore').textContent = '0.00';
-        document.getElementById('bestScore').textContent = '0';
+        document.getElementById('avgScore').textContent = '--';
+        document.getElementById('bestScore').textContent = '--';
     }
 }
         async function updatePerformanceSummary() {
@@ -2829,7 +2884,8 @@ async function calculateAndUpdateStats() {
                 }
             }
 
-        // ⭐ FIXED: Calculate strongest category using best scores per test
+        // Best at: based on norm classification (where student is best)
+        const NORM_LABELS_RANK = { 1: 'Poor', 2: 'Below Average', 3: 'Average', 4: 'Good', 5: 'Excellent' };
         async function calculateStrongestCategory() {
             try {
                 if (!studentData || !studentData.email) {
@@ -2838,112 +2894,67 @@ async function calculateAndUpdateStats() {
                     return;
                 }
 
-                console.log('🔍 Calculating strongest category for:', studentData.email);
-
                 const resultsQuery = query(
                     collection(db, 'testResults'),
                     where('studentEmail', '==', studentData.email),
-                    where('status', '==', 'completed')
+                    where('status', 'in', ['completed', 'overdue', 'late'])
                 );
-
                 const resultsSnapshot = await getDocs(resultsQuery);
 
                 if (resultsSnapshot.empty) {
-                    console.log('❌ No completed tests found');
                     document.getElementById('strongestCategory').textContent = 'No Data Yet';
                     document.getElementById('strongestCategoryScore').textContent = 'Complete tests to see your strongest area';
                     return;
                 }
 
-                console.log('📊 Found', resultsSnapshot.size, 'completed tests');
+                const categoryRanks = {
+                    'Cardiorespiratory Endurance': [],
+                    'Muscular Strength and Endurance': [],
+                    'Flexibility': [],
+                    'Body Composition': []
+                };
 
-                // ⭐ Group by testId first to use best scores only
-                const bestScoresByTest = new Map();
-                
                 resultsSnapshot.forEach((doc) => {
                     const result = doc.data();
-                    const score = result.score || calculateTestScore(
-                        result.testName, 
-                        result.resultData || result.result, 
-                        result.testTarget
-                    );
-                    const testId = result.testId;
-                    
-                    // Keep only the best score for each test
-                    if (!bestScoresByTest.has(testId) || score > bestScoresByTest.get(testId).score) {
-                        bestScoresByTest.set(testId, {
-                            testName: result.testName,
-                            score: score,
-                            category: getCategoryForTest(result.testName)
-                        });
+                    const category = getCategoryForTestProgress(result.testName);
+                    const normCat = getNormCategoryForProgress(result.testName, result.result || result.resultData) || 'Completed';
+                    const rank = normRankForProgress(normCat);
+                    if (categoryRanks[category]) categoryRanks[category].push(rank);
+                });
+
+                let bestCategory = null;
+                let bestAvgRank = -1;
+
+                Object.entries(categoryRanks).forEach(([category, ranks]) => {
+                    if (ranks.length === 0) return;
+                    const avg = ranks.reduce((a, b) => a + b, 0) / ranks.length;
+                    if (avg > bestAvgRank) {
+                        bestAvgRank = avg;
+                        bestCategory = category;
                     }
                 });
 
-                // Initialize category scores using the same categories
-                const categoryScores = {};
-                Object.keys(testCategories).forEach(category => {
-                    categoryScores[category] = {
-                        totalScore: 0,
-                        testCount: 0,
-                        averageScore: 0,
-                        tests: []
+                const elName = document.getElementById('strongestCategory');
+                const elScore = document.getElementById('strongestCategoryScore');
+                if (!elName || !elScore) return;
+
+                if (bestCategory && bestAvgRank >= 0) {
+                    const shortNames = {
+                        'Cardiorespiratory Endurance': 'Cardiorespiratory',
+                        'Muscular Strength and Endurance': 'Muscular',
+                        'Flexibility': 'Flexibility',
+                        'Body Composition': 'Body Composition'
                     };
-                });
-
-                // Process best scores by category
-                bestScoresByTest.forEach((test) => {
-                    const category = test.category;
-                    const score = test.score;
-                    
-                    console.log(`📝 Test: ${test.testName} → Category: ${category} → Score: ${score}`);
-                    
-                    if (categoryScores[category]) {
-                        categoryScores[category].totalScore += score;
-                        categoryScores[category].testCount++;
-                        categoryScores[category].tests.push(test.testName);
-                    } else {
-                        console.warn(`⚠️ Unknown category: ${category} for test: ${test.testName}`);
-                    }
-                });
-
-                // Calculate average scores
-                Object.keys(categoryScores).forEach(category => {
-                    if (categoryScores[category].testCount > 0) {
-                        categoryScores[category].averageScore = 
-                            categoryScores[category].totalScore / categoryScores[category].testCount;
-                    }
-                });
-
-                console.log('📊 Category Scores:', categoryScores);
-
-                // Find strongest category
-                let strongestCategory = null;
-                let highestAverageScore = -1;
-
-                Object.entries(categoryScores).forEach(([category, data]) => {
-                    if (data.testCount > 0 && data.averageScore > highestAverageScore) {
-                        highestAverageScore = data.averageScore;
-                        strongestCategory = category;
-                    }
-                });
-
-                // Update UI
-                if (strongestCategory && highestAverageScore > 0) {
-                    const categoryData = categoryScores[strongestCategory];
-                    document.getElementById('strongestCategory').textContent = strongestCategory;
-                    document.getElementById('strongestCategoryScore').textContent = 
-                        `Avg: ${Math.round(highestAverageScore)}/100 (${categoryData.testCount} test${categoryData.testCount > 1 ? 's' : ''})`;
-                    
-                    console.log('✅ Strongest Category:', strongestCategory, 'Score:', Math.round(highestAverageScore));
+                    const count = categoryRanks[bestCategory].length;
+                    const label = NORM_LABELS_RANK[Math.round(bestAvgRank)] || 'Average';
+                    elName.textContent = shortNames[bestCategory] || bestCategory;
+                    elScore.textContent = `Best: ${label} (${count} test${count !== 1 ? 's' : ''})`;
                 } else {
-                    console.log('❌ No valid category data found');
-                    document.getElementById('strongestCategory').textContent = 'No Data';
-                    document.getElementById('strongestCategoryScore').textContent = 'Complete tests to see your strongest area';
+                    elName.textContent = 'No Data';
+                    elScore.textContent = 'Complete tests to see your strongest area';
                 }
-
             } catch (error) {
                 console.error('❌ Error calculating strongest category:', error);
-                console.error('Error details:', error.message, error.stack);
                 document.getElementById('strongestCategory').textContent = 'Error';
                 document.getElementById('strongestCategoryScore').textContent = 'Unable to calculate';
             }
@@ -3170,58 +3181,73 @@ async function calculateAndUpdateStats() {
 
         // Render single test result with 2 decimal places
         function renderSingleTestResult(result, container) {
-            if (!result) {
-                container.innerHTML = `
-                    <div class="text-center py-8 sm:py-12">
-                        <i class="bi bi-clipboard-data text-5xl sm:text-6xl text-gray-300 mb-2 sm:mb-3"></i>
-                        <p class="text-gray-600 font-semibold mb-1 text-sm sm:text-base">No test results yet</p>
-                        <small class="text-gray-400 text-xs sm:text-sm">Complete a test to see your results here</small>
-                    </div>
-                `;
-                return;
-            }
+    if (!result) {
+        container.innerHTML = `
+            <div class="text-center py-16 bg-gray-50 rounded-xl">
+                <i class="bi bi-clipboard-data text-6xl text-gray-300 mb-3"></i>
+                <p class="text-gray-600 font-semibold">No test results yet</p>
+                <small class="text-gray-400">Complete a test to see results</small>
+            </div>
+        `;
+        return;
+    }
 
-            let submittedDate;
-            if (result.submittedAt?.toDate) {
-                submittedDate = result.submittedAt.toDate();
-            } else if (result.date) {
-                submittedDate = new Date(result.date);
-            } else if (result.submittedAt?.seconds) {
-                submittedDate = new Date(result.submittedAt.seconds * 1000);
-            } else {
-                submittedDate = new Date();
-            }
-            const dateStr = !isNaN(submittedDate.getTime()) 
-                ? submittedDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })
-                : 'Date unavailable';
+    let submittedDate;
+    if (result.submittedAt?.toDate) {
+        submittedDate = result.submittedAt.toDate();
+    } else if (result.date) {
+        submittedDate = new Date(result.date);
+    } else if (result.submittedAt?.seconds) {
+        submittedDate = new Date(result.submittedAt.seconds * 1000);
+    } else {
+        submittedDate = new Date();
+    }
 
-            const score = result.score || calculateTestScore(result.testName, result.result, result.testTarget);
-                const scoreFormatted = Math.round(score);
-            const rating = getRating(score);
+    const dateStr = !isNaN(submittedDate.getTime())
+        ? submittedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        : 'Date unavailable';
 
-            const html = `
-                <div class="bg-gray-50 rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 hover:bg-gray-100 transition-colors">
-                    <div class="flex-1 w-full sm:w-auto">
-                        <h4 class="font-semibold text-gray-900 text-sm sm:text-base mb-1 sm:mb-2 break-words">${result.testName}</h4>
-                        <p class="${rating.class} text-xs sm:text-sm font-medium mb-1">Score: ${scoreFormatted}/100 • ${rating.text}</p>
-                        <small class="text-gray-500 text-[10px] sm:text-xs">Completed: ${dateStr}</small>
-                    </div>
-                    <button data-result-id="${result.id}" class="view-result-btn w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:-translate-y-0.5 hover:shadow-lg transition-all whitespace-nowrap">
-                        View Result
-                    </button>
+    const normCat = getNormCategoryForDashboard(result.testName, result.result ?? result.resultData);
+
+    const normColors = {
+        'Excellent':     { bg: 'bg-green-100',  text: 'text-green-700',  border: 'border-green-300' },
+        'Good':          { bg: 'bg-blue-100',   text: 'text-blue-700',   border: 'border-blue-300' },
+        'Average':       { bg: 'bg-yellow-100', text: 'text-yellow-700', border: 'border-yellow-300' },
+        'Below Average': { bg: 'bg-orange-100', text: 'text-orange-700', border: 'border-orange-300' },
+        'Poor':          { bg: 'bg-red-100',    text: 'text-red-700',    border: 'border-red-300' },
+        'Completed':     { bg: 'bg-gray-100',   text: 'text-gray-700',   border: 'border-gray-300' },
+    };
+
+    const color = normColors[normCat] || normColors['Completed'];
+    const label = normCat || 'Completed';
+
+    const html = `
+        <div class="bg-gray-50 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:bg-gray-100 transition-colors border border-gray-200">
+            <div class="flex-1 min-w-0">
+                <h4 class="font-semibold text-gray-900 text-sm sm:text-base mb-2">${result.testName}</h4>
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border ${color.bg} ${color.text} ${color.border}">
+                        <i class="bi bi-award-fill"></i> ${label}
+                    </span>
                 </div>
-            `;
+                <small class="text-gray-500 text-xs">Completed: ${dateStr}</small>
+            </div>
+            <button data-result-id="${result.id}" class="view-result-btn w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:-translate-y-0.5 hover:shadow-lg transition-all whitespace-nowrap">
+                View Result
+            </button>
+        </div>
+    `;
 
-            container.innerHTML = html;
-            
-            const viewResultBtn = container.querySelector('.view-result-btn');
-            if (viewResultBtn) {
-                viewResultBtn.addEventListener('click', function() {
-                    const resultId = this.getAttribute('data-result-id');
-                    window.location.href = `./studentresult.html?resultId=${resultId}`;
-                });
-            }
-        }
+    container.innerHTML = html;
+
+    const viewResultBtn = container.querySelector('.view-result-btn');
+    if (viewResultBtn) {
+        viewResultBtn.addEventListener('click', function() {
+            const resultId = this.getAttribute('data-result-id');
+            window.location.href = `./studentresult.html?resultId=${resultId}`;
+        });
+    }
+}
 
         // Calculate test score
 function calculateTestScore(testName, result, testTarget = null) {

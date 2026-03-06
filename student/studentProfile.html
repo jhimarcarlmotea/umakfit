@@ -837,10 +837,9 @@
                             <i class="bi bi-book"></i> 
                             <span class="hidden xl:inline">Lesson</span>
                         </a>
-                        <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-award"></i> 
-                            <span class="hidden xl:inline">Grades</span>
-                        </a>
+                       <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                    <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
+                </a>
                         <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
                             <i class="bi bi-graph-up"></i> 
                             <span class="hidden xl:inline">Progress</span>
@@ -1078,18 +1077,18 @@
                                     <div class="modal-body">
                                         <form id="editProfileForm">
                                             <div class="row g-3">
-  <div class="col-md-6">
-    <label class="form-label fw-bold">Birthday</label>
-    <input type="date" class="form-control" id="editBirthday" required onchange="autoFillAge()">
-</div>
-<div class="col-md-6">
-    <label class="form-label fw-bold">Age</label>
-    <input type="text" class="form-control" id="editAge" 
-        readonly 
-        disabled
-        placeholder="Auto-calculated from birthday"
-        style="background:#f1f5f9; color:#64748b; cursor:not-allowed; font-weight:600;">
-</div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Birthday</label>
+                                        <input type="date" class="form-control" id="editBirthday" required onchange="autoFillAge()" oninput="this.setCustomValidity('')">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Age</label>
+                                        <input type="text" class="form-control" id="editAge" 
+                                            readonly 
+                                            disabled
+                                            placeholder="Auto-calculated from birthday"
+                                            style="background:#f1f5f9; color:#64748b; cursor:not-allowed; font-weight:600;">
+                                    </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label fw-bold">Gender</label>
                                                     <select class="form-select" id="editGender" required>
@@ -1967,11 +1966,22 @@ if (data.birthday) {
     };
 
     window.saveProfile = async function() {
-        const form = document.getElementById('editProfileForm');
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
+    const form = document.getElementById('editProfileForm');
+    
+    const birthday = document.getElementById('editBirthday').value;
+    if (!birthday) {
+        document.getElementById('editBirthday').focus();
+        document.getElementById('editBirthday').setCustomValidity('Please enter your birthday.');
+        document.getElementById('editBirthday').reportValidity();
+        return;
+    } else {
+        document.getElementById('editBirthday').setCustomValidity('');
+    }
+    
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
         
         try {
             const email = document.getElementById('editEmail').value;

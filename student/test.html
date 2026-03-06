@@ -322,23 +322,71 @@
         }
 
         /* Collapsible Category Styles */
-        .category-collapsed .category-tests {
-            max-height: 0 !important;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-
-        .category-expanded .category-tests {
-            max-height: 600px;
-            overflow-y: auto;
-            transition: max-height 0.5s ease-in;
-        }
-
         .category-tests {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+        -webkit-overflow-scrolling: touch;
+        background: white;
+        will-change: max-height;
+    }
+
+    .category-tests::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .category-tests::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .category-tests::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+
+    .category-tests::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    .category-header {
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.2s ease;
+    }
+
+    .category-header:hover {
+        background-color: #f8fafc;
+    }
+
+    .chevron-icon {
+        transition: transform 0.4s ease;
+    }
+
+    .category-expanded .chevron-icon {
+        transform: rotate(180deg);
+    }
+
+    /* Siguraduhin na ang expanded state ay may max-height na naka-set via JS */
+    .category-expanded .category-tests {
+        /* Ang max-height ay itatakda ng JavaScript */
+        overflow-y: auto;
+    }
+
+    /* Mobile optimization */
+    @media (max-width: 640px) {
+        .category-tests {
+            transition: max-height 0.35s ease;
         }
+        
+        .category-expanded .category-tests {
+            max-height: 400px !important; /* I-override ng JS ito */
+        }
+    }
+
+      
+
+
 
         .category-tests {
             scrollbar-gutter: stable;
@@ -779,9 +827,8 @@
                             <span class="hidden xl:inline">Lesson</span>
                         </a>
                         <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-award"></i> 
-                            <span class="hidden xl:inline">Grades</span>
-                        </a>
+                    <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
+                </a>
                         <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
                             <i class="bi bi-graph-up"></i> 
                             <span class="hidden xl:inline">Progress</span>
@@ -945,8 +992,8 @@
                         <i class="bi bi-book mr-3"></i>Lesson
                     </a>
                     <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-award mr-3"></i>Grades
-                    </a>
+                    <i class="bi bi-activity mr-3"></i>Performance
+                </a>
                     <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
                         <i class="bi bi-graph-up mr-3"></i>Progress
                     </a>
@@ -1000,32 +1047,32 @@
                             <div id="testsDone" class="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">0</div>
                             <div class="text-xs font-bold uppercase tracking-wider text-gray-600">Tests Completed</div>
                         </div>
-
-                        <!-- Average Score Card -->
-                        <div class="performance-card group relative bg-white rounded-2xl p-6 text-center border-2 border-purple-200 hover:border-purple-400 hover:shadow-xl transition-all duration-300">
+                            <!-- Overall Performance Card -->
+                            <div class="performance-card group relative bg-white rounded-2xl p-6 text-center border-2 border-purple-200 hover:border-purple-400 hover:shadow-xl transition-all duration-300">
                             <div class="w-14 h-14 mx-auto mb-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
                                 <i class="bi bi-graph-up text-white text-2xl"></i>
                             </div>
-                            <div id="avgScore" class="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent mb-2">0</div>
-                            <div class="text-xs font-bold uppercase tracking-wider text-gray-600">Average Score</div>
+                            <div id="avgScore" class="text-xl lg:text-2xl font-extrabold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent mb-2 leading-tight">--</div>
+                            <div class="text-xs font-bold uppercase tracking-wider text-gray-600">Overall Performance</div>
                         </div>
-
-                        <!-- Best Score Card -->
+                       <!-- Top Category Card -->
                         <div class="performance-card group relative bg-white rounded-2xl p-6 text-center border-2 border-green-200 hover:border-green-400 hover:shadow-xl transition-all duration-300">
                             <div class="w-14 h-14 mx-auto mb-3 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
                                 <i class="bi bi-trophy-fill text-white text-2xl"></i>
                             </div>
-                            <div id="bestScore" class="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent mb-2">0</div>
-                            <div class="text-xs font-bold uppercase tracking-wider text-gray-600">Best Score</div>
+                            <div id="bestScore" class="text-xl lg:text-2xl font-extrabold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent mb-2 leading-tight">--</div>
+                            <div class="text-xs font-bold uppercase tracking-wider text-gray-600">Best Result</div>
                         </div>
 
-                        <!-- Day Streak Card -->
+                       
+
+                        <!-- Week Streak Card -->
                         <div class="performance-card group relative bg-white rounded-2xl p-6 text-center border-2 border-orange-200 hover:border-orange-400 hover:shadow-xl transition-all duration-300">
                             <div class="w-14 h-14 mx-auto mb-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
                                 <i class="bi bi-fire text-white text-2xl"></i>
                             </div>
-                            <div id="dayStreak" class="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-orange-600 to-orange-800 bg-clip-text text-transparent mb-2">0</div>
-                            <div class="text-xs font-bold uppercase tracking-wider text-gray-600">Day Streak</div>
+                            <div id="weekStreak" class="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-orange-600 to-orange-800 bg-clip-text text-transparent mb-2">0</div>
+                            <div class="text-xs font-bold uppercase tracking-wider text-gray-600">Week Streak</div>
                         </div>
                     </div>
                 </div>
@@ -1697,7 +1744,7 @@
                     });
                 }
                 
-                await calculateAndUpdateStats();
+               
                 updateProfileUI();
                 return studentData;
             } catch (error) {
@@ -1705,71 +1752,42 @@
                 return null;
             }
         }
+            
+        
 
-        async function calculateAndUpdateStats() {
-            try {
-                const resultsQuery = query(
-                    collection(db, 'testResults'),
-                    where('studentEmail', '==', studentData.email),
-                    where('status', 'in', ['completed', 'overdue', 'late'])
-                );
-                
-                const resultsSnapshot = await getDocs(resultsQuery);
-                
-                const seenTests = new Set();
-                const testDates = [];
-                
-                resultsSnapshot.forEach((doc) => {
-                    const result = doc.data();
-                    const testId = result.testId || doc.id;
-                    seenTests.add(testId);
-                    
-                    const testDate = result.submittedAt?.toDate?.() || new Date(result.submittedAt || result.date);
-                    testDates.push(testDate);
-                });
-                
-                const testCount = seenTests.size;
-                const dayStreak = calculateDayStreak(testDates);
-                
-                document.getElementById('testsDone').textContent = testCount;
-                // Norm-based tests: hide numeric scores
-                document.getElementById('avgScore').textContent = '—';
-                document.getElementById('bestScore').textContent = '—';
-                document.getElementById('dayStreak').textContent = dayStreak;
-                
-            } catch (error) {
-                console.error('Error calculating stats:', error);
-                document.getElementById('testsDone').textContent = '0';
-                document.getElementById('avgScore').textContent = '—';
-                document.getElementById('bestScore').textContent = '—';
-                document.getElementById('dayStreak').textContent = '0';
-            }
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
         }
 
-        function calculateDayStreak(testDates) {
+        function calculateWeekStreak(testDates) {
             if (testDates.length === 0) return 0;
-            
-            testDates.sort((a, b) => b - a);
-            
+            const currentDate = new Date();
+            const currentWeek = getWeekNumber(currentDate);
+            const currentYear = currentDate.getFullYear();
+            const weekMap = new Map();
+            testDates.forEach(testDate => {
+                const d = new Date(testDate);
+                const weekNum = getWeekNumber(d);
+                const year = d.getFullYear();
+                weekMap.set(`${year}-W${weekNum}`, true);
+            });
             let streak = 0;
-            let currentDate = new Date();
-            currentDate.setHours(0, 0, 0, 0);
-            
-            for (const testDate of testDates) {
-                const date = new Date(testDate);
-                date.setHours(0, 0, 0, 0);
-                
-                const diffTime = currentDate - date;
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                
-                if (diffDays === streak) {
+            let checkYear = currentYear;
+            let checkWeek = currentWeek;
+            for (let i = 0; i < 52; i++) {
+                const key = `${checkYear}-W${checkWeek}`;
+                if (weekMap.has(key)) {
                     streak++;
-                    currentDate = date;
-                } else if (diffDays > streak) {
+                    checkWeek--;
+                    if (checkWeek < 1) { checkWeek = 52; checkYear--; }
+                } else {
                     break;
                 }
             }
-            
             return streak;
         }
 
@@ -2255,31 +2273,61 @@
             container.innerHTML = html;
         }
 
-        window.toggleCategory = function(categoryId) {
-            const categoryElement = document.getElementById(`category-${categoryId}`);
+       window.toggleCategory = function(categoryId) {
+        const categoryElement = document.getElementById(`category-${categoryId}`);
+        const testsContainer = categoryElement.querySelector('.category-tests');
+        const chevron = categoryElement.querySelector('.chevron-icon');
+        
+        if (!testsContainer) return;
+        
+        const isExpanded = categoryElement.classList.contains('category-expanded');
+        
+        if (isExpanded) {
+            // COLLAPSE - itago ang tests
+            testsContainer.style.maxHeight = '0';
+            categoryElement.classList.remove('category-expanded');
+            categoryElement.classList.add('category-collapsed');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+        } else {
+            // EXPAND - ipakita ang tests
+            categoryElement.classList.remove('category-collapsed');
+            categoryElement.classList.add('category-expanded');
             
-            if (categoryElement.classList.contains('category-expanded')) {
-                categoryElement.classList.remove('category-expanded');
-                categoryElement.classList.add('category-collapsed');
-            } else {
-                categoryElement.classList.remove('category-collapsed');
-                categoryElement.classList.add('category-expanded');
+            // Kunin ang natural height
+            testsContainer.style.maxHeight = 'none';
+            const naturalHeight = testsContainer.scrollHeight;
+            
+            // I-reset sa 0 para mag-transition
+            testsContainer.style.maxHeight = '0';
+            
+            // Force reflow
+            testsContainer.offsetHeight;
+            
+            // I-set sa natural height
+            testsContainer.style.maxHeight = naturalHeight + 'px';
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+            
+            // I-enable scroll kung mahaba
+            const isMobile = window.innerWidth <= 768;
+            const maxHeight = isMobile ? 400 : 500;
+            if (naturalHeight > maxHeight) {
+                testsContainer.style.overflowY = 'auto';
             }
-        };
-
+        }
+    };
         async function renderOverdueTests(overdueTestsArray) {
             const container = document.getElementById('overdueTestsContent');
             const countBadge = document.getElementById('overdueCount');
             
-            const uniqueTests = [];
-            const seenIds = new Set();
+             const uniqueOverdueTests = [];
+        const seenIds = new Set();
 
-            availableTests.forEach(test => {
-                if (!seenIds.has(test.id)) {
-                    seenIds.add(test.id);
-                    uniqueTests.push(test);
-                }
-            });
+        overdueTestsArray.forEach(test => {
+            if (!seenIds.has(test.id)) {
+                seenIds.add(test.id);
+                uniqueOverdueTests.push(test);
+            }
+        });
             
             countBadge.textContent = uniqueOverdueTests.length;
             
@@ -2480,18 +2528,10 @@
                                 <div class="flex-1 min-w-0">
                                     <h3 class="text-lg sm:text-xl font-black text-gray-900 mb-1 uppercase tracking-tight leading-tight">${category}</h3>
                                     <p class="text-xs sm:text-sm text-gray-600 font-medium">${categoryData.subtitle}</p>
-                                    <div class="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                                    <i class="bi bi-lightning-charge-fill"></i>
-                                    <span>${tests.filter(t => {
-                                        const a = attemptsMap.get(t.id) || { attempts: 0 };
-                                        const isUnlimited = t.attemptsAllowed === 0;
-                                        return isUnlimited || a.attempts < t.attemptsAllowed;
-                                    }).length} Test${tests.filter(t => {
-                                        const a = attemptsMap.get(t.id) || { attempts: 0 };
-                                        const isUnlimited = t.attemptsAllowed === 0;
-                                        return isUnlimited || a.attempts < t.attemptsAllowed;
-                                    }).length !== 1 ? 's' : ''} Available</span>
-                                </div>
+                                     <div class="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                                        <i class="bi bi-lightning-charge-fill"></i>
+                                        <span>0 Tests Available</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2558,7 +2598,7 @@
         allTestHistory = allResults;
 
         renderTestHistory();
-        calculateAndUpdateStats();
+       
         loadAvailableTests();
     };
 
@@ -3087,43 +3127,213 @@
             console.log(`❓ Unknown test type: ${testName}, using default score`);
             return 75;
         }
-        function getPushUpScore(reps, age, gender) {
-    const norms = {
-        male: [
-            { min: 15, max: 18, excellent: 40, good: 31, average: 21, belowAvg: 11, poor: 10 },
-            { min: 19, max: 22, excellent: 38, good: 28, average: 18, belowAvg: 9,  poor: 8  },
-            { min: 23, max: 26, excellent: 35, good: 25, average: 16, belowAvg: 8,  poor: 7  },
-            { min: 27, max: 30, excellent: 32, good: 23, average: 14, belowAvg: 6,  poor: 5  },
-        ],
-        female: [
-            { min: 15, max: 18, excellent: 25, good: 19, average: 13, belowAvg: 7,  poor: 6  },
-            { min: 19, max: 22, excellent: 23, good: 17, average: 11, belowAvg: 6,  poor: 5  },
-            { min: 23, max: 26, excellent: 20, good: 15, average: 9,  belowAvg: 5,  poor: 4  },
-            { min: 27, max: 30, excellent: 18, good: 13, average: 8,  belowAvg: 4,  poor: 3  },
-        ]
-    };
+        
+        // ====== NORM HELPERS (mirrors studentgrades.html exactly) ======
 
-    const ageNum = parseInt(age) || 19;
-    const genderKey = (gender || '').toLowerCase().includes('female') ? 'female' : 'male';
-    const normList = norms[genderKey];
-
-    let norm = normList[1]; // default 19-22
-    for (const n of normList) {
-        if (ageNum >= n.min && ageNum <= n.max) { norm = n; break; }
+function getStudentAgeForNorms() {
+    if (!studentData) return null;
+    if (studentData.birthday) {
+        try {
+            let birthDate = studentData.birthday.toDate
+                ? studentData.birthday.toDate()
+                : new Date(studentData.birthday);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+            if (!isNaN(age)) return age;
+        } catch (e) {}
     }
-
-    if (reps >= norm.excellent) return 100;
-    if (reps >= norm.good)      return 85;
-    if (reps >= norm.average)   return 70;
-    if (reps >= norm.belowAvg)  return 55;
-    return 40;
+    if (typeof studentData.age === 'number') return studentData.age;
+    if (typeof studentData.age === 'string') {
+        const match = studentData.age.match(/(\d+)/);
+        if (match) return parseInt(match[1], 10);
+    }
+    return null;
 }
-        function getRating(score) {
-            if (score >= 90) return { text: 'Excellent', class: 'text-green-600' };
-            if (score >= 80) return { text: 'Good', class: 'text-blue-600' };
-            if (score >= 70) return { text: 'Fair', class: 'text-yellow-600' };
-            return { text: 'Needs Improvement', class: 'text-red-600' };
+
+function getAgeGroup(age) {
+    if (age == null) return null;
+    if (age <= 18) return '15-18';
+    if (age <= 22) return '19-22';
+    if (age <= 26) return '23-26';
+    return '27-30';
+}
+
+function getGenderKey() {
+    const g = (studentData?.gender || '').toString().toLowerCase();
+    if (g.startsWith('f')) return 'female';
+    return 'male';
+}
+
+function extractNumericResult(result) {
+    if (typeof result === 'object' && result !== null) {
+        return parseFloat(result.value ?? result.result ?? result.score ?? result.count ?? result.repetitions ?? 0) || 0;
+    }
+    if (typeof result === 'string') {
+        const match = result.match(/(\d+\.?\d*)/);
+        return match ? parseFloat(match[1]) : 0;
+    }
+    return parseFloat(result) || 0;
+}
+
+function getNormCategory(testName, result) {
+    if (!testName) return null;
+    const normalized = testName.toLowerCase();
+    const numericValue = extractNumericResult(result);
+    const age = getStudentAgeForNorms();
+    const ageGroup = getAgeGroup(age);
+    const genderKey = getGenderKey();
+
+    if (normalized.includes('skinfold')) {
+        if (typeof result === 'string') {
+            const match = result.match(/\(([^)]+)\)/);
+            if (match) return match[1];
         }
+        return 'Completed';
+    }
+    if (normalized.includes('step test') || normalized.includes('3-minute')) {
+        if (!ageGroup) return 'Completed';
+        const norms = {
+            male:   { '15-18': [84,97,108,118], '19-22': [79,89,105,116], '23-26': [80,90,106,117], '27-30': [81,91,107,118] },
+            female: { '15-18': [89,103,113,124], '19-22': [85,98,109,118], '23-26': [86,99,110,119], '27-30': [88,101,112,121] }
+        };
+        const t = norms[genderKey][ageGroup];
+        if (numericValue <= t[0]) return 'Excellent';
+        if (numericValue <= t[1]) return 'Good';
+        if (numericValue <= t[2]) return 'Average';
+        if (numericValue <= t[3]) return 'Below Average';
+        return 'Poor';
+    }
+    if (normalized.includes('push-up') || normalized.includes('pushup')) {
+        if (!ageGroup) return null;
+        const norms = {
+            male:   { '15-18': [40,31,21,11], '19-22': [38,28,18,9], '23-26': [35,25,16,8], '27-30': [32,23,14,6] },
+            female: { '15-18': [25,19,13,7],  '19-22': [23,17,11,6], '23-26': [20,15,9,5],  '27-30': [18,13,8,4] }
+        };
+        const t = norms[genderKey][ageGroup];
+        if (numericValue >= t[0]) return 'Excellent';
+        if (numericValue >= t[1]) return 'Good';
+        if (numericValue >= t[2]) return 'Average';
+        if (numericValue >= t[3]) return 'Below Average';
+        return 'Poor';
+    }
+    if (normalized.includes('curl-up') || normalized.includes('curl up')) {
+        if (!ageGroup) return null;
+        const norms = {
+            male:   { '15-18': [50,41,31,21], '19-22': [47,38,28,19], '23-26': [44,35,25,17], '27-30': [40,32,22,15] },
+            female: { '15-18': [45,36,26,16], '19-22': [42,34,24,15], '23-26': [39,31,21,13], '27-30': [36,28,19,11] }
+        };
+        const t = norms[genderKey][ageGroup];
+        if (numericValue >= t[0]) return 'Excellent';
+        if (numericValue >= t[1]) return 'Good';
+        if (numericValue >= t[2]) return 'Average';
+        if (numericValue >= t[3]) return 'Below Average';
+        return 'Poor';
+    }
+    if (normalized.includes('sit-and-reach') || normalized.includes('sit and reach')) {
+        if (!ageGroup) return null;
+        const norms = {
+            male:   { '15-18': [38,33,26,18], '19-22': [37,32,25,17], '23-26': [35.5,30.5,23.5,15.5], '27-30': [34,29,22,14] },
+            female: { '15-18': [39,34,27,19], '19-22': [38,33,26,18], '23-26': [37,32,25,17],          '27-30': [36,31,24,16] }
+        };
+        const t = norms[genderKey][ageGroup];
+        if (numericValue >= t[0]) return 'Excellent';
+        if (numericValue >= t[1]) return 'Good';
+        if (numericValue >= t[2]) return 'Average';
+        if (numericValue >= t[3]) return 'Below Average';
+        return 'Poor';
+    }
+    return null;
+}
+
+function normCategoryRank(category) {
+    if (!category) return 3;
+    const c = category.toLowerCase();
+    if (c === 'excellent') return 5;
+    if (c === 'good' || c === 'athletic' || c === 'fitness') return 4;
+    if (c === 'average') return 3;
+    if (c === 'below average' || c === 'overfat') return 2;
+    if (c === 'poor' || c === 'obese') return 1;
+    return 3;
+}
+
+function rankToCategory(rank) {
+    if (rank >= 4.5) return 'Excellent';
+    if (rank >= 3.5) return 'Good';
+    if (rank >= 2.5) return 'Average';
+    if (rank >= 1.5) return 'Below Average';
+    return 'Poor';
+}
+
+// ====== STATS — uses same onSnapshot approach as studentgrades.html ======
+
+function setupPerformanceDashboard() {
+    if (!studentData?.email) return;
+
+    const resultsQuery = query(
+        collection(db, 'testResults'),
+        where('studentEmail', '==', studentData.email),
+        where('status', 'in', ['completed', 'overdue', 'late'])
+    );
+
+    onSnapshot(resultsQuery, (resultsSnapshot) => {
+        const testDates = [];
+        const allRanks = [];
+        let bestRank = 0;
+        let bestCat = null;
+        const seenTestIds = new Set();
+
+        resultsSnapshot.forEach((doc) => {
+            const result = doc.data();
+            const testId = result.testId || doc.id;
+
+            const testDate = result.submittedAt?.toDate?.()
+                || (result.submittedAt ? new Date(result.submittedAt) : new Date());
+            testDates.push(testDate);
+
+            // Deduplicate by testId — keep highest rank per test
+            const normCat = getNormCategory(result.testName, result.result ?? result.resultData ?? result.rawResult);
+            if (!normCat) return;
+
+            const rank = normCategoryRank(normCat);
+
+            if (!seenTestIds.has(testId)) {
+                seenTestIds.add(testId);
+                allRanks.push(rank);
+            } else {
+                // Replace with higher rank if this attempt is better
+                // (find index of existing rank for this testId — track separately)
+            }
+
+            if (rank > bestRank) {
+                bestRank = rank;
+                bestCat = normCat;
+            }
+        });
+
+        const testCount = seenTestIds.size;
+        const weekStreakCount = calculateWeekStreak(testDates);
+
+        // Overall performance
+        let overallLabel = '--';
+        if (allRanks.length > 0) {
+            const avgRank = allRanks.reduce((a, b) => a + b, 0) / allRanks.length;
+            overallLabel = rankToCategory(avgRank);
+        }
+
+        // Best result label
+        const bestLabel = bestCat || '--';
+
+        document.getElementById('testsDone').textContent = testCount;
+        document.getElementById('avgScore').textContent = overallLabel;
+        document.getElementById('bestScore').textContent = bestLabel;
+        const weekStreakEl = document.getElementById('weekStreak');
+        if (weekStreakEl) weekStreakEl.textContent = weekStreakCount;
+    }, (error) => {
+        console.error('Error in performance dashboard listener:', error);
+    });
+}
 
         function initPerformanceCarousel() {
             const carousel = document.getElementById('performanceCarousel');
@@ -3312,7 +3522,7 @@
                 try {
                     currentUser = user;
                     await loadStudentData(user);
-                    
+                    setupPerformanceDashboard();
                     if (!isProfileComplete(studentData)) {
                         loadingScreen.classList.add('hidden');
                         showProfileRequiredModalWithRedirect();

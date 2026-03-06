@@ -290,62 +290,12 @@
         margin: 2rem 0;
     }
 
-    .score-circle {
-        position: relative;
-        width: 200px;
-        height: 200px;
-    }
-
-    .score-ring-bg {
-        fill: none;
-        stroke: #f1f5f9;
-        stroke-width: 16;
-    }
-
-    .score-ring-progress {
-        fill: none;
-        stroke: url(#scoreGradient);
-        stroke-width: 16;
-        stroke-linecap: round;
-        stroke-dasharray: 565;
-        stroke-dashoffset: 565;
-        animation: fillScore 2s ease-out forwards;
-    }
-
-    @keyframes fillScore {
-        to {
-            stroke-dashoffset: calc(565 - (565 * var(--score)) / 100);
-        }
-    }
-
-    .score-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-    }
-
-    .score-number {
-        font-family: "Inter", Helvetica;
-        font-weight: 800;
-        font-size: 4rem;
-        color: #1e293b;
-        line-height: 1;
-    }
-
-    .score-label {
-        font-family: "Inter", Helvetica;
-        font-weight: 600;
-        color: #64748b;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-top: 8px;
-    }
-
     .score-details {
         text-align: left;
+    }
+
+    #scoreRating {
+        margin-top: 0.75rem;
     }
 
     .test-title {
@@ -710,15 +660,6 @@
             font-size: 1.5rem;
         }
 
-        .score-circle {
-            width: 150px;
-            height: 150px;
-        }
-
-        .score-number {
-            font-size: 2.5rem;
-        }
-
         .stat-badges {
             justify-content: center;
         }
@@ -787,9 +728,8 @@
                             <span class="hidden xl:inline">Lesson</span>
                         </a>
                         <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-award"></i> 
-                            <span class="hidden xl:inline">Grades</span>
-                        </a>
+                    <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
+                </a>
                         <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
                             <i class="bi bi-graph-up"></i> 
                             <span class="hidden xl:inline">Progress</span>
@@ -952,9 +892,9 @@
                     <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
                         <i class="bi bi-book mr-3"></i>Lessons
                     </a>
-                    <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-award mr-3"></i>Grades
-                    </a>
+                        <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
+                    <i class="bi bi-activity mr-3"></i>Performance
+                </a>
                     <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
                         <i class="bi bi-graph-up mr-3"></i>Progress
                     </a>
@@ -976,23 +916,6 @@
                         </div>
                         
                         <div class="score-wrapper">
-                            <div class="score-circle">
-                                <svg class="score-ring" viewBox="0 0 180 180">
-                                    <defs>
-                                        <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
-                                            <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
-                                        </linearGradient>
-                                    </defs>
-                                    <circle class="score-ring-bg" cx="90" cy="90" r="80" />
-                                    <circle class="score-ring-progress" cx="90" cy="90" r="80" id="scoreProgress" />
-                                </svg>
-                                <div class="score-content">
-                                    <div class="score-number" id="scoreValue">--</div>
-                                    <div class="score-label">SCORE</div>
-                                </div>
-                            </div>
-                            
                             <div class="score-details">
                                 <h1 class="test-title" id="testName">--</h1>
                                 <div id="scoreRating"></div>
@@ -2111,42 +2034,18 @@ function showErrorPopup(message, onClose) {
                     
                     // Determine norm-based category for main fitness tests
                     const normCategory = data.testName ? getNormCategoryForResult(data.testName, data.result) : null;
-                    const score = calculateScore(data.testName, data.result, data.testTarget);
-                    
-                    const scoreProgress = document.getElementById('scoreProgress');
-                    const scoreLabelEl = document.querySelector('.score-label');
-                    const scoreValueEl = document.getElementById('scoreValue');
+                    const score = normCategory ? mapNormCategoryToScore(normCategory) : calculateScore(data.testName, data.result, data.testTarget);
+                    const scoreRatingEl = document.getElementById('scoreRating');
 
                     if (normCategory) {
                         const rating = getRatingFromCategory(normCategory);
-                        
-                        // For norm-based tests, show the category instead of a numeric score
-                        if (scoreProgress) {
-                            scoreProgress.style.strokeDashoffset = 565;
-                        }
-                        if (scoreLabelEl) {
-                            scoreLabelEl.textContent = 'CATEGORY';
-                        }
-                        if (scoreValueEl) {
-                            scoreValueEl.textContent = normCategory;
-                        }
-                        document.getElementById('scoreRating').innerHTML = `<span class="score-rating ${rating.class}"><i class="bi bi-star-fill"></i> ${rating.text}</span>`;
+                        if (scoreRatingEl) scoreRatingEl.innerHTML = `<span class="score-rating ${rating.class}"><i class="bi bi-star-fill"></i> ${rating.text}</span>`;
                     } else {
-                        // Fallback for any non-norm tests: retain numeric score display
-                        if (scoreProgress) {
-                            scoreProgress.style.setProperty('--score', score);
-                        }
-                        if (scoreLabelEl) {
-                            scoreLabelEl.textContent = 'SCORE';
-                        }
-                        if (scoreValueEl) {
-                            scoreValueEl.textContent = score;
-                        }
                         const numericRating = score >= 90 ? 'Excellent' :
                                               score >= 80 ? 'Good' :
                                               score >= 70 ? 'Fair' : 'Needs Improvement';
                         const ratingMeta = getRatingFromCategory(numericRating);
-                        document.getElementById('scoreRating').innerHTML = `<span class="score-rating ${ratingMeta.class}"><i class="bi bi-star-fill"></i> ${ratingMeta.text}</span>`;
+                        if (scoreRatingEl) scoreRatingEl.innerHTML = `<span class="score-rating ${ratingMeta.class}"><i class="bi bi-star-fill"></i> ${ratingMeta.text}</span>`;
                     }
 
                     document.getElementById('testName').textContent = data.testName;
@@ -2321,20 +2220,7 @@ function showErrorPopup(message, onClose) {
 };
 
         window.goToTests = function() {
-    const scoreValue = parseInt(document.getElementById('scoreValue').textContent) || 0;
-    
-    if (scoreValue === 100) {
-        showConfirmPopup(
-            '🎉 Perfect Score!',
-            'Congratulations on achieving a perfect score! Ready to view other available tests?',
-            'View Tests',
-            'Cancel',
-            () => { window.location.href = './test.html'; },
-            null
-        );
-    } else {
-        window.location.href = './test.html';
-    }
+    window.location.href = './test.html';
 };
 
         // Profile dropdown functions
