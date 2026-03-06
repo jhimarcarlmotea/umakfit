@@ -2136,7 +2136,7 @@ function closeNotificationDropdown() {
                     await updateChartsWithRealData();
                     await createOverallProgressChart(); 
                     await loadUpcomingTests();
-                    
+                    setupDashboardDeadlineWatcher();
                     return studentData;
                     
                 } else {
@@ -2508,7 +2508,59 @@ function closeNotificationDropdown() {
                 }
             }
         }
+function setupDashboardDeadlineWatcher() {
+    setInterval(async () => {
+        const container = document.getElementById('upcomingTestsCard');
+        if (!container) return;
 
+        const now = new Date();
+        let anyExpired = false;
+
+        // Check if any displayed upcoming tests have passed their deadline
+        const testCards = container.querySelectorAll('[data-test-id]');
+        testCards.forEach(btn => {
+            const testId = btn.getAttribute('data-test-id');
+            const card = btn.closest('.bg-gradient-to-r');
+            if (!card) return;
+
+            // Find the deadline badge text and check
+            const deadlineBadge = card.querySelector('span[class*="rounded-full"]');
+            if (!deadlineBadge) return;
+
+            // Also check against availableTests data if accessible
+        });
+
+        // Simplest reliable approach: just reload the upcoming tests section
+        // Only if any test deadline has passed
+        const upcomingTestsQuery = query(
+            collection(db, 'scheduledTests'),
+            where('section', '==', studentData.section),
+            where('isVisible', '==', true)
+        );
+
+        try {
+            const snap = await getDocs(upcomingTestsQuery);
+            let hasExpired = false;
+            snap.forEach(doc => {
+                const test = doc.data();
+                let deadlineDateTime;
+                if (test.deadlineDateTime) {
+                    deadlineDateTime = new Date(test.deadlineDateTime);
+                } else {
+                    deadlineDateTime = new Date(test.deadline);
+                    deadlineDateTime.setHours(23, 59, 59, 999);
+                }
+                if (deadlineDateTime < now) hasExpired = true;
+            });
+
+            if (hasExpired) {
+                await loadUpcomingTests();
+            }
+        } catch (e) {
+            console.warn('Deadline watcher error:', e);
+        }
+    }, 10000);
+}
       
 async function calculateAndUpdateStats() {
     try {

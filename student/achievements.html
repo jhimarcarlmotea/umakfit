@@ -205,8 +205,8 @@
                     </div>
                     <div class="bg-gradient-to-r from-yellow-100 to-yellow-200 px-4 py-2 rounded-lg">
                         <span class="text-yellow-800 text-sm font-semibold">Achievements:</span>
-                        <span id="achievementCount" class="text-yellow-900 text-lg font-bold ml-2">0/16</span>
-                    </div>
+<span id="achievementCount" class="text-yellow-900 text-lg font-bold ml-2">0/10</span>
+ </div>
                 </div>
             </div>
             <!-- Progress Bar -->
@@ -755,14 +755,12 @@ async function loadTestResults() {
 function getTestCategory(testName) {
     if (!testName) return 'Other';
     const n = testName.toLowerCase();
-    if (n.includes('step') || n.includes('run') || n.includes('mile') || n.includes('cardio') || n.includes('3-minute')) return 'Cardiorespiratory';
-    if (n.includes('push') || n.includes('grip') || n.includes('strength')) return 'Muscular Strength';
-    if (n.includes('curl') || n.includes('plank') || n.includes('endurance')) return 'Muscular Endurance';
-    if ((n.includes('sit') && n.includes('reach')) || n.includes('flexibility')) return 'Flexibility';
+    if (n.includes('step') || n.includes('3-minute') || n.includes('run') || n.includes('mile') || n.includes('cardio')) return 'Cardiorespiratory';
+    if (n.includes('push') || n.includes('curl') || n.includes('grip') || n.includes('plank') || n.includes('strength') || n.includes('endurance')) return 'Muscular Strength and Endurance';
+    if ((n.includes('sit') && n.includes('reach')) || n.includes('flexibility') || n.includes('shoulder')) return 'Flexibility';
     if (n.includes('bmi') || n.includes('body') || n.includes('composition') || n.includes('skinfold')) return 'Body Composition';
     return 'Other';
 }
-
 function getWeekNumber(date) {
     if (!date) return 0;
     const d = new Date(date);
@@ -776,18 +774,16 @@ function getWeekNumber(date) {
 // ACHIEVEMENT DEFINITIONS
 // Now uses norm-based categories for relevant performance checks
 // ============================================================
-
 const achievementList = [
     { id: 'first_test',       title: 'First Step',        description: 'Complete your first fitness test', category: 'tests', tier: 'bronze', points: 100, icon: 'bi-flag' },
     { id: 'test_master',      title: 'Test Master',       description: 'Complete 5 different fitness tests', category: 'tests', tier: 'silver', points: 250, icon: 'bi-clipboard-check' },
-    // Performance achievements now based on norm categories
-    { id: 'norm_excellent',   title: 'Norm Excellent',    description: 'Achieve "Excellent" category on any norm-based test (Push-Up, Curl-Up, Sit-and-Reach, or Step Test)', category: 'performance', tier: 'gold', points: 500, icon: 'bi-star' },
-    { id: 'norm_good',        title: 'Norm Good',         description: 'Achieve "Good" or above category on any norm-based test', category: 'performance', tier: 'silver', points: 300, icon: 'bi-award' },
-    { id: 'norm_average',     title: 'Norm Average',      description: 'Achieve "Average" or above category on any norm-based test', category: 'performance', tier: 'bronze', points: 150, icon: 'bi-check-circle' },
+    { id: 'norm_average',     title: 'Getting There',     description: 'Reach "Average" or above on any norm-based test (Push-Up, Curl-Up, Sit-and-Reach, or Step Test)', category: 'performance', tier: 'bronze', points: 150, icon: 'bi-check-circle' },
+    { id: 'norm_good',        title: 'Good Standing',     description: 'Reach "Good" or above on any norm-based test', category: 'performance', tier: 'silver', points: 300, icon: 'bi-award' },
+    { id: 'norm_excellent',   title: 'Excellence',        description: 'Reach "Excellent" on any norm-based test', category: 'performance', tier: 'gold', points: 500, icon: 'bi-star' },
     { id: 'profile_complete', title: 'Profile Pioneer',   description: 'Complete your profile with all required information', category: 'profile', tier: 'bronze', points: 50, icon: 'bi-person-check' },
     { id: 'week_streak',      title: 'Consistency King',  description: 'Complete tests in 3 consecutive weeks', category: 'performance', tier: 'silver', points: 300, icon: 'bi-fire' },
-    { id: 'top_performer',    title: 'Top Performer',     description: 'Achieve "Good" or above in all completed norm-based tests', category: 'performance', tier: 'gold', points: 400, icon: 'bi-trophy' },
-    { id: 'all_categories',   title: 'Versatile Athlete', description: 'Complete tests in all 5 fitness categories', category: 'tests', tier: 'platinum', points: 1000, icon: 'bi-award' },
+    { id: 'top_performer',    title: 'Top Performer',     description: 'Achieve "Good" or above in ALL completed norm-based tests', category: 'performance', tier: 'gold', points: 400, icon: 'bi-trophy' },
+    { id: 'all_categories',   title: 'Versatile Athlete', description: 'Complete tests in all 4 fitness categories', category: 'tests', tier: 'platinum', points: 1000, icon: 'bi-award' },
     { id: 'complete_all',     title: 'UMakFit Legend',    description: 'Unlock all achievements', category: 'performance', tier: 'platinum', points: 2000, icon: 'bi-crown' }
 ];
 
@@ -854,10 +850,9 @@ function checkAchievements() {
                     }
                     break;
                 }
-
-                case 'all_categories':
-                    isUnlocked = testCategoriesCompleted.size >= 5;
-                    break;
+case 'all_categories':
+    isUnlocked = testCategoriesCompleted.size >= 4;
+    break;
 
                 case 'complete_all':
                     // checked after loop
@@ -900,10 +895,10 @@ function buildAchievementCard(achievement) {
     if (achievement.id === 'test_master') {
         progressInfo = `(${testResults.length}/5 tests)`;
         progressValue = testResults.length; progressMax = 5;
-    } else if (achievement.id === 'all_categories') {
-        progressInfo = `(${testCategoriesCompleted.size}/5 categories)`;
-        progressValue = testCategoriesCompleted.size; progressMax = 5;
-    }
+ } else if (achievement.id === 'all_categories') {
+    progressInfo = `(${testCategoriesCompleted.size}/4 categories)`;
+    progressValue = testCategoriesCompleted.size; progressMax = 4;
+}
 
     // Norm category hint for norm achievements
     const normTests = testResults.filter(r => r.normCategory);

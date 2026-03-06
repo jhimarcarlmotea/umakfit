@@ -1029,50 +1029,51 @@
 
     // Norm category order (same as grades.html)
     const CATEGORY_ORDER = { 'Excellent': 5, 'Good': 4, 'Average': 3, 'Below Average': 2, 'Poor': 1 };
-    // Helper function to get age group from student data
-function getAgeGroupFromStudent(studentData) {
-    if (!studentData) return '19-22'; // default
     
-    // If student has birthday
-    if (studentData.birthday) {
-        try {
-            let birthDate;
-            if (studentData.birthday.toDate) {
-                birthDate = studentData.birthday.toDate();
-            } else {
-                birthDate = new Date(studentData.birthday);
+    // Helper function to get age group from student data
+    function getAgeGroupFromStudent(studentData) {
+        if (!studentData) return '19-22'; // default
+        
+        // If student has birthday
+        if (studentData.birthday) {
+            try {
+                let birthDate;
+                if (studentData.birthday.toDate) {
+                    birthDate = studentData.birthday.toDate();
+                } else {
+                    birthDate = new Date(studentData.birthday);
+                }
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                
+                if (!isNaN(age) && age > 0) {
+                    if (age <= 18) return '15-18';
+                    if (age <= 22) return '19-22';
+                    if (age <= 26) return '23-26';
+                    return '27-30';
+                }
+            } catch (e) {
+                console.error('Error computing age from birthday:', e);
             }
-            const today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
-            }
-            
-            if (!isNaN(age) && age > 0) {
+        }
+        
+        // If student has age field
+        if (studentData.age) {
+            const age = parseInt(studentData.age);
+            if (!isNaN(age)) {
                 if (age <= 18) return '15-18';
                 if (age <= 22) return '19-22';
                 if (age <= 26) return '23-26';
                 return '27-30';
             }
-        } catch (e) {
-            console.error('Error computing age from birthday:', e);
         }
+        
+        return '19-22'; // default fallback
     }
-    
-    // If student has age field
-    if (studentData.age) {
-        const age = parseInt(studentData.age);
-        if (!isNaN(age)) {
-            if (age <= 18) return '15-18';
-            if (age <= 22) return '19-22';
-            if (age <= 26) return '23-26';
-            return '27-30';
-        }
-    }
-    
-    return '19-22'; // default fallback
-}
 
     function getCategoryClass(category) {
         switch(category) {
@@ -1181,104 +1182,6 @@ function getAgeGroupFromStudent(studentData) {
             return 'Poor';
         }
     }
-    async function loadScheduledTests(userEmail, userId) {
-    try {
-        let professorName = '';
-        const professorsQuery = query(collection(db, 'professors'), where('email', '==', userEmail));
-        const professorsSnapshot = await getDocs(professorsQuery);
-        if (!professorsSnapshot.empty) professorName = professorsSnapshot.docs[0].data().name || '';
-
-        if (!professorName) {
-            const usersQuery = query(collection(db, 'users'), where('email', '==', userEmail));
-            const usersSnapshot = await getDocs(usersQuery);
-            if (!usersSnapshot.empty) professorName = usersSnapshot.docs[0].data().name || '';
-        }
-
-        window.assignedSections = [];
-        const sectionsSnapshot = await getDocs(collection(db, 'sections'));
-        const profNameLower = (professorName || '').toLowerCase().trim();
-        const profEmailLower = (userEmail || '').toLowerCase().trim();
-        const allProfNameVariants = new Set();
-        if (profNameLower) allProfNameVariants.add(profNameLower);
-
-        const profAliasSnap = await getDocs(query(collection(db, 'professors'), where('email', '==', userEmail)));
-        profAliasSnap.forEach(d => { const n = (d.data().name || '').toLowerCase().trim(); if (n) allProfNameVariants.add(n); });
-        const userAliasSnap = await getDocs(query(collection(db, 'users'), where('email', '==', userEmail)));
-        userAliasSnap.forEach(d => { const n = (d.data().name || '').toLowerCase().trim(); if (n) allProfNameVariants.add(n); });
-
-        const seenSections = new Set();
-        for (const docSnap of sectionsSnapshot.docs) {
-            const sectionData = docSnap.data();
-            const sectionProfLower = (sectionData.professor || '').trim().toLowerCase();
-            const sectionProfEmailLower = (sectionData.professorEmail || '').toLowerCase().trim();
-            let isProfessorAssigned = sectionProfEmailLower === profEmailLower;
-
-            if (!isProfessorAssigned && sectionProfLower) {
-                for (const variant of allProfNameVariants) {
-                    if (!variant) continue;
-                    if (sectionProfLower === variant || sectionProfLower.includes(variant) || variant.includes(sectionProfLower)) {
-                        isProfessorAssigned = true; break;
-                    }
-                }
-            }
-            if (!isProfessorAssigned && profEmailLower) {
-                const emailUsername = profEmailLower.split('@')[0].toLowerCase();
-                if (emailUsername.length > 3 && sectionProfLower.includes(emailUsername)) isProfessorAssigned = true;
-            }
-
-            if (isProfessorAssigned && !seenSections.has(sectionData.name)) {
-                seenSections.add(sectionData.name);
-                const actualStudentCount = sectionData.students ? sectionData.students.length : 0;
-                window.assignedSections.push({
-                    section: sectionData.name,
-                    students: actualStudentCount,
-                    courseCode: sectionData.courseCode || 'PE 3',
-                    time: sectionData.time || 'Not Set',
-                    day: sectionData.day || 'Not Set',
-                    room: sectionData.room || 'Not Set'
-                });
-            }
-        }
-
-        let testsQuery, testsSnapshot;
-        if (window.assignedSections.length > 0) {
-            const sectionNames = window.assignedSections.map(s => s.section).slice(0, 10);
-            testsQuery = query(collection(db, 'scheduledTests'), where('professorEmail', '==', userEmail), where('section', 'in', sectionNames));
-            testsSnapshot = await getDocs(testsQuery);
-        } else {
-            testsQuery = query(collection(db, 'scheduledTests'), where('professorEmail', '==', userEmail));
-            testsSnapshot = await getDocs(testsQuery);
-        }
-        if (testsSnapshot.empty) {
-            testsSnapshot = await getDocs(query(collection(db, 'scheduledTests'), where('professorId', '==', userId)));
-        }
-
-        const permissionsSnapshot = await getDocs(query(collection(db, 'testPermissions'), where('grantedBy', '==', userEmail)));
-        const enabledTestsMap = new Map();
-        permissionsSnapshot.forEach(doc => {
-            const perm = doc.data();
-            if (!enabledTestsMap.has(perm.testId)) enabledTestsMap.set(perm.testId, []);
-            enabledTestsMap.get(perm.testId).push(perm.studentEmail);
-        });
-
-        window.allScheduledTests = [];
-        testsSnapshot.forEach(docSnap => { 
-            window.allScheduledTests.push({ id: docSnap.id, ...docSnap.data() }); 
-        });
-
-        // ===== I-LAGAY MO DITO ANG INITIALIZATION =====
-        lastStatusSnapshot = new Map();
-        window.allScheduledTests.forEach(test => {
-            lastStatusSnapshot.set(test.id, test.status || 'scheduled');
-        });
-
-        populateSectionSortDropdown();
-        renderScheduleTable(window.allScheduledTests, enabledTestsMap);
-    } catch (error) {
-        console.error('Error loading scheduled tests:', error);
-        document.getElementById('scheduleTableBody').innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">❌</div><div class="empty-title">Error Loading Tests</div><div class="empty-text">${error.message}</div></div></td></tr>`;
-    }
-}
 
     function getNormCategory(testName, result, genderKey = 'male', ageGroup = '19-22') {
         const normalized = (testName || '').toLowerCase();
@@ -1352,6 +1255,12 @@ function getAgeGroupFromStudent(studentData) {
     window.currentFilter = 'all-tests';
     window.availableTestTypes = [];
 
+    // Add real-time unsubscribe functions
+    let sectionsUnsubscribe = null;
+    let studentsUnsubscribe = null;
+    let testResultsUnsubscribe = null;
+    let testPermissionsUnsubscribe = null;
+
     onAuthStateChanged(auth, async (user) => {
         const loadingScreen = document.getElementById('loadingScreen');
         const mainContent = document.getElementById('mainContent');
@@ -1373,9 +1282,14 @@ function getAgeGroupFromStudent(studentData) {
                 }
                 const profName = window.currentProfessor.fullName || window.currentProfessor.name || user.displayName || 'Professor';
                 updateProfileUI(user.photoURL, profName, user.email);
+                
+                // Load initial data
                 await loadSections();
                 await loadStudents();
+                
+                // Set up real-time listeners
                 setupRealtimeUpdates();
+                
                 loadingScreen.style.display = 'none';
                 mainContent.classList.remove('hidden');
             } catch (error) {
@@ -1406,6 +1320,7 @@ function getAgeGroupFromStudent(studentData) {
             nameVariations.delete('');
             const nameTokens = new Set();
             nameVariations.forEach(name => { name.split(/[\s,\.]+/).forEach(word => { if (word.length >= 3) nameTokens.add(word); }); });
+            
             const sectionsSnapshot = await getDocs(collection(db, 'sections'));
             sectionsSnapshot.forEach(sectionDoc => {
                 const data = sectionDoc.data();
@@ -1453,159 +1368,131 @@ function getAgeGroupFromStudent(studentData) {
         return 'N/A';
     }
 
-window.loadStudents = async function() {
-    try {
-        if (window.sections.length === 0) { updateStudentsTable([]); return; }
-        window.students = [];
-        const seenStudentIds = new Set();
-        
-        // Load all students data from students collection para makuha ang age/birthday
-        const studentsMap = new Map();
-        const studentsSnap = await getDocs(collection(db, 'students'));
-        studentsSnap.forEach(doc => {
-            const data = doc.data();
-            if (data.email) {
-                studentsMap.set(data.email, {
-                    birthday: data.birthday || null,
-                    age: data.age || null,
-                    gender: data.gender || 'male'
-                });
-            }
-        });
-        
-        for (const section of window.sections) {
-            if (!section.students || !Array.isArray(section.students) || section.students.length === 0) continue;
+    window.loadStudents = async function() {
+        try {
+            if (window.sections.length === 0) { updateStudentsTable([]); return; }
+            window.students = [];
+            const seenStudentIds = new Set();
             
-            for (const rawStudent of section.students) {
-                const studentEmail = rawStudent.email || '';
-                if (!studentEmail || seenStudentIds.has(studentEmail)) continue;
-                seenStudentIds.add(studentEmail);
-                
-                let firstName = '', lastName = '', fullName = rawStudent.name || 'Unknown Student';
-                if (fullName.includes(',')) { 
-                    const parts = fullName.split(',').map(p => p.trim()); 
-                    lastName = parts[0]; 
-                    firstName = parts.slice(1).join(' '); 
-                } else { 
-                    const nameParts = fullName.split(' '); 
-                    firstName = nameParts[0] || ''; 
-                    lastName = nameParts.slice(1).join(' ') || ''; 
+            // Load all students data from students collection para makuha ang age/birthday
+            const studentsMap = new Map();
+            const studentsSnap = await getDocs(collection(db, 'students'));
+            studentsSnap.forEach(doc => {
+                const data = doc.data();
+                if (data.email) {
+                    studentsMap.set(data.email, {
+                        birthday: data.birthday || null,
+                        age: data.age || null,
+                        gender: data.gender || 'male'
+                    });
                 }
+            });
+            
+            for (const section of window.sections) {
+                if (!section.students || !Array.isArray(section.students) || section.students.length === 0) continue;
+                
+                for (const rawStudent of section.students) {
+                    const studentEmail = rawStudent.email || '';
+                    if (!studentEmail || seenStudentIds.has(studentEmail)) continue;
+                    seenStudentIds.add(studentEmail);
+                    
+                    let firstName = '', lastName = '', fullName = rawStudent.name || 'Unknown Student';
+                    if (fullName.includes(',')) { 
+                        const parts = fullName.split(',').map(p => p.trim()); 
+                        lastName = parts[0]; 
+                        firstName = parts.slice(1).join(' '); 
+                    } else { 
+                        const nameParts = fullName.split(' '); 
+                        firstName = nameParts[0] || ''; 
+                        lastName = nameParts.slice(1).join(' ') || ''; 
+                    }
 
-                // Get student data for age
-                const studentAgeData = studentsMap.get(studentEmail) || {};
+                    // Get student data for age
+                    const studentAgeData = studentsMap.get(studentEmail) || {};
 
-                // Load attempts and calculate categories (like grades.html)
-                let categories = [];
-                const bestCategoriesPerTest = new Map(); // Store best category per test
-                let totalAttempts = 0;
+                    // Load attempts and calculate categories (like grades.html)
+                    let categories = [];
+                    const bestCategoriesPerTest = new Map(); // Store best category per test
+                    let totalAttempts = 0;
 
-                if (studentEmail) {
-                    try {
-                        const attemptsQuery = query(
-                            collection(db, 'testResults'),
-                            where('studentEmail', '==', studentEmail),
-                            where('status', '==', 'completed')
-                        );
-                        const snapshot = await getDocs(attemptsQuery);
-                        totalAttempts = snapshot.size;
+                    if (studentEmail) {
+                        try {
+                            const attemptsQuery = query(
+                                collection(db, 'testResults'),
+                                where('studentEmail', '==', studentEmail),
+                                where('status', '==', 'completed')
+                            );
+                            const snapshot = await getDocs(attemptsQuery);
+                            totalAttempts = snapshot.size;
 
-                        snapshot.forEach(docSnap => {
-                            const data = docSnap.data();
-                            const testId = data.testId || docSnap.id;
-                            const testName = data.testName || 'Unknown Activity';
-                            const result = data.result || data.resultData || data.repetitions || '';
-                            
-                            // Determine gender (from test data or student data)
-                            const gender = (data.gender || studentAgeData.gender || '').toLowerCase();
-                            const genderKey = gender.startsWith('f') ? 'female' : 'male';
-                            
-                            // Get age group from student data
-                            const ageGroup = getAgeGroupFromStudent(studentAgeData);
-                            
-                            // Get category with CORRECT age group
-                            const category = getNormCategory(testName, result, genderKey, ageGroup);
-                            
-                            // Keep best category per test (based on CATEGORY_ORDER)
-                            if (!bestCategoriesPerTest.has(testId) || 
-                                (CATEGORY_ORDER[category] || 3) > (CATEGORY_ORDER[bestCategoriesPerTest.get(testId)] || 0)) {
-                                bestCategoriesPerTest.set(testId, category);
-                            }
-                        });
-                    } catch (e) { console.warn('Error loading attempts for student:', fullName, e); }
+                            snapshot.forEach(docSnap => {
+                                const data = docSnap.data();
+                                const testId = data.testId || docSnap.id;
+                                const testName = data.testName || 'Unknown Activity';
+                                const result = data.result || data.resultData || data.repetitions || '';
+                                
+                                // Determine gender (from test data or student data)
+                                const gender = (data.gender || studentAgeData.gender || '').toLowerCase();
+                                const genderKey = gender.startsWith('f') ? 'female' : 'male';
+                                
+                                // Get age group from student data
+                                const ageGroup = getAgeGroupFromStudent(studentAgeData);
+                                
+                                // Get category with CORRECT age group
+                                const category = getNormCategory(testName, result, genderKey, ageGroup);
+                                
+                                // Keep best category per test (based on CATEGORY_ORDER)
+                                if (!bestCategoriesPerTest.has(testId) || 
+                                    (CATEGORY_ORDER[category] || 3) > (CATEGORY_ORDER[bestCategoriesPerTest.get(testId)] || 0)) {
+                                    bestCategoriesPerTest.set(testId, category);
+                                }
+                            });
+                        } catch (e) { console.warn('Error loading attempts for student:', fullName, e); }
+                    }
+
+                    // Get all unique best categories
+                    const uniqueCategories = Array.from(bestCategoriesPerTest.values());
+                    const uniqueTestCount = uniqueCategories.length;
+                    
+                    // Get overall category (like grades.html)
+                    const overallCategory = getOverallCategory(uniqueCategories);
+                    
+                    // Calculate numeric representation for sorting
+                    const overallScore = CATEGORY_ORDER[overallCategory] || 3;
+
+                    window.students.push({
+                        id: studentEmail,
+                        umakId: rawStudent.student_id || rawStudent.studentId || 'N/A',
+                        firstName: firstName || 'Unknown',
+                        lastName: lastName || '',
+                        fullName: fullName,
+                        email: studentEmail,
+                        section: section.name,
+                        yearLevel: section.yearLevel || extractYearLevel(section.name),
+                        totalAttempts: totalAttempts || 0,
+                        uniqueTestCount: uniqueTestCount || 0,
+                        categories: uniqueCategories,
+                        overallCategory: overallCategory,
+                        overallScore: overallScore,
+                        status: 'active',
+                        age: studentAgeData.age || null,
+                        birthday: studentAgeData.birthday || null
+                    });
                 }
-
-                // Get all unique best categories
-                const uniqueCategories = Array.from(bestCategoriesPerTest.values());
-                const uniqueTestCount = uniqueCategories.length;
-                
-                // Get overall category (like grades.html)
-                const overallCategory = getOverallCategory(uniqueCategories);
-                
-                // Calculate numeric representation for sorting
-                const overallScore = CATEGORY_ORDER[overallCategory] || 3;
-
-                window.students.push({
-                    id: studentEmail,
-                    umakId: rawStudent.student_id || rawStudent.studentId || 'N/A',
-                    firstName: firstName || 'Unknown',
-                    lastName: lastName || '',
-                    fullName: fullName,
-                    email: studentEmail,
-                    section: section.name,
-                    yearLevel: section.yearLevel || extractYearLevel(section.name),
-                    totalAttempts: totalAttempts || 0,
-                    uniqueTestCount: uniqueTestCount || 0,
-                    categories: uniqueCategories,
-                    overallCategory: overallCategory,
-                    overallScore: overallScore,
-                    status: 'active',
-                    age: studentAgeData.age || null,
-                    birthday: studentAgeData.birthday || null
-                });
             }
+            
+            window.filteredStudents = [...window.students];
+            window.currentPage = 1;
+            updateStudentsTable(window.filteredStudents);
+            await loadOverdueStudents();
+            document.getElementById('allStudentsCount').textContent = window.students.length;
+        } catch (error) {
+            console.error('Error loading students:', error);
+            updateStudentsTable([]);
+            showErrorModal('Error loading students: ' + error.message);
         }
-        
-        window.filteredStudents = [...window.students];
-        window.currentPage = 1;
-        updateStudentsTable(window.filteredStudents);
-        await loadOverdueStudents();
-        document.getElementById('allStudentsCount').textContent = window.students.length;
-    } catch (error) {
-        console.error('Error loading students:', error);
-        updateStudentsTable([]);
-        showErrorModal('Error loading students: ' + error.message);
-    }
-};
+    };
 
-// ===== REAL-TIME STATUS AUTO REFRESH =====
-setInterval(() => {
-    if (!window.allScheduledTests?.length) return;
-    const now = new Date();
-    let changed = false;
-
-    window.allScheduledTests.forEach(test => {
-        const prevStatus = lastStatusSnapshot.get(test.id);
-        if (prevStatus === 'completed') return;
-
-        const deadlineDateTime = new Date(test.deadlineDateTime);
-        const testDateTime = new Date(test.dateTime || `${test.date}T${test.time || '00:00'}`);
-
-        let newStatus = 'scheduled';
-        if (testDateTime <= now && deadlineDateTime >= now) newStatus = 'active';
-        else if (deadlineDateTime < now) newStatus = 'completed';
-
-        if (newStatus !== prevStatus) {
-            test.status = newStatus;
-            lastStatusSnapshot.set(test.id, newStatus);
-            changed = true;
-        }
-    });
-
-    if (changed && window.renderScheduleTable) {
-        window.renderScheduleTable(window.allScheduledTests, window._enabledTestsMap || new Map());
-    }
-}, 1000);
     function populateSectionsTable() {
         const tableBody = document.getElementById('sectionsTableBody');
         document.getElementById('sectionCount').textContent = window.filteredSections.length;
@@ -1808,82 +1695,95 @@ setInterval(() => {
 
     window.closeViewSectionModal = function() { document.getElementById('viewSectionModal').style.display = 'none'; };
 
- window.viewStudentDetails = async function(studentId) {
-    try {
-        window.currentStudentId = studentId;
-        const student = window.students.find(s => s.id === studentId);
-        if (!student) { showErrorModal('Student not found!'); return; }
+    window.viewStudentDetails = async function(studentId) {
+        try {
+            window.currentStudentId = studentId;
+            const student = window.students.find(s => s.id === studentId);
+            if (!student) { showErrorModal('Student not found!'); return; }
 
-        const attemptsQuery = query(
-            collection(db, 'testResults'),
-            where('studentEmail', '==', student.email),
-            where('status', '==', 'completed')
-        );
-        const attemptsSnapshot = await getDocs(attemptsQuery);
+            const attemptsQuery = query(
+                collection(db, 'testResults'),
+                where('studentEmail', '==', student.email),
+                where('status', '==', 'completed')
+            );
+            const attemptsSnapshot = await getDocs(attemptsQuery);
 
-        // Get student age data
-        const studentAgeData = {
-            birthday: student.birthday,
-            age: student.age
-        };
+            // Get student age data
+            const studentAgeData = {
+                birthday: student.birthday,
+                age: student.age
+            };
 
-        const bestCategoriesPerTest = new Map(); // Store best category per test
-        const allAttemptsByTest = new Map();
+            const bestCategoriesPerTest = new Map(); // Store best category per test
+            const allAttemptsByTest = new Map();
 
-        attemptsSnapshot.forEach(docSnap => {
-            const attempt = { id: docSnap.id, ...docSnap.data() };
-            const testId = attempt.testId || attempt.testName;
-            if (!allAttemptsByTest.has(testId)) {
-                allAttemptsByTest.set(testId, { testName: attempt.testName || 'Unknown Test', attempts: [] });
+            attemptsSnapshot.forEach(docSnap => {
+                const attempt = { id: docSnap.id, ...docSnap.data() };
+                const testId = attempt.testId || attempt.testName;
+                if (!allAttemptsByTest.has(testId)) {
+                    allAttemptsByTest.set(testId, { testName: attempt.testName || 'Unknown Test', attempts: [] });
+                }
+                allAttemptsByTest.get(testId).attempts.push(attempt);
+
+                const gender = (attempt.gender || '').toLowerCase();
+                const genderKey = gender.startsWith('f') ? 'female' : 'male';
+                
+                // Get age group from student data
+                const ageGroup = getAgeGroupFromStudent(studentAgeData);
+                
+                const category = getNormCategory(attempt.testName || '', attempt.result || attempt.resultData || attempt.repetitions || attempt, genderKey, ageGroup);
+                
+                // Keep best category per test
+                if (!bestCategoriesPerTest.has(testId) || 
+                    (CATEGORY_ORDER[category] || 3) > (CATEGORY_ORDER[bestCategoriesPerTest.get(testId)] || 0)) {
+                    bestCategoriesPerTest.set(testId, category);
+                }
+            });
+
+            const uniqueTestCount = bestCategoriesPerTest.size;
+
+            const initials = (student.firstName?.charAt(0) || '') + (student.lastName?.charAt(0) || '');
+            let sectionSchedule = 'Not Set';
+            const studentSection = window.sections.find(s => s.name === student.section);
+            if (studentSection) {
+                if (studentSection.timeSlot && studentSection.days && studentSection.room) sectionSchedule = `${studentSection.timeSlot} / ${studentSection.days} / ${studentSection.room}`;
+                else if (studentSection.schedule) sectionSchedule = studentSection.schedule;
             }
-            allAttemptsByTest.get(testId).attempts.push(attempt);
 
-            const gender = (attempt.gender || '').toLowerCase();
-            const genderKey = gender.startsWith('f') ? 'female' : 'male';
+            const overallBadge = renderCategoryBadge(student.overallCategory);
             
-            // Get age group from student data
-            const ageGroup = getAgeGroupFromStudent(studentAgeData);
-            
-            const category = getNormCategory(attempt.testName || '', attempt.result || attempt.resultData || attempt.repetitions || attempt, genderKey, ageGroup);
-            
-            // Keep best category per test
-            if (!bestCategoriesPerTest.has(testId) || 
-                (CATEGORY_ORDER[category] || 3) > (CATEGORY_ORDER[bestCategoriesPerTest.get(testId)] || 0)) {
-                bestCategoriesPerTest.set(testId, category);
-            }
-        });
+            let html = `<div class="student-info-header"><div class="student-avatar">${initials || '??'}</div><div class="student-basic-info"><div class="student-name">${student.firstName || ''} ${student.lastName || ''}</div><div class="student-id">${student.umakId || 'N/A'} • ${student.section || 'N/A'}</div></div></div>
+            <div class="student-info-grid">
+                <div class="info-item"><div class="info-label">Email</div><div class="info-value" style="word-break:break-all; font-size:13px;">${student.email || 'N/A'}</div></div>
+                <div class="info-item"><div class="info-label">Year Level</div><div class="info-value">${student.yearLevel || 'N/A'}</div></div>
+                <div class="info-item"><div class="info-label">Section Schedule</div><div class="info-value">${sectionSchedule}</div></div>
+                <div class="info-item"><div class="info-label">Tests Taken</div><div class="info-value"><strong>${uniqueTestCount}</strong></div></div>
+                <div class="info-item"><div class="info-label">Overall</div><div class="info-value">${overallBadge}</div></div>
+                <div class="info-item"><div class="info-label">Status</div><div class="info-value"><span class="status-badge status-active">Active</span></div></div>
+            </div>`;
+            document.getElementById('studentDetailsContent').innerHTML = html;
 
-        const uniqueTestCount = bestCategoriesPerTest.size;
+            let attemptsHTML = '';
+            if (uniqueTestCount > 0) {
+                const testGroups = Array.from(allAttemptsByTest.entries()).map(([testId, group]) => {
+                    group.attempts.sort((a, b) => {
+                        const getTs = (att) => {
+                            if (!att.submittedAt) return 0;
+                            if (typeof att.submittedAt.toMillis === 'function') return att.submittedAt.toMillis();
+                            if (att.submittedAt instanceof Date) return att.submittedAt.getTime();
+                            if (typeof att.submittedAt === 'string' || typeof att.submittedAt === 'number') return new Date(att.submittedAt).getTime();
+                            if (att.submittedAt.seconds) return att.submittedAt.seconds * 1000;
+                            return 0;
+                        };
+                        return getTs(b) - getTs(a);
+                    });
+                    return { testId, testName: group.testName, attempts: group.attempts, bestCategory: bestCategoriesPerTest.get(testId) };
+                });
 
-        const initials = (student.firstName?.charAt(0) || '') + (student.lastName?.charAt(0) || '');
-        let sectionSchedule = 'Not Set';
-        const studentSection = window.sections.find(s => s.name === student.section);
-        if (studentSection) {
-            if (studentSection.timeSlot && studentSection.days && studentSection.room) sectionSchedule = `${studentSection.timeSlot} / ${studentSection.days} / ${studentSection.room}`;
-            else if (studentSection.schedule) sectionSchedule = studentSection.schedule;
-        }
-
-        const overallBadge = renderCategoryBadge(student.overallCategory);
-        
-        // Optional: Add age group info
-        // const ageGroupBadge = `<span class="ml-2 text-xs bg-info-bg text-info px-2 py-0.5 rounded">Age Group: ${getAgeGroupFromStudent(studentAgeData)}</span>`;
-        
-        let html = `<div class="student-info-header"><div class="student-avatar">${initials || '??'}</div><div class="student-basic-info"><div class="student-name">${student.firstName || ''} ${student.lastName || ''}</div><div class="student-id">${student.umakId || 'N/A'} • ${student.section || 'N/A'}</div></div></div>
-        <div class="student-info-grid">
-            <div class="info-item"><div class="info-label">Email</div><div class="info-value" style="word-break:break-all; font-size:13px;">${student.email || 'N/A'}</div></div>
-            <div class="info-item"><div class="info-label">Year Level</div><div class="info-value">${student.yearLevel || 'N/A'}</div></div>
-            <div class="info-item"><div class="info-label">Section Schedule</div><div class="info-value">${sectionSchedule}</div></div>
-            <div class="info-item"><div class="info-label">Tests Taken</div><div class="info-value"><strong>${uniqueTestCount}</strong></div></div>
-            <div class="info-item"><div class="info-label">Overall</div><div class="info-value">${overallBadge}</div></div>
-            <div class="info-item"><div class="info-label">Status</div><div class="info-value"><span class="status-badge status-active">Active</span></div></div>
-        </div>`;
-        document.getElementById('studentDetailsContent').innerHTML = html;
-
-        let attemptsHTML = '';
-        if (uniqueTestCount > 0) {
-            const testGroups = Array.from(allAttemptsByTest.entries()).map(([testId, group]) => {
-                group.attempts.sort((a, b) => {
-                    const getTs = (att) => {
+                testGroups.sort((a, b) => {
+                    const getLatest = (attempts) => {
+                        if (!attempts.length) return 0;
+                        const att = attempts[0];
                         if (!att.submittedAt) return 0;
                         if (typeof att.submittedAt.toMillis === 'function') return att.submittedAt.toMillis();
                         if (att.submittedAt instanceof Date) return att.submittedAt.getTime();
@@ -1891,167 +1791,154 @@ setInterval(() => {
                         if (att.submittedAt.seconds) return att.submittedAt.seconds * 1000;
                         return 0;
                     };
-                    return getTs(b) - getTs(a);
+                    return getLatest(b.attempts) - getLatest(a.attempts);
                 });
-                return { testId, testName: group.testName, attempts: group.attempts, bestCategory: bestCategoriesPerTest.get(testId) };
-            });
 
-            testGroups.sort((a, b) => {
-                const getLatest = (attempts) => {
-                    if (!attempts.length) return 0;
-                    const att = attempts[0];
-                    if (!att.submittedAt) return 0;
-                    if (typeof att.submittedAt.toMillis === 'function') return att.submittedAt.toMillis();
-                    if (att.submittedAt instanceof Date) return att.submittedAt.getTime();
-                    if (typeof att.submittedAt === 'string' || typeof att.submittedAt === 'number') return new Date(att.submittedAt).getTime();
-                    if (att.submittedAt.seconds) return att.submittedAt.seconds * 1000;
-                    return 0;
-                };
-                return getLatest(b.attempts) - getLatest(a.attempts);
-            });
-
-            testGroups.forEach(({ testName, attempts, bestCategory }) => {
-                const totalAttemptsInTest = attempts.length;
-                const bestBadge = renderCategoryBadge(bestCategory);
-                
-                attemptsHTML += `<div style="margin-bottom:16px; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
-                    <div style="background:linear-gradient(90deg, rgba(10,22,40,0.9) 0%, rgba(30,77,140,0.9) 100%); padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="color:white; font-weight:700; font-size:14px;"><i class="fas fa-clipboard-check" style="margin-right:6px;"></i>${testName}</span>
-                        <span style="color:rgba(255,255,255,0.8); font-size:12px;">Best: ${bestBadge} • ${totalAttemptsInTest} attempt${totalAttemptsInTest > 1 ? 's' : ''}</span>
-                    </div>`;
-
-                attempts.forEach((attempt, index) => {
-                    const attemptNumber = index + 1;
-                    let date = new Date();
-                    if (attempt.submittedAt) {
-                        if (typeof attempt.submittedAt.toDate === 'function') date = attempt.submittedAt.toDate();
-                        else if (attempt.submittedAt instanceof Date) date = attempt.submittedAt;
-                        else if (typeof attempt.submittedAt === 'string' || typeof attempt.submittedAt === 'number') date = new Date(attempt.submittedAt);
-                        else if (attempt.submittedAt.seconds) date = new Date(attempt.submittedAt.seconds * 1000);
-                    }
-                    const formattedDate = date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-                    const formattedTime = date.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-
-                    const gender = (attempt.gender || '').toLowerCase();
-                    const genderKey = gender.startsWith('f') ? 'female' : 'male';
+                testGroups.forEach(({ testName, attempts, bestCategory }) => {
+                    const totalAttemptsInTest = attempts.length;
+                    const bestBadge = renderCategoryBadge(bestCategory);
                     
-                    // Get age group from student data
-                    const ageGroup = getAgeGroupFromStudent(studentAgeData);
-                    
-                    const category = getNormCategory(attempt.testName || testName, attempt.result || attempt.resultData || attempt.repetitions || attempt, genderKey, ageGroup);
-                    
-                    const categoryBadge = renderCategoryBadge(category);
-                    const isBest = category === bestCategory;
-                    const bgColor = isBest ? '#f0fdf4' : (index % 2 === 0 ? '#ffffff' : '#f8fafc');
+                    attemptsHTML += `<div style="margin-bottom:16px; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+                        <div style="background:linear-gradient(90deg, rgba(10,22,40,0.9) 0%, rgba(30,77,140,0.9) 100%); padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:white; font-weight:700; font-size:14px;"><i class="fas fa-clipboard-check" style="margin-right:6px;"></i>${testName}</span>
+                            <span style="color:rgba(255,255,255,0.8); font-size:12px;">Best: ${bestBadge} • ${totalAttemptsInTest} attempt${totalAttemptsInTest > 1 ? 's' : ''}</span>
+                        </div>`;
 
-                    // Format result for display
-                    let resultDisplay = '—';
-                    if (attempt.result) {
-                        if (typeof attempt.result === 'object') { 
-                            const val = attempt.result.repetitions || attempt.result.time || attempt.result.distance || attempt.result.value || 0; 
-                            resultDisplay = `${val} ${attempt.testUnit || ''}`; 
-                        } else resultDisplay = `${attempt.result} ${attempt.testUnit || ''}`;
-                    } else if (attempt.repetitions) resultDisplay = `${attempt.repetitions} ${attempt.testUnit || ''}`;
+                    attempts.forEach((attempt, index) => {
+                        const attemptNumber = index + 1;
+                        let date = new Date();
+                        if (attempt.submittedAt) {
+                            if (typeof attempt.submittedAt.toDate === 'function') date = attempt.submittedAt.toDate();
+                            else if (attempt.submittedAt instanceof Date) date = attempt.submittedAt;
+                            else if (typeof attempt.submittedAt === 'string' || typeof attempt.submittedAt === 'number') date = new Date(attempt.submittedAt);
+                            else if (attempt.submittedAt.seconds) date = new Date(attempt.submittedAt.seconds * 1000);
+                        }
+                        const formattedDate = date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+                        const formattedTime = date.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
-                    attemptsHTML += `<div style="background:${bgColor}; padding:12px 14px; border-top:1px solid #f1f5f9;">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
-                            <div><div style="font-size:12px; color:#64748b; margin-bottom:2px;">Attempt ${attemptNumber} • ${formattedDate} at ${formattedTime}</div></div>
-                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                                <span style="font-weight:500;">${resultDisplay}</span>
-                                ${categoryBadge}
-                                ${isBest ? '<span style="color:#10b981; font-size:12px; font-weight:700;">🏆 Best</span>' : ''}
-                                <button class="btn-action btn-view" style="padding:4px 8px; font-size:11px;" onclick="viewAttemptDetails('${attempt.id}')"><i class="fas fa-info-circle"></i> Details</button>
+                        const gender = (attempt.gender || '').toLowerCase();
+                        const genderKey = gender.startsWith('f') ? 'female' : 'male';
+                        
+                        // Get age group from student data
+                        const ageGroup = getAgeGroupFromStudent(studentAgeData);
+                        
+                        const category = getNormCategory(attempt.testName || testName, attempt.result || attempt.resultData || attempt.repetitions || attempt, genderKey, ageGroup);
+                        
+                        const categoryBadge = renderCategoryBadge(category);
+                        const isBest = category === bestCategory;
+                        const bgColor = isBest ? '#f0fdf4' : (index % 2 === 0 ? '#ffffff' : '#f8fafc');
+
+                        // Format result for display
+                        let resultDisplay = '—';
+                        if (attempt.result) {
+                            if (typeof attempt.result === 'object') { 
+                                const val = attempt.result.repetitions || attempt.result.time || attempt.result.distance || attempt.result.value || 0; 
+                                resultDisplay = `${val} ${attempt.testUnit || ''}`; 
+                            } else resultDisplay = `${attempt.result} ${attempt.testUnit || ''}`;
+                        } else if (attempt.repetitions) resultDisplay = `${attempt.repetitions} ${attempt.testUnit || ''}`;
+
+                        attemptsHTML += `<div style="background:${bgColor}; padding:12px 14px; border-top:1px solid #f1f5f9;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                                <div><div style="font-size:12px; color:#64748b; margin-bottom:2px;">Attempt ${attemptNumber} • ${formattedDate} at ${formattedTime}</div></div>
+                                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                    <span style="font-weight:500;">${resultDisplay}</span>
+                                    ${categoryBadge}
+                                    ${isBest ? '<span style="color:#10b981; font-size:12px; font-weight:700;">🏆 Best</span>' : ''}
+                                    <button class="btn-action btn-view" style="padding:4px 8px; font-size:11px;" onclick="viewAttemptDetails('${attempt.id}')"><i class="fas fa-info-circle"></i> Details</button>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    attemptsHTML += `</div>`;
+                });
+            } else {
+                attemptsHTML = `<div style="text-align:center; padding:40px; color:#64748b;"><div style="font-size:48px; opacity:0.3; margin-bottom:10px;">📋</div><div>No test results recorded yet</div></div>`;
+            }
+            document.getElementById('attemptsTableBody').innerHTML = attemptsHTML;
+            document.getElementById('viewStudentModal').style.display = 'flex';
+        } catch (error) { console.error('Error viewing student details:', error); showErrorModal('Error: ' + error.message); }
+    };
+
+    window.viewAttemptDetails = async function(attemptId) {
+        try {
+            const attemptRef = doc(db, 'testResults', attemptId);
+            const attemptDoc = await getDoc(attemptRef);
+            if (!attemptDoc.exists()) { showErrorModal('Attempt not found!'); return; }
+            const attempt = attemptDoc.data();
+            const date = attempt.submittedAt?.toDate ? attempt.submittedAt.toDate() : (attempt.submittedAt?.seconds ? new Date(attempt.submittedAt.seconds * 1000) : new Date());
+            const student = window.students.find(s => s.email === attempt.studentEmail);
+            const studentName = student ? `${student.firstName} ${student.lastName}` : attempt.studentName || 'Unknown Student';
+
+            const gender = (attempt.gender || '').toLowerCase();
+            const genderKey = gender.startsWith('f') ? 'female' : 'male';
+            
+            // Get age group from student data
+            const studentAgeData = student ? { birthday: student.birthday, age: student.age } : {};
+            const ageGroup = getAgeGroupFromStudent(studentAgeData);
+            
+            const category = getNormCategory(attempt.testName || '', attempt.result || attempt.resultData || attempt.repetitions || attempt, genderKey, ageGroup);
+            
+            const categoryBadge = renderCategoryBadge(category);
+
+            let resultDisplay = 'N/A';
+            if (attempt.result) {
+                if (typeof attempt.result === 'object') { const val = attempt.result.repetitions || attempt.result.time || attempt.result.distance || attempt.result.value || 0; resultDisplay = `${val} ${attempt.testUnit || ''}`; }
+                else resultDisplay = `${attempt.result} ${attempt.testUnit || ''}`;
+            } else if (attempt.repetitions) resultDisplay = `${attempt.repetitions} ${attempt.testUnit || ''}`;
+
+            let attemptNumber = 1;
+            try {
+                const attQ = query(collection(db, 'testResults'), where('studentEmail', '==', attempt.studentEmail), where('testId', '==', attempt.testId), orderBy('submittedAt', 'asc'));
+                const attSnap = await getDocs(attQ);
+                const attemptList = attSnap.docs.map(d => d.id);
+                attemptNumber = attemptList.indexOf(attemptId) + 1;
+            } catch (e) {}
+
+            const existingModal = document.getElementById('attemptDetailsModal');
+            if (existingModal) existingModal.remove();
+
+            const modalHtml = `<div id="attemptDetailsModal" class="modal-overlay" style="display:flex; z-index:3000;">
+                <div class="modal-content small" onclick="event.stopPropagation()" style="max-width:500px;">
+                    <div class="modal-header" style="background:linear-gradient(90deg, #0a1628 0%, #1e4d8c 100%);">
+                        <h3 style="color:white;"><i class="fas fa-clipboard-check"></i> Attempt Details</h3>
+                        <button class="modal-close-btn" onclick="closeAttemptDetailsModal()" style="background:rgba(255,255,255,0.2); color:white;"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="modal-body" style="padding:24px;">
+                        <div style="background:#f8fafc; border-radius:10px; padding:16px; margin-bottom:20px; border-left:4px solid #2d6fc4;">
+                            <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                                <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg, #1e4d8c 0%, #2d6fc4 100%); display:flex; align-items:center; justify-content:center; color:white; font-weight:700;">${studentName.charAt(0) || '?'}</div>
+                                <div><div style="font-weight:700; color:#0a1628; font-size:16px;">${studentName}</div><div style="color:#64748b; font-size:13px;">${attempt.studentEmail}</div></div>
                             </div>
                         </div>
-                    </div>`;
-                });
-                attemptsHTML += `</div>`;
-            });
-        } else {
-            attemptsHTML = `<div style="text-align:center; padding:40px; color:#64748b;"><div style="font-size:48px; opacity:0.3; margin-bottom:10px;">📋</div><div>No test results recorded yet</div></div>`;
-        }
-        document.getElementById('attemptsTableBody').innerHTML = attemptsHTML;
-        document.getElementById('viewStudentModal').style.display = 'flex';
-    } catch (error) { console.error('Error viewing student details:', error); showErrorModal('Error: ' + error.message); }
-};
- window.viewAttemptDetails = async function(attemptId) {
-    try {
-        const attemptRef = doc(db, 'testResults', attemptId);
-        const attemptDoc = await getDoc(attemptRef);
-        if (!attemptDoc.exists()) { showErrorModal('Attempt not found!'); return; }
-        const attempt = attemptDoc.data();
-        const date = attempt.submittedAt?.toDate ? attempt.submittedAt.toDate() : (attempt.submittedAt?.seconds ? new Date(attempt.submittedAt.seconds * 1000) : new Date());
-        const student = window.students.find(s => s.email === attempt.studentEmail);
-        const studentName = student ? `${student.firstName} ${student.lastName}` : attempt.studentName || 'Unknown Student';
-
-        const gender = (attempt.gender || '').toLowerCase();
-        const genderKey = gender.startsWith('f') ? 'female' : 'male';
-        
-        // Get age group from student data
-        const studentAgeData = student ? { birthday: student.birthday, age: student.age } : {};
-        const ageGroup = getAgeGroupFromStudent(studentAgeData);
-        
-        const category = getNormCategory(attempt.testName || '', attempt.result || attempt.resultData || attempt.repetitions || attempt, genderKey, ageGroup);
-        
-        const categoryBadge = renderCategoryBadge(category);
-
-        let resultDisplay = 'N/A';
-        if (attempt.result) {
-            if (typeof attempt.result === 'object') { const val = attempt.result.repetitions || attempt.result.time || attempt.result.distance || attempt.result.value || 0; resultDisplay = `${val} ${attempt.testUnit || ''}`; }
-            else resultDisplay = `${attempt.result} ${attempt.testUnit || ''}`;
-        } else if (attempt.repetitions) resultDisplay = `${attempt.repetitions} ${attempt.testUnit || ''}`;
-
-        let attemptNumber = 1;
-        try {
-            const attQ = query(collection(db, 'testResults'), where('studentEmail', '==', attempt.studentEmail), where('testId', '==', attempt.testId), orderBy('submittedAt', 'asc'));
-            const attSnap = await getDocs(attQ);
-            const attemptList = attSnap.docs.map(d => d.id);
-            attemptNumber = attemptList.indexOf(attemptId) + 1;
-        } catch (e) {}
-
-        const existingModal = document.getElementById('attemptDetailsModal');
-        if (existingModal) existingModal.remove();
-
-        const modalHtml = `<div id="attemptDetailsModal" class="modal-overlay" style="display:flex; z-index:3000;">
-            <div class="modal-content small" onclick="event.stopPropagation()" style="max-width:500px;">
-                <div class="modal-header" style="background:linear-gradient(90deg, #0a1628 0%, #1e4d8c 100%);">
-                    <h3 style="color:white;"><i class="fas fa-clipboard-check"></i> Attempt Details</h3>
-                    <button class="modal-close-btn" onclick="closeAttemptDetailsModal()" style="background:rgba(255,255,255,0.2); color:white;"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="modal-body" style="padding:24px;">
-                    <div style="background:#f8fafc; border-radius:10px; padding:16px; margin-bottom:20px; border-left:4px solid #2d6fc4;">
-                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-                            <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg, #1e4d8c 0%, #2d6fc4 100%); display:flex; align-items:center; justify-content:center; color:white; font-weight:700;">${studentName.charAt(0) || '?'}</div>
-                            <div><div style="font-weight:700; color:#0a1628; font-size:16px;">${studentName}</div><div style="color:#64748b; font-size:13px;">${attempt.studentEmail}</div></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+                            <div style="background:#f1f5f9; padding:12px; border-radius:8px;"><div style="color:#475569; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Test Name</div><div style="font-weight:700; color:#0a1628; font-size:14px;">${attempt.testName || 'Unknown'}</div></div>
+                            <div style="background:#f1f5f9; padding:12px; border-radius:8px;"><div style="color:#475569; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Category</div><div>${categoryBadge}</div></div>
+                            <div style="background:#f1f5f9; padding:12px; border-radius:8px;"><div style="color:#475569; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Result</div><div style="font-weight:700; color:#1e293b; font-size:14px;">${resultDisplay}</div></div>
+                            <div style="background:#f1f5f9; padding:12px; border-radius:8px;"><div style="color:#475569; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Attempt #</div><div style="font-weight:700; color:#0a1628; font-size:14px;">${attemptNumber}</div></div>
+                        </div>
+                        <div style="background:#f8fafc; border-radius:8px; padding:16px; margin-bottom:16px;">
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;"><i class="fas fa-calendar-alt" style="color:#2d6fc4;"></i><span style="font-weight:600; color:#475569;">Submission Date &amp; Time</span></div>
+                            <div style="font-size:15px; color:#0a1628; margin-left:24px;">${date.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}<br><span style="color:#2d6fc4; font-weight:500;">${date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span></div>
+                        </div>
+                        <div style="background:#f8fafc; border-radius:8px; padding:16px;">
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;"><i class="fas fa-info-circle" style="color:#2d6fc4;"></i><span style="font-weight:600; color:#475569;">Additional Information</span></div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-left:24px;">
+                                ${attempt.heartRate ? `<div><div style="color:#64748b; font-size:11px;">Heart Rate</div><div style="font-weight:500; color:#1e293b;">${attempt.heartRate} bpm</div></div>` : ''}
+                                <div><div style="color:#64748b; font-size:11px;">Status</div><div><span class="status-badge status-active" style="font-size:11px;">Completed</span></div></div>
+                                ${attempt.isProfessorOverride ? `<div style="grid-column:span 2;"><div style="color:#64748b; font-size:11px;">Edited By</div><div style="font-weight:500; color:#b45309;">✏️ ${attempt.overriddenByName || 'Professor'}</div></div>` : ''}
+                            </div>
                         </div>
                     </div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
-                        <div style="background:#f1f5f9; padding:12px; border-radius:8px;"><div style="color:#475569; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Test Name</div><div style="font-weight:700; color:#0a1628; font-size:14px;">${attempt.testName || 'Unknown'}</div></div>
-                        <div style="background:#f1f5f9; padding:12px; border-radius:8px;"><div style="color:#475569; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Category</div><div>${categoryBadge}</div></div>
-                        <div style="background:#f1f5f9; padding:12px; border-radius:8px;"><div style="color:#475569; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Result</div><div style="font-weight:700; color:#1e293b; font-size:14px;">${resultDisplay}</div></div>
-                        <div style="background:#f1f5f9; padding:12px; border-radius:8px;"><div style="color:#475569; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Attempt #</div><div style="font-weight:700; color:#0a1628; font-size:14px;">${attemptNumber}</div></div>
-                    </div>
-                    <div style="background:#f8fafc; border-radius:8px; padding:16px; margin-bottom:16px;">
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;"><i class="fas fa-calendar-alt" style="color:#2d6fc4;"></i><span style="font-weight:600; color:#475569;">Submission Date &amp; Time</span></div>
-                        <div style="font-size:15px; color:#0a1628; margin-left:24px;">${date.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}<br><span style="color:#2d6fc4; font-weight:500;">${date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span></div>
-                    </div>
-                    <div style="background:#f8fafc; border-radius:8px; padding:16px;">
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;"><i class="fas fa-info-circle" style="color:#2d6fc4;"></i><span style="font-weight:600; color:#475569;">Additional Information</span></div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-left:24px;">
-                            ${attempt.heartRate ? `<div><div style="color:#64748b; font-size:11px;">Heart Rate</div><div style="font-weight:500; color:#1e293b;">${attempt.heartRate} bpm</div></div>` : ''}
-                            <div><div style="color:#64748b; font-size:11px;">Status</div><div><span class="status-badge status-active" style="font-size:11px;">Completed</span></div></div>
-                            ${attempt.isProfessorOverride ? `<div style="grid-column:span 2;"><div style="color:#64748b; font-size:11px;">Edited By</div><div style="font-weight:500; color:#b45309;">✏️ ${attempt.overriddenByName || 'Professor'}</div></div>` : ''}
-                        </div>
-                    </div>
+                    <div class="modal-footer"><button class="px-6 py-2.5 bg-navy hover:bg-navy-light text-white rounded-lg font-semibold transition-all text-sm" onclick="closeAttemptDetailsModal()">Close</button></div>
                 </div>
-                <div class="modal-footer"><button class="px-6 py-2.5 bg-navy hover:bg-navy-light text-white rounded-lg font-semibold transition-all text-sm" onclick="closeAttemptDetailsModal()">Close</button></div>
-            </div>
-        </div>`;
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-    } catch (error) { console.error('Error viewing attempt details:', error); showErrorModal('Error: ' + error.message); }
-};
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        } catch (error) { console.error('Error viewing attempt details:', error); showErrorModal('Error: ' + error.message); }
+    };
+
     window.closeAttemptDetailsModal = function() { const modal = document.getElementById('attemptDetailsModal'); if (modal) modal.remove(); };
     document.addEventListener('click', function(event) { const modal = document.getElementById('attemptDetailsModal'); if (modal && event.target === modal) window.closeAttemptDetailsModal(); });
+
     window.closeViewStudentModal = function() { document.getElementById('viewStudentModal').style.display = 'none'; window.currentStudentId = null; };
 
     window.filterSections = function() {
@@ -2111,76 +1998,167 @@ setInterval(() => {
     };
 
     function setupRealtimeUpdates() {
-        if (window.currentUser && window.currentProfessor) {
-            const professorName = window.currentProfessor.fullName || window.currentProfessor.name || window.currentUser.displayName;
-            if (professorName) {
-                try {
-                    const sectionsQuery = query(collection(db, 'sections'), where('professor', '==', professorName));
-                    onSnapshot(sectionsQuery, () => { loadSections().then(() => { loadStudents(); }); });
-                } catch (e) { console.warn('Could not set up real-time updates:', e); }
-            }
-        }
+        // Clean up existing listeners
+        if (sectionsUnsubscribe) sectionsUnsubscribe();
+        if (testResultsUnsubscribe) testResultsUnsubscribe();
+        if (testPermissionsUnsubscribe) testPermissionsUnsubscribe();
+
+        // Listen for section changes
+        sectionsUnsubscribe = onSnapshot(collection(db, 'sections'), async () => {
+            console.log('Sections updated, reloading...');
+            await loadSections();
+            await loadStudents();
+        });
+
+ testResultsUnsubscribe = onSnapshot(collection(db, 'testResults'), async () => {
+    const modalOpen = document.getElementById('studentTestsModal')?.style.display === 'flex';
+    if (!modalOpen) {
+        await loadStudents();
+        await loadOverdueStudents();
+    }
+});
+
+ // Listen for test permissions changes
+testPermissionsUnsubscribe = onSnapshot(collection(db, 'testPermissions'), async () => {
+    // Skip background reload if the overdue tests modal is open (user is actively using it)
+    const modalOpen = document.getElementById('studentTestsModal')?.style.display === 'flex';
+    if (!modalOpen) {
+        await loadOverdueStudents();
+    }
+});
+
+        // Also listen for test permissions from any professor (for enabling tests)
+        const additionalPermissionsListener = onSnapshot(collection(db, 'testPermissions'), async () => {
+            // This will catch all test permissions changes
+            await loadOverdueStudents();
+        });
+
+        // Store for cleanup
+        if (!window.additionalListeners) window.additionalListeners = [];
+        window.additionalListeners.push(additionalPermissionsListener);
     }
 
-    window.switchTab = function(tab) {
-        window.currentTab = tab;
-        const allTab = document.getElementById('allStudentsTab');
-        const overdueTab = document.getElementById('overdueTab');
-        if (tab === 'all') {
-            allTab.className = 'px-4 py-2.5 font-semibold text-[13px] text-blue border-b-2 border-blue transition-all';
-            overdueTab.className = 'px-4 py-2.5 font-semibold text-[13px] text-text-muted hover:text-text-primary transition-all';
-            document.getElementById('allStudentsView').classList.remove('hidden');
-            document.getElementById('overdueView').classList.add('hidden');
-        } else {
-            overdueTab.className = 'px-4 py-2.5 font-semibold text-[13px] text-blue border-b-2 border-blue transition-all';
-            allTab.className = 'px-4 py-2.5 font-semibold text-[13px] text-text-muted hover:text-text-primary transition-all';
-            document.getElementById('overdueView').classList.remove('hidden');
-            document.getElementById('allStudentsView').classList.add('hidden');
+    // Clean up listeners on page unload
+    window.addEventListener('beforeunload', () => {
+        if (sectionsUnsubscribe) sectionsUnsubscribe();
+        if (testResultsUnsubscribe) testResultsUnsubscribe();
+        if (testPermissionsUnsubscribe) testPermissionsUnsubscribe();
+        if (window.additionalListeners) {
+            window.additionalListeners.forEach(listener => listener());
         }
-    };
+    });
 
     window.loadOverdueStudents = async function() {
         try {
             window.overdueStudents = [];
             const now = new Date();
+            
+            // Load all test permissions for enabled tests
+            const permissionsSnapshot = await getDocs(collection(db, 'testPermissions'));
+            const enabledTestsMap = new Map();
+            permissionsSnapshot.forEach(docSnap => {
+                const perm = docSnap.data();
+                enabledTestsMap.set(`${perm.studentEmail}_${perm.testId}`, true);
+            });
+
             for (const section of window.sections) {
                 if (!section.students || section.students.length === 0) continue;
+                
+                // Get all tests for this section
                 const testsQuery = query(collection(db, 'scheduledTests'), where('section', '==', section.name));
                 const testsSnapshot = await getDocs(testsQuery);
-                for (const student of section.students) {
-                    const studentEmail = student.email || '';
-                    if (!studentEmail) continue;
-                    const completedQuery = query(collection(db, 'testResults'), where('studentEmail', '==', studentEmail));
-                    const completedSnapshot = await getDocs(completedQuery);
-                    const completedTests = new Map();
-                    completedSnapshot.forEach(docSnap => {
+                
+                // Get all completed results for students in this section
+                const studentEmails = section.students.map(s => s.email).filter(e => e);
+                if (studentEmails.length === 0) continue;
+                
+                const completedResults = new Map();
+                // Process in batches to avoid too many queries
+                for (let i = 0; i < studentEmails.length; i += 10) {
+                    const batch = studentEmails.slice(i, i + 10);
+                    const resultsQuery = query(
+                        collection(db, 'testResults'),
+                        where('studentEmail', 'in', batch),
+                        where('status', '==', 'completed')
+                    );
+                    const resultsSnapshot = await getDocs(resultsQuery);
+                    resultsSnapshot.forEach(docSnap => {
                         const data = docSnap.data();
-                        const testId = data.testId;
+                        const key = `${data.studentEmail}_${data.testId}`;
+                        
+                        // Keep the best result per test (based on category)
                         const gender = (data.gender || '').toLowerCase();
                         const genderKey = gender.startsWith('f') ? 'female' : 'male';
                         const category = getNormCategory(data.testName || '', data.result || data.resultData || data.repetitions || data, genderKey, '19-22');
                         
-                        if (!completedTests.has(testId) || 
-                            (CATEGORY_ORDER[category] || 3) > (CATEGORY_ORDER[completedTests.get(testId).category] || 0)) {
-                            completedTests.set(testId, { category: category, result: data.result, resultId: docSnap.id, submittedAt: data.submittedAt, status: data.status });
+                        if (!completedResults.has(key) || 
+                            (CATEGORY_ORDER[category] || 3) > (CATEGORY_ORDER[completedResults.get(key).category] || 0)) {
+                            completedResults.set(key, {
+                                category: category,
+                                result: data.result,
+                                resultId: docSnap.id,
+                                submittedAt: data.submittedAt,
+                                status: data.status
+                            });
                         }
                     });
+                }
+
+                // Check each student for overdue tests
+                for (const student of section.students) {
+                    const studentEmail = student.email || '';
+                    if (!studentEmail) continue;
+
                     testsSnapshot.forEach(testDoc => {
                         const test = { id: testDoc.id, ...testDoc.data() };
+                        
+                        // Parse deadline
                         let deadlineDateTime = new Date(test.deadline);
-                        if (test.deadlineTime) { const [hours, minutes] = test.deadlineTime.split(':').map(Number); deadlineDateTime.setHours(hours, minutes, 0, 0); } else deadlineDateTime.setHours(23, 59, 59, 999);
+                        if (test.deadlineTime) { 
+                            const [hours, minutes] = test.deadlineTime.split(':').map(Number); 
+                            deadlineDateTime.setHours(hours, minutes, 0, 0); 
+                        } else { 
+                            deadlineDateTime.setHours(23, 59, 59, 999); 
+                        }
+                        
+                        // Check if test is overdue
                         if (deadlineDateTime < now) {
-                            const completedData = completedTests.get(test.id);
-                            window.overdueStudents.push({ studentName: student.name || 'Unknown', studentEmail: studentEmail, studentId: student.student_id || student.studentId || 'N/A', section: section.name, testId: test.id, testName: test.testName, testTarget: test.testTarget || 0, testUnit: test.testUnit || '', deadline: deadlineDateTime, deadlineString: formatDeadline(test.deadline, test.deadlineTime), hasCompleted: !!completedData, currentCategory: completedData?.category || null, resultId: completedData?.resultId || null, status: completedData?.status || 'not-started' });
+                            const completedKey = `${studentEmail}_${test.id}`;
+                            const completedData = completedResults.get(completedKey);
+                            const isEnabled = enabledTestsMap.has(completedKey);
+                            
+                            window.overdueStudents.push({
+                                studentName: student.name || 'Unknown',
+                                studentEmail: studentEmail,
+                                studentId: student.student_id || student.studentId || 'N/A',
+                                section: section.name,
+                                testId: test.id,
+                                testName: test.testName,
+                                testTarget: test.testTarget || 0,
+                                testUnit: test.testUnit || '',
+                                deadline: deadlineDateTime,
+                                deadlineString: formatDeadline(test.deadline, test.deadlineTime),
+                                hasCompleted: !!completedData,
+                                isEnabled: isEnabled,
+                                currentCategory: completedData?.category || null,
+                                resultId: completedData?.resultId || null,
+                                status: completedData?.status || 'not-started'
+                            });
                         }
                     });
                 }
             }
+            
+            // Update counts
             document.getElementById('overdueCount').textContent = window.overdueStudents.length;
             document.getElementById('allStudentsCount').textContent = window.students.length;
+            
             window.filteredOverdueStudents = [...window.overdueStudents];
             renderOverdueTable();
-        } catch (error) { console.error('Error loading overdue students:', error); showErrorModal('Error loading overdue students: ' + error.message); }
+        } catch (error) { 
+            console.error('Error loading overdue students:', error); 
+            showErrorModal('Error loading overdue students: ' + error.message); 
+        }
     };
 
     function formatDeadline(deadline, deadlineTime) {
@@ -2269,18 +2247,36 @@ setInterval(() => {
         renderOverdueTable();
     };
 
-    window.enableOverdueTest = async function(studentEmail, testId, testName) {
-        showConfirmModal(`Enable "${testName}" for this student? They will be able to take this test even though it's overdue.`, async () => {
-            try {
-                const existingPermissionQuery = query(collection(db, 'testPermissions'), where('studentEmail', '==', studentEmail), where('testId', '==', testId));
-                const existingSnapshot = await getDocs(existingPermissionQuery);
-                if (!existingSnapshot.empty) { showWarningModal('This test is already enabled for this student!', () => {}, () => {}); return; }
-                await addDoc(collection(db, 'testPermissions'), { studentEmail: studentEmail, testId: testId, testName: testName, grantedBy: window.currentUser.email, grantedByName: window.currentUser.displayName || window.currentUser.email, grantedAt: serverTimestamp(), reason: 'Overdue test enabled by professor', status: 'active' });
-                showSuccessModal('Test enabled successfully! Student can now take this test.');
-                await loadOverdueStudents();
-            } catch (error) { showErrorModal('Error: ' + error.message); }
-        });
-    };
+  window.enableOverdueTest = async function(studentEmail, testId, testName) {
+    showConfirmModal(`Enable "${testName}" for this student? They will be able to take this test even though it's overdue.`, async () => {
+        try {
+            const existingPermissionQuery = query(collection(db, 'testPermissions'), where('studentEmail', '==', studentEmail), where('testId', '==', testId));
+            const existingSnapshot = await getDocs(existingPermissionQuery);
+            if (!existingSnapshot.empty) { showWarningModal('This test is already enabled for this student!', () => {}, () => {}); return; }
+
+            await addDoc(collection(db, 'testPermissions'), {
+                studentEmail: studentEmail,
+                testId: testId,
+                testName: testName,
+                grantedBy: window.currentUser.email,
+                grantedByName: window.currentUser.displayName || window.currentUser.email,
+                grantedAt: serverTimestamp(),
+                reason: 'Overdue test enabled by professor',
+                status: 'active'
+            });
+
+            // ✅ Optimistically update currentStudentTests in-place (no modal close)
+            window.currentStudentTests = window.currentStudentTests.map(t =>
+                (t.studentEmail === studentEmail && t.testId === testId)
+                    ? { ...t, isEnabled: true }
+                    : t
+            );
+            filterStudentTests(); // re-render table with updated data
+
+            showSuccessModal('Test enabled! The student can now take this test.');
+        } catch (error) { showErrorModal('Error: ' + error.message); }
+    });
+};
 
     window.setOverdueScore = function(studentEmail, testId, testName, testTarget, testUnit, studentName, currentCategory = null, currentResult = '', resultId = '') {
         window.openEditResultModal(studentEmail, testId, testName, testTarget, testUnit, studentName, currentCategory, currentResult, resultId);
@@ -2360,8 +2356,7 @@ setInterval(() => {
             
             showSuccessModal(`Result saved! Category: ${category}`);
             closeEditScoreModal();
-            if (window.loadOverdueStudents) await window.loadOverdueStudents();
-            if (window.loadStudents) await window.loadStudents();
+            // Real-time listeners will automatically update the UI
         } catch (error) {
             showErrorModal('Error: ' + error.message);
             const submitBtn = document.getElementById('btnSubmit');
@@ -2518,9 +2513,12 @@ setInterval(() => {
         if (studentTests.length === 0) return;
         const studentName = studentTests[0].studentName;
         document.getElementById('modalStudentName').textContent = `${studentName}'s Overdue Tests (${studentTests.length})`;
+        
+        // Get latest permissions
         const permissionsSnapshot = await getDocs(query(collection(db, 'testPermissions'), where('grantedBy', '==', window.currentUser.email)));
         const enabledTests = new Map();
         permissionsSnapshot.forEach(docSnap => { const perm = docSnap.data(); enabledTests.set(`${perm.studentEmail}_${perm.testId}`, { id: docSnap.id }); });
+        
         const enrichedTests = studentTests.map(item => ({ ...item, isEnabled: enabledTests.has(`${item.studentEmail}_${item.testId}`) }));
         window.currentStudentTests = enrichedTests;
         populateTestFilterOptions(enrichedTests);
@@ -2550,6 +2548,22 @@ setInterval(() => {
     window.changeFilter = changeFilter;
     window.toggleSortDropdown = toggleSortDropdown;
     window.changeSort = changeSort;
+    window.switchTab = function(tab) {
+        window.currentTab = tab;
+        const allTab = document.getElementById('allStudentsTab');
+        const overdueTab = document.getElementById('overdueTab');
+        if (tab === 'all') {
+            allTab.className = 'px-4 py-2.5 font-semibold text-[13px] text-blue border-b-2 border-blue transition-all';
+            overdueTab.className = 'px-4 py-2.5 font-semibold text-[13px] text-text-muted hover:text-text-primary transition-all';
+            document.getElementById('allStudentsView').classList.remove('hidden');
+            document.getElementById('overdueView').classList.add('hidden');
+        } else {
+            overdueTab.className = 'px-4 py-2.5 font-semibold text-[13px] text-blue border-b-2 border-blue transition-all';
+            allTab.className = 'px-4 py-2.5 font-semibold text-[13px] text-text-muted hover:text-text-primary transition-all';
+            document.getElementById('overdueView').classList.remove('hidden');
+            document.getElementById('allStudentsView').classList.add('hidden');
+        }
+    };
 
     document.addEventListener('DOMContentLoaded', function() {
         const newResultInput = document.getElementById('newResult');

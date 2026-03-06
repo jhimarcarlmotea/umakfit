@@ -1924,7 +1924,43 @@ async function loadAvailableTests() {
                 console.error('Error setting up test updates for student:', error);
             }
         }
+function setupDeadlineWatcher() {
+    // Check every 10 seconds if any available test has crossed its deadline
+    setInterval(async () => {
+        const now = new Date();
+        let anyExpired = false;
 
+        availableTests = availableTests.filter(test => {
+            let deadlineDateTime;
+            if (test.deadlineDateTime) {
+                deadlineDateTime = new Date(test.deadlineDateTime);
+            } else {
+                deadlineDateTime = new Date(test.deadline);
+                if (test.deadlineTime) {
+                    const [h, m] = test.deadlineTime.split(':').map(Number);
+                    deadlineDateTime.setHours(h, m, 0, 0);
+                } else {
+                    deadlineDateTime.setHours(23, 59, 59, 999);
+                }
+            }
+
+            if (deadlineDateTime < now) {
+                // Move to overdueTests if not already there
+                if (!overdueTests.find(o => o.id === test.id)) {
+                    overdueTests.push(test);
+                }
+                anyExpired = true;
+                return false; // remove from availableTests
+            }
+            return true;
+        });
+
+        if (anyExpired) {
+            await renderCategoryCards();
+            renderOverdueTests(overdueTests);
+        }
+    }, 10000); // every 10 seconds
+}
         function formatDeadline(deadline, deadlineTime) {
             if (!deadline) return 'No deadline';
             
@@ -3503,6 +3539,7 @@ function setupPerformanceDashboard() {
                     await loadAvailableTests();
                     await loadRecentTestHistory();
                     setupTestUpdatesForStudent();
+                    setupDeadlineWatcher();
                     
                     setupNotificationListener();
                     await checkUnreadNotifications();
