@@ -128,26 +128,19 @@
 
         /* Students modal: enable horizontal scroll if needed */
         #studentsModal .students-modal-scroll {
-            overflow-x: auto;
-        }
-        #studentsModal table {
-            min-width: 720px;
-        }
-
-        /* Students modal table: avoid horizontal scroll, allow wrapping */
-        #studentsModal table {
-            table-layout: fixed;
-            width: 100%;
-        }
-        #studentsModal th,
-        #studentsModal td {
-            white-space: normal;
-            word-wrap: break-word;
-        }
-        /* Email column can be long; break aggressively */
-        #studentsModal td:nth-child(2) {
-            word-break: break-all;
-        }
+    overflow-x: hidden;
+    }
+    #studentsModal table {
+        table-layout: fixed;
+        width: 100%;
+        min-width: unset;
+    }
+    #studentsModal th,
+    #studentsModal td {
+        white-space: normal;
+        word-wrap: break-word;
+        word-break: break-word;
+    }
     </style>
 </head>
 <body class="font-sans bg-surface text-text-primary min-h-screen m-0 p-0">
@@ -201,43 +194,50 @@
 </div>
 
 <!-- ─── ALL STUDENTS MODAL ─── -->
-<div id="studentsModal" class="pro-modal fixed inset-0 bg-black/50 justify-center items-center z-[9000] p-4">
-    <div class="bg-white rounded-2xl w-full max-w-[900px] max-h-[85vh] flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.2)] animate-fadeIn overflow-hidden">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
-            <div>
-                <h3 class="font-display text-xl font-bold text-navy flex items-center gap-2">
-                    <i class="fas fa-user-graduate text-blue text-lg"></i>
-                    All Students
-                </h3>
-                <p class="text-xs text-text-muted mt-0.5">
-                    <span id="modalStudentTotal">0</span> students across all sections
-                </p>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="relative">
+    <div id="studentsModal" class="pro-modal fixed inset-0 bg-black/50 justify-center items-center z-[9000] p-4">
+        <div class="bg-white rounded-2xl w-full max-w-[900px] max-h-[85vh] flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.2)] animate-fadeIn overflow-hidden">
+            <div class="flex flex-col gap-3 px-5 py-4 border-b border-border flex-shrink-0 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div>
+            <h3 class="font-display text-xl font-bold text-navy flex items-center gap-2">
+                <i class="fas fa-user-graduate text-blue text-lg"></i>
+                All Students
+            </h3>
+            <p class="text-xs text-text-muted mt-0.5">
+                <span id="modalStudentTotal">0</span> students across all sections
+            </p>
+        </div>
+            <div class="flex flex-col gap-2 w-full mt-2 sm:mt-0 sm:flex-row sm:items-center sm:w-auto sm:gap-3">
+            <div class="flex gap-2">
+                <div class="relative flex-1 sm:flex-none">
                     <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-xs pointer-events-none"></i>
                     <input id="studentSearchInput" type="text" placeholder="Search students..." oninput="filterModalStudents()"
-                        class="pl-8 pr-3 py-2 border border-border rounded-lg text-[13px] font-sans bg-surface focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/10 w-[200px]">
+                        class="pl-8 pr-3 py-2 border border-border rounded-lg text-[13px] font-sans bg-surface focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/10 w-full sm:w-[180px]">
                 </div>
+                <button onclick="closeStudentsModal()" class="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center text-text-muted hover:bg-danger-bg hover:text-danger transition-all cursor-pointer flex-shrink-0 sm:hidden">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            <div class="flex gap-2 items-center">
                 <select id="modalSectionFilter" onchange="filterModalStudents()"
-                    class="px-3 py-2 border border-border rounded-lg text-[13px] font-sans bg-surface focus:outline-none focus:border-blue cursor-pointer">
+                    class="px-3 py-2 border border-border rounded-lg text-[13px] font-sans bg-surface focus:outline-none focus:border-blue cursor-pointer flex-1 sm:flex-none">
                     <option value="">All Sections</option>
                 </select>
-                <button onclick="closeStudentsModal()" class="w-8 h-8 rounded-lg bg-surface border border-border flex items-center justify-center text-text-muted hover:bg-danger-bg hover:text-danger transition-all cursor-pointer">
+                <button onclick="closeStudentsModal()" class="w-9 h-9 rounded-lg bg-surface border border-border items-center justify-center text-text-muted hover:bg-danger-bg hover:text-danger transition-all cursor-pointer flex-shrink-0 hidden sm:flex">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
         </div>
+        </div>
         <div class="flex-1 overflow-y-auto students-modal-scroll">
             <table class="w-full">
-                <thead class="sticky top-0 bg-surface border-b border-border">
-                    <tr>
-                        <th class="text-left px-6 py-3 text-[11px] font-bold text-text-muted uppercase tracking-[0.8px]">Student</th>
-                        <th class="text-left px-4 py-3 text-[11px] font-bold text-text-muted uppercase tracking-[0.8px]">Email</th>
-                        <th class="text-left px-4 py-3 text-[11px] font-bold text-text-muted uppercase tracking-[0.8px]">Section</th>
-                        <th class="text-left px-4 py-3 text-[11px] font-bold text-text-muted uppercase tracking-[0.8px]">Status</th>
-                    </tr>
-                </thead>
+               <thead class="sticky top-0 bg-surface border-b border-border">
+                <tr>
+                    <th class="text-left px-3 py-3 text-[11px] font-bold text-text-muted uppercase tracking-[0.8px] w-[35%]">Student</th>
+                    <th class="text-left px-2 py-3 text-[11px] font-bold text-text-muted uppercase tracking-[0.8px] w-[35%]">Email</th>
+                    <th class="text-left px-2 py-3 text-[11px] font-bold text-text-muted uppercase tracking-[0.8px] w-[18%]">Section</th>
+                    <th class="text-left px-2 py-3 text-[11px] font-bold text-text-muted uppercase tracking-[0.8px] w-[12%]">Status</th>
+                </tr>
+            </thead>
                 <tbody id="modalStudentsList"></tbody>
             </table>
         </div>
@@ -667,36 +667,36 @@
     };
 
     function renderModalStudents(list) {
-        const tbody = document.getElementById('modalStudentsList');
-        document.getElementById('modalStudentShowing').textContent = list.length;
-        document.getElementById('modalStudentTotal').textContent = (window._allStudents||[]).length;
-        if (!list.length) {
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-text-muted text-sm">No students found</td></tr>`;
-            return;
-        }
-        tbody.innerHTML = list.map(s => {
-            const name = s.name || s.email || 'Unknown';
-            const init = getInitials(name);
-            return `
-            <tr class="student-row border-b border-border">
-                <td class="px-6 py-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-xs flex-shrink-0">${init}</div>
-                        <span class="text-[13px] font-semibold text-text-primary">${name}</span>
-                    </div>
-                </td>
-                <td class="px-4 py-3 text-[13px] text-text-secondary">${s.email || '—'}</td>
-                <td class="px-4 py-3">
-                    <span class="inline-flex items-center bg-info-bg text-blue text-[11px] font-semibold px-2.5 py-0.5 rounded-full">${s.section || '—'}</span>
-                </td>
-                <td class="px-4 py-3">
-                    <span class="inline-flex items-center bg-success-bg text-success text-[11px] font-semibold px-2.5 py-0.5 rounded-full gap-1">
-                        <i class="fas fa-check-circle text-[9px]"></i> Active
-                    </span>
-                </td>
-            </tr>`;
-        }).join('');
+    const tbody = document.getElementById('modalStudentsList');
+    document.getElementById('modalStudentShowing').textContent = list.length;
+    document.getElementById('modalStudentTotal').textContent = (window._allStudents||[]).length;
+    if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-text-muted text-sm">No students found</td></tr>`;
+        return;
     }
+    tbody.innerHTML = list.map(s => {
+        const name = s.name || s.email || 'Unknown';
+        const init = getInitials(name);
+        return `
+        <tr class="student-row border-b border-border">
+            <td class="px-3 py-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">${init}</div>
+                    <span class="text-[12px] font-semibold text-text-primary break-words">${name}</span>
+                </div>
+            </td>
+            <td class="px-2 py-3 text-[11px] text-text-secondary break-all">${s.email || '—'}</td>
+            <td class="px-2 py-3">
+                <span class="inline-flex items-center bg-info-bg text-blue text-[10px] font-semibold px-1.5 py-0.5 rounded-full">${s.section || '—'}</span>
+            </td>
+            <td class="px-2 py-3">
+                <span class="inline-flex items-center bg-success-bg text-success text-[10px] font-semibold px-1.5 py-0.5 rounded-full gap-0.5">
+                    <i class="fas fa-check-circle text-[8px]"></i> Active
+                </span>
+            </td>
+        </tr>`;
+    }).join('');
+}
 
     function populateModalSectionFilter() {
         const sel = document.getElementById('modalSectionFilter');

@@ -5,2374 +5,1268 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UMakFit - Test Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;800&family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
     @import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
-    
+
+    :root {
+        --navy: #0D1B2A;
+        --navy-mid: #1A2B3C;
+        --navy-light: #2C4A5E;
+        --gold: #C5A046;
+        --gold-light: #EAD38A;
+        --gold-dark: #8B6D2D;
+        --blue-accent: #3b82f6;
+        --blue-light: #dbeafe;
+        --surface: #ffffff;
+        --bg: #f8fafc;
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --text-muted: #94a3b8;
+        --border: #e2e8f0;
+        --radius-lg: 16px;
+        --radius-xl: 24px;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+        --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+        --shadow-lg: 0 8px 32px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.05);
+    }
+
     * {
         -webkit-font-smoothing: antialiased;
         box-sizing: border-box;
-        font-family: 'Inter', sans-serif;
     }
-    
+
     html, body {
         margin: 0;
-        height: 100%;
-    }
-    
-    button:focus-visible {
-        outline: 2px solid #4a90e2 !important;
-    }
-    
-    a {
-        text-decoration: none;
+        min-height: 100%;
+        background: var(--bg);
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text-primary);
     }
 
-    body {
-        background:#f8fafc;
-        min-height: 100vh;
-    }
+    .font-manrope { font-family: 'Manrope', sans-serif; }
+    .font-sora { font-family: 'Sora', sans-serif; }
 
-    .font-manrope { 
-        font-family: 'Manrope', sans-serif; 
-    }
+    a { text-decoration: none; }
 
+    /* ── Animations ── */
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
     @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(-10px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes pulse {
         0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
+        50%       { transform: scale(1.1); }
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
     }
 
-    .pulse-animation {
-        animation: pulse 2s infinite;
-    }
+    .anim-1 { animation: fadeUp 0.5s ease both; }
+    .anim-2 { animation: fadeUp 0.5s 0.08s ease both; }
+    .anim-3 { animation: fadeUp 0.5s 0.16s ease both; }
+    .anim-4 { animation: fadeUp 0.5s 0.24s ease both; }
+    .anim-5 { animation: fadeUp 0.5s 0.32s ease both; }
+    .anim-6 { animation: fadeUp 0.5s 0.40s ease both; }
 
-    .slide-down {
-        animation: slideDown 0.3s ease;
+    /* ── Loading ── */
+    .loading-screen {
+        position: fixed; inset: 0;
+        background: rgba(255,255,255,0.98);
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        z-index: 9999; gap: 20px;
     }
-
-    /* Notification Styles */
-    .notification-bell-btn {
-        background: rgba(255, 255, 255, 0.2);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        width: 42px;
-        height: 42px;
+    .spinner {
+        width: 44px; height: 44px;
+        border: 3px solid #e2e8f0;
+        border-top-color: var(--blue-accent);
         border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin: 0;
+        animation: spin 0.8s linear infinite;
     }
 
-    .notification-bell-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-        border-color: rgba(255, 255, 255, 0.5);
-        transform: scale(1.1);
-    }
-
-    .notification-bell-btn i {
-        font-size: 20px;
-    }
-
-    .notification-bell-badge {
-        position: absolute;
-        top: -4px;
-        right: -4px;
-        background: #ef4444;
+    /* ── Notification Bell ── */
+    .notification-bell-btn {
+        background: rgba(255,255,255,0.15);
+        border: 1.5px solid rgba(255,255,255,0.25);
         color: white;
-        font-size: 10px;
-        font-weight: 700;
-        padding: 0.15rem 0.4rem;
-        border-radius: 10px;
-        min-width: 18px;
-        height: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all 0.25s ease; margin: 0;
+    }
+    .notification-bell-btn:hover {
+        background: rgba(255,255,255,0.25);
+        transform: scale(1.08);
+    }
+    .notification-bell-badge {
+        position: absolute; top: -4px; right: -4px;
+        background: #ef4444; color: white;
+        font-size: 10px; font-weight: 700;
+        padding: 0.15rem 0.4rem; border-radius: 10px;
+        min-width: 18px; height: 18px;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.25);
         animation: pulse 2s infinite;
     }
-
-    .notification-bell-container {
-        position: relative;
-        display: inline-block;
-    }
-
+    .notification-bell-container { position: relative; display: inline-block; }
     .notification-dropdown {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        margin-top: 0.5rem;
-        width: 24rem;
-        max-width: calc(100vw - 2rem);
-        background: white;
-        border-radius: 0.75rem;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        z-index: 9999;
-        max-height: 480px;
-        overflow-y: auto;
-        animation: slideDown 0.3s ease;
+        position: absolute; top: 100%; right: 0; margin-top: 0.5rem;
+        width: 24rem; max-width: calc(100vw - 2rem);
+        background: white; border-radius: 14px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        z-index: 9999; max-height: 480px; overflow-y: auto;
+        animation: slideDown 0.25s ease;
     }
-
     .notification-dropdown-header {
-        padding: 0.75rem 1rem;
-        border-bottom: 2px solid #e5e7eb;
-        background: linear-gradient(135deg, #f8fafc, #ffffff);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 0.75rem 0.75rem 0 0;
-        position: sticky;
-        top: 0;
-        z-index: 10;
+        padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
+        background: #f8fafc;
+        display: flex; justify-content: space-between; align-items: center;
+        border-radius: 14px 14px 0 0;
+        position: sticky; top: 0; z-index: 10;
     }
-
-    @media (min-width: 640px) {
-        .notification-dropdown-header {
-            padding: 1rem 1.25rem;
-        }
-    }
-
-    .notification-dropdown-body {
-        max-height: 360px;
-        overflow-y: auto;
-    }
-
+    .notification-dropdown-body { max-height: 340px; overflow-y: auto; }
     .notification-item {
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid #f3f4f6;
-        transition: background-color 0.2s ease;
-        cursor: pointer;
+        padding: 1rem 1.25rem; border-bottom: 1px solid #f1f5f9;
+        transition: background 0.15s; cursor: pointer;
     }
-
-    .notification-item:hover {
-        background-color: #f9fafb;
-    }
-
-    .notification-item:last-child {
-        border-bottom: none;
-    }
-
-    .notification-item strong {
-        color: #111827;
-        font-size: 0.875rem;
-        display: block;
-        margin-bottom: 0.25rem;
-        font-weight: 600;
-    }
-
-    .notification-item p {
-        color: #6b7280;
-        font-size: 0.8125rem;
-        margin-bottom: 0.25rem;
-        line-height: 1.5;
-    }
-
-    .notification-item small {
-        color: #9ca3af;
-        font-size: 0.6875rem;
-        display: block;
-    }
-
+    .notification-item:hover { background: #f8fafc; }
+    .notification-item:last-child { border-bottom: none; }
+    .notification-item strong { color: #111827; font-size: 0.875rem; display: block; margin-bottom: 0.2rem; font-weight: 600; }
+    .notification-item p { color: #6b7280; font-size: 0.8125rem; margin-bottom: 0.2rem; line-height: 1.5; }
+    .notification-item small { color: #9ca3af; font-size: 0.6875rem; display: block; }
     .notification-dropdown-footer {
-        padding: 0.5rem 0.75rem;
-        border-top: 2px solid #e5e7eb;
-        background-color: #f9fafb;
-        border-radius: 0 0 0.75rem 0.75rem;
-        position: sticky;
-        bottom: 0;
+        padding: 0.75rem 1rem; border-top: 1px solid var(--border);
+        background: #f8fafc; border-radius: 0 0 14px 14px;
+        position: sticky; bottom: 0;
     }
+    .notification-empty { padding: 2rem; text-align: center; color: #9ca3af; }
+    .notification-empty i { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; }
+    .notification-empty p { color: #6b7280; font-size: 0.875rem; }
 
-    @media (min-width: 640px) {
-        .notification-dropdown-footer {
-            padding: 0.75rem 1rem;
-        }
+    /* ── Hamburger / Drawer ── */
+    .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; z-index: 60; }
+    .hamburger span {
+        width: 25px; height: 3px;
+        background: linear-gradient(135deg, #EAD38A, #C5A046, #8B6D2D);
+        border-radius: 2px; transition: all 0.3s ease;
     }
-
-    .notification-empty {
-        padding: 1.5rem 2rem;
-        text-align: center;
-        color: #9ca3af;
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -6px); }
+    .mobile-drawer {
+        position: fixed; top: 0; right: -100%; width: 280px; height: 100vh;
+        background: linear-gradient(135deg, #0D1B2A, #1A2B3C, #2C4A5E);
+        z-index: 55; transition: right 0.3s ease;
+        box-shadow: -5px 0 20px rgba(0,0,0,0.25); overflow-y: auto;
     }
-
-    .notification-empty i {
-        font-size: 3rem;
-        margin-bottom: 0.75rem;
-        display: block;
+    .mobile-drawer.active { right: 0; }
+    .drawer-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+        z-index: 50; opacity: 0; visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
     }
+    .drawer-overlay.active { opacity: 1; visibility: visible; }
+    @media (max-width: 1023px) { .hamburger { display: flex; } }
 
-    .notification-empty p {
-        color: #6b7280;
-        font-size: 0.875rem;
-    }
-
-    /* Main Content */
-    .main-content {
-        max-width: 1400px;
+    /* ════════════════════════════════
+       MAIN PAGE LAYOUT
+    ════════════════════════════════ */
+    .page-wrapper {
+        max-width: 1100px;
         margin: 0 auto;
-        padding: 1.5rem;
+        padding: 2.5rem 1.5rem 4rem;
     }
 
-    /* Back Button */
-    .back-button {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 16px 56px;
-        min-width: 280px;
-        height: 56px;
-        border-radius: 50px;
-        border: none;
-        background: linear-gradient(to top, #4b5563, #6b7280, #9ca3af);
-        color: white;
-        font-family: "Inter", Helvetica;
-        font-weight: 600;
-        font-size: 13px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 15px 30px rgba(107, 114, 128, 0.4);
-        text-transform: uppercase;
-        letter-spacing: 1px;
+    /* ── Hero Banner ── */
+    .hero-banner {
+        position: relative;
+        background: #ffffff;
+        border-radius: var(--radius-xl);
+        padding: 3.5rem 2rem 3rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+    /* subtle dot-grid texture */
+    .hero-banner::before {
+        content: '';
+        position: absolute; inset: 0;
+        background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+        background-size: 28px 28px;
+        opacity: 0.35;
+        pointer-events: none;
+    }
+    /* soft color wash at top */
+    .hero-banner::after {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; height: 220px;
+        background: linear-gradient(180deg, rgba(219,234,254,0.45) 0%, transparent 100%);
+        pointer-events: none;
+    }
+    .hero-banner-inner {
+        position: relative; z-index: 1;
+    }
+    .hero-eyebrow {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: #1e293b;
+        border-radius: 100px;
+        padding: 6px 18px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 11px; font-weight: 700;
+        color: var(--gold-light);
+        text-transform: uppercase; letter-spacing: 1.2px;
+        margin-bottom: 1.25rem;
+    }
+    .hero-eyebrow i { font-size: 12px; color: var(--gold); }
+    .hero-title {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1.2;
+        margin-bottom: 1.1rem;
+        letter-spacing: -0.02em;
+    }
+    .hero-divider {
+        width: 48px; height: 3px;
+        background: linear-gradient(90deg, var(--gold), var(--gold-light));
+        border-radius: 2px;
+        margin: 0 auto 1.1rem;
+    }
+    .hero-stats {
+        display: flex; flex-wrap: wrap; gap: 0.75rem;
         justify-content: center;
     }
-
-    .back-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 18px 35px rgba(107, 114, 128, 0.5);
+    .hero-stat {
+        display: inline-flex; align-items: center; gap: 7px;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        padding: 6px 16px;
     }
+    .hero-stat-icon { font-size: 14px; color: #64748b; }
+    .hero-stat-text { font-size: 13px; font-weight: 500; color: #475569; }
 
-    /* Test Header */
-    .test-header {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .test-badge {
-        display: inline-block;
-        background: linear-gradient(90deg, rgba(254, 243, 199, 1) 0%, rgba(253, 230, 138, 1) 100%);
-        padding: 10px 32px;
-        border-radius: 8px;
-        margin-bottom: 0.75rem;
-    }
-
-    .test-badge-icon {
-        width: 56px;
-        height: 56px;
-        margin: 0 auto;
-    }
-
-    .test-category {
-        font-family: "Inter", Helvetica;
-        font-weight: 600;
-        color: #785600;
-        font-size: 15px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-
-    .test-title {
-        font-family: "Inter", Helvetica;
-        font-weight: 700;
-        color: #1e3a8a;
-        font-size: 2rem;
-        margin: 0.75rem 0;
-        line-height: 1.3;
-    }
-
-    .test-meta {
-        font-family: "Inter", Helvetica;
-        font-weight: 600;
-        color: #1e3a8a;
-        font-size: 15px;
-    }
-
-    /* Test Info Cards - New Design */
-    .test-info-section {
-        max-width: 900px;
-        margin: 0 auto 2rem;
-    }
-
-    .info-cards-grid {
+    /* ── Three-column info cards ── */
+    .info-cards-row {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 1rem;
-    }
-
-    .info-card-new {
-        background: white;
-        border-radius: 12px;
-        padding: 1.25rem;
-        box-shadow: 0px 2px 8px rgba(0,0,0,0.08);
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .info-card-new:hover {
-        transform: translateY(-3px);
-        box-shadow: 0px 4px 12px rgba(59, 130, 246, 0.15);
-    }
-
-    .info-card-icon-wrapper {
-        width: 48px;
-        height: 48px;
-        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 0.875rem;
-    }
-
-    .info-card-icon-new {
-        width: 28px;
-        height: 28px;
-    }
-
-    .info-card-label {
-        font-family: "Inter", Helvetica;
-        font-weight: 700;
-        color: #3b82f6;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.5rem;
-    }
-
-    .info-card-value {
-        font-family: "Inter", Helvetica;
-        font-weight: 600;
-        color: #1e3a8a;
-        font-size: 14px;
-        line-height: 1.5;
-    }
-
-    /* Content Sections */
-    .content-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
         margin-bottom: 2rem;
-        max-width: 1200px;
-        margin-left: auto;
-        margin-right: auto;
+    }
+    .info-card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
+        display: flex; flex-direction: column; gap: 0.5rem;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .info-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+    .info-card-icon-ring {
+        width: 44px; height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 0.25rem;
+    }
+    .info-card-icon-ring i { font-size: 20px; color: #2563eb; }
+    .info-card-label {
+        font-size: 10px; font-weight: 700;
+        color: #64748b; text-transform: uppercase; letter-spacing: 0.7px;
+    }
+    .info-card-value {
+        font-size: 13.5px; font-weight: 600;
+        color: var(--text-primary); line-height: 1.5;
     }
 
-    .content-card {
-        background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
-        display: flex;
-        flex-direction: column;
-    }
-
-    .content-card-header {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
+    /* ── Two-column content ── */
+    .content-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
         margin-bottom: 1.25rem;
     }
-
-    .content-card-icon {
-        width: 28px;
-        height: 28px;
+    .content-panel {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        display: flex; flex-direction: column;
     }
-
-    .content-card-title {
-        font-family: "Inter", Helvetica;
-        font-weight: 700;
-        color: #1e3a8a;
-        font-size: 18px;
+    .panel-header {
+        display: flex; align-items: center; gap: 10px;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: #fafbfc;
     }
+    .panel-header-icon {
+        width: 34px; height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+    .panel-header-icon i { font-size: 17px; color: #2563eb; }
+    .panel-header-title {
+        font-family: 'Sora', sans-serif;
+        font-size: 15px; font-weight: 700;
+        color: var(--text-primary);
+    }
+    .panel-body { padding: 1.5rem; flex: 1; }
 
-    .video-placeholder {
-        width: 100%;
-        height: 300px;
-        background: #f3f4f6;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* Video */
+    .video-embed-wrapper {
+        width: 100%; aspect-ratio: 16/9;
+        border-radius: 12px; overflow: hidden;
+        background: #f1f5f9;
+        display: flex; align-items: center; justify-content: center;
         margin-bottom: 1rem;
-        flex-shrink: 0;
+    }
+    .video-embed-wrapper iframe,
+    .video-embed-wrapper img {
+        width: 100%; height: 100%;
+        object-fit: cover; border-radius: 12px;
+    }
+    .video-caption {
+        font-size: 12.5px; color: var(--text-muted);
+        text-align: center; line-height: 1.5;
     }
 
-    .video-placeholder img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 12px;
+    /* Protocol steps */
+    .protocol-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .protocol-item { display: flex; align-items: flex-start; gap: 0.875rem; }
+    .step-badge {
+        min-width: 26px; height: 26px;
+        background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 11px; font-weight: 700; color: white;
+        flex-shrink: 0; margin-top: 1px;
     }
+    .step-content { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; font-weight: 500; }
 
-    .video-description {
-        font-family: "Inter", Helvetica;
-        font-weight: 500;
-        color: #6b7280;
-        font-size: 13px;
-        text-align: center;
-        line-height: 1.4;
-    }
-
-    /* Protocol Steps */
-    .protocol-steps {
-        display: flex;
-        flex-direction: column;
-        gap: 0.875rem;
-    }
-
-    .protocol-step {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.875rem;
-    }
-
-    .step-number {
-        width: 24px;
-        height: 24px;
-        background-color: #3b82f6;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        font-family: "Inter", Helvetica;
-        font-weight: 600;
-        color: white;
-        font-size: 13px;
-    }
-
-    .step-text {
-        font-family: "Inter", Helvetica;
-        font-weight: 500;
-        color: #1e3a8a;
-        font-size: 13px;
-        padding-top: 2px;
-        line-height: 1.5;
-    }
-
-    /* Safety Tips */
-    .safety-section {
-        background: linear-gradient(90deg, rgba(254, 243, 199, 1) 0%, rgba(253, 230, 138, 1) 100%);
-        border-radius: 16px;
-        padding: 2rem;
+    /* ── Safety panel ── */
+    .safety-panel {
+        background: linear-gradient(135deg, #fffbeb, #fef3c7);
+        border: 1px solid #fde68a;
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
         margin-bottom: 2rem;
-        max-width: 1200px;
-        margin-left: auto;
-        margin-right: auto;
     }
-
-    .safety-header {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 1.5rem;
+    .safety-panel-header {
+        display: flex; align-items: center; gap: 10px;
+        margin-bottom: 1.25rem;
     }
-
-    .safety-icon {
-        width: 24px;
-        height: 24px;
+    .safety-icon-ring {
+        width: 36px; height: 36px;
+        background: rgba(197,160,70,0.2);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
     }
-
-    .safety-title {
-        font-family: "Inter", Helvetica;
-        font-weight: 700;
-        color: #785600;
-        font-size: 18px;
+    .safety-icon-ring i { font-size: 18px; color: #92400e; }
+    .safety-panel-title {
+        font-family: 'Sora', sans-serif;
+        font-size: 15px; font-weight: 700; color: #78350f;
     }
-
-    .safety-tips-grid {
+    .safety-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
+        gap: 0.875rem;
     }
-
-    .safety-tip {
+    .safety-chip {
         background: white;
         border-radius: 12px;
-        padding: 1.25rem 1rem;
-        box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+        padding: 1rem;
         text-align: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        border: 1px solid rgba(253,211,77,0.3);
         transition: transform 0.2s, box-shadow 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
+    .safety-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .safety-chip-icon { font-size: 22px; margin-bottom: 0.4rem; display: block; }
+    .safety-chip-text { font-size: 12.5px; font-weight: 600; color: #78350f; line-height: 1.4; }
 
-    .safety-tip:hover {
+    /* ── Action bar ── */
+    .action-bar {
+        display: flex; align-items: center; justify-content: center;
+        gap: 1rem; flex-wrap: wrap;
+    }
+    .btn-back {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 0 32px; height: 52px;
+        border-radius: 100px; border: 1.5px solid var(--border);
+        background: var(--surface);
+        color: var(--text-secondary);
+        font-family: 'DM Sans', sans-serif;
+        font-weight: 600; font-size: 13.5px;
+        cursor: pointer; transition: all 0.25s ease;
+        box-shadow: var(--shadow-sm);
+    }
+    .btn-back:hover {
+        background: #f1f5f9; border-color: #cbd5e1;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+    .btn-start {
+        display: inline-flex; align-items: center; gap: 10px;
+        padding: 0 40px; height: 52px; min-width: 240px; justify-content: center;
+        border-radius: 100px; border: none;
+        background: linear-gradient(135deg, #0D1B2A, #1d4ed8 60%, #3b82f6);
+        color: white;
+        font-family: 'Sora', sans-serif;
+        font-weight: 700; font-size: 14px;
+        cursor: pointer; transition: all 0.3s ease;
+        box-shadow: 0 8px 24px rgba(29,78,216,0.35);
+        position: relative; overflow: hidden;
+        letter-spacing: 0.3px;
+    }
+    .btn-start::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+        border-radius: inherit;
+    }
+    .btn-start:hover:not(:disabled) {
         transform: translateY(-2px);
-        box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 12px 32px rgba(29,78,216,0.45);
+    }
+    .btn-start:disabled {
+        opacity: 0.65; cursor: not-allowed;
+        transform: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .btn-start i { font-size: 18px; }
+
+    /* ── Divider ── */
+    .section-divider {
+        height: 1px; background: var(--border); margin: 0 0 1.25rem;
     }
 
-    .safety-tip-text {
-        font-family: "Inter", Helvetica;
-        font-weight: 600;
-        color: #785600;
-        font-size: 13px;
-        line-height: 1.5;
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+        .content-columns { grid-template-columns: 1fr; }
+        .safety-grid { grid-template-columns: repeat(2, 1fr); }
+        .info-cards-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+        .page-wrapper { padding: 1.5rem 1rem 3rem; }
+        .hero-banner { padding: 2.5rem 1.25rem 2rem; }
+        .hero-title { font-size: 1.75rem; }
+        .safety-grid { grid-template-columns: repeat(2, 1fr); }
+        .btn-start { width: 100%; }
+        .btn-back { width: 100%; justify-content: center; }
+        .action-bar { flex-direction: column-reverse; }
     }
 
-    /* Start Test Button */
-    .start-test-container {
-        text-align: center;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    .btn-start-test {
-        min-width: 280px;
-        height: 56px;
-        background: linear-gradient(to top, #00154c, #12376e, #23487f);
-        color: #fff;
-        border-radius: 50px;
-        border: none;
-        outline: none;
-        cursor: pointer;
-        position: relative;
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-        overflow: hidden;
-        font-family: "Inter", Helvetica;
-        padding: 0 40px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-start-test span {
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: top 0.5s;
-        font-weight: 600;
-    }
-
-    .btn-text-one-start {
-        position: absolute;
-        width: 100%;
-        top: 50%;
-        left: 0;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .btn-text-two-start {
-        position: absolute;
-        width: 100%;
-        top: 150%;
-        left: 0;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .btn-start-test:hover:not(:disabled) .btn-text-one-start {
-        top: -100%;
-    }
-
-    .btn-start-test:hover:not(:disabled) .btn-text-two-start {
-        top: 50%;
-    }
-
-    .btn-start-test:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .btn-start-test:disabled .btn-text-one-start,
-    .btn-start-test:disabled .btn-text-two-start {
-        transition: none;
-    }
-
-    /* Loading Screen */
-    .loading {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.98);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .spinner {
-        border: 4px solid #e5e7eb;
-        border-top: 4px solid #3b82f6;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .loading-text {
-        font-family: "Inter", sans-serif;
-        font-weight: 500;
-        color: #475569;
-        font-size: 16px;
-    }
-
-    /* Responsive */
-    @media (max-width: 992px) {
-        .main-content {
-            padding: 1.25rem;
-        }
-        
-        .content-grid {
-            grid-template-columns: 1fr;
-            max-width: 100%;
-        }
-        
-        .safety-section {
-            max-width: 100%;
-        }
-
-        .safety-tips-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-
-        .video-placeholder {
-            height: 280px;
-        }
-
-        .info-cards-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .test-info-section {
-            max-width: 100%;
-        }
-        
-        .notification-dropdown {
-            width: calc(100vw - 2rem);
-            right: 0;
-            left: auto;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .main-content {
-            padding: 1rem;
-        }
-
-        .test-badge-icon {
-            width: 48px;
-            height: 48px;
-        }
-
-        .test-title {
-            font-size: 1.5rem;
-        }
-
-        .test-meta {
-            font-size: 13px;
-        }
-
-        .content-card {
-            padding: 1.5rem;
-        }
-
-        .content-card-title {
-            font-size: 16px;
-        }
-
-        .video-placeholder {
-            height: 220px;
-        }
-        
-        .safety-tips-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.875rem;
-        }
-
-        .safety-tip {
-            padding: 1rem 0.75rem;
-        }
-
-        .safety-tip-text {
-            font-size: 12px;
-        }
-
-        .btn-start-test {
-            padding: 10px 32px;
-            font-size: 14px;
-        }
-
-        .info-card-new {
-            padding: 1rem;
-        }
-
-        .info-card-icon-wrapper {
-            width: 40px;
-            height: 40px;
-        }
-
-        .info-card-icon-new {
-            width: 24px;
-            height: 24px;
-        }
-
-        .info-card-label {
-            font-size: 10px;
-        }
-
-        .info-card-value {
-            font-size: 13px;
-        }
-        
-        .start-test-container {
-            flex-direction: column-reverse !important;
-        }
-        
-        .back-button {
-            width: 100%;
-            justify-content: center;
-            padding: 14px 40px;
-            min-width: auto;
-            height: 52px;
-            font-size: 13px;
-        }
-        
-        .btn-start-test {
-            width: 100%;
-            min-width: auto;
-            height: 52px;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .test-category {
-            font-size: 13px;
-        }
-
-        .test-title {
-            font-size: 1.25rem;
-        }
-
-        .safety-tips-grid {
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-        }
-
-        .safety-tip-text {
-            font-size: 13px;
-        }
-    }
-
-    /* Hamburger Menu Styles */
-    .hamburger {
-        display: none;
-        flex-direction: column;
-        gap: 4px;
-        cursor: pointer;
-        z-index: 60;
-    }
-
-    .hamburger span {
-        width: 25px;
-        height: 3px;
-        background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-        border-radius: 2px;
-        transition: all 0.3s ease;
-    }
-
-    .hamburger.active span:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 5px);
-    }
-
-    .hamburger.active span:nth-child(2) {
-        opacity: 0;
-    }
-
-    .hamburger.active span:nth-child(3) {
-        transform: rotate(-45deg) translate(7px, -6px);
-    }
-
-    /* Mobile Drawer */
-    .mobile-drawer {
-        position: fixed;
-        top: 0;
-        right: -100%;
-        width: 280px;
-        height: 100vh;
-        background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
-        z-index: 55;
-        transition: right 0.3s ease;
-        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-        overflow-y: auto;
-    }
-
-    .mobile-drawer.active {
-        right: 0;
-    }
-
-    .drawer-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 50;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .drawer-overlay.active {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    @media (max-width: 1023px) {
-        .hamburger {
-            display: flex;
-        }
-    }
+    /* profile dropdown slide animation */
+    .slide-down { animation: slideDown 0.25s ease; }
     </style>
 </head>
 <body>
-     <!-- Loading Screen -->
-<div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
-    <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
+
+<!-- Loading Screen -->
+<div id="loadingScreen" class="loading-screen">
+    <img src="UMakfit Logo (2).png" alt="UMakFit" style="height:120px; object-fit:contain; animation: pulse 1.8s infinite;">
     <div class="spinner"></div>
-    <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Test Details...</div>
+    <div style="font-size:14px; color:#64748b; font-weight:500;">Loading Test Details…</div>
 </div>
 
-    <div id="mainContent" style="display: none;">
-        <!-- Navigation -->
-        <nav class="shadow-lg" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
-            <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
-                <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-                    <!-- Logo -->
-                    <a href="./studentDashboard.html" class="flex items-center gap-2 sm:gap-3">
-                        <img src="UMakfit Logo (2).png" 
-                             alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
-                        <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                            UMakFit
-                        </span>
-                    </a>
-                    
-                    <!-- Desktop Navigation -->
-                    <div class="hidden lg:flex items-center gap-2 flex-wrap">
-                        <a href="./studentDashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-speedometer2"></i> 
-                            <span class="hidden xl:inline">Dashboard</span>
-                        </a>
-                        <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
-                            <i class="bi bi-clipboard-check"></i> 
-                            <span class="hidden xl:inline">Test</span>
-                        </a>
-                        <a href="./studentlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-book"></i> 
-                            <span class="hidden xl:inline">Lesson</span>
-                        </a>
-                        <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                    <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
-                </a>
-                        <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-graph-up"></i> 
-                            <span class="hidden xl:inline">Progress</span>
-                        </a>
-                        <a href="./achievements.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-trophy"></i> 
-                            <span class="hidden xl:inline">Achievements</span>
-                        </a>
-                        
-                        <!-- Notification Bell - Desktop -->
-                        <div class="relative">
-                            <button id="notificationBellBtn" class="notification-bell-btn">
-                                <i class="bi bi-bell-fill text-base xl:text-lg"></i>
-                                <span id="navNotificationCount" class="notification-bell-badge hidden">0</span>
-                            </button>
-                            
-                            <!-- Notification Dropdown - Desktop -->
-                            <div id="notificationDropdown" class="notification-dropdown hidden">
-                                <div class="notification-dropdown-header">
-                                    <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
-                                        <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                                    </h6>
-                                    <button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600 p-1 transition-colors">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-                                </div>
-                                <div id="notificationDropdownBody" class="notification-dropdown-body">
-                                    <div class="notification-empty">
-                                        <i class="bi bi-bell-slash"></i>
-                                        <p>No notifications yet</p>
-                                    </div>
-                                </div>
-                                <div class="notification-dropdown-footer">
-                                    <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
-                                        View All Notifications
-                                    </button>
-                                </div>
-                            </div>
+<div id="mainContent" style="display:none;">
+
+<!-- ════════════ NAVIGATION (unchanged) ════════════ -->
+<nav class="shadow-lg" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
+    <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
+        <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+            <a href="./studentDashboard.html" class="flex items-center gap-2 sm:gap-3">
+                <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
+                <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">UMakFit</span>
+            </a>
+            <!-- Desktop Nav -->
+            <div class="hidden lg:flex items-center gap-2 flex-wrap">
+                <a href="./studentDashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-speedometer2"></i><span class="hidden xl:inline">Dashboard</span></a>
+                <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"><i class="bi bi-clipboard-check"></i><span class="hidden xl:inline">Test</span></a>
+                <a href="./studentlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-book"></i><span class="hidden xl:inline">Lesson</span></a>
+                <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span></a>
+                <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-graph-up"></i><span class="hidden xl:inline">Progress</span></a>
+                <a href="./achievements.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-trophy"></i><span class="hidden xl:inline">Achievements</span></a>
+                <!-- Notification Bell Desktop -->
+                <div class="relative">
+                    <button id="notificationBellBtn" class="notification-bell-btn">
+                        <i class="bi bi-bell-fill text-base xl:text-lg"></i>
+                        <span id="navNotificationCount" class="notification-bell-badge hidden">0</span>
+                    </button>
+                    <div id="notificationDropdown" class="notification-dropdown hidden">
+                        <div class="notification-dropdown-header">
+                            <h6 class="font-bold text-gray-900 text-sm flex items-center gap-2"><i class="bi bi-bell-fill text-blue-500"></i> Notifications</h6>
+                            <button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button>
                         </div>
-                        
-                        <!-- Profile Dropdown -->
-                        <div class="relative">
-                            <img src="" alt="Profile" id="profilePictureBtn"
-                                 class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
-                            
-                            <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-                                <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
-                                    <h6 id="profileDropdownName" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
-                                    <p id="profileDropdownEmail" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
-                                </div>
-                                <div class="p-2">
-                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-                                    </a>
-                                    <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                                   <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
-                                    <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
-                                    <span class="font-medium text-sm sm:text-base">Logout</span>
-                                </div>
-                                </div>
-                            </div>
+                        <div id="notificationDropdownBody" class="notification-dropdown-body">
+                            <div class="notification-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet</p></div>
+                        </div>
+                        <div class="notification-dropdown-footer">
+                            <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg font-semibold text-xs hover:from-blue-600 hover:to-blue-700 transition-all">View All Notifications</button>
                         </div>
                     </div>
-                    
-                    <!-- Mobile Right Icons -->
-                    <div class="flex lg:hidden items-center gap-2 sm:gap-3">
-                        <!-- Mobile Notification Bell -->
-                        <div class="relative">
-                            <button id="notificationBellBtnMobile" class="notification-bell-btn">
-                                <i class="bi bi-bell-fill text-base sm:text-lg"></i>
-                                <span id="navNotificationCountMobile" class="notification-bell-badge hidden">0</span>
-                            </button>
-                            
-                            <!-- Mobile Notification Dropdown -->
-                            <div id="notificationDropdownMobile" class="notification-dropdown hidden fixed right-2 left-2 top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
-                                <div class="notification-dropdown-header">
-                                    <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
-                                        <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                                    </h6>
-                                    <button id="closeNotificationBtnMobile" class="text-gray-400 hover:text-gray-600 p-1 transition-colors">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-                                </div>
-                                <div id="notificationDropdownBodyMobile" class="notification-dropdown-body">
-                                    <div class="notification-empty">
-                                        <i class="bi bi-bell-slash"></i>
-                                        <p>No notifications yet</p>
-                                    </div>
-                                </div>
-                                <div class="notification-dropdown-footer">
-                                    <button onclick="window.location.href='./notifications.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
-                                        View All Notifications
-                                    </button>
-                                </div>
-                            </div>
+                </div>
+                <!-- Profile Dropdown Desktop -->
+                <div class="relative">
+                    <img src="" alt="Profile" id="profilePictureBtn" class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
+                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                        <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
+                            <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-3 border-3 border-blue-500 object-cover">
+                            <h6 id="profileDropdownName" class="font-bold text-gray-900 text-base">Loading...</h6>
+                            <p id="profileDropdownEmail" class="text-xs text-gray-500 mt-1 truncate px-2">Loading...</p>
                         </div>
-                        
-                        <!-- Mobile Profile -->
-                        <div class="relative">
-                            <img src="" alt="Profile" id="profilePictureBtnMobile"
-                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
-                            
-                            <!-- Mobile Profile Dropdown -->
-                            <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-                                <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
-                                    <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
-                                    <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
-                                </div>
-                                <div class="p-2">
-                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-                                    </a>
-                                    <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
-                                    <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
-                                    <span class="font-medium text-sm sm:text-base">Logout</span>
-                                </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Hamburger Menu Button -->
-                        <div class="hamburger" id="hamburger">
-                            <span></span>
-                            <span></span>
-                            <span></span>
+                        <div class="p-2">
+                            <a href="./studentProfile.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"><i class="bi bi-person-circle text-blue-500 text-xl"></i><span class="font-medium text-gray-700 text-sm">View Profile</span></a>
+                            <div class="h-px bg-gray-200 my-2"></div>
+                            <div onclick="handleLogout()" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500"><i class="bi bi-box-arrow-right text-xl"></i><span class="font-medium text-sm">Logout</span></div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- Mobile Right -->
+            <div class="flex lg:hidden items-center gap-2 sm:gap-3">
+                <div class="relative">
+                    <button id="notificationBellBtnMobile" class="notification-bell-btn">
+                        <i class="bi bi-bell-fill text-base sm:text-lg"></i>
+                        <span id="navNotificationCountMobile" class="notification-bell-badge hidden">0</span>
+                    </button>
+                    <div id="notificationDropdownMobile" class="notification-dropdown hidden fixed right-2 left-2 top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
+                        <div class="notification-dropdown-header">
+                            <h6 class="font-bold text-gray-900 text-sm flex items-center gap-2"><i class="bi bi-bell-fill text-blue-500"></i> Notifications</h6>
+                            <button id="closeNotificationBtnMobile" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button>
+                        </div>
+                        <div id="notificationDropdownBodyMobile" class="notification-dropdown-body">
+                            <div class="notification-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet</p></div>
+                        </div>
+                        <div class="notification-dropdown-footer">
+                            <button onclick="window.location.href='./notifications.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg font-semibold text-xs hover:from-blue-600 hover:to-blue-700 transition-all">View All Notifications</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <img src="" alt="Profile" id="profilePictureBtnMobile" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
+                    <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                        <div class="p-4 border-b-2 border-gray-200 text-center">
+                            <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 rounded-full mx-auto mb-3 border-3 border-blue-500 object-cover">
+                            <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base">Loading...</h6>
+                            <p id="profileDropdownEmailMobile" class="text-xs text-gray-500 mt-1 truncate px-2">Loading...</p>
+                        </div>
+                        <div class="p-2">
+                            <a href="./studentProfile.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"><i class="bi bi-person-circle text-blue-500 text-xl"></i><span class="font-medium text-gray-700 text-sm">View Profile</span></a>
+                            <div class="h-px bg-gray-200 my-2"></div>
+                            <div onclick="handleLogout()" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500"><i class="bi bi-box-arrow-right text-xl"></i><span class="font-medium text-sm">Logout</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Drawer Overlay + Mobile Drawer -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="mobile-drawer" id="mobileDrawer">
+    <div class="p-6 pt-8">
+        <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
+            <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
+            <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A, #C5A046, #8B6D2D); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">UMakFIT</span>
+        </div>
+        <nav class="space-y-2">
+            <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-speedometer2 mr-3"></i>Dashboard</a>
+            <a href="./test.html" class="mobile-nav-link block text-white bg-white/10 font-semibold py-3 px-4 rounded-lg transition-all"><i class="bi bi-clipboard-check mr-3"></i>Test</a>
+            <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-book mr-3"></i>Lessons</a>
+            <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-activity mr-3"></i>Performance</a>
+            <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-graph-up mr-3"></i>Progress</a>
+            <a href="./achievements.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-trophy mr-3"></i>Achievements</a>
         </nav>
-
-        <!-- Mobile Drawer Overlay -->
-        <div class="drawer-overlay" id="drawerOverlay"></div>
-
-        <!-- Mobile Drawer -->
-        <div class="mobile-drawer" id="mobileDrawer">
-            <div class="p-6 pt-8">
-                <!-- Drawer Header -->
-                <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
-                    <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
-                         alt="UMak Logo" class="h-12 w-auto object-contain">
-                    <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                        UMakFIT
-                    </span>
-                </div>
-
-                <nav class="space-y-2">
-                    <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-speedometer2 mr-3"></i>Dashboard
-                    </a>
-                    <a href="./test.html" class="mobile-nav-link block text-white bg-white/10 font-semibold py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-clipboard-check mr-3"></i>Test
-                    </a>
-                    <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-book mr-3"></i>Lessons
-                    </a>
-                   <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                    <i class="bi bi-activity mr-3"></i>Performance
-                </a>
-                    <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-graph-up mr-3"></i>Progress
-                    </a>
-                    <a href="./achievements.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-trophy mr-3"></i>Achievements
-                    </a>
-                </nav>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <!-- Test Header -->
-            <div class="test-header">
-                <div class="test-category" id="testCategory">LOADING...</div>
-                <h1 class="test-title" id="testTitle">Loading Test...</h1>
-                <div class="test-meta" id="testMeta">⏱️ Duration: Loading... | 🎯 Difficulty: Loading...</div>
-            </div>
-
-            <!-- Test Info Cards -->
-            <div class="test-info-section">
-                <div class="info-cards-grid">
-                    <div class="info-card-new">
-                        <div class="info-card-icon-wrapper">
-                            <img class="info-card-icon-new" id="objectiveIconNew" src="https://c.animaapp.com/HN7hFbsr/img/image-148@2x.png" alt="Objective">
-                        </div>
-                        <div class="info-card-label">OBJECTIVE</div>
-                        <div class="info-card-value" id="objectiveTextNew">Loading...</div>
-                    </div>
-                    
-                    <div class="info-card-new">
-                        <div class="info-card-icon-wrapper">
-                            <img class="info-card-icon-new" id="scoringIconNew" src="https://c.animaapp.com/HN7hFbsr/img/image-157@2x.png" alt="Scoring">
-                        </div>
-                        <div class="info-card-label">SCORING</div>
-                        <div class="info-card-value" id="scoringTextNew">Loading...</div>
-                    </div>
-                    
-                    <div class="info-card-new">
-                        <div class="info-card-icon-wrapper">
-                            <img class="info-card-icon-new" id="requirementsIconNew" src="https://c.animaapp.com/HN7hFbsr/img/image-158@2x.png" alt="Requirements">
-                        </div>
-                        <div class="info-card-label">REQUIREMENTS</div>
-                        <div class="info-card-value" id="requirementsTextNew">Loading...</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Content Grid -->
-            <div class="content-grid">
-                <!-- Video Demonstration -->
- <!-- Video Demonstration -->
-<div class="content-card">
-    <div class="content-card-header">
-        <img class="content-card-icon" src="https://c.animaapp.com/pVU46Rgb/img/image-159@2x.png" alt="Video Icon">
-        <h2 class="content-card-title">Video Demonstration</h2>
     </div>
-    <div class="video-placeholder" id="videoPlaceholder">
-        <img id="testVideo" src="https://c.animaapp.com/pVU46Rgb/img/image-82.png" alt="Test demonstration">
-    </div>
-    <p class="video-description" id="videoDescription">Loading video description...</p>
 </div>
 
-                <!-- Test Protocol -->
-                <div class="content-card">
-                    <div class="content-card-header">
-                        <img class="content-card-icon" src="https://c.animaapp.com/pVU46Rgb/img/image-160@2x.png" alt="Protocol Icon">
-                        <h2 class="content-card-title">Test Protocol</h2>
-                    </div>
-                    <div class="protocol-steps" id="protocolSteps">
-                        <!-- Protocol steps will be dynamically inserted here -->
-                    </div>
-                </div>
-            </div>
+<!-- ════════════ MAIN CONTENT ════════════ -->
+<div class="page-wrapper">
 
-            <!-- Safety Tips -->
-            <div class="safety-section">
-                <div class="safety-header">
-                    <img class="safety-icon" src="https://c.animaapp.com/pVU46Rgb/img/image-161@2x.png" alt="Safety Icon">
-                    <h3 class="safety-title">Safety Tips</h3>
-                </div>
-                <div class="safety-tips-grid" id="safetyTipsGrid">
-                    <!-- Safety tips will be dynamically inserted here -->
-                </div>
+    <!-- Hero Banner -->
+    <div class="hero-banner anim-1">
+        <div class="hero-banner-inner">
+            <div class="hero-eyebrow">
+                <i class="bi bi-activity"></i>
+                <span id="testCategory">LOADING…</span>
             </div>
-
-            <!-- Start Test Button -->
-            <div class="start-test-container" style="display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap;">
-                <button class="back-button" onclick="window.history.back()">
-                    <i class="bi bi-arrow-left"></i> Back to test
-                </button>
-                <button class="btn-start-test" id="startTestBtn" onclick="startTest()">
-                    <span class="btn-text-one-start">
-                        <i class="bi bi-play-circle-fill"></i> Start Test Now
-                    </span>
-                    <span class="btn-text-two-start">
-                        <i class="bi bi-lightning-charge-fill"></i> Let's Go!
-                    </span>
-                </button>
+            <h1 class="hero-title" id="testTitle">Loading Test…</h1>
+            <div class="hero-divider"></div>
+            <div class="hero-stats" id="heroStats">
+                <div class="hero-stat">
+                    <i class="bi bi-clock hero-stat-icon"></i>
+                    <span class="hero-stat-text" id="statDuration">Loading…</span>
+                </div>
             </div>
         </div>
-        <!-- Footer -->
-    <footer style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%); border-top: 1px solid rgba(255,255,255,0.07); padding: clamp(3rem,6vw,5rem) clamp(1.5rem,5vw,4rem) 2rem; margin-top: 3rem;">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
-                <!-- About UmakFit & College of Human Kinetics -->
-                <div>
-                    <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                        <img src="UMakfit Logo (2).png" 
-                             alt="UMak Logo" class="h-12 w-auto object-contain">
-                        <div>
-                            <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
-                            <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
-                        </div>
-                    </div>
-                    <p class="text-sm lg:text-base leading-relaxed text-blue-100">
-                        UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati. 
-                        Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
-                    </p>
-                    <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
-                        <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Fitness Tracking</span>
-                        <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Performance Assessment</span>
-                        <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Health & Wellness</span>
-                    </div>
-                </div>
-
-                <!-- Quick Links -->
-                <div>
-                    <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
-                    <div class="grid grid-cols-2 gap-4 lg:gap-6">
-                        <div class="space-y-3">
-                            <a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-book mr-2"></i>Lessons
-                            </a>
-                            <a href="./test.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-clipboard-check mr-2"></i>Tests
-                            </a>
-                            <a href="./progress.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-graph-up mr-2"></i>Progress
-                            </a>
-                        </div>
-                        <div class="space-y-3">
-                            <a href="./studentgrades.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-award mr-2"></i>Grades
-                            </a>
-                            <a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-person-circle mr-2"></i>Profile
-                            </a>
-                            <a href="./achievements.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-trophy mr-2"></i>Achievements
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Contact & Social -->
-                <div>
-                    <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
-                    <div class="space-y-4 lg:space-y-5">
-                        <div class="flex items-start gap-3">
-                            <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
-                            <p class="text-sm lg:text-base text-blue-100">
-                                College of Human Kinetics<br>
-                                University of Makati<br>
-                                3rd floor, Administration Building, University of Makati,<br>
-                                JP Rizal Ext., West Rembo, Taguig City
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
-                            <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">
-                                chk@umak.edu.ph
-                            </a>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
-                            <span class="text-sm lg:text-base text-blue-100">
-                                +63 933 189 7230
-                            </span>
-                        </div>
-                        <div class="flex items-center gap-4 pt-2 justify-center lg:justify-start">
-                            <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110">
-                                <i class="bi bi-facebook text-white text-lg"></i>
-                            </a>
-                            <a href="https://www.instagram.com" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110">
-                                <i class="bi bi-instagram text-white text-lg"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bottom bar -->
-            <div class="border-t border-white/10 mt-8 pt-6 text-center">
-                <p class="text-xs lg:text-sm text-blue-200/70">
-                    © 2025 University of Makati — College of Human Kinetics. All Rights Reserved.
-                </p>
-            </div>
-        </div>
-    </footer>
     </div>
 
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, collection, query, where, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
-            authDomain: "umakfit-e3b1d.firebaseapp.com",
-            projectId: "umakfit-e3b1d",
-            storageBucket: "umakfit-e3b1d.appspot.com",
-            messagingSenderId: "276569891504",
-            appId: "1:276569891504:web:39b1732b519f4d8b785175"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let currentUser = null;
-        let currentTest = null;
-        let studentData = null;
-
-        // ========== NOTIFICATION SYSTEM ==========
-        
-        async function checkUnreadNotifications() {
-            try {
-                if (!studentData || !studentData.section) return;
-
-                const notificationsQuery = query(
-                    collection(db, 'notifications'),
-                    where('section', '==', studentData.section)
-                );
-                
-                const notificationsSnapshot = await getDocs(notificationsQuery);
-                
-                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-                
-                let unreadCount = 0;
-                notificationsSnapshot.forEach(doc => {
-                    if (!readNotifications.includes(doc.id)) {
-                        unreadCount++;
-                    }
-                });
-                
-                const countBadge = document.getElementById('navNotificationCount');
-                const countBadgeMobile = document.getElementById('navNotificationCountMobile');
-                
-                if (unreadCount > 0) {
-                    if (countBadge) {
-                        countBadge.textContent = unreadCount;
-                        countBadge.classList.remove('hidden');
-                    }
-                    if (countBadgeMobile) {
-                        countBadgeMobile.textContent = unreadCount;
-                        countBadgeMobile.classList.remove('hidden');
-                    }
-                } else {
-                    if (countBadge) countBadge.classList.add('hidden');
-                    if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
-                }
-            } catch (error) {
-                console.error('Error checking unread notifications:', error);
-            }
-        }
-
-        async function loadNotificationDropdown(isMobile = false) {
-            try {
-                const activeBodyId = isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody';
-                const dropdownBody = document.getElementById(activeBodyId);
-                
-                if (!dropdownBody) return;
-
-                if (!studentData || !studentData.section) {
-                    dropdownBody.innerHTML = `
-                        <div class="notification-empty">
-                            <i class="bi bi-bell-slash"></i>
-                            <p>No section assigned</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const notificationsQuery = query(
-                    collection(db, 'notifications'),
-                    where('section', '==', studentData.section)
-                );
-                
-                const notificationsSnapshot = await getDocs(notificationsQuery);
-                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-                
-                if (!notificationsSnapshot.empty) {
-                    const seenNotifications = new Set();
-                    const uniqueNotifications = [];
-                    
-                    notificationsSnapshot.forEach(doc => {
-                        const notification = doc.data();
-                        const contentKey = `${notification.title}|${notification.message}|${notification.createdAt?.toDate?.().getTime() || ''}`;
-                        
-                        if (!seenNotifications.has(contentKey)) {
-                            seenNotifications.add(contentKey);
-                            uniqueNotifications.push({ id: doc.id, ...notification });
-                        }
-                    });
-                    
-                    uniqueNotifications.sort((a, b) => {
-                        const dateA = a.createdAt?.toDate?.() || new Date(0);
-                        const dateB = b.createdAt?.toDate?.() || new Date(0);
-                        return dateB - dateA;
-                    });
-                    
-                    const unreadNotificationIds = [];
-                    uniqueNotifications.forEach(notification => {
-                        if (!readNotifications.includes(notification.id)) {
-                            unreadNotificationIds.push(notification.id);
-                        }
-                    });
-                    
-                    let html = '';
-                    uniqueNotifications.slice(0, 5).forEach(notification => {
-                        const createdDate = notification.createdAt?.toDate?.();
-                        const dateStr = createdDate ? createdDate.toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        }) : 'Recently';
-                        
-                        const isRead = readNotifications.includes(notification.id);
-                        
-                        html += `
-                            <div class="notification-item ${isRead ? 'bg-gray-50' : 'bg-white'}" data-notification-id="${notification.id}">
-                                <strong>${notification.title || 'Notification'}</strong>
-                                <p>${notification.message || ''}</p>
-                                <small>${dateStr}</small>
-                            </div>
-                        `;
-                    });
-                    
-                    dropdownBody.innerHTML = html;
-                    
-                    if (unreadNotificationIds.length > 0) {
-                        markNotificationsAsRead(unreadNotificationIds);
-                    }
-                    
-                } else {
-                    dropdownBody.innerHTML = `
-                        <div class="notification-empty">
-                            <i class="bi bi-bell-slash"></i>
-                            <p>No notifications yet</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Error loading notifications:', error);
-            }
-        }
-
-        function markNotificationsAsRead(notificationIds) {
-            if (!studentData || !studentData.email || !notificationIds.length) return;
-            
-            const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-            const updatedReadNotifications = [...new Set([...readNotifications, ...notificationIds])];
-            
-            localStorage.setItem(`readNotifications_${studentData.email}`, JSON.stringify(updatedReadNotifications));
-            updateNotificationBadgeAfterRead(notificationIds);
-        }
-
-        async function updateNotificationBadgeAfterRead(markedAsReadIds) {
-            try {
-                if (!studentData || !studentData.section) return;
-                
-                const notificationsQuery = query(
-                    collection(db, 'notifications'),
-                    where('section', '==', studentData.section)
-                );
-                
-                const notificationsSnapshot = await getDocs(notificationsQuery);
-                const uniqueNotificationIds = new Set();
-                
-                notificationsSnapshot.forEach(doc => {
-                    uniqueNotificationIds.add(doc.id);
-                });
-                
-                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-                
-                let unreadCount = 0;
-                uniqueNotificationIds.forEach(notificationId => {
-                    if (!readNotifications.includes(notificationId)) {
-                        unreadCount++;
-                    }
-                });
-                
-                const countBadge = document.getElementById('navNotificationCount');
-                const countBadgeMobile = document.getElementById('navNotificationCountMobile');
-                
-                if (unreadCount > 0) {
-                    if (countBadge) {
-                        countBadge.textContent = unreadCount;
-                        countBadge.classList.remove('hidden');
-                    }
-                    if (countBadgeMobile) {
-                        countBadgeMobile.textContent = unreadCount;
-                        countBadgeMobile.classList.remove('hidden');
-                    }
-                } else {
-                    if (countBadge) countBadge.classList.add('hidden');
-                    if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
-                }
-            } catch (error) {
-                console.error('Error updating notification badge:', error);
-            }
-        }
-
-        function toggleNotificationDropdown(event) {
-            event?.stopPropagation();
-            const isMobile = window.innerWidth < 1024;
-            const dropdown = isMobile ? 
-                document.getElementById('notificationDropdownMobile') : 
-                document.getElementById('notificationDropdown');
-            
-            if (dropdown.classList.contains('hidden')) {
-                dropdown.classList.remove('hidden');
-                loadNotificationDropdown(isMobile);
-                
-                const profileDropdown = document.getElementById('profileDropdown');
-                const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-                if (profileDropdown) profileDropdown.classList.add('hidden');
-                if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
-            } else {
-                dropdown.classList.add('hidden');
-            }
-        }
-
-        function closeNotificationDropdown() {
-            const notificationDropdown = document.getElementById('notificationDropdown');
-            const notificationDropdownMobile = document.getElementById('notificationDropdownMobile');
-            if (notificationDropdown) notificationDropdown.classList.add('hidden');
-            if (notificationDropdownMobile) notificationDropdownMobile.classList.add('hidden');
-        }
-
-        function setupNotificationListener() {
-            try {
-                if (!studentData || !studentData.section) return;
-
-                const notificationsQuery = query(
-                    collection(db, 'notifications'),
-                    where('section', '==', studentData.section)
-                );
-                
-                onSnapshot(notificationsQuery, (snapshot) => {
-                    console.log('🔔 Notification update detected!');
-                    checkUnreadNotifications();
-                }, (error) => {
-                    console.error('❌ Error in notification listener:', error);
-                });
-                
-            } catch (error) {
-                console.error('Error setting up notification listener:', error);
-            }
-        }
-
-        // ========== END NOTIFICATION SYSTEM ==========
-
-        // Test data mapping
-        const testData = {
-            '3-Minute Step Test': {
-                category: 'CARDIORESPIRATORY ENDURANCE TEST',
-                icon: 'https://c.animaapp.com/HN7hFbsr/img/image-148@2x.png',
-                badgeIcon: 'https://c.animaapp.com/pVU46Rgb/img/image-152@2x.png',
-                getDuration: (target) => target ? `${target} minutes` : '3 minutes',
-                difficulty: 'Beginner',
-                objective: 'Measure heart rate recovery after a brief, sub-maximal exercise bout',
-                scoring: 'Lower recovery heart rate indicates better cardiorespiratory fitness',
-                requirements: '12-inch step bench, metronome (96 bpm), stopwatch',
-                video: 'https://c.animaapp.com/pVU46Rgb/img/image-82.png',
-                videoDescription: 'Watch this video to learn proper step test technique with 4-count rhythm',
-                protocol: [
-                    'Set metronome to 96 bpm for a 4-count rhythm: "UP, UP, DOWN, DOWN"',
-                    'Step up with right foot, then left foot (24 steps per minute)',
-                    'Step down with right foot, then left foot',
-                    'Continue for exactly 3 minutes following the rhythm',
-                    'Stop immediately after 3 minutes and sit down',
-                    'After 5-second rest, count pulse for 60 seconds',
-                    'Record your recovery heart rate'
-                ],
-                safetyTips: [
-                    'Use a stable 12-inch platform',
-                    'Wear supportive shoes',
-                    'Stop if feeling dizzy',
-                    'Maintain steady 24 steps/min pace'
-                ]
-            },
-            'Curl-Up Test': {
-                category: 'MUSCULAR ENDURANCE TEST',
-                icon: 'https://c.animaapp.com/HN7hFbsr/img/image-150@2x.png',
-                badgeIcon: 'https://c.animaapp.com/pVU46Rgb/img/image-152@2x.png',
-                getDuration: (target) => target ? `Target: ${target} curl-ups` : 'Maximum repetitions',
-                difficulty: 'Beginner',
-                objective: 'Measure abdominal muscle endurance through repeated contractions',
-                scoring: 'More repetitions at correct pace indicates better muscular endurance',
-                requirements: 'Mat, tape/cardboard (4.5 inches apart), metronome (3-sec intervals)',
-                video: 'https://c.animaapp.com/pVU46Rgb/img/image-82.png',
-                videoDescription: 'Watch proper curl-up technique and pacing',
-                protocol: [
-                    'Make tape marks 4.5 inches apart on the ground',
-                    'Lie supine with arms straight, fingertips at first mark',
-                    'Bend knees with feet flat, heels near buttocks',
-                    'Curl up and slide fingers to touch second tape mark',
-                    'Return to starting position (shoulder blades touch floor)',
-                    'Perform one curl every 3 seconds following metronome',
-                    'Stop when you can no longer maintain the pace',
-                    'Record total number of completed curl-ups'
-                ],
-                safetyTips: [
-                    'Keep heels on floor',
-                    'Maintain smooth movement',
-                    'Don\'t pull on neck',
-                    'Stop if back pain occurs'
-                ]
-            },
-            'Push-Up Test': {
-                category: 'MUSCULAR ENDURANCE TEST',
-                icon: 'https://c.animaapp.com/HN7hFbsr/img/image-150@2x.png',
-                badgeIcon: 'https://c.animaapp.com/pVU46Rgb/img/image-152@2x.png',
-                getDuration: (target) => target ? `Target: ${target} push-ups` : 'Maximum repetitions',
-                difficulty: 'Intermediate',
-                objective: 'Measure upper body muscular endurance of chest, shoulders, and triceps',
-                scoring: 'More push-ups with proper form indicates better muscular endurance',
-                requirements: 'Floor mat, stopwatch (optional)',
-                video: 'https://c.animaapp.com/pVU46Rgb/img/image-82.png',
-                videoDescription: 'Watch proper push-up form and technique',
-                protocol: [
-                    'Men: Start in standard plank, hands shoulder-width apart',
-                    'Women: Modified position with knees on ground',
-                    'Keep back straight from head to heels (or knees)',
-                    'Lower body until elbows bent at 90 degrees',
-                    'Chest should nearly touch floor',
-                    'Push back up until arms fully extended',
-                    'Perform as many as possible without stopping',
-                    'Stop when unable to maintain proper form'
-                ],
-                safetyTips: [
-                    'Keep core engaged',
-                    'Maintain straight body line',
-                    'Breathe consistently',
-                    'Stop if shoulder pain occurs'
-                ]
-            },
-            'Sit-and-Reach': {
-                category: 'FLEXIBILITY TEST',
-                icon: 'https://c.animaapp.com/HN7hFbsr/img/image-48@2x.png',
-                badgeIcon: 'https://c.animaapp.com/pVU46Rgb/img/image-152@2x.png',
-                getDuration: (target) => target ? `Target: ${target} cm` : '3 attempts',
-                difficulty: 'Beginner',
-                objective: 'Measure flexibility of lower back and hamstring muscles',
-                scoring: 'Greater reach distance indicates better flexibility',
-                requirements: 'Sit-and-reach box (or ruler and step), mat',
-                video: 'https://c.animaapp.com/pVU46Rgb/img/image-82.png',
-                videoDescription: 'Learn proper sit-and-reach technique for accurate measurement',
-                protocol: [
-                    'Remove shoes and sit with legs fully extended',
-                    'Place feet flat against the sit-and-reach box',
-                    'Place one hand on top of the other, fingers aligned',
-                    'Slowly reach forward keeping knees straight',
-                    'Slide hands along measuring scale as far as possible',
-                    'Hold final position for at least 1-2 seconds',
-                    'Perform 3 practice reaches, then 1 recorded test',
-                    'Record distance reached (positive if past toes)'
-                ],
-                safetyTips: [
-                    'Warm up with light stretching',
-                    'Avoid bouncing movements',
-                    'Stretch slowly and steadily',
-                    'Stop if sharp pain occurs'
-                ]
-            },
-            'Skinfold Caliper': {
-                category: 'BODY COMPOSITION TEST',
-                icon: 'https://c.animaapp.com/HN7hFbsr/img/image-151@2x.png',
-                badgeIcon: 'https://c.animaapp.com/pVU46Rgb/img/image-152@2x.png',
-                getDuration: (target) => target ? `Target: ${target}% body fat` : '10-15 minutes',
-                difficulty: 'Advanced',
-                objective: 'Estimate body fat percentage by measuring subcutaneous fat thickness',
-                scoring: 'Lower body fat % indicates leaner body composition (varies by age/sex)',
-                requirements: 'Skinfold calipers, marker, trained professional',
-                video: 'https://c.animaapp.com/pVU46Rgb/img/image-82.png',
-                videoDescription: 'Professional demonstration of proper skinfold measurement technique',
-                protocol: [
-                    'Mark measurement sites (3 or 7 sites depending on protocol)',
-                    'Men (3-site): Chest, Abdomen, Thigh',
-                    'Women (3-site): Triceps, Suprailiac (hip), Thigh',
-                    'Pinch skin and fat layer, pulling away from muscle',
-                    'Place calipers 1 cm away from fingers',
-                    'Read measurement after 2 seconds',
-                    'Take 2-3 measurements at each site',
-                    'Use equation to calculate body fat percentage'
-                ],
-                safetyTips: [
-                    'Trained professional required',
-                    'Same tester for all measurements',
-                    'Measure on right side of body',
-                    'Mark sites carefully'
-                ]
-            }
-        };
-
-        function getTestData(testName) {
-            return testData[testName] || {
-                category: 'FITNESS TEST',
-                icon: 'https://c.animaapp.com/HN7hFbsr/img/image-148@2x.png',
-                badgeIcon: 'https://c.animaapp.com/pVU46Rgb/img/image-152@2x.png',
-                getDuration: () => 'Varies',
-                difficulty: 'Moderate',
-                objective: 'Complete the test according to instructions',
-                scoring: 'Based on performance metrics',
-                requirements: 'Follow test-specific requirements',
-                video: 'https://c.animaapp.com/pVU46Rgb/img/image-82.png',
-                videoDescription: 'Watch this video for demonstration',
-                protocol: ['Follow the test instructions carefully'],
-                safetyTips: ['Warm up properly', 'Stop if you feel pain', 'Maintain proper form', 'Stay hydrated']
-            };
-        }
-
-        function getTargetLabel(testName) {
-            const normalized = testName.toLowerCase();
-            if (normalized.includes('push-up') || normalized.includes('pushup')) return 'push-ups';
-            if (normalized.includes('sit-up') || normalized.includes('situp')) return 'sit-ups';
-            if (normalized.includes('plank')) return 'seconds';
-            if (normalized.includes('step test')) return 'minutes';
-            if (normalized.includes('sit-and-reach')) return 'cm';
-            return 'units';
-        }
-
-        function populateTestDetails(test) {    
-            const testInfo = getTestData(test.testName);
-            
-            document.getElementById('testCategory').textContent = testInfo.category;
-            document.getElementById('testTitle').textContent = test.testName;
-            
-            const duration = typeof testInfo.getDuration === 'function' 
-                ? testInfo.getDuration(null) 
-                : testInfo.duration;
-
-            document.getElementById('testMeta').textContent = `⏱️ Duration: ${duration} | 🎯 Difficulty: ${testInfo.difficulty}`;
-
-            const categoryIcon = getCategoryIcon(test.testName);
-
-            document.getElementById('objectiveIconNew').src = categoryIcon;
-            document.getElementById('objectiveTextNew').textContent = testInfo.objective;
-
-            document.getElementById('scoringIconNew').src = categoryIcon;
-            document.getElementById('scoringTextNew').textContent = testInfo.scoring;
-
-            document.getElementById('requirementsIconNew').src = categoryIcon;
-
-            let requirementsText = testInfo.requirements;
-            document.getElementById('requirementsTextNew').textContent = requirementsText;
-        
- // Find this part in populateTestDetails function
-const videoPlaceholder = document.querySelector('.video-placeholder');
-if (test.videoURL) {
-    let videoId = '';
-    
-    if (test.videoURL.includes('youtube.com/watch?v=')) {
-        videoId = test.videoURL.split('v=')[1].split('&')[0];
-    } else if (test.videoURL.includes('youtu.be/')) {
-        videoId = test.videoURL.split('youtu.be/')[1].split('?')[0];
-    } else if (test.videoURL.includes('youtube.com/embed/')) {
-        videoId = test.videoURL.split('embed/')[1].split('?')[0];
-    }
-    
-    if (videoId) {
-        // Replace with EMBEDDED YouTube player
-        videoPlaceholder.innerHTML = `
-            <div style="position: relative; width: 100%; height: 100%;">
-                <iframe width="100%" height="100%" 
-                    src="https://www.youtube.com/embed/${videoId}" 
-                    title="YouTube video player" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                    allowfullscreen
-                    style="border-radius: 12px; width: 100%; height: 100%;">
-                </iframe>
-            </div>
-        `;
-        document.getElementById('videoDescription').textContent = '📺 Watch the video demonstration above';
-    } else {
-        videoPlaceholder.innerHTML = `
-            <div style="padding: 40px; text-align: center; background: #fee2e2; border-radius: 8px;">
-                <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
-                <p style="color: #991b1b; font-weight: 600; margin: 0 0 10px 0; font-size: 16px;">
-                    Video URL format not supported
-                </p>
-                <p style="color: #7f1d1d; font-size: 13px; margin: 0;">
-                    Please contact your professor
-                </p>
-            </div>
-        `;
-        document.getElementById('videoDescription').textContent = 'Unable to load video';
-    }
-} else {
-    videoPlaceholder.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 15px; padding: 40px; background: #f3f4f6; border-radius: 8px;">
-            <div style="font-size: 64px; opacity: 0.5;">📹</div>
-            <p style="color: #6b7280; font-size: 15px; margin: 0; font-weight: 500;">
-                No instruction video available for this test
-            </p>
+    <!-- Info Cards -->
+    <div class="info-cards-row anim-2">
+        <div class="info-card">
+            <div class="info-card-icon-ring"><i class="bi bi-bullseye"></i></div>
+            <div class="info-card-label">Objective</div>
+            <div class="info-card-value" id="objectiveTextNew">Loading…</div>
         </div>
-    `;
-    document.getElementById('videoDescription').textContent = testInfo.videoDescription;
-}
-            
-            
-            const protocolStepsContainer = document.getElementById('protocolSteps');
-            protocolStepsContainer.innerHTML = '';
-            testInfo.protocol.forEach((step, index) => {
-                const stepElement = document.createElement('div');
-                stepElement.className = 'protocol-step';
-                stepElement.innerHTML = `
-                    <div class="step-number">${index + 1}</div>
-                    <div class="step-text">${step}</div>
-                `;
-                protocolStepsContainer.appendChild(stepElement);
-            });
-            
-            const safetyTipsContainer = document.getElementById('safetyTipsGrid');
-            safetyTipsContainer.innerHTML = '';
-            testInfo.safetyTips.forEach(tip => {
-                const tipElement = document.createElement('div');
-                tipElement.className = 'safety-tip';
-                tipElement.innerHTML = `<p class="safety-tip-text">${tip}</p>`;
-                safetyTipsContainer.appendChild(tipElement);
-            });
-        
-            document.getElementById('startTestBtn').setAttribute('data-test-id', test.id);
-        
-        }
-        function getCategoryIcon(testName) {
-            const normalized = testName.toLowerCase();
-            
-            if (normalized.includes('step test') || normalized.includes('3-minute')) {
-                return 'https://c.animaapp.com/HN7hFbsr/img/image-148@2x.png';
-            }
-            
-            if (normalized.includes('push-up') || normalized.includes('pushup') || 
-                normalized.includes('curl-up')) {
-                return 'https://c.animaapp.com/HN7hFbsr/img/image-150@2x.png';
-            }
-            
-            if (normalized.includes('sit-and-reach')) {
-                return 'https://c.animaapp.com/HN7hFbsr/img/image-48@2x.png';
-            }
-            
-            if (normalized.includes('skinfold') || normalized.includes('caliper')) {
-                return 'https://c.animaapp.com/HN7hFbsr/img/image-151@2x.png';
-            }
-            
-            return 'https://c.animaapp.com/HN7hFbsr/img/image-148@2x.png';
-        }
+        <div class="info-card">
+            <div class="info-card-icon-ring"><i class="bi bi-bar-chart-line"></i></div>
+            <div class="info-card-label">Scoring</div>
+            <div class="info-card-value" id="scoringTextNew">Loading…</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-icon-ring"><i class="bi bi-box-seam"></i></div>
+            <div class="info-card-label">Requirements</div>
+            <div class="info-card-value" id="requirementsTextNew">Loading…</div>
+        </div>
+    </div>
 
-        async function checkStudentAttempts(testId, userId) {
-            try {
-                const resultsQuery = query(
-                    collection(db, 'testResults'),
-                    where('testId', '==', testId),
-                    where('studentId', '==', userId)
-                );
-                
-                const resultsSnapshot = await getDocs(resultsQuery);
-                
-                let attempts = [];
-                let highestScore = 0;
-                let perfectScore = false;
-                
-                resultsSnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    attempts.push(data);
-                    
-                    const score = calculateTestScore(data.testName, data.result, data.testTarget);
-                    if (score > highestScore) {
-                        highestScore = score;
-                    }
-                    if (score === 100) {
-                        perfectScore = true;
-                    }
-                });
-                
-                return {
-                    attemptCount: attempts.length,
-                    attempts: attempts,
-                    highestScore: highestScore,
-                    perfectScore: perfectScore
-                };
-            } catch (error) {
-                console.error('Error checking attempts:', error);
-                return { attemptCount: 0, attempts: [], highestScore: 0, perfectScore: false };
-            }
-        }
+    <!-- Two-column: Video + Protocol -->
+    <div class="content-columns anim-3">
+        <!-- Video Panel -->
+        <div class="content-panel">
+            <div class="panel-header">
+                <div class="panel-header-icon"><i class="bi bi-play-circle"></i></div>
+                <span class="panel-header-title">Video Demonstration</span>
+            </div>
+            <div class="panel-body">
+                <div class="video-embed-wrapper" id="videoPlaceholder">
+                    <img id="testVideo" src="https://c.animaapp.com/pVU46Rgb/img/image-82.png" alt="Test demo">
+                </div>
+                <p class="video-caption" id="videoDescription">Loading video description…</p>
+            </div>
+        </div>
 
-        function calculateTestScore(testName, result, testTarget = null) {
-            const normalized = testName.toLowerCase();
-            
-            if (testTarget && testTarget > 0) {
-                const value = parseFloat(result);
-                
-                if (normalized.includes('push-up') || normalized.includes('pushup') || 
-                    normalized.includes('sit-up') || normalized.includes('situp')) {
-                    const reps = parseInt(result);
-                    if (reps >= testTarget) return 100;
-                    if (reps >= testTarget * 0.9) return 95;
-                    if (reps >= testTarget * 0.8) return 90;
-                    if (reps >= testTarget * 0.7) return 85;
-                    if (reps >= testTarget * 0.6) return 80;
-                    if (reps >= testTarget * 0.5) return 75;
-                    return Math.max(50, Math.round((reps / testTarget) * 100));
-                } else if (normalized.includes('plank')) {
-                    const seconds = parseInt(result.split(':')[1] || result);
-                    if (seconds >= testTarget) return 100;
-                    if (seconds >= testTarget * 0.9) return 95;
-                    if (seconds >= testTarget * 0.8) return 90;
-                    if (seconds >= testTarget * 0.7) return 85;
-                    if (seconds >= testTarget * 0.6) return 80;
-                    if (seconds >= testTarget * 0.5) return 75;
-                    return Math.max(50, Math.round((seconds / testTarget) * 100));
-                } else if (normalized.includes('sit-and-reach')) {
-                    const distance = parseFloat(result);
-                    if (distance >= testTarget) return 100;
-                    if (distance >= testTarget * 0.9) return 95;
-                    if (distance >= testTarget * 0.8) return 90;
-                    if (distance >= testTarget * 0.7) return 85;
-                    if (distance >= testTarget * 0.6) return 80;
-                    if (distance >= testTarget * 0.5) return 75;
-                    return Math.max(50, Math.round((distance / testTarget) * 100));
-                }
-            }
-            
-            if (normalized.includes('push-up') || normalized.includes('pushup')) {
-                const reps = parseInt(result);
-                if (reps >= 40) return 100;
-                if (reps >= 30) return 90;
-                if (reps >= 20) return 80;
-                if (reps >= 15) return 70;
-                if (reps >= 10) return 60;
-                return 50;
-            } else if (normalized.includes('plank')) {
-                const seconds = parseInt(result.split(':')[1] || result);
-                if (seconds >= 120) return 100;
-                if (seconds >= 90) return 90;
-                if (seconds >= 60) return 80;
-                if (seconds >= 45) return 70;
-                if (seconds >= 30) return 60;
-                return 50;
-            }
-            
-            return 75;
-        }
+        <!-- Protocol Panel -->
+        <div class="content-panel">
+            <div class="panel-header">
+                <div class="panel-header-icon"><i class="bi bi-list-ol"></i></div>
+                <span class="panel-header-title">Test Protocol</span>
+            </div>
+            <div class="panel-body">
+                <div class="protocol-list" id="protocolSteps"></div>
+            </div>
+        </div>
+    </div>
 
-        async function loadTestDetails(testId) {
-            try {
-                console.log('Loading test details for ID:', testId);
-                
-                const testDoc = await getDoc(doc(db, 'scheduledTests', testId));
-                
-                console.log('Test doc exists:', testDoc.exists()); 
-                
-                if (testDoc.exists()) {
-                    currentTest = { id: testDoc.id, ...testDoc.data() };
-                    console.log('Current test loaded:', currentTest); 
-                    
-                    const attemptInfo = await checkStudentAttempts(testId, currentUser.uid);
-                    currentTest.studentAttemptInfo = attemptInfo;
-                    
-                    populateTestDetails(currentTest);
-                    
-                    updateStartButton(currentTest, attemptInfo);
-                } else {
-                    console.error('Test document does not exist for ID:', testId);
-                    alert('Test not found. Please try again.');
-                    window.history.back();
-                }
-            } catch (error) {
-                console.error('Detailed error loading test:', error);
-                console.error('Error code:', error.code);
-                console.error('Error message:', error.message);
-                alert('Error loading test details: ' + error.message);
-            }
-        }
+    <!-- Safety Panel -->
+    <div class="safety-panel anim-4">
+        <div class="safety-panel-header">
+            <div class="safety-icon-ring"><i class="bi bi-shield-check"></i></div>
+            <span class="safety-panel-title">Safety Guidelines</span>
+        </div>
+        <div class="safety-grid" id="safetyTipsGrid"></div>
+    </div>
 
-        function updateStartButton(test, attemptInfo) {
-            const startBtn = document.getElementById('startTestBtn');
-            const attemptsAllowed = test.attemptsAllowed || 1;
-            
-            if (attemptInfo.perfectScore) {
-                startBtn.innerHTML = `
-                    <span class="btn-text-one-start">
-                        <i class="bi bi-check-circle-fill"></i> Perfect Score Achieved!
-                    </span>
-                    <span class="btn-text-two-start">
-                        <i class="bi bi-check-circle-fill"></i> Perfect Score Achieved!
-                    </span>
-                `;
-                startBtn.disabled = true;
-                startBtn.style.background = 'linear-gradient(90deg, #10b981 0%, #059669 100%)';
-                startBtn.style.cursor = 'not-allowed';
-                startBtn.style.opacity = '0.7';
-            } else if (attemptInfo.attemptCount >= attemptsAllowed) {
-                startBtn.innerHTML = `
-                    <span class="btn-text-one-start">
-                        <i class="bi bi-lock-fill"></i> All ${attemptsAllowed} Attempts Used
-                    </span>
-                    <span class="btn-text-two-start">
-                        <i class="bi bi-lock-fill"></i> All ${attemptsAllowed} Attempts Used
-                    </span>
-                `;
-                startBtn.disabled = true;
-                startBtn.style.background = 'linear-gradient(90deg, #6b7280 0%, #4b5563 100%)';
-                startBtn.style.cursor = 'not-allowed';
-                startBtn.style.opacity = '0.7';
-            } else {
-                const attemptNumber = attemptInfo.attemptCount + 1;
-                if (attemptNumber > 1) {
-                    startBtn.innerHTML = `
-                        <span class="btn-text-one-start">
-                            <i class="bi bi-arrow-clockwise"></i> Start Attempt ${attemptNumber}/${attemptsAllowed}
-                        </span>
-                        <span class="btn-text-two-start">
-                            <i class="bi bi-lightning-charge-fill"></i> Try Again!
-                        </span>
-                    `;
-                } else {
-                    startBtn.innerHTML = `
-                        <span class="btn-text-one-start">
-                            <i class="bi bi-play-circle-fill"></i> Start Test Now (${attemptNumber}/${attemptsAllowed})
-                        </span>
-                        <span class="btn-text-two-start">
-                            <i class="bi bi-lightning-charge-fill"></i> Let's Go!
-                        </span>
-                    `;
-                }
-            }
-        }
+    <!-- Action Bar -->
+    <div class="action-bar anim-5">
+        <button class="btn-back" onclick="window.history.back()">
+            <i class="bi bi-arrow-left"></i> Back to Tests
+        </button>
+        <button class="btn-start" id="startTestBtn" onclick="startTest()">
+            <i class="bi bi-play-circle-fill"></i> Start Test Now
+        </button>
+    </div>
 
-        function getUrlParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return {
-                testId: urlParams.get('testId'),
-                testName: urlParams.get('testName')
-            };
-        }
+</div><!-- /page-wrapper -->
 
-        // Hamburger Menu and Drawer functionality
-        const hamburger = document.getElementById('hamburger');
-        const mobileDrawer = document.getElementById('mobileDrawer');
-        const drawerOverlay = document.getElementById('drawerOverlay');
-        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+<!-- ════════════ FOOTER ════════════ -->
+<footer style="background: linear-gradient(135deg, #0D1B2A, #1A2B3C, #2C4A5E); border-top: 1px solid rgba(255,255,255,0.07); padding: clamp(3rem,6vw,5rem) clamp(1.5rem,5vw,4rem) 2rem; margin-top: 1rem;">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
+            <div>
+                <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                    <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
+                    <div>
+                        <h6 class="text-yellow-400 font-bold text-lg mb-1">UMakFit</h6>
+                        <p class="text-xs text-blue-200 font-medium">College of Human Kinetics</p>
+                    </div>
+                </div>
+                <p class="text-sm leading-relaxed text-blue-100">UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati.</p>
+                <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
+                    <span style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-size:0.7rem;padding:4px 10px;border-radius:100px;font-weight:500;">Fitness Tracking</span>
+                    <span style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-size:0.7rem;padding:4px 10px;border-radius:100px;font-weight:500;">Performance Assessment</span>
+                </div>
+            </div>
+            <div>
+                <h6 class="text-yellow-400 font-bold text-lg mb-6">Quick Links</h6>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-3">
+                        <a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all text-sm"><i class="bi bi-book mr-2"></i>Lessons</a>
+                        <a href="./test.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all text-sm"><i class="bi bi-clipboard-check mr-2"></i>Tests</a>
+                        <a href="./progress.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all text-sm"><i class="bi bi-graph-up mr-2"></i>Progress</a>
+                    </div>
+                    <div class="space-y-3">
+                        <a href="./studentgrades.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all text-sm"><i class="bi bi-award mr-2"></i>Grades</a>
+                        <a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all text-sm"><i class="bi bi-person-circle mr-2"></i>Profile</a>
+                        <a href="./achievements.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all text-sm"><i class="bi bi-trophy mr-2"></i>Achievements</a>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h6 class="text-yellow-400 font-bold text-lg mb-6">Get In Touch</h6>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3">
+                        <i class="bi bi-geo-alt-fill text-yellow-400 text-lg mt-1"></i>
+                        <p class="text-sm text-blue-100">College of Human Kinetics<br>University of Makati<br>3rd floor, Administration Building,<br>JP Rizal Ext., West Rembo, Taguig City</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="bi bi-envelope-fill text-yellow-400 text-lg"></i>
+                        <a href="/cdn-cgi/l/email-protection#197a7172596c747872377c7d6c376971" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm"><span class="__cf_email__" data-cfemail="cfaca7a48fbaa2aea4e1aaabbae1bfa7">[email&#160;protected]</span></a>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="bi bi-telephone-fill text-yellow-400 text-lg"></i>
+                        <span class="text-sm text-blue-100">+63 933 189 7230</span>
+                    </div>
+                    <div class="flex items-center gap-4 pt-2 justify-center lg:justify-start">
+                        <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110"><i class="bi bi-facebook text-white text-lg"></i></a>
+                        <a href="https://www.instagram.com" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110"><i class="bi bi-instagram text-white text-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-white/10 mt-8 pt-6 text-center">
+            <p class="text-xs text-blue-200/70">© 2025 University of Makati — College of Human Kinetics. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
 
-        if (hamburger) {
-            hamburger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                hamburger.classList.toggle('active');
-                mobileDrawer.classList.toggle('active');
-                drawerOverlay.classList.toggle('active');
-                document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-            });
-        }
+</div><!-- /mainContent -->
 
-        if (drawerOverlay) {
-            drawerOverlay.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                mobileDrawer.classList.remove('active');
-                drawerOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-        }
+<!-- ════════════ SCRIPTS ════════════ -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        mobileNavLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                mobileDrawer.classList.remove('active');
-                drawerOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-        });
-
-        // Profile dropdown functions
-        window.toggleProfileDropdown = function() {
-            const isMobile = window.innerWidth < 1024;
-            const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
-            
-            dropdown.classList.toggle('hidden');
-            if (!dropdown.classList.contains('hidden')) {
-                setTimeout(() => {
-                    document.addEventListener('click', closeProfileOnClickOutside);
-                }, 100);
-            } else {
-                document.removeEventListener('click', closeProfileOnClickOutside);
-            }
-        };
-
-        function closeProfileOnClickOutside(event) {
-            const isMobile = window.innerWidth < 1024;
-            const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
-            const profileBtn = document.getElementById('profilePictureBtn');
-            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-            
-            if (!dropdown.contains(event.target) && !profileBtn?.contains(event.target) && !profileBtnMobile?.contains(event.target)) {
-                dropdown.classList.add('hidden');
-                document.removeEventListener('click', closeProfileOnClickOutside);
-            }
-        }
-
-        function updateProfileUI() {
-            if (!currentUser) return;
-            
-            const photoURL = currentUser.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(currentUser.displayName || 'User') + '&background=3b82f6&color=fff&size=128';
-            
-            const profileBtn = document.getElementById('profilePictureBtn');
-            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-            if (profileBtn) profileBtn.src = photoURL;
-            if (profileBtnMobile) profileBtnMobile.src = photoURL;
-            
-            const dropdownPic = document.getElementById('profileDropdownPicture');
-            const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
-            if (dropdownPic) dropdownPic.src = photoURL;
-            if (dropdownPicMobile) dropdownPicMobile.src = photoURL;
-            
-            const dropdownName = document.getElementById('profileDropdownName');
-            const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
-            if (dropdownName) dropdownName.textContent = currentUser.displayName || 'Student';
-            if (dropdownNameMobile) dropdownNameMobile.textContent = currentUser.displayName || 'Student';
-            
-            const dropdownEmail = document.getElementById('profileDropdownEmail');
-            const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
-            if (dropdownEmail) dropdownEmail.textContent = currentUser.email || '';
-            if (dropdownEmailMobile) dropdownEmailMobile.textContent = currentUser.email || '';
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            const notificationBtn = document.getElementById('notificationBellBtn');
-            const notificationBtnMobile = document.getElementById('notificationBellBtnMobile');
-            
-            if (notificationBtn) notificationBtn.addEventListener('click', toggleNotificationDropdown);
-            if (notificationBtnMobile) notificationBtnMobile.addEventListener('click', toggleNotificationDropdown);
-            
-            const closeNotificationBtn = document.getElementById('closeNotificationBtn');
-            const closeNotificationBtnMobile = document.getElementById('closeNotificationBtnMobile');
-            
-            if (closeNotificationBtn) {
-                closeNotificationBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    closeNotificationDropdown();
-                });
-            }
-            
-            if (closeNotificationBtnMobile) {
-                closeNotificationBtnMobile.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    closeNotificationDropdown();
-                });
-            }
-            
-            const profileBtn = document.getElementById('profilePictureBtn');
-            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-            
-            if (profileBtn) profileBtn.addEventListener('click', toggleProfileDropdown);
-            if (profileBtnMobile) profileBtnMobile.addEventListener('click', toggleProfileDropdown);
-            
-            document.addEventListener('click', (event) => {
-                if (!event.target.closest('#notificationBellBtn') && 
-                    !event.target.closest('#notificationBellBtnMobile') && 
-                    !event.target.closest('#notificationDropdown') && 
-                    !event.target.closest('#notificationDropdownMobile')) {
-                    closeNotificationDropdown();
-                }
-                
-                if (!event.target.closest('#profilePictureBtn') && 
-                    !event.target.closest('#profilePictureBtnMobile') && 
-                    !event.target.closest('#profileDropdown') && 
-                    !event.target.closest('#profileDropdownMobile')) {
-                    const profileDropdown = document.getElementById('profileDropdown');
-                    const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-                    if (profileDropdown) profileDropdown.classList.add('hidden');
-                    if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
-                }
-            });
-        }
-
-        async function loadStudentData(user) {
-            try {
-                const studentsQuery = query(
-                    collection(db, 'students'),
-                    where('email', '==', user.email)
-                );
-                const studentsSnapshot = await getDocs(studentsQuery);
-                
-                studentData = {
-                    displayName: user.displayName || user.email.split('@')[0] || 'Student',
-                    email: user.email,
-                    section: 'Not Assigned'
-                };
-                
-                if (!studentsSnapshot.empty) {
-                    studentsSnapshot.forEach((doc) => {
-                        const data = doc.data();
-                        studentData = { 
-                            ...studentData,
-                            ...data,
-                            section: data.section || 'Not Assigned'
-                        };
-                    });
-                }
-                
-                return studentData;
-            } catch (error) {
-                console.error('Error loading student data:', error);
-                return null;
-            }
-        }
-
-        window.startTest = function() {
-            if (currentTest) {
-                window.location.href = `./activetest.html?testId=${currentTest.id}&testName=${encodeURIComponent(currentTest.testName)}`;
-            } else {
-                alert('Test data not loaded. Please try again.');
-            }
-        };
-
-        window.handleLogout = async function() {
-            if (confirm('Are you sure you want to logout?')) {
-                try {
-                    await signOut(auth);
-                    window.location.href = '../login/index.html';
-                } catch (error) {
-                    console.error('Error logging out:', error);
-                    alert('Error logging out. Please try again.');
-                }
-            }
-        };
-
-        onAuthStateChanged(auth, async (user) => {
-            const loadingScreen = document.getElementById('loadingScreen');
-            const mainContent = document.getElementById('mainContent');
-
-            if (user) {
-                try {
-                    currentUser = user;
-                    
-                    await loadStudentData(user);
-                    setupNotificationListener();
-                    await checkUnreadNotifications();
-                    
-                    updateProfileUI();
-                    
-                    const { testId } = getUrlParams();
-                    
-                    if (testId) {
-                        await loadTestDetails(testId);
-                    } else {
-                        alert('No test specified. Redirecting to test page.');
-                        window.location.href = './test.html';
-                    }
-                    
-                    setupEventListeners();
-                    
-                    loadingScreen.style.display = 'none';
-                    mainContent.style.display = 'block';
-                } catch (error) {
-                    console.error('Error loading page:', error);
-                    alert('Error loading page. Please try again.');
-                }
-            } else {
-                window.location.href = '../login/index.html';
-            }
-        });
-            window.handleLogout = function() {
-    showLogoutConfirmPopup();
+const firebaseConfig = {
+    apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+    authDomain: "umakfit-e3b1d.firebaseapp.com",
+    projectId: "umakfit-e3b1d",
+    storageBucket: "umakfit-e3b1d.appspot.com",
+    messagingSenderId: "276569891504",
+    appId: "1:276569891504:web:39b1732b519f4d8b785175"
 };
 
-function showLogoutConfirmPopup() {
-    // Remove existing popup if any
-    const existing = document.getElementById('logoutOverlay');
-    if (existing) existing.remove();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    const overlay = document.createElement('div');
-    overlay.id = 'logoutOverlay';
-    overlay.style.cssText = `
-        position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-        display: flex; align-items: center; justify-content: center;
-        z-index: 99999; padding: 1rem;
-        animation: fadeInLogout 0.2s ease;
-    `;
+let currentUser = null;
+let currentTest = null;
+let studentData = null;
 
-    overlay.innerHTML = `
-        <style>
-            @keyframes fadeInLogout { from { opacity:0; } to { opacity:1; } }
-            @keyframes slideUpLogout { from { opacity:0; transform:translateY(24px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
-        </style>
-        <div style="
-            background:#fff;
-            border-radius:24px;
-            padding:2rem 1.5rem 1.5rem;
-            max-width:360px;
-            width:100%;
-            box-shadow:0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
-            animation:slideUpLogout 0.35s cubic-bezier(.4,0,.2,1);
-            text-align:center;
-            font-family:'Inter',sans-serif;
-        ">
-            <!-- Icon -->
-            <div style="
-                width:68px; height:68px;
-                background:#fce8e6;
-                border-radius:50%;
-                display:flex; align-items:center; justify-content:center;
-                margin:0 auto 1.25rem;
-            ">
-                <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
-                    <path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                    <path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
+// ── NOTIFICATION SYSTEM ──
+async function checkUnreadNotifications() {
+    try {
+        if (!studentData?.section) return;
+        const q = query(collection(db,'notifications'), where('section','==',studentData.section));
+        const snap = await getDocs(q);
+        const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
+        let count = 0;
+        snap.forEach(d => { if (!read.includes(d.id)) count++; });
+        ['navNotificationCount','navNotificationCountMobile'].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (count > 0) { el.textContent = count; el.classList.remove('hidden'); }
+            else el.classList.add('hidden');
+        });
+    } catch(e) { console.error(e); }
+}
 
-            <!-- Title -->
-            <div style="font-size:1.25rem; font-weight:600; color:#202124; margin-bottom:0.35rem; letter-spacing:-0.01em;">
-                Log Out
-            </div>
+async function loadNotificationDropdown(isMobile=false) {
+    const bodyId = isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody';
+    const body = document.getElementById(bodyId);
+    if (!body || !studentData?.section) return;
+    try {
+        const q = query(collection(db,'notifications'), where('section','==',studentData.section));
+        const snap = await getDocs(q);
+        const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
+        if (snap.empty) { body.innerHTML = `<div class="notification-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet</p></div>`; return; }
+        const seen = new Set(); const list = [];
+        snap.forEach(d => {
+            const nd = d.data();
+            const key = `${nd.title}|${nd.message}|${nd.createdAt?.toDate?.().getTime()||''}`;
+            if (!seen.has(key)) { seen.add(key); list.push({id:d.id,...nd}); }
+        });
+        list.sort((a,b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)));
+        const unread = list.filter(n => !read.includes(n.id)).map(n => n.id);
+        body.innerHTML = list.slice(0,5).map(n => {
+            const d = n.createdAt?.toDate?.();
+            const ds = d ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Recently';
+            const isRead = read.includes(n.id);
+            return `<div class="notification-item ${isRead?'bg-gray-50':'bg-white'}" data-id="${n.id}">
+                <strong>${n.title||'Notification'}</strong>
+                <p>${n.message||''}</p><small>${ds}</small></div>`;
+        }).join('');
+        if (unread.length) markRead(unread);
+    } catch(e) { console.error(e); }
+}
 
-            <!-- Subtitle -->
-            <div style="font-size:0.875rem; color:#5f6368; margin-bottom:1.5rem; line-height:1.5;">
-                Are you sure you want to log out of your account?
-            </div>
+function markRead(ids) {
+    if (!studentData?.email || !ids.length) return;
+    const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
+    localStorage.setItem(`readNotifications_${studentData.email}`, JSON.stringify([...new Set([...read,...ids])]));
+    checkUnreadNotifications();
+}
 
-            <!-- Divider -->
-            <div style="height:1px; background:#e8eaed; margin:0 -1.5rem 1.25rem;"></div>
+function toggleNotificationDropdown(e) {
+    e?.stopPropagation();
+    const mob = window.innerWidth < 1024;
+    const drop = document.getElementById(mob ? 'notificationDropdownMobile' : 'notificationDropdown');
+    if (drop.classList.contains('hidden')) {
+        drop.classList.remove('hidden');
+        loadNotificationDropdown(mob);
+        document.getElementById('profileDropdown')?.classList.add('hidden');
+        document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+    } else { drop.classList.add('hidden'); }
+}
 
-            <!-- Buttons -->
-            <div style="display:flex; gap:0.75rem;">
-                <button id="logoutCancelBtn" style="
-                    flex:1;
-                    padding:0.75rem 0.5rem;
-                    border-radius:100px;
-                    border:1.5px solid #dadce0;
-                    background:#fff;
-                    color:#3c4043;
-                    font-size:0.9375rem;
-                    font-weight:500;
-                    cursor:pointer;
-                    font-family:'Inter',sans-serif;
-                    transition:background 0.15s;
-                    min-height:48px;
-                ">Cancel</button>
-                <button id="logoutConfirmBtn" style="
-                    flex:1;
-                    padding:0.75rem 0.5rem;
-                    border-radius:100px;
-                    border:none;
-                    background:#ea4335;
-                    color:#fff;
-                    font-size:0.9375rem;
-                    font-weight:500;
-                    cursor:pointer;
-                    font-family:'Inter',sans-serif;
-                    transition:background 0.15s, box-shadow 0.15s;
-                    min-height:48px;
-                ">Log Out</button>
-            </div>
-        </div>
-    `;
+function closeNotificationDropdown() {
+    document.getElementById('notificationDropdown')?.classList.add('hidden');
+    document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
+}
 
-    document.body.appendChild(overlay);
+function setupNotificationListener() {
+    if (!studentData?.section) return;
+    const q = query(collection(db,'notifications'), where('section','==',studentData.section));
+    onSnapshot(q, () => checkUnreadNotifications(), e => console.error(e));
+}
 
-    // Close profile dropdowns first
-    const profileDropdown = document.getElementById('profileDropdown');
-    const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-    if (profileDropdown) profileDropdown.classList.add('hidden');
-    if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
+// ── TEST DATA MAP ──
+const testData = {
+    '3-Minute Step Test': {
+        category: 'CARDIORESPIRATORY ENDURANCE',
+        getDuration: t => t ? `${t} minutes` : '3 minutes',
+        objective: 'Measure heart rate recovery after a brief, sub-maximal exercise bout',
+        scoring: 'Lower recovery heart rate indicates better cardiorespiratory fitness',
+        requirements: '12-inch step bench, metronome (96 bpm), stopwatch',
+        videoDescription: 'Watch this video to learn proper step test technique',
+        protocol: [
+            'Set metronome to 96 bpm for a 4-count rhythm: "UP, UP, DOWN, DOWN"',
+            'Step up with right foot, then left foot (24 steps per minute)',
+            'Step down with right foot, then left foot',
+            'Continue for exactly 3 minutes following the rhythm',
+            'Stop immediately after 3 minutes and sit down',
+            'After 5-second rest, count pulse for 60 seconds',
+            'Record your recovery heart rate'
+        ],
+        safetyTips: [
+            { icon: '🪜', text: 'Use a stable 12-inch platform' },
+            { icon: '👟', text: 'Wear supportive shoes' },
+            { icon: '😵', text: 'Stop if feeling dizzy' },
+            { icon: '⏱️', text: 'Maintain steady 24 steps/min pace' }
+        ]
+    },
+    'Curl-Up Test': {
+        category: 'MUSCULAR ENDURANCE',
+        getDuration: t => t ? `Target: ${t} curl-ups` : 'Maximum repetitions',
+        objective: 'Measure abdominal muscle endurance through repeated contractions',
+        scoring: 'More repetitions at correct pace indicates better muscular endurance',
+        requirements: 'Mat, tape/cardboard (4.5 inches apart), metronome (3-sec intervals)',
+        videoDescription: 'Watch proper curl-up technique and pacing',
+        protocol: [
+            'Make tape marks 4.5 inches apart on the ground',
+            'Lie supine with arms straight, fingertips at first mark',
+            'Bend knees with feet flat, heels near buttocks',
+            'Curl up and slide fingers to touch second tape mark',
+            'Return to starting position (shoulder blades touch floor)',
+            'Perform one curl every 3 seconds following metronome',
+            'Stop when you can no longer maintain the pace',
+            'Record total number of completed curl-ups'
+        ],
+        safetyTips: [
+            { icon: '🦶', text: 'Keep heels on floor' },
+            { icon: '🔄', text: 'Maintain smooth movement' },
+            { icon: '🙅', text: "Don't pull on neck" },
+            { icon: '🚑', text: 'Stop if back pain occurs' }
+        ]
+    },
+    'Push-Up Test': {
+        category: 'MUSCULAR ENDURANCE',
+        getDuration: t => t ? `Target: ${t} push-ups` : 'Maximum repetitions',
+        objective: 'Measure upper body muscular endurance of chest, shoulders, and triceps',
+        scoring: 'More push-ups with proper form indicates better muscular endurance',
+        requirements: 'Floor mat, stopwatch (optional)',
+        videoDescription: 'Watch proper push-up form and technique',
+        protocol: [
+            'Men: Start in standard plank, hands shoulder-width apart',
+            'Women: Modified position with knees on ground',
+            'Keep back straight from head to heels (or knees)',
+            'Lower body until elbows bent at 90 degrees',
+            'Chest should nearly touch floor',
+            'Push back up until arms fully extended',
+            'Perform as many as possible without stopping',
+            'Stop when unable to maintain proper form'
+        ],
+        safetyTips: [
+            { icon: '💪', text: 'Keep core engaged' },
+            { icon: '📏', text: 'Maintain straight body line' },
+            { icon: '🌬️', text: 'Breathe consistently' },
+            { icon: '🛑', text: 'Stop if shoulder pain occurs' }
+        ]
+    },
+    'Sit-and-Reach': {
+        category: 'FLEXIBILITY',
+        getDuration: t => t ? `Target: ${t} cm` : '3 attempts',
+        objective: 'Measure flexibility of lower back and hamstring muscles',
+        scoring: 'Greater reach distance indicates better flexibility',
+        requirements: 'Sit-and-reach box (or ruler and step), mat',
+        videoDescription: 'Learn proper sit-and-reach technique for accurate measurement',
+        protocol: [
+            'Remove shoes and sit with legs fully extended',
+            'Place feet flat against the sit-and-reach box',
+            'Place one hand on top of the other, fingers aligned',
+            'Slowly reach forward keeping knees straight',
+            'Slide hands along measuring scale as far as possible',
+            'Hold final position for at least 1-2 seconds',
+            'Perform 3 practice reaches, then 1 recorded test',
+            'Record distance reached (positive if past toes)'
+        ],
+        safetyTips: [
+            { icon: '🧘', text: 'Warm up with light stretching' },
+            { icon: '🚫', text: 'Avoid bouncing movements' },
+            { icon: '🐢', text: 'Stretch slowly and steadily' },
+            { icon: '⚡', text: 'Stop if sharp pain occurs' }
+        ]
+    },
+    'Skinfold Caliper': {
+        category: 'BODY COMPOSITION',
+        getDuration: t => t ? `Target: ${t}% body fat` : '10–15 minutes',
+        objective: 'Estimate body fat percentage by measuring subcutaneous fat thickness',
+        scoring: 'Lower body fat % indicates leaner body composition (varies by age/sex)',
+        requirements: 'Skinfold calipers, marker, trained professional',
+        videoDescription: 'Professional demonstration of proper skinfold measurement technique',
+        protocol: [
+            'Mark measurement sites (3 or 7 sites depending on protocol)',
+            'Men (3-site): Chest, Abdomen, Thigh',
+            'Women (3-site): Triceps, Suprailiac (hip), Thigh',
+            'Pinch skin and fat layer, pulling away from muscle',
+            'Place calipers 1 cm away from fingers',
+            'Read measurement after 2 seconds',
+            'Take 2–3 measurements at each site',
+            'Use equation to calculate body fat percentage'
+        ],
+        safetyTips: [
+            { icon: '👨‍⚕️', text: 'Trained professional required' },
+            { icon: '📋', text: 'Same tester for all measurements' },
+            { icon: '➡️', text: 'Measure on right side of body' },
+            { icon: '✏️', text: 'Mark sites carefully' }
+        ]
+    }
+};
 
-    // Cancel button
-    document.getElementById('logoutCancelBtn').addEventListener('click', () => {
-        overlay.remove();
-    });
+function getTestData(name) {
+    return testData[name] || {
+        category: 'FITNESS TEST',
+        getDuration: () => 'Varies',
+        objective: 'Complete the test according to instructions',
+        scoring: 'Based on performance metrics',
+        requirements: 'Follow test-specific requirements',
+        videoDescription: 'Watch this video for demonstration',
+        protocol: ['Follow the test instructions carefully'],
+        safetyTips: [
+            { icon: '🏃', text: 'Warm up properly' },
+            { icon: '🛑', text: 'Stop if you feel pain' },
+            { icon: '📐', text: 'Maintain proper form' },
+            { icon: '💧', text: 'Stay hydrated' }
+        ]
+    };
+}
 
-    // Click outside to close
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) overlay.remove();
-    });
+function populateTestDetails(test) {
+    const info = getTestData(test.testName);
 
-    // Confirm logout
-    document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
-        const confirmBtn = document.getElementById('logoutConfirmBtn');
-        confirmBtn.textContent = 'Logging out...';
-        confirmBtn.disabled = true;
-        confirmBtn.style.opacity = '0.7';
+    document.getElementById('testCategory').textContent = info.category;
+    document.getElementById('testTitle').textContent = test.testName;
 
+    // ← REMOVE the statDuration line here, it will be set in updateStartButton instead
+    document.getElementById('statDuration').textContent = 'Loading…';
+
+    document.getElementById('objectiveTextNew').textContent = info.objective;
+    document.getElementById('scoringTextNew').textContent = info.scoring;
+    document.getElementById('requirementsTextNew').textContent = info.requirements;
+
+    const videoWrap = document.getElementById('videoPlaceholder');
+    if (test.videoURL) {
+        let vid = '';
+        if (test.videoURL.includes('youtube.com/watch?v=')) vid = test.videoURL.split('v=')[1].split('&')[0];
+        else if (test.videoURL.includes('youtu.be/')) vid = test.videoURL.split('youtu.be/')[1].split('?')[0];
+        else if (test.videoURL.includes('youtube.com/embed/')) vid = test.videoURL.split('embed/')[1].split('?')[0];
+
+        if (vid) {
+            videoWrap.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid}" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius:12px;width:100%;height:100%;"></iframe>`;
+            document.getElementById('videoDescription').textContent = '📺 Watch the video demonstration above';
+        } else {
+            videoWrap.innerHTML = `<div style="text-align:center;padding:2rem;"><div style="font-size:3rem;margin-bottom:0.5rem;">⚠️</div><p style="color:#64748b;font-size:13px;">Video format not supported.</p></div>`;
+            document.getElementById('videoDescription').textContent = 'Unable to load video';
+        }
+    } else {
+        videoWrap.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.75rem;padding:2rem;background:#f8fafc;border-radius:12px;width:100%;height:100%;"><span style="font-size:3.5rem;opacity:0.4;">📹</span><p style="color:#94a3b8;font-size:14px;font-weight:500;margin:0;">No instruction video available</p></div>`;
+        document.getElementById('videoDescription').textContent = info.videoDescription;
+    }
+
+    const proto = document.getElementById('protocolSteps');
+    proto.innerHTML = info.protocol.map((step, i) => `
+        <div class="protocol-item">
+            <div class="step-badge">${i+1}</div>
+            <div class="step-content">${step}</div>
+        </div>`).join('');
+
+    const safety = document.getElementById('safetyTipsGrid');
+    safety.innerHTML = info.safetyTips.map(t => `
+        <div class="safety-chip">
+            <span class="safety-chip-icon">${t.icon}</span>
+            <span class="safety-chip-text">${t.text}</span>
+        </div>`).join('');
+
+    document.getElementById('startTestBtn').setAttribute('data-test-id', test.id);
+}
+
+async function checkStudentAttempts(testId, userId) {
+    try {
+        const q = query(
+            collection(db, 'testResults'),
+            where('testId', '==', testId),
+            where('studentId', '==', userId)
+        );
+        const snap = await getDocs(q);
+        
+        // ADD THIS - open browser console to check
+        console.log('Checking testId:', testId);
+        console.log('Total results found:', snap.size);
+        snap.forEach(d => console.log('Result doc:', d.data().testId, d.data().testName, d.data().attemptNumber));
+
+        let attempts = [], highest = 0, perfect = false;
+        snap.forEach(d => {
+            const data = d.data();
+            if (data.testId === testId && data.studentId === userId) {
+                attempts.push(data);
+                const s = calcScore(data.testName, data.result, data.testTarget);
+                if (s > highest) highest = s;
+                if (s === 100) perfect = true;
+            }
+        });
+        return { attemptCount: attempts.length, attempts, highestScore: highest, perfectScore: perfect };
+    } catch(e) { return { attemptCount: 0, attempts: [], highestScore: 0, perfectScore: false }; }
+}
+
+    function calcScore(testName, result, target=null) {
+        const n = testName.toLowerCase();
+        if (target && target > 0) {
+            const v = parseFloat(result);
+            if (isNaN(v)) return 75;
+            const ratio = v / target;
+            if (ratio >= 1) return 100;
+            if (ratio >= 0.9) return 95;
+            if (ratio >= 0.8) return 90;
+            if (ratio >= 0.7) return 85;
+            if (ratio >= 0.6) return 80;
+            if (ratio >= 0.5) return 75;
+            return Math.max(50, Math.round(ratio * 100));
+        }
+        return 75;
+    }
+
+    async function loadTestDetails(testId) {
         try {
-            await signOut(auth);
-            window.location.href = '../login/index.html';
-        } catch (error) {
-            console.error('Logout error:', error);
-            overlay.remove();
-            alert('Error logging out. Please try again.');
+            const testDoc = await getDoc(doc(db,'scheduledTests',testId));
+            if (testDoc.exists()) {
+                currentTest = { id: testDoc.id, ...testDoc.data() };
+                const info = await checkStudentAttempts(testId, currentUser.uid);
+                currentTest.studentAttemptInfo = info;
+                populateTestDetails(currentTest);
+                updateStartButton(currentTest, info);
+            } else {
+                alert('Test not found. Please try again.');
+                window.history.back();
+            }
+        } catch(e) {
+            console.error(e);
+            alert('Error loading test: ' + e.message);
+        }
+    }
+
+    function updateStartButton(test, info) {
+    const btn = document.getElementById('startTestBtn');
+    const allowed = parseInt(test.attemptsAllowed) || 1;
+    const used = info.attemptCount;
+    const remaining = allowed - used;
+
+    // ← Hero stat now shows REMAINING attempts only
+    const statEl = document.getElementById('statDuration');
+    if (remaining <= 0) {
+        statEl.textContent = 'No attempts remaining';
+    } else {
+        statEl.textContent = remaining === 1 ? '1 attempt remaining' : `${remaining} attempts remaining`;
+    }
+
+    if (info.perfectScore) {
+        btn.innerHTML = `<i class="bi bi-check-circle-fill"></i> Perfect Score Achieved!`;
+        btn.disabled = true;
+        btn.style.background = 'linear-gradient(135deg, #059669, #10b981)';
+        btn.style.boxShadow = '0 8px 24px rgba(5,150,105,0.3)';
+    } else if (remaining <= 0) {
+        btn.innerHTML = `<i class="bi bi-lock-fill"></i> All ${allowed} Attempt${allowed > 1 ? 's' : ''} Used`;
+        btn.disabled = true;
+        btn.style.background = 'linear-gradient(135deg, #475569, #64748b)';
+        btn.style.boxShadow = 'none';
+    } else {
+        if (used > 0) {
+            btn.innerHTML = `<i class="bi bi-arrow-clockwise"></i> Start Attempt ${used + 1}/${allowed}`;
+        } else {
+            btn.innerHTML = `<i class="bi bi-play-circle-fill"></i> Start Test Now`;
+        }
+        btn.disabled = false;
+    }
+}
+
+function updateProfileUI() {
+    if (!currentUser) return;
+    const photo = currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName||'User')}&background=3b82f6&color=fff&size=128`;
+    ['profilePictureBtn','profilePictureBtnMobile','profileDropdownPicture','profileDropdownPictureMobile'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.src = photo;
+    });
+    ['profileDropdownName','profileDropdownNameMobile'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.textContent = currentUser.displayName || 'Student';
+    });
+    ['profileDropdownEmail','profileDropdownEmailMobile'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.textContent = currentUser.email || '';
+    });
+}
+
+async function loadStudentData(user) {
+    try {
+        const q = query(collection(db,'students'), where('email','==',user.email));
+        const snap = await getDocs(q);
+        studentData = { displayName: user.displayName||user.email.split('@')[0]||'Student', email: user.email, section: 'Not Assigned' };
+        if (!snap.empty) snap.forEach(d => { studentData = { ...studentData, ...d.data(), section: d.data().section||'Not Assigned' }; });
+        return studentData;
+    } catch(e) { return null; }
+}
+
+function setupEventListeners() {
+    document.getElementById('notificationBellBtn')?.addEventListener('click', toggleNotificationDropdown);
+    document.getElementById('notificationBellBtnMobile')?.addEventListener('click', toggleNotificationDropdown);
+    document.getElementById('closeNotificationBtn')?.addEventListener('click', e => { e.stopPropagation(); closeNotificationDropdown(); });
+    document.getElementById('closeNotificationBtnMobile')?.addEventListener('click', e => { e.stopPropagation(); closeNotificationDropdown(); });
+    document.getElementById('profilePictureBtn')?.addEventListener('click', () => toggleProfile(false));
+    document.getElementById('profilePictureBtnMobile')?.addEventListener('click', () => toggleProfile(true));
+    document.addEventListener('click', e => {
+        if (!e.target.closest('#notificationBellBtn,#notificationBellBtnMobile,#notificationDropdown,#notificationDropdownMobile')) closeNotificationDropdown();
+        if (!e.target.closest('#profilePictureBtn,#profilePictureBtnMobile,#profileDropdown,#profileDropdownMobile')) {
+            document.getElementById('profileDropdown')?.classList.add('hidden');
+            document.getElementById('profileDropdownMobile')?.classList.add('hidden');
         }
     });
 }
-        // Make functions globally available
-        window.toggleNotificationDropdown = toggleNotificationDropdown;
-        window.closeNotificationDropdown = closeNotificationDropdown;
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    
+function toggleProfile(isMob) {
+    const id = isMob ? 'profileDropdownMobile' : 'profileDropdown';
+    document.getElementById(id)?.classList.toggle('hidden');
+}
+
+// Hamburger
+const ham = document.getElementById('hamburger');
+const drawer = document.getElementById('mobileDrawer');
+const overlay = document.getElementById('drawerOverlay');
+ham?.addEventListener('click', e => {
+    e.stopPropagation();
+    ham.classList.toggle('active');
+    drawer.classList.toggle('active');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : '';
+});
+overlay?.addEventListener('click', () => {
+    ham.classList.remove('active'); drawer.classList.remove('active'); overlay.classList.remove('active');
+    document.body.style.overflow = '';
+});
+document.querySelectorAll('.mobile-nav-link').forEach(l => l.addEventListener('click', () => {
+    ham.classList.remove('active'); drawer.classList.remove('active'); overlay.classList.remove('active');
+    document.body.style.overflow = '';
+}));
+
+// Globals
+window.startTest = function() {
+    if (currentTest) window.location.href = `./activetest.html?testId=${currentTest.id}&testName=${encodeURIComponent(currentTest.testName)}`;
+    else alert('Test data not loaded. Please try again.');
+};
+
+window.handleLogout = function() { showLogoutPopup(); };
+
+function showLogoutPopup() {
+    const existing = document.getElementById('logoutOverlay');
+    if (existing) existing.remove();
+    const overlay = document.createElement('div');
+    overlay.id = 'logoutOverlay';
+    overlay.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:1rem;`;
+    overlay.innerHTML = `
+        <div style="background:#fff;border-radius:24px;padding:2rem 1.5rem 1.5rem;max-width:360px;width:100%;box-shadow:0 8px 40px rgba(60,64,67,0.18);text-align:center;font-family:'DM Sans',sans-serif;">
+            <div style="width:68px;height:68px;background:#fce8e6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;">
+                <svg width="34" height="34" viewBox="0 0 48 48" fill="none"><path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/><path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/></svg>
+            </div>
+            <div style="font-size:1.25rem;font-weight:600;color:#202124;margin-bottom:0.35rem;">Log Out</div>
+            <div style="font-size:0.875rem;color:#5f6368;margin-bottom:1.5rem;line-height:1.5;">Are you sure you want to log out of your account?</div>
+            <div style="height:1px;background:#e8eaed;margin:0 -1.5rem 1.25rem;"></div>
+            <div style="display:flex;gap:0.75rem;">
+                <button id="logoutCancelBtn" style="flex:1;padding:0.75rem;border-radius:100px;border:1.5px solid #dadce0;background:#fff;color:#3c4043;font-size:0.9375rem;font-weight:500;cursor:pointer;min-height:48px;font-family:inherit;">Cancel</button>
+                <button id="logoutConfirmBtn" style="flex:1;padding:0.75rem;border-radius:100px;border:none;background:#ea4335;color:#fff;font-size:0.9375rem;font-weight:500;cursor:pointer;min-height:48px;font-family:inherit;">Log Out</button>
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
+    document.getElementById('logoutCancelBtn').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('logoutConfirmBtn');
+        btn.textContent = 'Logging out…'; btn.disabled = true; btn.style.opacity = '0.7';
+        try { await signOut(auth); window.location.href = '../login/index.html'; }
+        catch(e) { overlay.remove(); alert('Error logging out. Please try again.'); }
+    });
+}
+
+// Auth
+onAuthStateChanged(auth, async user => {
+    const loading = document.getElementById('loadingScreen');
+    const main = document.getElementById('mainContent');
+    if (user) {
+        try {
+            currentUser = user;
+            await loadStudentData(user);
+            setupNotificationListener();
+            await checkUnreadNotifications();
+            updateProfileUI();
+            const testId = new URLSearchParams(window.location.search).get('testId');
+            if (testId) { await loadTestDetails(testId); }
+            else { alert('No test specified.'); window.location.href = './test.html'; }
+            setupEventListeners();
+            loading.style.display = 'none';
+            main.style.display = 'block';
+        } catch(e) { console.error(e); alert('Error loading page.'); }
+    } else { window.location.href = '../login/index.html'; }
+});
+
+window.toggleNotificationDropdown = toggleNotificationDropdown;
+window.closeNotificationDropdown = closeNotificationDropdown;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
