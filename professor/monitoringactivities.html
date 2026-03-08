@@ -200,80 +200,83 @@
 </div>
 
 <!-- TEST DETAIL MODAL -->
-<div id="testDetailModal" class="modal-overlay fixed inset-0 bg-black/55 justify-center items-center z-[10000] backdrop-blur-sm p-4">
-    <div class="bg-white rounded-2xl w-full max-w-[860px] max-h-[90vh] flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.25)] animate-fadeSlide overflow-hidden">
+<div id="testDetailModal" class="modal-overlay fixed inset-0 bg-black/55 justify-center items-center z-[10000] backdrop-blur-sm p-2 sm:p-4">
+    <div class="bg-white rounded-2xl w-full max-w-[860px] max-h-[95vh] flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.25)] animate-fadeSlide overflow-hidden">
         <!-- Modal Header -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-border bg-white flex-shrink-0">
-            <div>
-                <div class="font-display text-[17px] font-bold text-navy" id="modalTestTitle">Test Name</div>
+        <div class="flex items-center justify-between px-4 py-3 border-b border-border bg-white flex-shrink-0">
+            <div class="min-w-0 flex-1 pr-3">
+                <div class="font-display text-[15px] font-bold text-navy truncate" id="modalTestTitle">Test Name</div>
                 <div class="text-xs text-text-muted mt-0.5" id="modalTestSection">Section: —</div>
             </div>
-            <button onclick="closeTestModal()" class="w-8 h-8 rounded-full bg-surface border-0 flex items-center justify-center cursor-pointer text-text-muted hover:bg-danger-bg hover:text-danger transition-all text-sm">
+            <button onclick="closeTestModal()" class="w-8 h-8 rounded-full bg-surface border-0 flex items-center justify-center cursor-pointer text-text-muted hover:bg-danger-bg hover:text-danger transition-all text-sm flex-shrink-0">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-6">
-            <!-- Summary row -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
-                <div class="bg-navy rounded-xl p-4 text-center text-white">
-                    <div class="text-2xl font-bold font-mono" id="modalTotalStudents">0</div>
-                    <div class="text-[11px] text-white/55 mt-1 uppercase tracking-wide">Total Students</div>
+        <div class="flex-1 overflow-y-auto p-3 sm:p-6">
+            <!-- Summary row — 4 cols always, compact on mobile -->
+            <div class="grid grid-cols-4 gap-2 sm:gap-4 mb-3 sm:mb-5">
+                <div class="bg-navy rounded-xl p-2 sm:p-4 text-center text-white">
+                    <div class="text-lg sm:text-2xl font-bold font-mono" id="modalTotalStudents">0</div>
+                    <div class="text-[9px] sm:text-[11px] text-white/55 mt-0.5 uppercase tracking-wide leading-tight">Total</div>
                 </div>
-                <div class="bg-gradient-to-br from-success to-[#0a6646] rounded-xl p-4 text-center text-white">
-                    <div class="text-2xl font-bold font-mono" id="modalCompletedCount">0</div>
-                    <div class="text-[11px] text-white/55 mt-1 uppercase tracking-wide">Completed</div>
+                <div class="bg-gradient-to-br from-success to-[#0a6646] rounded-xl p-2 sm:p-4 text-center text-white">
+                    <div class="text-lg sm:text-2xl font-bold font-mono" id="modalCompletedCount">0</div>
+                    <div class="text-[9px] sm:text-[11px] text-white/55 mt-0.5 uppercase tracking-wide leading-tight">Done</div>
                 </div>
-                <div class="bg-gradient-to-br from-danger to-[#922b21] rounded-xl p-4 text-center text-white">
-                    <div class="text-2xl font-bold font-mono" id="modalNotTakenCount">0</div>
-                    <div class="text-[11px] text-white/55 mt-1 uppercase tracking-wide">Not Taken</div>
+                <div class="bg-gradient-to-br from-danger to-[#922b21] rounded-xl p-2 sm:p-4 text-center text-white">
+                    <div class="text-lg sm:text-2xl font-bold font-mono" id="modalNotTakenCount">0</div>
+                    <div class="text-[9px] sm:text-[11px] text-white/55 mt-0.5 uppercase tracking-wide leading-tight">Pending</div>
                 </div>
-                <div class="bg-gradient-to-br from-royal to-blue rounded-xl p-4 text-center text-white">
-                    <div class="text-2xl font-bold font-mono" id="modalCompletionRate">0%</div>
-                    <div class="text-[11px] text-white/55 mt-1 uppercase tracking-wide">Completion</div>
+                <div class="bg-gradient-to-br from-royal to-blue rounded-xl p-2 sm:p-4 text-center text-white">
+                    <div class="text-lg sm:text-2xl font-bold font-mono" id="modalCompletionRate">0%</div>
+                    <div class="text-[9px] sm:text-[11px] text-white/55 mt-0.5 uppercase tracking-wide leading-tight">Rate</div>
                 </div>
             </div>
+
             <!-- Progress bar -->
-            <div class="h-2 bg-border rounded-full overflow-hidden mb-5">
+            <div class="h-1.5 bg-border rounded-full overflow-hidden mb-3 sm:mb-5">
                 <div class="h-full bg-gradient-to-r from-success to-[#34d399] rounded-full progress-fill" id="modalProgressBar" style="width:0%"></div>
             </div>
 
-            <!-- Filters -->
-            <div class="flex flex-wrap items-center gap-3 bg-surface rounded-xl p-4 border border-border mb-5">
-                <select id="studentStatusFilter" onchange="window.filterModalStudents()" class="px-3 py-2 border border-border rounded-lg text-[13px] font-medium text-text-primary bg-white cursor-pointer focus:outline-none focus:border-blue">
-                    <option value="all">All Students</option>
-                    <option value="taken">Taken</option>
-                    <option value="not-taken">Not Taken</option>
-                </select>
-                <select id="studentSortBy" onchange="window.filterModalStudents()" class="px-3 py-2 border border-border rounded-lg text-[13px] font-medium text-text-primary bg-white cursor-pointer focus:outline-none focus:border-blue">
-                    <option value="name">Sort by Name</option>
-                    <option value="category">Sort by Best Category</option>
-                </select>
-                <div class="relative flex-1 min-w-[200px]">
+            <!-- Filters — compact 2-col grid on mobile -->
+            <div class="bg-surface rounded-xl p-2.5 sm:p-4 border border-border mb-3 sm:mb-5">
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <select id="studentStatusFilter" onchange="window.filterModalStudents()" class="px-2 py-1.5 border border-border rounded-lg text-[12px] font-medium text-text-primary bg-white cursor-pointer focus:outline-none focus:border-blue w-full">
+                        <option value="all">All Students</option>
+                        <option value="taken">Taken</option>
+                        <option value="not-taken">Not Taken</option>
+                    </select>
+                    <select id="studentSortBy" onchange="window.filterModalStudents()" class="px-2 py-1.5 border border-border rounded-lg text-[12px] font-medium text-text-primary bg-white cursor-pointer focus:outline-none focus:border-blue w-full">
+                        <option value="name">Sort: Name</option>
+                        <option value="category">Sort: Category</option>
+                    </select>
+                </div>
+                <div class="relative mb-2">
                     <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-xs"></i>
                     <input type="text" id="studentSearch" placeholder="Search students..." onkeyup="window.filterModalStudents()"
-                        class="w-full pl-9 pr-3 py-2 border border-border rounded-lg text-[13px] font-medium focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/10 transition-all">
+                        class="w-full pl-8 pr-3 py-1.5 border border-border rounded-lg text-[12px] font-medium focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/10 transition-all">
                 </div>
-                <div class="flex items-center gap-3 ml-auto">
-                    <span class="inline-flex items-center gap-1.5 bg-success-bg text-success text-xs font-semibold px-2.5 py-1 rounded-full border border-success/20">
-                        <i class="fas fa-check-circle text-[10px]"></i>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1 bg-success-bg text-success text-[11px] font-semibold px-2 py-0.5 rounded-full border border-success/20 flex-1 justify-center">
+                        <i class="fas fa-check-circle text-[9px]"></i>
                         <span id="takenCount">0</span> Taken
                     </span>
-                    <span class="inline-flex items-center gap-1.5 bg-danger-bg text-danger text-xs font-semibold px-2.5 py-1 rounded-full border border-danger/20">
-                        <i class="fas fa-times-circle text-[10px]"></i>
+                    <span class="inline-flex items-center gap-1 bg-danger-bg text-danger text-[11px] font-semibold px-2 py-0.5 rounded-full border border-danger/20 flex-1 justify-center">
+                        <i class="fas fa-times-circle text-[9px]"></i>
                         <span id="notTakenCount">0</span> Not Taken
                     </span>
                 </div>
             </div>
 
             <!-- Student list heading -->
-            <div class="flex justify-between items-center mb-3">
-                <span class="text-[14px] font-semibold text-navy" id="modalListTitle">Students</span>
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-[13px] font-semibold text-navy" id="modalListTitle">Students</span>
                 <span class="text-xs text-text-muted" id="displayedCount">Showing 0 of 0</span>
             </div>
 
-            <!-- Student list -->
-            <div id="modalStudentList" class="space-y-2 max-h-80 overflow-y-auto pr-1"></div>
+            <!-- Student list — no fixed max-height, fills remaining space -->
+            <div id="modalStudentList" class="space-y-2"></div>
         </div>
     </div>
 </div>
@@ -291,20 +294,24 @@
             </button>
         </div>
         <div class="flex-1 overflow-y-auto p-6">
-            <div class="grid grid-cols-3 gap-4 mb-5">
-                <div class="bg-navy rounded-xl p-3 text-center text-white">
-                    <div class="text-sm font-semibold" id="studentDetailsTest">—</div>
-                    <div class="text-[10px] text-white/50 mt-0.5 uppercase tracking-wide">Test</div>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+            <!-- Test name -->
+            <div style="background:#0a1628; border-radius:12px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between;">
+                <span style="font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.8px; flex-shrink:0; margin-right:8px;">Test</span>
+                <span style="font-size:13px; font-weight:700; color:white; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="studentDetailsTest">—</span>
+            </div>
+            <!-- Best Category + Status in one row -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div style="background:linear-gradient(135deg,#1e4d8c,#2d6fc4); border-radius:12px; padding:10px 12px; text-align:center;">
+                    <div style="font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:5px;">Best Category</div>
+                    <div id="studentDetailsBestCategory" style="display:flex; justify-content:center;">—</div>
                 </div>
-                <div class="bg-gradient-to-br from-royal to-blue rounded-xl p-3 text-center text-white">
-                    <div class="text-sm font-semibold" id="studentDetailsBestCategory">—</div>
-                    <div class="text-[10px] text-white/50 mt-0.5 uppercase tracking-wide">Best Category</div>
-                </div>
-                <div class="bg-gradient-to-br from-success to-[#0a6646] rounded-xl p-3 text-center text-white">
-                    <div class="text-sm font-semibold" id="studentDetailsStatus">Taken</div>
-                    <div class="text-[10px] text-white/50 mt-0.5 uppercase tracking-wide">Status</div>
+                <div style="background:linear-gradient(135deg,#0e8a5f,#0a6646); border-radius:12px; padding:10px 12px; text-align:center;">
+                    <div style="font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:5px;">Status</div>
+                    <div style="font-size:12px; font-weight:700;" id="studentDetailsStatus">Taken</div>
                 </div>
             </div>
+        </div>
             <h4 class="font-display text-base font-bold text-navy mb-3 flex items-center gap-2">
                 <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white text-[10px]">
                     <i class="fas fa-history"></i>
@@ -1613,36 +1620,63 @@ function getAgeGroupFromStudent(studentData) {
     window._filterModalStudents = window.filterModalStudents;
 
     function renderModalStudents() {
-        const list = document.getElementById('modalStudentList');
-        if (!currentFilteredStudents.length) {
-            list.innerHTML = `<div class="text-center py-8 text-text-muted text-sm"><i class="fas fa-user-graduate text-3xl mb-2 opacity-40"></i><div>No students match your filters</div></div>`;
-            return;
-        }
-        list.innerHTML = currentFilteredStudents.map(s => {
-            const name   = s.name || (s.email||'').split('@')[0] || 'Student';
-            const init   = name.charAt(0).toUpperCase();
-            const categoryBadge = s.hasTaken && s.bestCategory ? renderCategoryBadge(s.bestCategory) : '';
-            const aCnt   = s.attempts?.length || 0;
-            return `
-            <div class="student-item flex items-center justify-between p-3 rounded-xl border border-border cursor-pointer" onclick="viewStudentDetails('${(s.email||'').replace(/'/g,"\\'")}')">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-sm flex-shrink-0">${init}</div>
-                    <div>
-                        <div class="text-[13px] font-semibold text-navy">${name}</div>
-                        <div class="text-[11px] text-text-muted">${s.email||''}</div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    ${s.hasTaken ? categoryBadge : ''}
-                    ${s.hasTaken && aCnt > 1 ? `<span class="text-[10px] bg-border text-text-muted px-1.5 py-0.5 rounded">${aCnt} attempts</span>` : ''}
-                    <span class="inline-block px-2.5 py-1 rounded-full text-[11px] font-bold border ${s.hasTaken ? 'bg-success-bg text-success border-success/20' : 'bg-danger-bg text-danger border-danger/20'}">
-                        ${s.hasTaken ? '✓ Taken' : '✗ Not Taken'}
-                    </span>
-                    ${s.hasTaken ? `<button class="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-br from-royal to-blue text-white rounded-lg text-[10px] font-semibold" onclick="event.stopPropagation(); viewStudentDetails('${(s.email||'').replace(/'/g,"\\'")}')"><i class="fas fa-history"></i> History</button>` : ''}
-                </div>
-            </div>`;
-        }).join('');
+    const list = document.getElementById('modalStudentList');
+    if (!currentFilteredStudents.length) {
+        list.innerHTML = `<div class="text-center py-8 text-text-muted text-sm"><i class="fas fa-user-graduate text-3xl mb-2 opacity-40"></i><div>No students match your filters</div></div>`;
+        return;
     }
+    list.innerHTML = currentFilteredStudents.map(s => {
+        const name  = s.name || (s.email||'').split('@')[0] || 'Student';
+        const init  = name.charAt(0).toUpperCase();
+        const aCnt  = s.attempts?.length || 0;
+        const catClass = s.hasTaken && s.bestCategory ? getCategoryClass(s.bestCategory) : '';
+        const catIcon  = s.hasTaken && s.bestCategory ? getCategoryIcon(s.bestCategory) : '';
+
+        return `
+        <div class="student-item border border-border rounded-xl cursor-pointer" style="background:white; margin-bottom:6px; overflow:hidden;" onclick="viewStudentDetails('${(s.email||'').replace(/'/g,"\\'")}')">
+            
+            <!-- Row 1: Avatar + Name + Email + Status badge -->
+            <div style="display:flex; align-items:center; gap:10px; padding:10px 12px 6px;">
+                <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#1e4d8c,#2d6fc4);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;flex-shrink:0;">
+                    ${init}
+                </div>
+                <div style="min-width:0;flex:1;">
+                    <div style="font-size:13px;font-weight:700;color:#0a1628;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
+                    <div style="font-size:11px;color:#8a98ae;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.email||''}</div>
+                </div>
+                ${s.hasTaken
+                    ? `<span style="display:inline-flex;align-items:center;gap:3px;background:#d4f0e6;color:#0e8a5f;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;flex-shrink:0;border:1px solid rgba(14,138,95,0.2);">
+                            <i class="fas fa-check" style="font-size:8px;"></i> Taken
+                       </span>`
+                    : `<span style="display:inline-flex;align-items:center;gap:3px;background:#fce8e6;color:#c0392b;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;flex-shrink:0;border:1px solid rgba(192,57,43,0.2);">
+                            <i class="fas fa-times" style="font-size:8px;"></i> Not Taken
+                       </span>`
+                }
+            </div>
+
+            <!-- Row 2: Category + Attempts + History button -->
+            <div style="display:flex;align-items:center;gap:6px;padding:0 12px 10px;flex-wrap:nowrap;">
+                ${s.hasTaken && s.bestCategory
+                    ? `<span class="category-badge ${catClass}" style="font-size:10px;padding:3px 8px;flex-shrink:0;">
+                           ${catIcon} ${s.bestCategory}
+                       </span>
+                       ${aCnt > 0 ? `<span style="font-size:10px;color:#8a98ae;background:#f4f6fa;padding:3px 8px;border-radius:99px;border:1px solid #e1e6ef;flex-shrink:0;">
+                           ${aCnt} attempt${aCnt !== 1 ? 's' : ''}
+                       </span>` : ''}`
+                    : `<span style="font-size:11px;color:#8a98ae;flex:1;">No attempts yet</span>`
+                }
+                ${s.hasTaken
+                    ? `<button onclick="event.stopPropagation(); viewStudentDetails('${(s.email||'').replace(/'/g,"\\'")}');"
+                          style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#0a1628,#1a3a5c);color:white;border:none;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:600;cursor:pointer;flex-shrink:0;">
+                          <i class="fas fa-history" style="font-size:9px;"></i> History
+                       </button>`
+                    : ''
+                }
+            </div>
+
+        </div>`;
+    }).join('');
+}
 
     window.viewStudentDetails = function(email) {
         if (!currentTestData) return;
@@ -1663,17 +1697,21 @@ function getAgeGroupFromStudent(studentData) {
         document.getElementById('studentTestAttempts').innerHTML = sorted.map(a => {
             const isBest = a.category === td.bestCategory;
             const categoryBadge = renderCategoryBadge(a.category);
-            return `
-            <div class="flex items-center justify-between p-3 rounded-xl border ${isBest ? 'border-success/30 bg-success-bg/30' : 'border-border bg-surface'}">
-                <div>
-                    <span class="text-[13px] font-semibold text-navy">Attempt ${a.attemptNumber}</span>
-                    ${isBest ? '<span class="ml-2 text-[10px] bg-success-bg text-success px-1.5 py-0.5 rounded font-bold">Best</span>' : ''}
-                    <span class="text-[11px] text-text-muted ml-2">${a.formattedDate}</span>
+           return `
+            <div style="border-radius:12px; border:1px solid ${isBest ? 'rgba(14,138,95,0.3)' : '#e1e6ef'}; background:${isBest ? 'rgba(212,240,230,0.3)' : '#f4f6fa'}; padding:12px; margin-bottom:6px;">
+                <!-- Row 1: Attempt number + Best badge + date -->
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px; flex-wrap:wrap;">
+                    <span style="font-size:13px; font-weight:700; color:#0a1628;">Attempt ${a.attemptNumber}</span>
+                    ${isBest ? '<span style="font-size:10px; background:#d4f0e6; color:#0e8a5f; padding:2px 7px; border-radius:99px; font-weight:700;">Best</span>' : ''}
+                    ${a.isProfessorOverride ? '<span style="font-size:10px; background:#d6eaf8; color:#1a6fa8; padding:2px 7px; border-radius:99px; font-weight:700;">Override</span>' : ''}
+                    <span style="font-size:10px; color:#8a98ae; margin-left:auto;">${a.formattedDate}</span>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-[11px] text-text-muted">${a.result} ${a.testUnit||''}</span>
+                <!-- Row 2: Result + Category badge -->
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <span style="font-size:11px; color:#4a5a72; background:white; padding:3px 10px; border-radius:99px; border:1px solid #e1e6ef; font-weight:600;">
+                        <i class="fas fa-chart-bar" style="font-size:9px; margin-right:3px;"></i>${a.result} ${a.testUnit||''}
+                    </span>
                     ${categoryBadge}
-                    ${a.isProfessorOverride ? '<span class="text-[10px] bg-info-bg text-info px-1.5 py-0.5 rounded">Override</span>' : ''}
                 </div>
             </div>`;
         }).join('') || '<div class="text-center py-4 text-text-muted text-sm">No attempt details</div>';
