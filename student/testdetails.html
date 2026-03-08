@@ -1110,16 +1110,17 @@
             <!-- Content Grid -->
             <div class="content-grid">
                 <!-- Video Demonstration -->
-                <div class="content-card">
-                    <div class="content-card-header">
-                        <img class="content-card-icon" src="https://c.animaapp.com/pVU46Rgb/img/image-159@2x.png" alt="Video Icon">
-                        <h2 class="content-card-title">Video Demonstration</h2>
-                    </div>
-                    <div class="video-placeholder">
-                        <img id="testVideo" src="https://c.animaapp.com/pVU46Rgb/img/image-82.png" alt="Test demonstration">
-                    </div>
-                    <p class="video-description" id="videoDescription">Loading video description...</p>
-                </div>
+ <!-- Video Demonstration -->
+<div class="content-card">
+    <div class="content-card-header">
+        <img class="content-card-icon" src="https://c.animaapp.com/pVU46Rgb/img/image-159@2x.png" alt="Video Icon">
+        <h2 class="content-card-title">Video Demonstration</h2>
+    </div>
+    <div class="video-placeholder" id="videoPlaceholder">
+        <img id="testVideo" src="https://c.animaapp.com/pVU46Rgb/img/image-82.png" alt="Test demonstration">
+    </div>
+    <p class="video-description" id="videoDescription">Loading video description...</p>
+</div>
 
                 <!-- Test Protocol -->
                 <div class="content-card">
@@ -1717,67 +1718,61 @@
 
             let requirementsText = testInfo.requirements;
             document.getElementById('requirementsTextNew').textContent = requirementsText;
-
-            const videoPlaceholder = document.querySelector('.video-placeholder');
-            if (test.videoURL) {
-                let videoId = '';
-                
-                if (test.videoURL.includes('youtube.com/watch?v=')) {
-                    videoId = test.videoURL.split('v=')[1].split('&')[0];
-                } else if (test.videoURL.includes('youtu.be/')) {
-                    videoId = test.videoURL.split('youtu.be/')[1].split('?')[0];
-                } else if (test.videoURL.includes('youtube.com/embed/')) {
-                    videoId = test.videoURL.split('embed/')[1].split('?')[0];
-                }
-                
-                if (videoId) {
-                    videoPlaceholder.innerHTML = `
-                        <div style="position: relative; width: 100%; height: 100%; cursor: pointer; border-radius: 8px; overflow: hidden;" onclick="window.open('${test.videoURL}', '_blank')">
-                            <img src="https://img.youtube.com/vi/${videoId}/maxresdefault.jpg" 
-                                 alt="Video Thumbnail" 
-                                 style="width: 100%; height: 100%; object-fit: cover;"
-                                 onerror="this.src='https://img.youtube.com/vi/${videoId}/hqdefault.jpg'">
-                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-                                        background: rgba(255, 0, 0, 0.9); width: 80px; height: 80px; 
-                                        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-                                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-                                <div style="width: 0; height: 0; border-left: 25px solid white; 
-                                            border-top: 15px solid transparent; border-bottom: 15px solid transparent;
-                                            margin-left: 5px;"></div>
-                            </div>
-                            <div style="position: absolute; bottom: 0; left: 0; right: 0; 
-                                        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); 
-                                        padding: 20px; color: white; font-weight: 600;">
-                                🎥 Click to Watch on YouTube
-                            </div>
-                        </div>
-                    `;
-                    document.getElementById('videoDescription').textContent = '📺 Click the video to watch the instruction from your professor';
-                } else {
-                    videoPlaceholder.innerHTML = `
-                        <div style="padding: 40px; text-align: center; background: #fee2e2; border-radius: 8px;">
-                            <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
-                            <p style="color: #991b1b; font-weight: 600; margin: 0 0 10px 0; font-size: 16px;">
-                                Video URL format not supported
-                            </p>
-                            <p style="color: #7f1d1d; font-size: 13px; margin: 0;">
-                                Please contact your professor
-                            </p>
-                        </div>
-                    `;
-                    document.getElementById('videoDescription').textContent = 'Unable to load video';
-                }
-            } else {
-                videoPlaceholder.innerHTML = `
-                    <div style="display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 15px; padding: 40px; background: #f3f4f6; border-radius: 8px;">
-                        <div style="font-size: 64px; opacity: 0.5;">📹</div>
-                        <p style="color: #6b7280; font-size: 15px; margin: 0; font-weight: 500;">
-                            No instruction video available for this test
-                        </p>
-                    </div>
-                `;
-                document.getElementById('videoDescription').textContent = testInfo.videoDescription;
-            }
+        
+ // Find this part in populateTestDetails function
+const videoPlaceholder = document.querySelector('.video-placeholder');
+if (test.videoURL) {
+    let videoId = '';
+    
+    if (test.videoURL.includes('youtube.com/watch?v=')) {
+        videoId = test.videoURL.split('v=')[1].split('&')[0];
+    } else if (test.videoURL.includes('youtu.be/')) {
+        videoId = test.videoURL.split('youtu.be/')[1].split('?')[0];
+    } else if (test.videoURL.includes('youtube.com/embed/')) {
+        videoId = test.videoURL.split('embed/')[1].split('?')[0];
+    }
+    
+    if (videoId) {
+        // Replace with EMBEDDED YouTube player
+        videoPlaceholder.innerHTML = `
+            <div style="position: relative; width: 100%; height: 100%;">
+                <iframe width="100%" height="100%" 
+                    src="https://www.youtube.com/embed/${videoId}" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen
+                    style="border-radius: 12px; width: 100%; height: 100%;">
+                </iframe>
+            </div>
+        `;
+        document.getElementById('videoDescription').textContent = '📺 Watch the video demonstration above';
+    } else {
+        videoPlaceholder.innerHTML = `
+            <div style="padding: 40px; text-align: center; background: #fee2e2; border-radius: 8px;">
+                <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
+                <p style="color: #991b1b; font-weight: 600; margin: 0 0 10px 0; font-size: 16px;">
+                    Video URL format not supported
+                </p>
+                <p style="color: #7f1d1d; font-size: 13px; margin: 0;">
+                    Please contact your professor
+                </p>
+            </div>
+        `;
+        document.getElementById('videoDescription').textContent = 'Unable to load video';
+    }
+} else {
+    videoPlaceholder.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 15px; padding: 40px; background: #f3f4f6; border-radius: 8px;">
+            <div style="font-size: 64px; opacity: 0.5;">📹</div>
+            <p style="color: #6b7280; font-size: 15px; margin: 0; font-weight: 500;">
+                No instruction video available for this test
+            </p>
+        </div>
+    `;
+    document.getElementById('videoDescription').textContent = testInfo.videoDescription;
+}
+            
             
             const protocolStepsContainer = document.getElementById('protocolSteps');
             protocolStepsContainer.innerHTML = '';
@@ -1799,10 +1794,10 @@
                 tipElement.innerHTML = `<p class="safety-tip-text">${tip}</p>`;
                 safetyTipsContainer.appendChild(tipElement);
             });
-            
+        
             document.getElementById('startTestBtn').setAttribute('data-test-id', test.id);
+        
         }
-
         function getCategoryIcon(testName) {
             const normalized = testName.toLowerCase();
             

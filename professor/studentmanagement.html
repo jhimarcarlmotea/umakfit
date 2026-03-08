@@ -498,7 +498,7 @@
                             <thead>
                                 <tr>
                                     <th>ID</th><th>Student Name</th><th>Section</th>
-                                    <th>Activities</th><th>Overall Performance</th><th>Actions</th>
+                                     <th>Activities</th><th>Health Condition</th><th>Overall Performance</th><th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="studentsTableBody">
@@ -1383,7 +1383,8 @@
                     studentsMap.set(data.email, {
                         birthday: data.birthday || null,
                         age: data.age || null,
-                        gender: data.gender || 'male'
+                        gender: data.gender || 'male',
+                        medicalCondition: data.medicalCondition || null
                     });
                 }
             });
@@ -1476,7 +1477,8 @@
                         overallScore: overallScore,
                         status: 'active',
                         age: studentAgeData.age || null,
-                        birthday: studentAgeData.birthday || null
+                        birthday: studentAgeData.birthday || null,
+                        medicalCondition: studentAgeData.medicalCondition || null
                     });
                 }
             }
@@ -1539,15 +1541,18 @@
         displayStudents.forEach(student => {
             const badge = renderCategoryBadge(student.overallCategory);
             
-            rowsHTML += `<tr onclick="viewStudentDetails('${student.id}')" style="cursor:pointer;">
+const healthDisplay = student.medicalCondition
+    ? `<span style="display:inline-flex;align-items:center;gap:5px;background:#fff7ed;border:1px solid #fed7aa;color:#92400e;font-weight:600;font-size:12px;padding:4px 10px;border-radius:20px;">🏥 ${student.medicalCondition}</span>`
+    : `<span style="color:#94a3b8;font-size:13px;">—</span>`;
+rowsHTML += `<tr onclick="viewStudentDetails('${student.id}')" style="cursor:pointer;">
                 <td data-label="ID"><strong>${student.umakId || 'N/A'}</strong></td>
                 <td data-label="Student Name">${student.firstName} ${student.lastName}</td>
                 <td data-label="Section">${student.section || 'N/A'}</td>
                 <td data-label="Activities"><strong>${student.uniqueTestCount}</strong></td>
+                <td data-label="Health Condition">${healthDisplay}</td>
                 <td data-label="Overall">${badge}</td>
                 <td data-label="Actions"><div class="action-buttons"><button class="btn-action btn-view" onclick="event.stopPropagation(); viewStudentDetails('${student.id}')"><i class="fas fa-eye"></i> View</button></div></td>
-            </tr>`;
-        });
+            </tr>`;        });
         tableBody.innerHTML = rowsHTML;
         updateResponsiveViews();
     }
@@ -1713,6 +1718,7 @@
                 birthday: student.birthday,
                 age: student.age
             };
+            const medicalCondition = student.medicalCondition || null;
 
             const bestCategoriesPerTest = new Map(); // Store best category per test
             const allAttemptsByTest = new Map();
@@ -1759,9 +1765,16 @@
                 <div class="info-item"><div class="info-label">Section Schedule</div><div class="info-value">${sectionSchedule}</div></div>
                 <div class="info-item"><div class="info-label">Tests Taken</div><div class="info-value"><strong>${uniqueTestCount}</strong></div></div>
                 <div class="info-item"><div class="info-label">Overall</div><div class="info-value">${overallBadge}</div></div>
-                <div class="info-item"><div class="info-label">Status</div><div class="info-value"><span class="status-badge status-active">Active</span></div></div>
-            </div>`;
-            document.getElementById('studentDetailsContent').innerHTML = html;
+<div class="info-item"><div class="info-label">Status</div><div class="info-value"><span class="status-badge status-active">Active</span></div></div>
+            </div>
+            ${medicalCondition ? `
+            <div style="margin-top:16px; background:#fff7ed; border:1.5px solid #fed7aa; border-radius:10px; padding:14px 16px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <span style="font-size:16px;">🏥</span>
+                    <span style="font-weight:700; color:#92400e; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">Medical Condition</span>
+                </div>
+                <div style="color:#7c2d12; font-size:14px; line-height:1.6;">${medicalCondition}</div>
+            </div>` : ''}`;            document.getElementById('studentDetailsContent').innerHTML = html;
 
             let attemptsHTML = '';
             if (uniqueTestCount > 0) {
