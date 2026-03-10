@@ -1966,6 +1966,12 @@ document.getElementById('profileAgeGender').textContent =
             mobileDrawer.classList.toggle('active');
             drawerOverlay.classList.toggle('active');
             document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+
+            // Close profile and notification dropdowns when hamburger is opened
+            document.getElementById('profileDropdown')?.classList.add('hidden');
+            document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+            document.getElementById('notificationDropdown')?.classList.add('hidden');
+            document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
         });
     }
 
@@ -1978,13 +1984,17 @@ document.getElementById('profileAgeGender').textContent =
         });
     }
 
-    mobileNavLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            mobileDrawer.classList.remove('active');
-            drawerOverlay.classList.remove('active');
+     window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024) {
+            hamburger?.classList.remove('active');
+            mobileDrawer?.classList.remove('active');
+            drawerOverlay?.classList.remove('active');
             document.body.style.overflow = '';
-        });
+            document.getElementById('profileDropdown')?.classList.add('hidden');
+            document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+            document.getElementById('notificationDropdown')?.classList.add('hidden');
+            document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
+        }
     });
 
     async function updateLastLogin(studentId) {

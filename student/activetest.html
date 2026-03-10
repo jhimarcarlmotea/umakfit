@@ -1810,14 +1810,24 @@ const notificationsQuery = query(
         const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
 
         if (hamburger) {
-            hamburger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                hamburger.classList.toggle('active');
-                mobileDrawer.classList.toggle('active');
-                drawerOverlay.classList.toggle('active');
-                document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-            });
-        }
+        hamburger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hamburger.classList.toggle('active');
+            mobileDrawer.classList.toggle('active');
+            drawerOverlay.classList.toggle('active');
+            document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+
+            // Close profile and notification dropdowns when hamburger is opened
+            const profileDropdown = document.getElementById('profileDropdown');
+            const profileDropdownMobile = document.getElementById('profileDropdownMobile');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const notificationDropdownMobile = document.getElementById('notificationDropdownMobile');
+            if (profileDropdown) profileDropdown.classList.add('hidden');
+            if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
+            if (notificationDropdown) notificationDropdown.classList.add('hidden');
+            if (notificationDropdownMobile) notificationDropdownMobile.classList.add('hidden');
+        });
+    }
 
         if (drawerOverlay) {
             drawerOverlay.addEventListener('click', () => {
@@ -1920,7 +1930,14 @@ const notificationsQuery = query(
                 if (timeInput) timeInput.value = timerValue;
             }
         };
-
+            window.addEventListener('resize', () => {
+    if (window.innerWidth >= 1024) {
+        ham?.classList.remove('active');
+        drawer?.classList.remove('active');
+        overlay?.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+});
 window.resetTimer = function() {
     const existing = document.getElementById('resetConfirmOverlay');
     if (existing) existing.remove();
@@ -2233,8 +2250,8 @@ function updateTimer() {
                 html = `
                     <div class="input-group-custom">
                         <label class="input-label">💪 Number of Curl-Ups Completed <span style="color: #ef4444;">*</span></label>
-<input type="number" class="input-field" id="repetitionsInput" placeholder="Enter number of curl-ups" oninput="if(this.value.length>3)this.value=this.value.slice(0,3)">
-                        <div class="input-hint">
+                    <input type="number" class="input-field" id="repetitionsInput" placeholder="Enter number of curl-ups" onkeypress="return event.charCode!==46&&(event.charCode>=48&&event.charCode<=57);" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length>3)this.value=this.value.slice(0,3);">
+                        <div class="input-hint">            
                             <i class="bi bi-info-circle"></i>
                             Count only complete curl-ups at 1 per 3 seconds pace${targetHint}
                         </div>
@@ -2247,7 +2264,7 @@ function updateTimer() {
                 html = `
                     <div class="input-group-custom">
                         <label class="input-label">💪 Number of Push-ups Completed <span style="color: #ef4444;">*</span></label>
-<input type="number" class="input-field" id="repetitionsInput" placeholder="Enter number of push-ups" oninput="if(this.value.length>3)this.value=this.value.slice(0,3)">
+                        <input type="number" class="input-field" id="repetitionsInput" placeholder="Enter number of push-ups" onkeypress="return event.charCode!==46&&(event.charCode>=48&&event.charCode<=57);" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length>3)this.value=this.value.slice(0,3);">
                         <div class="input-hint">
                             <i class="bi bi-info-circle"></i>
                             Count only complete push-ups with proper form${targetHint}
@@ -2261,7 +2278,7 @@ function updateTimer() {
                 html = `
                     <div class="input-group-custom">
                         <label class="input-label">❤️ Recovery Heart Rate (bpm) <span style="color: #ef4444;">*</span></label>
-<input type="number" class="input-field" id="heartRateInput" placeholder="Wait for the 3-min timer to finish..." min="40" max="220" required disabled style="opacity:0.5; cursor:not-allowed;" oninput="if(this.value.length>3)this.value=this.value.slice(0,3)">
+                        <input type="number" class="input-field" id="heartRateInput" placeholder="Wait for the 3-min timer to finish..." min="40" max="220" required disabled style="opacity:0.5; cursor:not-allowed;" onkeypress="return event.charCode!==46&&(event.charCode>=48&&event.charCode<=57);" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length>3)this.value=this.value.slice(0,3);">
                         <div class="input-hint">
                             <i class="bi bi-info-circle"></i>
                             Complete 3 minutes stepping, rest 5 seconds, then count pulse for 60 seconds
@@ -2278,7 +2295,7 @@ function updateTimer() {
                 html = `
                     <div class="input-group-custom">
                         <label class="input-label">📏 Distance Reached (cm) <span style="color: #ef4444;">*</span></label>
-<input type="number" class="input-field" id="distanceInput" placeholder="Enter distance in cm" oninput="if(this.value.length>3)this.value=this.value.slice(0,3)">
+                            <input type="number" class="input-field" id="distanceInput" placeholder="Enter distance in cm" onkeypress="return event.charCode!==46&&(event.charCode>=48&&event.charCode<=57);" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length>3)this.value=this.value.slice(0,3);">
                         <div class="input-hint">
                             <i class="bi bi-info-circle"></i>
                             Measure how far you can reach past your toes (positive = past toes)${targetHint}
@@ -2306,17 +2323,17 @@ function updateTimer() {
             <div id="maleSites">
                 <div class="input-group-custom">
                     <label class="input-label">📏 Chest Skinfold (mm) <span style="color: #ef4444;">*</span></label>
-<input type="number" class="input-field" id="site1Input" placeholder="Enter chest skinfold in mm" step="0.1" min="0" max="100" oninput="if(this.value.length>3)this.value=this.value.slice(0,3)">
+<input type="number" class="input-field" id="site1Input" placeholder="Enter chest skinfold in mm" step="0.1" min="0" max="100" oninput="this.value=this.value.replace(/[^0-9.]/g,'');if(this.value.indexOf('.')>-1){var p=this.value.split('.');this.value=p[0].slice(0,3)+'.'+p[1].slice(0,1);}else if(this.value.length>3)this.value=this.value.slice(0,3);">
                     <div class="input-hint"><i class="bi bi-info-circle"></i> Diagonal fold, midway between anterior axillary line and nipple</div>
                 </div>
                 <div class="input-group-custom">
                     <label class="input-label">📏 Abdomen Skinfold (mm) <span style="color: #ef4444;">*</span></label>
-<input type="number" class="input-field" id="site2Input" placeholder="Enter abdomen skinfold in mm" step="0.1" min="0" max="100" oninput="if(this.value.length>3)this.value=this.value.slice(0,3)">
+<input type="number" class="input-field" id="site2Input" placeholder="Enter abdomen skinfold in mm" step="0.1" min="0" max="100" oninput="this.value=this.value.replace(/[^0-9.]/g,'');if(this.value.indexOf('.')>-1){var p=this.value.split('.');this.value=p[0].slice(0,3)+'.'+p[1].slice(0,1);}else if(this.value.length>3)this.value=this.value.slice(0,3);">
                     <div class="input-hint"><i class="bi bi-info-circle"></i> Vertical fold, 2 cm to the right of the umbilicus</div>
                 </div>
                 <div class="input-group-custom">
                     <label class="input-label">📏 Thigh Skinfold (mm) <span style="color: #ef4444;">*</span></label>
-<input type="number" class="input-field" id="site3Input" placeholder="Enter thigh skinfold in mm" step="0.1" min="0" max="100" oninput="if(this.value.length>3)this.value=this.value.slice(0,3)">
+<input type="number" class="input-field" id="site3Input" placeholder="Enter thigh skinfold in mm" step="0.1" min="0" max="100" oninput="this.value=this.value.replace(/[^0-9.]/g,'');if(this.value.indexOf('.')>-1){var p=this.value.split('.');this.value=p[0].slice(0,3)+'.'+p[1].slice(0,1);}else if(this.value.length>3)this.value=this.value.slice(0,3);">
                     <div class="input-hint"><i class="bi bi-info-circle"></i> Vertical fold, anterior midline of thigh, midway between hip and knee</div>
                 </div>
             </div>
@@ -2324,17 +2341,17 @@ function updateTimer() {
             <div id="femaleSites" style="display:none;">
                 <div class="input-group-custom">
                     <label class="input-label">📏 Triceps Skinfold (mm) <span style="color: #ef4444;">*</span></label>
-<input type="number" class="input-field" id="site1Input" placeholder="Enter triceps skinfold in mm" step="0.1" min="0" max="100" oninput="if(this.value.length>3)this.value=this.value.slice(0,3)">
+<input type="number" class="input-field" id="site1Input" placeholder="Enter triceps skinfold in mm" step="0.1" min="0" max="100" oninput="this.value=this.value.replace(/[^0-9.]/g,'');if(this.value.indexOf('.')>-1){var p=this.value.split('.');this.value=p[0].slice(0,3)+'.'+p[1].slice(0,1);}else if(this.value.length>3)this.value=this.value.slice(0,3);">
                     <div class="input-hint"><i class="bi bi-info-circle"></i> Vertical fold, posterior midline of upper arm, halfway between shoulder and elbow</div>
                 </div>
                 <div class="input-group-custom">
                     <label class="input-label">📏 Suprailium Skinfold (mm) <span style="color: #ef4444;">*</span></label>
-<input type="number" class="input-field" id="site2Input" placeholder="Enter suprailium (hip) skinfold in mm" step="0.1" min="0" max="100" oninput="if(this.value.length>3)this.value=this.value.slice(0,3)">
+<input type="number" class="input-field" id="site2Input" placeholder="Enter suprailium (hip) skinfold in mm" step="0.1" min="0" max="100" oninput="this.value=this.value.replace(/[^0-9.]/g,'');if(this.value.indexOf('.')>-1){var p=this.value.split('.');this.value=p[0].slice(0,3)+'.'+p[1].slice(0,1);}else if(this.value.length>3)this.value=this.value.slice(0,3);">
                     <div class="input-hint"><i class="bi bi-info-circle"></i> Diagonal fold, just above the iliac crest along the anterior axillary line</div>
                 </div>
                 <div class="input-group-custom">
                     <label class="input-label">📏 Thigh Skinfold (mm) <span style="color: #ef4444;">*</span></label>
-<input type="number" class="input-field" id="site3Input" placeholder="Enter thigh skinfold in mm" step="0.1" min="0" max="100" oninput="if(this.value.length>3)this.value=this.value.slice(0,3)">
+<input type="number" class="input-field" id="site3Input" placeholder="Enter thigh skinfold in mm" step="0.1" min="0" max="100" oninput="this.value=this.value.replace(/[^0-9.]/g,'');if(this.value.indexOf('.')>-1){var p=this.value.split('.');this.value=p[0].slice(0,3)+'.'+p[1].slice(0,1);}else if(this.value.length>3)this.value=this.value.slice(0,3);">
                     <div class="input-hint"><i class="bi bi-info-circle"></i> Vertical fold, anterior midline of thigh, midway between hip and knee</div>
                 </div>
             </div>

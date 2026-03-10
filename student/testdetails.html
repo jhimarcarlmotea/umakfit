@@ -1200,30 +1200,36 @@ function setupEventListeners() {
     });
 }
 
-function toggleProfile(isMob) {
-    const id = isMob ? 'profileDropdownMobile' : 'profileDropdown';
-    document.getElementById(id)?.classList.toggle('hidden');
-}
+    function toggleProfile(isMob) {
+        const id = isMob ? 'profileDropdownMobile' : 'profileDropdown';
+        document.getElementById(id)?.classList.toggle('hidden');
+    }
 
-// Hamburger
-const ham = document.getElementById('hamburger');
-const drawer = document.getElementById('mobileDrawer');
-const overlay = document.getElementById('drawerOverlay');
-ham?.addEventListener('click', e => {
-    e.stopPropagation();
-    ham.classList.toggle('active');
-    drawer.classList.toggle('active');
-    overlay.classList.toggle('active');
-    document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : '';
-});
-overlay?.addEventListener('click', () => {
-    ham.classList.remove('active'); drawer.classList.remove('active'); overlay.classList.remove('active');
-    document.body.style.overflow = '';
-});
-document.querySelectorAll('.mobile-nav-link').forEach(l => l.addEventListener('click', () => {
-    ham.classList.remove('active'); drawer.classList.remove('active'); overlay.classList.remove('active');
-    document.body.style.overflow = '';
-}));
+    // Hamburger
+    const ham = document.getElementById('hamburger');
+    const drawer = document.getElementById('mobileDrawer');
+    const overlay = document.getElementById('drawerOverlay');
+    ham?.addEventListener('click', e => {
+        e.stopPropagation();
+        ham.classList.toggle('active');
+        drawer.classList.toggle('active');
+        overlay.classList.toggle('active');
+        document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : '';
+
+        // Close profile and notification dropdowns when hamburger is opened
+        document.getElementById('profileDropdown')?.classList.add('hidden');
+        document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+        document.getElementById('notificationDropdown')?.classList.add('hidden');
+        document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
+    });
+    overlay?.addEventListener('click', () => {
+        ham.classList.remove('active'); drawer.classList.remove('active'); overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+    document.querySelectorAll('.mobile-nav-link').forEach(l => l.addEventListener('click', () => {
+        ham.classList.remove('active'); drawer.classList.remove('active'); overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }));
 
 // Globals
 window.startTest = function() {
@@ -1262,6 +1268,14 @@ function showLogoutPopup() {
         catch(e) { overlay.remove(); alert('Error logging out. Please try again.'); }
     });
 }
+        window.addEventListener('resize', () => {
+    if (window.innerWidth >= 1024) {
+        ham?.classList.remove('active');
+        drawer?.classList.remove('active');
+        overlay?.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+});
         function listenForTestDeletion(testId) {
     const deletedRef = doc(db, 'deletedTests', testId);
     onSnapshot(deletedRef, (snap) => {

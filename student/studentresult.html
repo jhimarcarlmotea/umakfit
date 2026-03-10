@@ -197,7 +197,26 @@
         position: sticky;
         bottom: 0;
     }
+        /* Notification dropdown scrollbar */
+        #notificationDropdown::-webkit-scrollbar,
+        #notificationDropdownMobile::-webkit-scrollbar,
+        #notificationDropdownBody::-webkit-scrollbar,
+        #notificationDropdownBodyMobile::-webkit-scrollbar { width: 6px; }
 
+        #notificationDropdown::-webkit-scrollbar-track,
+        #notificationDropdownMobile::-webkit-scrollbar-track,
+        #notificationDropdownBody::-webkit-scrollbar-track,
+        #notificationDropdownBodyMobile::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+
+        #notificationDropdown::-webkit-scrollbar-thumb,
+        #notificationDropdownMobile::-webkit-scrollbar-thumb,
+        #notificationDropdownBody::-webkit-scrollbar-thumb,
+        #notificationDropdownBodyMobile::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+
+        #notificationDropdown::-webkit-scrollbar-thumb:hover,
+        #notificationDropdownMobile::-webkit-scrollbar-thumb:hover,
+        #notificationDropdownBody::-webkit-scrollbar-thumb:hover,
+        #notificationDropdownBodyMobile::-webkit-scrollbar-thumb:hover { background: #2563eb; }
     @media (min-width: 640px) {
         .notification-dropdown-footer {
             padding: 0.75rem 1rem;
@@ -2407,7 +2426,7 @@ function showErrorPopup(message, onClose) {
                     closeNotificationDropdown();
                 });
             }
-            
+                
             const profileBtn = document.getElementById('profilePictureBtn');
             const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
             
@@ -2441,14 +2460,20 @@ function showErrorPopup(message, onClose) {
         const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
 
         if (hamburger) {
-            hamburger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                hamburger.classList.toggle('active');
-                mobileDrawer.classList.toggle('active');
-                drawerOverlay.classList.toggle('active');
-                document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-            });
-        }
+        hamburger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hamburger.classList.toggle('active');
+            mobileDrawer.classList.toggle('active');
+            drawerOverlay.classList.toggle('active');
+            document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+
+            // Close profile and notification dropdowns
+            document.getElementById('profileDropdown')?.classList.add('hidden');
+            document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+            document.getElementById('notificationDropdown')?.classList.add('hidden');
+            document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
+        });
+    }
 
         if (drawerOverlay) {
             drawerOverlay.addEventListener('click', () => {
@@ -2460,13 +2485,27 @@ function showErrorPopup(message, onClose) {
         }
 
         mobileNavLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                mobileDrawer.classList.remove('active');
-                drawerOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            mobileDrawer.classList.remove('active');
+            drawerOverlay.classList.remove('active');
+            document.body.style.overflow = '';
         });
+    });
+
+    // Close drawer when resizing back to desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024) {
+            hamburger?.classList.remove('active');
+            mobileDrawer?.classList.remove('active');
+            drawerOverlay?.classList.remove('active');
+            document.body.style.overflow = '';
+            document.getElementById('profileDropdown')?.classList.add('hidden');
+            document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+            document.getElementById('notificationDropdown')?.classList.add('hidden');
+            document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
+        }
+    });
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
