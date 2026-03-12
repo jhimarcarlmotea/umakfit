@@ -790,6 +790,8 @@
         }
     }
 
+let unsubscribeNotifications = null;
+
     async function loadAllNotifications() {
         document.getElementById('loadingNotifs').style.display = 'flex';
         try {
@@ -822,9 +824,27 @@
             document.getElementById('loadingNotifs').style.display = 'none';
             renderNotifications();
 
-            // Real-time listener
-            onSnapshot(q, () => {
-                loadAllNotifications();
+            // Real-time listener — kill previous one first
+            if (unsubscribeNotifications) unsubscribeNotifications();
+            unsubscribeNotifications = onSnapshot(q, async () => {
+                // Re-fetch cleanly instead of calling loadAllNotifications recursively
+                const freshSnap = await getDocs(q);
+                const freshSeen = new Set();
+                allNotifications = [];
+                freshSnap.forEach(d => {
+                    const data = d.data();
+                    const key = `${data.title}|${data.message}|${data.createdAt?.toDate?.().getTime() || ''}`;
+                    if (!freshSeen.has(key)) {
+                        freshSeen.add(key);
+                        allNotifications.push({ id: d.id, ...data });
+                    }
+                });
+                allNotifications.sort((a, b) => {
+                    const da = a.createdAt?.toDate?.() || new Date(0);
+                    const db2 = b.createdAt?.toDate?.() || new Date(0);
+                    return db2 - da;
+                });
+                renderNotifications();
             });
 
         } catch (e) {
@@ -924,16 +944,15 @@
             if (el) el.textContent = email;
         });
     }
-
-    // ========== AUTH ==========
-    onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, async (user) => {
         if (user) {
-            await loadStudentData(user);
-            await loadAllNotifications();
-            updateProfileUI(user);
+            // Show page immediately, load data in background
             document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             setupEventListeners();
+            await loadStudentData(user);
+            updateProfileUI(user);
+            await loadAllNotifications();
         } else {
             window.location.href = '../login/index.html';
         }
@@ -1025,6 +1044,9 @@
             }
         });
     };
+    window.addEventListener('pagehide', () => {
+        if (unsubscribeNotifications) unsubscribeNotifications();
+    });
     </script>
 </body>
 </html>

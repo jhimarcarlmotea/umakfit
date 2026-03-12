@@ -1612,14 +1612,14 @@ renderScheduleTable(window.allScheduledTests, enabledTestsMap);
         }
         // ===== REAL-TIME AUTO REFRESH =====
 let lastStatusSnapshot = new Map(); // track previous statuses
-setInterval(() => {
+const statusRefreshInterval = setInterval(() => {
     if (!window.allScheduledTests?.length) return;
     const now = new Date();
     let changed = false;
 
     window.allScheduledTests.forEach(test => {
         const prevStatus = lastStatusSnapshot.get(test.id);
-        if (prevStatus === 'completed') return; // already overdue, skip
+        if (prevStatus === 'completed') return;
 
         const deadlineDateTime = new Date(test.deadlineDateTime);
         const testDateTime = new Date(test.dateTime || `${test.date}T${test.time || '00:00'}`);
@@ -1639,6 +1639,10 @@ setInterval(() => {
         renderScheduleTable(window.allScheduledTests, window._enabledTestsMap || new Map());
     }
 }, 1000);
+
+// Clean up on page leave
+window.addEventListener('pagehide', () => clearInterval(statusRefreshInterval));
+window.addEventListener('beforeunload', () => clearInterval(statusRefreshInterval));
 // Initialize snapshot on first load
 window.allScheduledTests?.forEach(test => {
     lastStatusSnapshot.set(test.id, test.status || 'scheduled');

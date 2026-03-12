@@ -564,6 +564,10 @@
         let currentUser = null;
         let studentData = null;
 
+        const activeListeners = [];
+function registerListener(unsub) { activeListeners.push(unsub); }
+function cleanupAllListeners() { activeListeners.forEach(fn => { try { fn(); } catch(e) {} }); activeListeners.length = 0; }
+
         // ========== NORM CLASSIFICATION HELPERS (same as studentresult.html) ==========
 
         function getStudentAgeForNorms() {
@@ -908,7 +912,11 @@ const notificationsQuery = query(
     collection(db, 'notifications'),
     where('section', '==', studentData.section),
     where('studentEmail', '==', studentData.email)
-);            onSnapshot(notificationsQuery, () => checkUnreadNotifications(), error => console.error(error));
+
+);           
+registerListener(onSnapshot(notificationsQuery, () => checkUnreadNotifications(), error => console.error(error)));
+
+
         }
 
   window.toggleProfileDropdown = function() {
@@ -1015,8 +1023,8 @@ if (hamburger) {
 
                 let totalAssignedTests = 0;
 
-                onSnapshot(assignedTestsQuery, async (assignedSnapshot) => {
-                    const now = new Date();
+registerListener(onSnapshot(assignedTestsQuery, async (assignedSnapshot) => {
+                        const now = new Date();
                     const seenTestIds = new Set();
                     totalAssignedTests = 0;
 
@@ -1050,7 +1058,7 @@ if (hamburger) {
 
                     document.getElementById('totalTests').textContent = `/${totalAssignedTests}`;
                     setupRealTimePerformanceListener(totalAssignedTests);
-                });
+                }));
 
             } catch (error) {
                 console.error('Error loading performance:', error);
@@ -1067,8 +1075,8 @@ if (hamburger) {
                     where('status', 'in', ['completed', 'overdue', 'late'])
                 );
 
-                onSnapshot(resultsQuery, (resultsSnapshot) => {
-                    const testResults = [];
+registerListener(onSnapshot(resultsQuery, (resultsSnapshot) => {
+                        const testResults = [];
                     const categoryData = {};
 
                     Object.keys(testCategories).forEach(cat => {
@@ -1150,7 +1158,7 @@ if (hamburger) {
 
                     document.getElementById('loadingScreen').classList.add('hidden');
                     document.getElementById('mainContent').classList.remove('hidden');
-                });
+                }));
 
             } catch (error) {
                 console.error('Error in real-time listener:', error);
@@ -1339,24 +1347,50 @@ if (hamburger) {
                 }
             });
         }
+// REPLACE WITH:
+let unsubscribeAuth = null;
 
-        // ========== AUTH ==========
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                setTimeout(() => {
-                    document.getElementById('loadingScreen').classList.add('hidden');
-                    document.getElementById('mainContent').classList.remove('hidden');
-                }, 1500);
-                await loadStudentData(user);
-                cachedStudentData = studentData;
-                await loadPerformance();
-                updateProfileUI();
-                setupEventListeners();
-            } else {
-                window.location.href = '../login/index.html';
-            }
-        });
+// Start showing page in max 1.5s regardless
+const loadingTimeout = setTimeout(() => {
+    document.getElementById('loadingScreen').classList.add('hidden');
+    document.getElementById('mainContent').classList.remove('hidden');
+}, 1500);
+
+unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        setupEventListeners();
+
+        // Parallel: load student data + set up UI simultaneously
+        await loadStudentData(user);
+        cachedStudentData = studentData;
+        updateProfileUI();
+
+        clearTimeout(loadingTimeout);
+        document.getElementById('loadingScreen').classList.add('hidden');
+        document.getElementById('mainContent').classList.remove('hidden');
+
+        // Non-blocking background load
+        loadPerformance().catch(err => console.error('Performance load error:', err));
+    } else {
+        clearTimeout(loadingTimeout);
+        window.location.href = '../login/index.html';
+    }
+});
+
+// Kill all listeners when navigating away
+window.addEventListener('pagehide', () => {
+    cleanupAllListeners();
+    if (unsubscribeAuth) unsubscribeAuth();
+});
+
+window.addEventListener('beforeunload', () => {
+    cleanupAllListeners();
+    if (unsubscribeAuth) unsubscribeAuth();
+});
+
+// ✅ Cleanup on page leave
+window.addEventListener('pagehide', () => unsubscribeAuth());
 
         // ========== LOGOUT ==========
         window.handleLogout = function() { showLogoutConfirmPopup(); };

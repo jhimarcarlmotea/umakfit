@@ -1322,25 +1322,40 @@ const notificationsQuery = query(
             if (notificationDropdownMobile) notificationDropdownMobile.classList.add('hidden');
         }
 
-        function setupNotificationListener() {
-            try {
-                if (!studentData || !studentData.section) return;
+ let unsubscribeNotificationListener = null;
 
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);                onSnapshot(notificationsQuery, (snapshot) => {
-                    console.log('🔔 Notification update detected!');
-                    checkUnreadNotifications();
-                }, (error) => {
-                    console.error('❌ Error in notification listener:', error);
-                });
-                
-            } catch (error) {
-                console.error('Error setting up notification listener:', error);
-            }
-        }
+function setupNotificationListener() {
+    try {
+        if (!studentData || !studentData.section) return;
+        const notificationsQuery = query(
+            collection(db, 'notifications'),
+            where('section', '==', studentData.section),
+            where('studentEmail', '==', studentData.email)
+        );
+        unsubscribeNotificationListener = onSnapshot(notificationsQuery, (snapshot) => {
+            console.log('🔔 Notification update detected!');
+            checkUnreadNotifications();
+        }, (error) => {
+            console.error('❌ Error in notification listener:', error);
+        });
+    } catch (error) {
+        console.error('Error setting up notification listener:', error);
+    }
+}
+
+// Clean up on page leave
+window.addEventListener('pagehide', () => {
+    if (unsubscribeNotificationListener) {
+        unsubscribeNotificationListener();
+        unsubscribeNotificationListener = null;
+    }
+});
+window.addEventListener('beforeunload', () => {
+    if (unsubscribeNotificationListener) {
+        unsubscribeNotificationListener();
+        unsubscribeNotificationListener = null;
+    }
+});
 
         // ========== END NOTIFICATION SYSTEM ==========
 
@@ -2511,7 +2526,10 @@ function showErrorPopup(message, onClose) {
             document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
         }
     });
-
+const loadingTimeout = setTimeout(() => {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+}, 1500);
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;

@@ -1714,9 +1714,13 @@ function renderSectionRankingTable() {
             <td data-label="Performance">${perfCell}</td>
             <td data-label="Actions">
                 <div class="tbl-actions">
-                    <button class="tbl-btn tbl-btn-view" onclick="viewSectionDetails('${s.name.replace(/'/g, "\\'")}')">
-                        <i class="fas fa-eye"></i> View
-                    </button>
+<button class="tbl-btn tbl-btn-view" onclick="viewSectionDetails('${s.name.replace(/'/g, "\\'")}')">
+    <i class="fas fa-eye"></i> View
+</button>
+<button class="tbl-btn tbl-btn-deact" onclick="deleteSection('${s.name.replace(/'/g, "\\'")}')">
+    <i class="fas fa-trash"></i> Delete
+</button>
+
                 </div>
             </td>
         </tr>`;
@@ -2626,6 +2630,186 @@ preAssessments = preAssessments.filter(a => {
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-user-plus"></i> Add Secretary';
+    }
+};
+
+window.deleteSection = async function(sectionName) {
+    // Confirm first
+    const confirmed = await showDeanConfirm(
+        `Delete section <strong>${sectionName}</strong>?<br><br>
+         This will permanently delete:<br>
+         • The section record<br>
+         • All enrolled students in this section<br>
+         • All BMI assessments for those students<br><br>
+         <strong>Professors will NOT be deleted.</strong> This cannot be undone.`,
+        {
+            title: 'Delete Section',
+            confirmText: 'Yes, Delete Everything',
+            cancelText: 'Cancel',
+            type: 'error'
+        }
+    );
+    if (!confirmed) return;
+
+    try {
+        // Show loading modal
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'deleteSectionLoading';
+        loadingOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,22,40,0.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:99999;';
+        loadingOverlay.innerHTML = `
+            <div style="background:#fff;border-radius:20px;padding:2rem 2.5rem;text-align:center;font-family:'DM Sans',sans-serif;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                <div class="spinner" style="margin:0 auto 1rem;"></div>
+                <div style="font-weight:600;color:#0a1628;font-size:15px;" id="deleteSectionStatus">Deleting section...</div>
+                <div style="font-size:12px;color:#8a98ae;margin-top:4px;" id="deleteSectionSub">Please wait</div>
+            </div>`;
+        document.body.appendChild(loadingOverlay);
+
+        const updateStatus = (msg, sub) => {
+            const s = document.getElementById('deleteSectionStatus');
+            const b = document.getElementById('deleteSectionSub');
+            if (s) s.textContent = msg;
+            if (b) b.textContent = sub || '';
+        };
+
+        const BATCH_SIZE = 400; // Firestore batch limit is 500, stay safe
+
+        // ── Helper: delete documents in batches ──
+        async function batchDelete(docs) {
+            for (let i = 0; i < docs.length; i += BATCH_SIZE) {
+                const batch = db.batch();
+                docs.slice(i, i + BATCH_SIZE).forEach(d => batch.delete(d.ref));
+                await batch.commit();
+            }
+        }
+
+        // ── Step 1: Find all students in this section ──
+        updateStatus('Finding students...', `Section: ${sectionName}`);
+
+        const studentUids   = new Set();
+        const studentEmails = new Set();
+        const studentUmakIds = new Set();
+
+        // Check users collection
+        const usersSnap = await db.collection('users')
+            .where('role', '==', 'student')
+            .get();
+
+        const studentUserDocs = [];
+        usersSnap.forEach(d => {
+            const data = d.data();
+            const sec = data.section || data.assignedSection || data.class || data.sectionName || '';
+            if (sec === sectionName) {
+                studentUserDocs.push(d);
+                studentUids.add(d.id);
+                if (data.email)   studentEmails.add(data.email.toLowerCase());
+                if (data.umakId)  studentUmakIds.add(data.umakId.trim().toUpperCase());
+                const rawId = (data.studentId || '').replace(/^student_/i, '').trim();
+                if (rawId) studentUmakIds.add(rawId.toUpperCase());
+            }
+        });
+
+        // Also check students collection
+        const studentsCollSnap = await db.collection('students').get();
+        const studentCollDocs = [];
+        studentsCollSnap.forEach(d => {
+            const data = d.data();
+            const sec = data.section || data.assignedSection || data.class || data.sectionName || '';
+            if (sec === sectionName) {
+                studentCollDocs.push(d);
+                studentUids.add(d.id);
+                if (data.email)  studentEmails.add(data.email.toLowerCase());
+                if (data.umakId) studentUmakIds.add(data.umakId.trim().toUpperCase());
+            }
+        });
+
+        const totalStudents = studentUids.size;
+        updateStatus(`Found ${totalStudents} student(s)`, 'Deleting BMI records...');
+
+        // ── Step 2: Delete BMI records for these students ──
+        const bmiSnap = await db.collection('BMI').get();
+        const bmiToDelete = [];
+        bmiSnap.forEach(d => {
+            const data = d.data();
+            const sec  = data.section || data.assignedSection || '';
+            const docEmail  = (data.email || data.studentEmail || '').toLowerCase();
+            const docUmakId = (data.umakId || (data.studentId||'').replace(/^student_/i,'')).trim().toUpperCase();
+            const docUid    = data.uid || data.userId || data.studentId || d.id;
+
+            if (
+                sec === sectionName ||
+                studentUids.has(docUid) ||
+                (docEmail  && studentEmails.has(docEmail)) ||
+                (docUmakId && studentUmakIds.has(docUmakId))
+            ) {
+                bmiToDelete.push(d);
+            }
+        });
+
+        updateStatus(`Deleting ${bmiToDelete.length} BMI record(s)...`, 'Almost done...');
+        await batchDelete(bmiToDelete);
+
+        // ── Step 3: Delete testResults for these students ──
+        const testSnap = await db.collection('testResults').get();
+        const testsToDelete = [];
+        testSnap.forEach(d => {
+            const data = d.data();
+            const sec       = data.section || '';
+            const docEmail  = (data.studentEmail || data.email || '').toLowerCase();
+            const docUmakId = (data.umakId || '').trim().toUpperCase();
+            const docUid    = data.studentId || data.uid || d.id;
+
+            if (
+                sec === sectionName ||
+                studentUids.has(docUid) ||
+                (docEmail  && studentEmails.has(docEmail)) ||
+                (docUmakId && studentUmakIds.has(docUmakId))
+            ) {
+                testsToDelete.push(d);
+            }
+        });
+
+        updateStatus(`Deleting ${testsToDelete.length} test record(s)...`, 'Cleaning up...');
+        await batchDelete(testsToDelete);
+
+        // ── Step 4: Delete student user documents ──
+        updateStatus(`Deleting ${totalStudents} student account(s)...`, '');
+        await batchDelete(studentUserDocs);
+        await batchDelete(studentCollDocs);
+
+        // ── Step 5: Delete the section document itself ──
+        updateStatus('Deleting section record...', '');
+        const sectionSnap = await db.collection('sections')
+            .where('name', '==', sectionName)
+            .get();
+        await batchDelete(sectionSnap.docs);
+
+        // Also try by document ID (in case section doc ID matches name)
+        try {
+            const byId = await db.collection('sections').doc(sectionName).get();
+            if (byId.exists) await byId.ref.delete();
+        } catch(e) {}
+
+        // ── Done ──
+        loadingOverlay.remove();
+
+        await showDeanAlert(
+            `Section <strong>${sectionName}</strong> has been deleted.<br><br>
+             Removed: ${totalStudents} student(s), ${bmiToDelete.length} BMI record(s), ${testsToDelete.length} test result(s).`,
+            { title: 'Section Deleted', type: 'success', confirmText: 'Done' }
+        );
+
+        // Refresh all data
+        await loadTestResults();
+        await loadSections();
+        await loadSectionRankings();
+        await loadDashboardStats();
+        await loadStudentRankings();
+
+    } catch (err) {
+        console.error('deleteSection error:', err);
+        const loading = document.getElementById('deleteSectionLoading');
+        if (loading) loading.remove();
+        await showDeanAlert('Delete failed: ' + err.message, { title: 'Error', type: 'error' });
     }
 };
 </script>

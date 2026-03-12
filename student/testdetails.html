@@ -1276,30 +1276,26 @@ function showLogoutPopup() {
         document.body.style.overflow = '';
     }
 });
-        function listenForTestDeletion(testId) {
+ function listenForTestDeletion(testId) {
+    // Kill any previous listeners
+    if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
+
     const testRef = doc(db, 'scheduledTests', testId);
-    onSnapshot(testRef, (snap) => {
+    const unsub1 = onSnapshot(testRef, (snap) => {
         if (!snap.exists()) {
-            // Test was deleted
             showTestDeletedPopup();
             return;
         }
-
         const updatedData = snap.data();
-
-        // Check if video URL changed
         if (currentTest && updatedData.videoURL !== currentTest.videoURL) {
             currentTest.videoURL = updatedData.videoURL;
-
             const videoWrap = document.getElementById('videoPlaceholder');
             const info = getTestData(updatedData.testName);
-
             if (updatedData.videoURL) {
                 let vid = '';
                 if (updatedData.videoURL.includes('youtube.com/watch?v=')) vid = updatedData.videoURL.split('v=')[1].split('&')[0];
                 else if (updatedData.videoURL.includes('youtu.be/')) vid = updatedData.videoURL.split('youtu.be/')[1].split('?')[0];
                 else if (updatedData.videoURL.includes('youtube.com/embed/')) vid = updatedData.videoURL.split('embed/')[1].split('?')[0];
-
                 if (vid) {
                     videoWrap.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid}" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius:12px;width:100%;height:100%;"></iframe>`;
                     document.getElementById('videoDescription').textContent = '📺 Watch the video demonstration above';
@@ -1314,14 +1310,15 @@ function showLogoutPopup() {
         }
     });
 
-    // Also listen to deletedTests collection (backup)
     const deletedRef = doc(db, 'deletedTests', testId);
-    onSnapshot(deletedRef, (snap) => {
-        if (snap.exists()) {
-            showTestDeletedPopup();
-        }
+    const unsub2 = onSnapshot(deletedRef, (snap) => {
+        if (snap.exists()) showTestDeletedPopup();
     });
+
+    // Store combined unsubscribe so pagehide can kill both
+    unsubscribeSnapshot = () => { unsub1(); unsub2(); };
 }
+
 
 function showTestDeletedPopup() {
     // Remove any existing popup
@@ -1401,9 +1398,14 @@ function showTestDeletedPopup() {
     }
 }
 // Auth
-onAuthStateChanged(auth, async user => {
-    const loading = document.getElementById('loadingScreen');
-    const main = document.getElementById('mainContent');
+let unsubscribeSnapshot = null;
+
+const loadingTimeout = setTimeout(() => {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+}, 1500);
+
+const unsubscribeAuth = onAuthStateChanged(auth, async user => {
     if (user) {
         try {
             currentUser = user;
@@ -1414,12 +1416,25 @@ onAuthStateChanged(auth, async user => {
             if (testId) { await loadTestDetails(testId); }
             else { alert('No test specified.'); window.location.href = './test.html'; }
             setupEventListeners();
-            loading.style.display = 'none';
-            main.style.display = 'block';
         } catch(e) { console.error(e); alert('Error loading page.'); }
-    } else { window.location.href = '../login/index.html'; }
+        finally {
+            clearTimeout(loadingTimeout);
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }
+    } else { 
+        clearTimeout(loadingTimeout);
+        window.location.href = '../login/index.html'; 
+    }
 });
 
+window.addEventListener('pagehide', () => {
+    unsubscribeAuth();
+    if (unsubscribeSnapshot) unsubscribeSnapshot();
+});
+window.addEventListener('beforeunload', () => {
+    if (unsubscribeSnapshot) unsubscribeSnapshot();
+});
 window.toggleNotificationDropdown = toggleNotificationDropdown;
 window.closeNotificationDropdown = closeNotificationDropdown;
 </script>

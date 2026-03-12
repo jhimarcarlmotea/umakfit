@@ -1098,18 +1098,25 @@ function createConfetti() {
         setTimeout(() => c.remove(), 5000);
     }
 }
-
-// ============================================================
-// LOAD STUDENT DATA
-// ============================================================
-
 async function loadStudentData(user) {
     try {
         currentUser = user;
-        const q = query(collection(db, 'students'), where('email', '==', user.email));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-            const data = snap.docs[0].data();
+
+        // ✅ Show skeleton profile immediately
+        const photo = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || user.email.split('@')[0])}&background=3b82f6&color=fff&size=128`;
+        ['profilePictureBtn','profilePictureBtnMobile','profileDropdownPicture','profileDropdownPictureMobile','studentProfilePicture'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.src = photo;
+        });
+
+        // ✅ Fetch student doc and test results IN PARALLEL
+        const [studentsSnap, resultsSnap] = await Promise.all([
+            getDocs(query(collection(db, 'students'), where('email', '==', user.email))),
+            getDocs(query(collection(db, 'testResults'), where('studentEmail', '==', user.email)))
+        ]);
+
+        // Build studentData
+        if (!studentsSnap.empty) {
+            const data = studentsSnap.docs[0].data();
             let displayName = user.displayName || `${data.firstName||''} ${data.lastName||''}`.trim() || user.email.split('@')[0];
             studentData = {
                 uid: user.uid, displayName, email: data.email || user.email,
@@ -1131,12 +1138,37 @@ async function loadStudentData(user) {
                 height: 0, weight: 0, contactNumber: 'Not Provided', birthday: null
             };
         }
-        await checkUnreadNotifications();
-        loadTestResults();
+
+        // Process test results
+        testResults = [];
+        testCategoriesCompleted.clear();
+        const byTest = new Map();
+        resultsSnap.forEach(d => {
+            const r = { id: d.id, ...d.data() };
+            r.score = calculateTestScore(r.testName, r.resultData || r.result, r.testTarget);
+            r.normCategory = getResultCategory(r.testName, r.resultData || r.result);
+            if (r.submittedAt?.toDate) r.submittedAt = r.submittedAt.toDate();
+            else if (typeof r.submittedAt === 'string') r.submittedAt = new Date(r.submittedAt);
+            else if (!r.submittedAt) r.submittedAt = new Date();
+            const key = r.testId || r.testName;
+            if (!byTest.has(key)) byTest.set(key, []);
+            byTest.get(key).push(r);
+        });
+        byTest.forEach((attempts) => {
+            attempts.sort((a,b) => b.score - a.score);
+            const best = attempts[0];
+            testResults.push(best);
+            const cat = getTestCategory(best.testName);
+            if (cat) testCategoriesCompleted.add(cat);
+        });
+
+        // ✅ All data ready — update everything at once
         checkAchievements();
+        updateStats();
         updateProfileUI();
         renderAchievements();
-        updateStats();
+        checkUnreadNotifications();
+
         return studentData;
     } catch (e) {
         console.error('loadStudentData', e);
@@ -1145,7 +1177,6 @@ async function loadStudentData(user) {
         return studentData;
     }
 }
-
 // ============================================================
 // PROFILE UI
 // ============================================================
@@ -1270,38 +1301,58 @@ function showLogoutConfirmPopup() {
         catch (e) { console.error(e); overlay.remove(); alert('Error logging out. Please try again.'); }
     });
 }
+let unsubscribeAuth = null;
 
-// ============================================================
-// AUTH STATE
-// ============================================================
+// Show page within 1.5s max regardless
+const loadingTimeout = setTimeout(() => {
+    document.getElementById('loadingScreen').classList.add('hidden');
+    document.getElementById('mainContent').classList.remove('hidden');
+}, 1500);
 
-onAuthStateChanged(auth, async (user) => {
-    const loading = document.getElementById('loadingScreen');
-    const main = document.getElementById('mainContent');
+unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
     if (user) {
         try {
-            const q = query(collection(db, 'students'), where('email', '==', user.email));
-            const check = await getDocs(q);
-            if (check.empty) {
-                const uRef = doc(db, 'users', user.uid);
-                const uDoc = await getDoc(uRef);
-                if (uDoc.exists() && uDoc.data().role === 'professor') {
-                    alert('Access Denied: This page is for students only');
-                    await signOut(auth); window.location.href = '../login/index.html'; return;
-                }
+            // Role check — run in parallel with early page reveal
+            const [studentsSnap, userDoc] = await Promise.all([
+                getDocs(query(collection(db, 'students'), where('email', '==', user.email))),
+                getDoc(doc(db, 'users', user.uid))
+            ]);
+
+            if (studentsSnap.empty && userDoc.exists() && userDoc.data().role === 'professor') {
+                clearTimeout(loadingTimeout);
+                alert('Access Denied: This page is for students only');
+                await signOut(auth);
+                window.location.href = '../login/index.html';
+                return;
             }
-            await loadStudentData(user);
+
+            // ✅ Show page immediately
+            clearTimeout(loadingTimeout);
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+
+            // ✅ Load data in background (non-blocking)
             setupEventListeners();
-            loading.classList.add('hidden');
-            main.classList.remove('hidden');
+            loadStudentData(user).catch(e => console.error('loadStudentData error:', e));
+
         } catch (e) {
             console.error(e);
-            loading.classList.add('hidden');
-            main.classList.remove('hidden');
+            clearTimeout(loadingTimeout);
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
         }
     } else {
+        clearTimeout(loadingTimeout);
         window.location.href = '../login/index.html';
     }
+});
+
+// ✅ Clean up auth listener when leaving the page
+window.addEventListener('pagehide', () => {
+    if (unsubscribeAuth) unsubscribeAuth();
+});
+window.addEventListener('beforeunload', () => {
+    if (unsubscribeAuth) unsubscribeAuth();
 });
 </script>
 </body>
