@@ -542,7 +542,18 @@
     };
     window.closeConfirmModal = () => document.getElementById('confirmModal').classList.remove('open');
     window.scrollToSections  = () => document.getElementById('sectionsPanel').scrollIntoView({ behavior:'smooth' });
-
+// Cleanup listeners when leaving page
+window.addEventListener('pagehide', () => {
+    activeListeners.forEach(unsub => {
+        if (typeof unsub === 'function') {
+            try { unsub(); } catch(e) {}
+        }
+    });
+    if (unsubActivities && typeof unsubActivities === 'function') {
+        try { unsubActivities(); } catch(e) {}
+    }
+    if (window.headerDateInterval) clearInterval(window.headerDateInterval);
+});
 </script>
 
 <script type="module">
@@ -571,44 +582,57 @@
     // Track active listeners for cleanup during logout
     const activeListeners = [];
 
-    onAuthStateChanged(auth, async user => {
-        if (user) {
-            try {
-                currentUser = user;
-                const email = user.email.toLowerCase();
+  // Max 1.5s loading screen — matches student dashboard speed
+const loadingTimeout = setTimeout(() => {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('mainContent').style.display   = 'block';
+}, 1500);
 
-                const profQuery = query(collection(db,'professors'), where('email','==',email));
-                const profSnap  = await getDocs(profQuery);
-                if (!profSnap.empty) {
-                    currentProfessor = { id: profSnap.docs[0].id, ...profSnap.docs[0].data() };
+onAuthStateChanged(auth, async user => {
+    if (user) {
+        try {
+            currentUser = user;
+            const email = user.email.toLowerCase();
+
+            const profQuery = query(collection(db,'professors'), where('email','==',email));
+            const profSnap  = await getDocs(profQuery);
+            if (!profSnap.empty) {
+                currentProfessor = { id: profSnap.docs[0].id, ...profSnap.docs[0].data() };
+            } else {
+                const usrQuery = query(collection(db,'users'), where('email','==',email), where('role','==','professor'));
+                const usrSnap  = await getDocs(usrQuery);
+                if (!usrSnap.empty) {
+                    currentProfessor = { id: usrSnap.docs[0].id, ...usrSnap.docs[0].data() };
                 } else {
-                    const usrQuery = query(collection(db,'users'), where('email','==',email), where('role','==','professor'));
-                    const usrSnap  = await getDocs(usrQuery);
-                    if (!usrSnap.empty) {
-                        currentProfessor = { id: usrSnap.docs[0].id, ...usrSnap.docs[0].data() };
-                    } else {
-                        throw new Error('Professor account not found. Contact the secretary.');
-                    }
+                    throw new Error('Professor account not found. Contact the secretary.');
                 }
-
-                window.currentProfessor = currentProfessor;
-                setupUI(user);
-                await loadSections();
-                await loadActivities();
-
-                document.getElementById('loadingScreen').style.display = 'none';
-                document.getElementById('mainContent').style.display   = 'block';
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById('loadingScreen').style.display = 'none';
-                showAlert(err.message || 'Error loading dashboard.', 'error');
-                setTimeout(async () => { await signOut(auth); window.location.href = '/login/index.html'; }, 2500);
             }
-        } else {
-            window.location.href = '/login/index.html';
+
+            window.currentProfessor = currentProfessor;
+
+            // ✅ Show page immediately — same as student dashboard
+            clearTimeout(loadingTimeout);
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display   = 'block';
+
+            // ✅ Setup UI right away, load data in background
+            setupUI(user);
+            loadSections();        // no await — runs in background
+            loadActivities();      // no await — runs in background
+
+        } catch (err) {
+            console.error(err);
+            clearTimeout(loadingTimeout);
+            document.getElementById('loadingScreen').style.display = 'none';
+            showAlert(err.message || 'Error loading dashboard.', 'error');
+            setTimeout(async () => { await signOut(auth); window.location.href = '/login/index.html'; }, 2500);
         }
-    });
+    } else {
+        clearTimeout(loadingTimeout);
+        window.location.href = '/login/index.html';
+    }
+});
+
 function setupUI(user) {
     const displayName = user.displayName || 
                         currentProfessor.fullName || 

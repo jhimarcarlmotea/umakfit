@@ -993,32 +993,56 @@
     // ─────────────────────────────────────────────────────────────────
     //  AUTH
     // ─────────────────────────────────────────────────────────────────
-    onAuthStateChanged(auth, async user => {
-        if (!user) { window.location.href = '/login/index.html'; return; }
-        try {
-            currentUser = user;
-            await loadProfessorData(user);
-            setupUI(user);
-            await loadAssignedSections();
-            await loadAllStudents();
-            await loadAllTests();
-            await loadTestResults();
-            await loadTestPermissions();
-            setupRealtimeListener();
-            renderOverview();
-            updateStats();
-            updateTime();
-            if (refreshTimer) clearInterval(refreshTimer);
-            refreshTimer = setInterval(() => { updateTime(); updateStats(); }, 30000);
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('mainContent').style.display   = 'block';
-        } catch(err) {
-            console.error(err);
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('mainContent').style.display   = 'block';
-            window.showAlert('Error loading dashboard: ' + err.message, 'error');
-        }
-    });
+ // ─── FAST LOADING: show UI immediately, load data in background ───
+const _loadingTimeout = setTimeout(() => {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('mainContent').style.display   = 'block';
+}, 1500);
+
+let _authUnsub = onAuthStateChanged(auth, async user => {
+    if (!user) { clearTimeout(_loadingTimeout); window.location.href = '/login/index.html'; return; }
+    try {
+        currentUser = user;
+        await loadProfessorData(user);
+        setupUI(user);
+
+        // ─── Show UI immediately (same as dashboard) ───
+        clearTimeout(_loadingTimeout);
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('mainContent').style.display   = 'block';
+
+        // ─── Load data in background ───
+        await loadAssignedSections();
+        await loadAllStudents();
+        await loadAllTests();
+        await loadTestResults();
+        await loadTestPermissions();
+        setupRealtimeListener();
+        renderOverview();
+        updateStats();
+        updateTime();
+        if (refreshTimer) clearInterval(refreshTimer);
+        refreshTimer = setInterval(() => { updateTime(); updateStats(); }, 30000);
+    } catch(err) {
+        console.error(err);
+        clearTimeout(_loadingTimeout);
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('mainContent').style.display   = 'block';
+        window.showAlert('Error loading dashboard: ' + err.message, 'error');
+    }
+});
+
+// ─── CLEANUP: kill listeners when leaving the page ───
+function _cleanupMonitoring() {
+    if (_authUnsub) { _authUnsub(); _authUnsub = null; }
+    activeListeners.forEach(u => { try { u(); } catch(e) {} });
+    activeListeners.length = 0;
+    if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; }
+    if (window.statsInterval) { clearInterval(window.statsInterval); window.statsInterval = null; }
+}
+window.addEventListener('pagehide', _cleanupMonitoring);
+window.addEventListener('beforeunload', _cleanupMonitoring);
+
 
     // ─────────────────────────────────────────────────────────────────
     //  PROFESSOR DATA

@@ -970,25 +970,48 @@
         return p.length >= 2 ? (p[0][0] + p[p.length-1][0]).toUpperCase() : name.substring(0,2).toUpperCase();
     }
 
-    // Auth
-    onAuthStateChanged(auth, async user => {
-        if (!user) { window.location.href = '/login/index.html'; return; }
-        try {
-            currentUser = user;
-            await loadProfessorData(user);
-            setupUI(user);
-            await loadAssignedSections();
-            await loadTestResults();
-            calculateRankings();
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-        } catch(err) {
-            console.error(err);
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-            showAlert('Error loading dashboard: ' + err.message, 'error');
-        }
-    });
+  // Max 1.5s loading — matches student dashboard speed
+const loadingTimeout = setTimeout(() => {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+}, 1500);
+
+let unsubscribeAuth = null;
+
+unsubscribeAuth = onAuthStateChanged(auth, async user => {
+    if (!user) {
+        clearTimeout(loadingTimeout);
+        window.location.href = '/login/index.html';
+        return;
+    }
+    try {
+        currentUser = user;
+        await loadProfessorData(user);
+        setupUI(user);
+
+        // ✅ Show page immediately — data loads in background
+        clearTimeout(loadingTimeout);
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+
+        // ✅ Heavy data loads after page is visible
+        await loadAssignedSections();
+        await loadTestResults();
+        calculateRankings();
+
+    } catch(err) {
+        console.error(err);
+        clearTimeout(loadingTimeout);
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        showAlert('Error loading dashboard: ' + err.message, 'error');
+    }
+});
+
+// ✅ Cleanup auth listener on page leave
+window.addEventListener('pagehide', () => {
+    if (unsubscribeAuth) unsubscribeAuth();
+});
 
     async function loadProfessorData(user) {
         const email = user.email.toLowerCase();

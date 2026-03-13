@@ -952,7 +952,13 @@
     const auth = firebase.auth();
     const db   = firebase.firestore();
 
-    let currentUser = null, deanData = null;
+let currentUser = null, deanData = null;
+
+// Fast loading: max 800ms, then show page regardless
+const loadingTimeout = setTimeout(() => {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+}, 800);
     let allAccounts = [], filteredAccounts = [];
     let preAssessments = [], postAssessments = [];
     let currentUserToEdit = null;
@@ -1204,43 +1210,56 @@
     window.showAccountManagement = function() { hideAllPages(); document.getElementById('accountPage').classList.add('active'); setActiveNav('nav-account'); loadAllAccounts(); };
 
     // ─── AUTH ───
-    auth.onAuthStateChanged(async (user) => {
-        const loading = document.getElementById('loadingScreen');
-        const main = document.getElementById('mainContent');
-        if (user) {
-            try {
-                currentUser = user;
-                let deanFound = false, userData = null;
-                try { const d = await db.collection('deans').doc(user.uid).get(); if (d.exists&&d.data().role==='dean') { userData=d.data(); deanFound=true; } } catch(e){}
-                if (!deanFound) { try { const d = await db.collection('users').doc(user.uid).get(); if (d.exists&&['dean','head_admin'].includes(d.data().role)) { userData=d.data(); deanFound=true; } } catch(e){} }
-                if (!deanFound) { try { const key=user.email.toLowerCase().replace(/\./g,'_'); const d=await db.collection('users').doc(key).get(); if (d.exists&&['dean','head_admin'].includes(d.data().role)) { userData=d.data(); deanFound=true; } } catch(e){} }
-                if (!deanFound) {
-                    await showDeanAlert('This account is not authorized to access the dean dashboard.', {title:'Access Denied',type:'error',confirmText:'Return to Login'});
-                    await auth.signOut();
-                    window.location.href = '/login/index.html';
-                    return;
-                }
-                await updateProfileDisplay(userData||{email:user.email,name:'Dean',role:'dean'});
-                await loadTestResults();
-                await loadDashboardStats();
-                await loadPreAssessments();
-                await loadPostAssessments();
-                await loadAllAccounts();
-                await loadSections();
-                await loadSectionRankings();
-                await loadTopSections();
-                await loadStudentRankings();
-                loading.style.display = 'none';
-                main.style.display = 'block';
-            } catch(err) {
-                console.error(err);
-                loading.style.display = 'none';
-                main.style.display = 'block';
+  let unsubscribeAuth = null;
+unsubscribeAuth = auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        try {
+            currentUser = user;
+            let deanFound = false, userData = null;
+            try { const d = await db.collection('deans').doc(user.uid).get(); if (d.exists&&d.data().role==='dean') { userData=d.data(); deanFound=true; } } catch(e){}
+            if (!deanFound) { try { const d = await db.collection('users').doc(user.uid).get(); if (d.exists&&['dean','head_admin'].includes(d.data().role)) { userData=d.data(); deanFound=true; } } catch(e){} }
+            if (!deanFound) { try { const key=user.email.toLowerCase().replace(/\./g,'_'); const d=await db.collection('users').doc(key).get(); if (d.exists&&['dean','head_admin'].includes(d.data().role)) { userData=d.data(); deanFound=true; } } catch(e){} }
+            if (!deanFound) {
+                clearTimeout(loadingTimeout);
+                await showDeanAlert('This account is not authorized to access the dean dashboard.', {title:'Access Denied',type:'error',confirmText:'Return to Login'});
+                await auth.signOut();
+                window.location.href = '/login/index.html';
+                return;
             }
-        } else {
-            window.location.href = '/login/index.html';
+            await updateProfileDisplay(userData||{email:user.email,name:'Dean',role:'dean'});
+            await loadTestResults();
+            await loadDashboardStats();
+            await loadPreAssessments();
+            await loadPostAssessments();
+            await loadAllAccounts();
+            await loadSections();
+            await loadSectionRankings();
+            await loadTopSections();
+            await loadStudentRankings();
+
+            // ✅ Clear loading immediately once auth confirmed
+            clearTimeout(loadingTimeout);
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        } catch(err) {
+            console.error(err);
+            clearTimeout(loadingTimeout);
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
         }
-    });
+    } else {
+        clearTimeout(loadingTimeout);
+        window.location.href = '/login/index.html';
+    }
+});
+
+// ✅ Kill auth listener when leaving page
+window.addEventListener('pagehide', () => {
+    if (unsubscribeAuth) { try { unsubscribeAuth(); } catch(e) {} }
+});
+window.addEventListener('beforeunload', () => {
+    if (unsubscribeAuth) { try { unsubscribeAuth(); } catch(e) {} }
+});
 
     // ─── LOGOUT ───
     window.handleLogout = function(e) {
