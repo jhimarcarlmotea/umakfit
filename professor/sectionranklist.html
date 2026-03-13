@@ -666,15 +666,28 @@
                 <div class="text-[12px] text-text-muted break-all px-2">${st.email}</div>
             </div>
 
-            <!-- Stats -->
+           <!-- Stats -->
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="flex flex-col items-center p-3 rounded-xl bg-surface border border-border">
                     <div class="text-[10px] font-semibold text-text-muted uppercase tracking-wide mb-1">Rank</div>
                     <div class="font-mono font-bold text-navy text-xl">#${st.rank}</div>
                 </div>
                 <div class="flex flex-col items-center p-3 rounded-xl bg-surface border border-border">
-                    <div class="text-[10px] font-semibold text-text-muted uppercase tracking-wide mb-1">Activities</div>
-                    <div class="font-mono font-bold text-navy text-xl">${st.activitiesCount}</div>
+                    <div class="text-[10px] font-semibold text-text-muted uppercase tracking-wide mb-1">Tests Done</div>
+                    <div class="font-mono font-bold text-navy text-xl">${st.activitiesCount}<span class="text-[13px] text-text-muted font-normal">/${st.totalAssigned || '?'}</span></div>
+                </div>
+            </div>
+            <!-- Completion Rate -->
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-surface mb-3">
+                <div class="w-8 h-8 rounded-lg bg-success-bg flex items-center justify-center text-success text-sm flex-shrink-0"><i class="fas fa-tasks"></i></div>
+                <div class="flex-1">
+                    <div class="text-[10px] font-semibold text-text-muted uppercase tracking-wide mb-1">Completion Rate</div>
+                    <div class="flex items-center gap-2">
+                        <div class="flex-1 h-1.5 bg-border rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-success to-emerald-400 rounded-full" style="width:${st.completionRate || 0}%"></div>
+                        </div>
+                        <span class="text-[13px] font-bold text-success">${st.completionRate || 0}%</span>
+                    </div>
                 </div>
             </div>
 
@@ -995,9 +1008,9 @@ unsubscribeAuth = onAuthStateChanged(auth, async user => {
         document.getElementById('mainContent').style.display = 'block';
 
         // ✅ Heavy data loads after page is visible
-        await loadAssignedSections();
+       await loadAssignedSections();
         await loadTestResults();
-        calculateRankings();
+        await calculateRankings();
 
     } catch(err) {
         console.error(err);
@@ -1292,11 +1305,60 @@ window.addEventListener('pagehide', () => {
             });
         } catch(e) { console.error('testResults error:', e); }
 
-        allTestResults = Array.from(bestMap.values());
+allTestResults = Array.from(bestMap.values());
     }
 
-    function calculateRankings() {
+    async function loadScheduledTestsCount() {
+        const scheduledMap = new Map(); // sectionId -> total assigned test count
+        try {
+               const snap = await getDocs(query(
+                collection(db, 'scheduledTests'),
+                where('isVisible', '==', true),
+                where('isActive', '==', true)
+            ));
+            const now = new Date();
+            snap.forEach(doc => {
+                const test = doc.data();
+                const sec = assignedSections.find(s => s.name === test.section);
+                if (!sec) return;
+
+                let testDateTime;
+                if (test.date && test.time) testDateTime = new Date(`${test.date}T${test.time}`);
+                else if (test.date) { testDateTime = new Date(test.date); testDateTime.setHours(0,0,0,0); }
+                else testDateTime = new Date(0);
+
+                let deadlineDateTime;
+                if (test.deadlineDateTime) deadlineDateTime = new Date(test.deadlineDateTime);
+                else if (test.deadline) {
+                    deadlineDateTime = new Date(test.deadline);
+                    if (test.deadlineTime) { const [h,m] = test.deadlineTime.split(':').map(Number); deadlineDateTime.setHours(h,m,0,0); }
+                    else deadlineDateTime.setHours(23,59,59,999);
+                } else deadlineDateTime = new Date(8640000000000000);
+
+                if (testDateTime <= now || deadlineDateTime < now) {
+                    // Store per student email count — same as studentgrades.html selectedStudents check
+                    const students = sec.students || [];
+                    students.forEach(st => {
+                        if (!st.email) return;
+                        let isSelected = true;
+                        if (test.selectedStudents && Array.isArray(test.selectedStudents)) {
+                            isSelected = test.selectedStudents.includes(st.email);
+                        }
+                        if (!isSelected) return;
+                        const key = `${sec.id}_${st.email}`;
+                        const current = scheduledMap.get(key) || 0;
+                        scheduledMap.set(key, current + 1);
+                    });
+                }
+            });
+        } catch(e) { console.error('scheduledTests error:', e); }
+        return scheduledMap;
+    }
+
+   async function calculateRankings() {
         sectionRankings = [];
+
+        const scheduledMap = await loadScheduledTestsCount();
 
         assignedSections.forEach(sec => {
             const studentsInSection = sec.students || [];
@@ -1331,11 +1393,20 @@ window.addEventListener('pagehide', () => {
                 }
             });
 
-            const studentCategories = [];
-            studentMap.forEach((s, email) => {
+           // Get total unique tests assigned to this section (same as studentgrades.html logic)
+        const uniqueTestIds = [...new Set(allTestResults.filter(r => r.sectionId === sec.id).map(r => r.testId))];
+        const totalAssignedTests = uniqueTestIds.length || 1;
+
+        const studentCategories = [];
+        studentMap.forEach((s, email) => {
                 const overallCategory = s.categories.length ? getOverallCategory(s.categories) : 'No Results yet';
                 const categoryScore = s.categories.length ?
                     s.categories.reduce((sum, cat) => sum + (CATEGORY_ORDER[cat] || 3), 0) / s.categories.length : 0;
+
+               
+                const key = `${sec.id}_${email}`;
+                const totalAssignedTests = scheduledMap.get(key) || s.categories.length || 1;
+                const studentCompletionRate = Math.round((s.categories.length / totalAssignedTests) * 100);
 
                 studentCategories.push({
                     email,
@@ -1343,11 +1414,19 @@ window.addEventListener('pagehide', () => {
                     overallCategory,
                     categoryScore,
                     activitiesCount: s.categories.length,
+                    totalAssigned: totalAssignedTests,
+                    completionRate: studentCompletionRate,
                     hasGrades: s.hasGrades,
                     ageGroup: s.ageGroup
                 });
+
             });
-            studentCategories.sort((a, b) => b.categoryScore - a.categoryScore);
+           const maxActivities = Math.max(...studentCategories.map(s => s.activitiesCount), 1);
+            studentCategories.sort((a, b) => {
+                const aComposite = (a.categoryScore / 5) * 0.6 + (a.activitiesCount / maxActivities) * 0.4;
+                const bComposite = (b.categoryScore / 5) * 0.6 + (b.activitiesCount / maxActivities) * 0.4;
+                return bComposite - aComposite;
+            });
 
             const totalStudents = studentsInSection.length;
             const studentsWithGrades = studentCategories.filter(s => s.hasGrades).length;
@@ -1366,6 +1445,12 @@ window.addEventListener('pagehide', () => {
                 else sectionOverallCategory = 'Poor';
             }
 
+             const completionWeight = 0.4;
+            const categoryWeight = 0.6;
+            const normalizedCompletion = completionRate / 100; // 0.0 to 1.0
+            const normalizedCategory = sectionCategoryScore / 5;  // 0.0 to 1.0 (max score is 5)
+            const compositeScore = (normalizedCategory * categoryWeight) + (normalizedCompletion * completionWeight);
+
             sectionRankings.push({
                 id: sec.id,
                 name: sec.name,
@@ -1375,12 +1460,14 @@ window.addEventListener('pagehide', () => {
                 studentsWithGrades,
                 completionRate: parseFloat(completionRate.toFixed(2)),
                 categoryScore: parseFloat(sectionCategoryScore.toFixed(2)),
+                compositeScore: parseFloat(compositeScore.toFixed(4)),
                 overallCategory: sectionOverallCategory,
                 studentCategories,
             });
         });
 
-        sectionRankings.sort((a, b) => b.categoryScore - a.categoryScore);
+        // Sort by composite score (completion + category quality combined)
+        sectionRankings.sort((a, b) => b.compositeScore - a.compositeScore);
         sectionRankings = sectionRankings.map((s, i) => ({ ...s, rank: i + 1 }));
 
         renderRankings(sectionRankings);
@@ -1515,6 +1602,7 @@ window.addEventListener('pagehide', () => {
                     : '';
 
                 // Build student JSON for mobile tap — only include displayable ageGroup
+                // Build student JSON for mobile tap — only include displayable ageGroup
                 const studentPayload = {
                     rank: i + 1,
                     name: st.name,
@@ -1522,6 +1610,8 @@ window.addEventListener('pagehide', () => {
                     overallCategory: st.overallCategory,
                     hasGrades: st.hasGrades,
                     activitiesCount: st.activitiesCount,
+                    totalAssigned: st.totalAssigned,
+                    completionRate: st.completionRate,
                     // Pass sentinel as-is so the modal JS can decide whether to show it
                     ageGroup: st.ageGroup || '19-22_default'
                 };
@@ -1534,11 +1624,15 @@ window.addEventListener('pagehide', () => {
                         <div class="w-9 h-9 rounded-full bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white font-bold text-sm flex-shrink-0">${getInitials(st.name)}</div>
                         <div class="flex-1 min-w-0">
                             <div class="font-semibold text-navy text-[14px] truncate">${st.name}</div>
-                            <div class="text-[12px] text-text-muted truncate">${st.email}${ageGroupLabel}</div>
+                           <div class="text-[12px] text-text-muted truncate">${st.email}${ageGroupLabel}</div>
+                            ${st.hasGrades ? `<div class="text-[11px] text-text-muted mt-0.5 sm:hidden"><span class="font-semibold text-success">${st.activitiesCount}/${st.totalAssigned} tests</span> &middot; <span class="font-semibold text-blue">${st.completionRate}%</span> completion</div>` : ''}
                         </div>
                         <div class="flex items-center gap-2 flex-shrink-0 mobile-badge-hide">
                             ${st.hasGrades
-                                ? studentBadge
+                                ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success-bg border border-success/20 text-[11px] font-semibold text-success mr-1">
+                                        <i class="fas fa-check-circle text-[10px]"></i>
+                                        ${st.activitiesCount}/${st.totalAssigned} · ${st.completionRate}%
+                                    </span>${studentBadge}`
                                 : `<span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-surface text-text-muted border border-border">No Results yet</span>`
                             }
                         </div>
@@ -1644,7 +1738,7 @@ window.addEventListener('pagehide', () => {
         try {
             await loadAssignedSections();
             await loadTestResults();
-            calculateRankings();
+            await calculateRankings();
             showAlert('Rankings refreshed successfully!', 'success');
         } catch(e) { showAlert('Error refreshing: ' + e.message, 'error'); }
     };
