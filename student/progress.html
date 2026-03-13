@@ -1288,11 +1288,11 @@ function setupEventListeners() {
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeImprovementModal(); });
 }
+const loadingTimeout = setTimeout(() => {
+    document.getElementById('loadingScreen').style.display = 'none';
+}, 1500);
 
-// ============================================================
-// AUTH
-// ============================================================
-onAuthStateChanged(auth, async user => {
+const unsubscribeAuth = onAuthStateChanged(auth, async user => {
     if (user) {
         try {
             currentUser = user;
@@ -1308,20 +1308,24 @@ onAuthStateChanged(auth, async user => {
                 studentData = { displayName: user.displayName||user.email.split('@')[0], email: user.email, section:'Not Assigned' };
             }
             updateProfileUI();
-
             await checkUnreadNotifications();
             await loadProgressData(user.email);
-            document.getElementById('loadingScreen').style.display = 'none';
             setupEventListeners();
         } catch(error) {
             console.error('Error loading page:', error);
-            document.getElementById('loadingScreen').style.display = 'none';
             alert('Error loading your progress data. Please refresh the page.');
+        } finally {
+            clearTimeout(loadingTimeout);
+            document.getElementById('loadingScreen').style.display = 'none';
         }
     } else {
+        clearTimeout(loadingTimeout);
         window.location.href = '../login/index.html';
     }
 });
+
+window.addEventListener('pagehide', () => unsubscribeAuth());
+window.addEventListener('beforeunload', () => unsubscribeAuth());
 
 // ============================================================
 // LOGOUT

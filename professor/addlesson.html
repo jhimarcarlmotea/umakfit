@@ -621,21 +621,38 @@
     const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getFirestore(app);
     let currentUser=null,currentProfessor=null,assignedSections=[],allLessons=[],filteredLessons=[],editingLessonId=null,selectedFiles=[],activeSectionFilter=null;
 
-    onAuthStateChanged(auth,async user=>{
-        if(user){
-            try{
-                currentUser=user;
-                await loadProfessorData(user);
-                setupUI(user);
-                await loadAssignedSections();
-                await loadLessons();
-                initListeners();
-                document.getElementById('loadingScreen').style.display='none';
-                document.getElementById('mainContent').style.display='block';
-            }catch(err){console.error(err);document.getElementById('loadingScreen').style.display='none';showAlert(err.message||'Error loading page.','error');}
-        }else{window.location.href='/login/index.html';}
-    });
+ // AFTER:
+const loadingTimeout = setTimeout(() => {
+    document.getElementById('loadingScreen').style.display='none';
+    document.getElementById('mainContent').style.display='block';
+}, 1500);
 
+const unsubscribeAuth = onAuthStateChanged(auth, async user => {
+    if(user){
+        try{
+            currentUser=user;
+            // Show page immediately
+            clearTimeout(loadingTimeout);
+            document.getElementById('loadingScreen').style.display='none';
+            document.getElementById('mainContent').style.display='block';
+            // Load data in background
+            await loadProfessorData(user);
+            setupUI(user);
+            await loadAssignedSections();
+            await loadLessons();
+            initListeners();
+        }catch(err){
+            console.error(err);
+            showAlert(err.message||'Error loading page.','error');
+        }
+    }else{
+        clearTimeout(loadingTimeout);
+        window.location.href='/login/index.html';
+    }
+});
+
+window.addEventListener('pagehide', () => { unsubscribeAuth(); });
+window.addEventListener('beforeunload', () => { unsubscribeAuth(); });
     async function loadProfessorData(user){
         const email=user.email.toLowerCase();
         const ps=await getDocs(query(collection(db,'professors'),where('email','==',email)));

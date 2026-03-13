@@ -1779,28 +1779,27 @@ const notificationsQuery = query(
             if (notificationDropdown) notificationDropdown.classList.add('hidden');
             if (notificationDropdownMobile) notificationDropdownMobile.classList.add('hidden');
         }
+let unsubscribeNotifications = null;
 
-        function setupNotificationListener() {
-            try {
-                if (!studentData || !studentData.section) return;
+function setupNotificationListener() {
+    try {
+        if (!studentData || !studentData.section) return;
+        if (unsubscribeNotifications) unsubscribeNotifications();
 
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);
-                onSnapshot(notificationsQuery, (snapshot) => {
-                    console.log('🔔 Notification update detected!');
-                    checkUnreadNotifications();
-                }, (error) => {
-                    console.error('❌ Error in notification listener:', error);
-                });
-                
-            } catch (error) {
-                console.error('Error setting up notification listener:', error);
-            }
-        }
-
+        const notificationsQuery = query(
+            collection(db, 'notifications'),
+            where('section', '==', studentData.section),
+            where('studentEmail', '==', studentData.email)
+        );
+        unsubscribeNotifications = onSnapshot(notificationsQuery, (snapshot) => {
+            checkUnreadNotifications();
+        }, (error) => {
+            console.error('❌ Error in notification listener:', error);
+        });
+    } catch (error) {
+        console.error('Error setting up notification listener:', error);
+    }
+}
         // ========== END NOTIFICATION SYSTEM ==========
 
         // Hamburger Menu functionality
@@ -3488,10 +3487,12 @@ function calculateScoreWithNorms(testName, rawResult, testTarget, student) {
             if (dropdownEmailMobile) dropdownEmailMobile.textContent = currentUser.email || '';
         }
 
+let unsubscribeTestDeletion = null;
 
-            function listenForTestDeletion(testId) {
+function listenForTestDeletion(testId) {
+    if (unsubscribeTestDeletion) unsubscribeTestDeletion();
     const deletedRef = doc(db, 'deletedTests', testId);
-    onSnapshot(deletedRef, (snap) => {
+    unsubscribeTestDeletion = onSnapshot(deletedRef, (snap) => {
         if (snap.exists()) {
             showTestDeletedPopup();
         }
@@ -3612,16 +3613,8 @@ function showTestDeletedPopup() {
             
             console.log('✅ All data loaded successfully');
             
-            loadingScreen.style.opacity = '0';
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-                mainContent.style.display = 'block';
-                mainContent.style.transition = 'opacity 0.4s ease';
-                mainContent.style.opacity = '0';
-                setTimeout(() => {
-                    mainContent.style.opacity = '1';
-                }, 50);
-            }, 300);
+ loadingScreen.style.display = 'none';
+mainContent.style.display = 'block';
                     
                     // Setup notification event listeners
                     const notificationBtn = document.getElementById('notificationBellBtn');
@@ -3801,6 +3794,14 @@ function showLogoutConfirmPopup() {
         window.toggleNotificationDropdown = toggleNotificationDropdown;
         window.closeNotificationDropdown = closeNotificationDropdown;
         window.handleLogout = handleLogout;
+
+        // Cleanup all listeners when leaving page
+window.addEventListener('pagehide', () => {
+    if (unsubscribeTestDeletion) unsubscribeTestDeletion();
+    if (unsubscribeNotifications) unsubscribeNotifications();
+    clearInterval(timerInterval);
+    stopMetronome();
+});
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

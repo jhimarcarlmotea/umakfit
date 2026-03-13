@@ -1236,27 +1236,27 @@ function toggleNotificationDropdown(event) {
             if (notificationDropdownMobile) notificationDropdownMobile.classList.add('hidden');
         }
 
-        function setupNotificationListener() {
-            try {
-                if (!studentData || !studentData.section) return;
+ function setupNotificationListener() {
+    try {
+        if (!studentData || !studentData.section) return;
 
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);                
-                onSnapshot(notificationsQuery, (snapshot) => {
-                    console.log('🔔 Notification update detected!');
-                    checkUnreadNotifications();
-                }, (error) => {
-                    console.error('❌ Error in notification listener:', error);
-                });
-                
-            } catch (error) {
-                console.error('Error setting up notification listener:', error);
-            }
-        }
+        const notificationsQuery = query(
+            collection(db, 'notifications'),
+            where('section', '==', studentData.section),
+            where('studentEmail', '==', studentData.email)
+        );
 
+        unsubscribeNotifListener = onSnapshot(notificationsQuery, (snapshot) => {
+            console.log('🔔 Notification update detected!');
+            checkUnreadNotifications();
+        }, (error) => {
+            console.error('❌ Error in notification listener:', error);
+        });
+
+    } catch (error) {
+        console.error('Error setting up notification listener:', error);
+    }
+}
         // ========== END NOTIFICATION SYSTEM ==========
 
         // Update profile UI
@@ -1403,11 +1403,7 @@ if (drawerOverlay) {
  // Load lessons with real-time listener
 function loadLessons() {
     try {
-        if (!studentData || !studentData.section) {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
-            return;
-        }
+        if (!studentData || !studentData.section) return;
 
         const lessonsQuery = query(
             collection(db, 'lessons'),
@@ -1433,22 +1429,14 @@ function loadLessons() {
 
                 container.innerHTML = html;
             }
-
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
         }, (error) => {
             console.error('Error loading lessons:', error);
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
         });
 
     } catch (error) {
         console.error('Error loading lessons:', error);
-        document.getElementById('loadingScreen').classList.add('hidden');
-        document.getElementById('mainContent').classList.remove('hidden');
     }
 }
-
         // Render lesson card
         function renderLessonCard(lesson) {
             const createdDate = lesson.createdAt?.toDate?.() || new Date();
@@ -1645,23 +1633,45 @@ ${hasYouTube ? `
             });
         }
 
-        // Auth state change
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                await loadStudentData(user);
-                updateProfileUI();
-                setupNotificationListener();
-                await checkUnreadNotifications();
-                await loadLessons();
-                setupEventListeners();
-            } else {
-                window.location.href = '../login/index.html';
-            }
-        });
-            window.handleLogout = function() {
-    showLogoutConfirmPopup();
-};
+// Auth state change
+let unsubscribeAuth = null;
+let unsubscribeNotifListener = null;
+
+const loadingTimeout = setTimeout(() => {
+    document.getElementById('loadingScreen').classList.add('hidden');
+    document.getElementById('mainContent').classList.remove('hidden');
+}, 1500);
+
+unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        try {
+            currentUser = user;
+            await loadStudentData(user);
+            updateProfileUI();
+            setupNotificationListener();
+            await checkUnreadNotifications();
+            loadLessons(); // no await — onSnapshot shows content itself
+            setupEventListeners();
+        } catch(e) {
+            console.error('Error initializing page:', e);
+        } finally {
+            clearTimeout(loadingTimeout);
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+        }
+    } else {
+        clearTimeout(loadingTimeout);
+        window.location.href = '../login/index.html';
+    }
+});
+
+window.addEventListener('pagehide', () => {
+    if (unsubscribeAuth) unsubscribeAuth();
+    if (unsubscribeNotifListener) unsubscribeNotifListener();
+});
+window.addEventListener('beforeunload', () => {
+    if (unsubscribeNotifListener) unsubscribeNotifListener();
+});
 
 function showLogoutConfirmPopup() {
     // Remove existing popup if any

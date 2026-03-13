@@ -821,12 +821,12 @@
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
-        <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
-        <div class="spinner"></div>
-        <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Profile...</div>
-    </div>
+<!-- Loading Screen -->
+<div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
+    <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
+    <div class="spinner"></div>
+    <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Profile...</div>
+</div>
 
     <div id="mainContent" style="display: none;">
         <!-- Navigation -->
@@ -1637,28 +1637,49 @@ function closeNotificationDropdown() {
     if (notificationDropdown) { notificationDropdown.classList.add('hidden'); notificationDropdown.style.display = ''; }
     if (notificationDropdownMobile) { notificationDropdownMobile.classList.add('hidden'); notificationDropdownMobile.style.display = ''; }
 }
+let unsubscribeNotificationListener = null;
 
-    function setupNotificationListener() {
-        try {
-            if (!studentData || !studentData.section) return;
+function setupNotificationListener() {
+    try {
+        if (!studentData || !studentData.section) return;
 
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);            
-            onSnapshot(notificationsQuery, (snapshot) => {
-                console.log('🔔 Notification update detected!');
-                checkUnreadNotifications();
-            }, (error) => {
-                console.error('❌ Error in notification listener:', error);
-            });
-            
-        } catch (error) {
-            console.error('Error setting up notification listener:', error);
+        // Cleanup previous listener if any
+        if (unsubscribeNotificationListener) {
+            unsubscribeNotificationListener();
+            unsubscribeNotificationListener = null;
         }
-    }
 
+        const notificationsQuery = query(
+            collection(db, 'notifications'),
+            where('section', '==', studentData.section),
+            where('studentEmail', '==', studentData.email)
+        );
+
+        unsubscribeNotificationListener = onSnapshot(notificationsQuery, (snapshot) => {
+            console.log('🔔 Notification update detected!');
+            checkUnreadNotifications();
+        }, (error) => {
+            console.error('❌ Error in notification listener:', error);
+        });
+
+    } catch (error) {
+        console.error('Error setting up notification listener:', error);
+    }
+}
+
+// Kill listener when user navigates away
+window.addEventListener('pagehide', () => {
+    if (unsubscribeNotificationListener) {
+        unsubscribeNotificationListener();
+        unsubscribeNotificationListener = null;
+    }
+});
+window.addEventListener('beforeunload', () => {
+    if (unsubscribeNotificationListener) {
+        unsubscribeNotificationListener();
+        unsubscribeNotificationListener = null;
+    }
+});
     // ========== END NOTIFICATION SYSTEM ==========
 
     // Helper function to capitalize names

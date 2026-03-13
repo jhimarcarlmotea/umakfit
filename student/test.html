@@ -831,6 +831,9 @@
         let overdueTests = [];
         let allTestHistory = [];
         let showAllHistory = false;
+const activeListeners = [];
+function registerListener(unsub) { activeListeners.push(unsub); }
+function cleanupAllListeners() { activeListeners.forEach(fn => { try { fn(); } catch(e) {} }); activeListeners.length = 0; }
         const VISIBLE_HISTORY_COUNT = 2;
 
         const testCategories = {
@@ -984,7 +987,9 @@ const notificationsQuery = query(
     collection(db, 'notifications'),
     where('section', '==', studentData.section),
     where('studentEmail', '==', studentData.email)
-);                onSnapshot(notificationsQuery, (snapshot) => { checkUnreadNotifications(); }, (error) => { console.error('❌ Error in notification listener:', error); });
+);               
+registerListener(onSnapshot(notificationsQuery, () => { checkUnreadNotifications(); }, (error) => { console.error('❌ Error in notification listener:', error); }));
+
             } catch (error) { console.error('Error setting up notification listener:', error); }
         }
         // ========== END NOTIFICATION SYSTEM ==========
@@ -1176,14 +1181,13 @@ if (hamburger) {
 
         // Listen for scheduled tests changes
         const testsQuery = query(collection(db, 'scheduledTests'), where('section', '==', studentData.section));
-        onSnapshot(testsQuery, () => { loadAvailableTests(); }, (error) => { console.error('❌ Error in real-time listener:', error); });
+registerListener(onSnapshot(testsQuery, () => { loadAvailableTests(); }, (error) => { console.error('❌ Error in real-time listener:', error); }));
 
         // Listen for testPermissions changes in real-time
         const permQuery = query(collection(db, 'testPermissions'), where('studentEmail', '==', studentData.email));
-        onSnapshot(permQuery, () => {
-            // Re-render overdue tests with updated permissions
-            renderOverdueTests(overdueTests);
-        }, (error) => { console.error('❌ Error in permissions listener:', error); });
+registerListener(onSnapshot(permQuery, () => {
+    renderOverdueTests(overdueTests);
+}, (error) => { console.error('❌ Error in permissions listener:', error); }));
 
     } catch (error) { console.error('Error setting up test updates for student:', error); }
 }
@@ -1541,11 +1545,11 @@ if (hamburger) {
                 const historyQueryAlt = query(collection(db, 'testResults'), where('studentEmail', '==', emailOrig));
                 const [snap1, snap2] = await Promise.all([getDocs(historyQuery), getDocs(historyQueryAlt)]);
                 processSnapshot(snap1, snap2);
-                onSnapshot(historyQuery, async (snapshot1) => { const snapshot2 = await getDocs(historyQueryAlt); processSnapshot(snapshot1, snapshot2); }, (error) => {
-                    console.error('❌ Error in test results listener:', error);
-                    document.getElementById('testHistoryContainer').innerHTML = `<div class="text-center py-8 sm:py-12"><div class="text-5xl sm:text-6xl mb-3 sm:mb-4">⚠️</div><p class="text-base sm:text-lg font-semibold text-gray-600 mb-1 sm:mb-2">Error Loading History</p><small class="text-sm text-gray-400">Please refresh the page to try again</small></div>`;
-                });
-            } catch (error) { console.error('Error setting up test history listener:', error); }
+registerListener(onSnapshot(historyQuery, async (snapshot1) => { const snapshot2 = await getDocs(historyQueryAlt); processSnapshot(snapshot1, snapshot2); }, (error) => {
+                        console.error('❌ Error in test results listener:', error);
+document.getElementById('testHistoryContainer').innerHTML = `...`;
+                }));
+                        } catch (error) { console.error('Error setting up test history listener:', error); }
         }
 
         function renderTestHistory() {
@@ -1712,8 +1716,8 @@ if (hamburger) {
         function setupPerformanceDashboard() {
             if (!studentData?.email) return;
             const resultsQuery = query(collection(db, 'testResults'), where('studentEmail', '==', studentData.email), where('status', 'in', ['completed', 'overdue', 'late']));
-            onSnapshot(resultsQuery, (resultsSnapshot) => {
-                const testDates = [];
+registerListener(onSnapshot(resultsQuery, (resultsSnapshot) => {
+                    const testDates = [];
                 const allRanks = [];
                 let bestRank = 0;
                 let bestCat = null;
@@ -1738,7 +1742,7 @@ if (hamburger) {
                 document.getElementById('bestScore').textContent = bestCat || '--';
                 const weekStreakEl = document.getElementById('weekStreak');
                 if (weekStreakEl) weekStreakEl.textContent = weekStreakCount;
-            }, (error) => { console.error('Error in performance dashboard listener:', error); });
+ }, (error) => { console.error('Error in performance dashboard listener:', error); }));
         }
 
         function initPerformanceCarousel() {
@@ -1807,29 +1811,71 @@ if (hamburger) {
             });
         }
 
-        onAuthStateChanged(auth, async (user) => {
-            const loadingScreen = document.getElementById('loadingScreen');
-            const mainContent = document.getElementById('mainContent');
-            if (user) {
-                try {
-                    currentUser = user;
-                    await loadStudentData(user);
-                    setupPerformanceDashboard();
-                    if (!isProfileComplete(studentData)) { loadingScreen.classList.add('hidden'); showProfileRequiredModalWithRedirect(); return; }
-                    await loadAvailableTests();
-                    await loadRecentTestHistory();
-                    setupTestUpdatesForStudent();
-                    setupDeadlineWatcher();
-                    setupNotificationListener();
-                    await checkUnreadNotifications();
-                    setupEventListeners();
-                    loadingScreen.classList.add('hidden');
-                    mainContent.classList.remove('hidden');
-                    setTimeout(initPerformanceCarousel, 100);
-                } catch (error) { console.error('Error loading page:', error); alert('Error loading page. Please try again.'); }
-            } else { window.location.href = '../login/index.html'; }
-        });
+ // REPLACE WITH:
+const loadingScreen = document.getElementById('loadingScreen');
+const mainContent = document.getElementById('mainContent');
 
+let unsubscribeAuth = null;
+
+// Max 1.5s loading screen
+const loadingTimeout = setTimeout(() => {
+    loadingScreen.classList.add('hidden');
+    mainContent.classList.remove('hidden');
+}, 1500);
+
+unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        try {
+            currentUser = user;
+
+            // Load student data first (fast, single query)
+            await loadStudentData(user);
+
+            // Show page immediately
+            clearTimeout(loadingTimeout);
+            loadingScreen.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+
+            setupEventListeners();
+            setTimeout(initPerformanceCarousel, 100);
+
+            // Profile check after showing page
+            if (!isProfileComplete(studentData)) {
+                showProfileRequiredModalWithRedirect();
+                return;
+            }
+
+            // Load everything else in background (non-blocking)
+            setupPerformanceDashboard();
+            setupNotificationListener();
+            checkUnreadNotifications();
+            loadAvailableTests().then(() => {
+                setupTestUpdatesForStudent();
+                setupDeadlineWatcher();
+            });
+            loadRecentTestHistory();
+
+        } catch (error) {
+            console.error('Error loading page:', error);
+            clearTimeout(loadingTimeout);
+            loadingScreen.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+        }
+    } else {
+        clearTimeout(loadingTimeout);
+        window.location.href = '../login/index.html';
+    }
+});
+
+// Kill all listeners on page leave
+window.addEventListener('pagehide', () => {
+    cleanupAllListeners();
+    if (unsubscribeAuth) unsubscribeAuth();
+});
+window.addEventListener('beforeunload', () => {
+    cleanupAllListeners();
+    if (unsubscribeAuth) unsubscribeAuth();
+});
         let resizeTimeout;
         window.addEventListener('resize', () => { clearTimeout(resizeTimeout); resizeTimeout = setTimeout(() => { if (window.innerWidth < 1024) initPerformanceCarousel(); }, 250); });
 

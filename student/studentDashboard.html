@@ -3744,110 +3744,98 @@ function calculateTestScore(testName, result, testTarget = null) {
         window.goToEditProfile = function() {
             window.location.href = './studentProfile.html?editProfile=true';
         };
-        
-        // Auth state change listener - UPDATED VERSION
-        onAuthStateChanged(auth, async (user) => {
+   // REPLACE WITH:
+let unsubscribeAuth = null;
+
+// Max 1.5s loading screen regardless
+const loadingTimeout = setTimeout(() => {
+    loadingScreen.classList.add('hidden');
+    mainContent.classList.remove('hidden');
+}, 1500);
+
+unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
     if (user) {
         try {
-            console.log('=== DASHBOARD: Checking access ===');
-            console.log('User:', user.email);
             currentUser = user;
-            
-            // ✅ FIXED: Properly check user role with multiple fallbacks
             const userEmail = user.email.toLowerCase();
             let isStudent = false;
             let userRole = null;
-            
-            // Method 1: Check students collection (PRIMARY - matches login flow)
+
+            // Method 1: students collection
             try {
-                const studentsQuery = query(
-                    collection(db, 'students'),
-                    where('email', '==', userEmail)
-                );
+                const studentsQuery = query(collection(db, 'students'), where('email', '==', userEmail));
                 const studentsSnapshot = await getDocs(studentsQuery);
-                
                 if (!studentsSnapshot.empty) {
-                    const studentData = studentsSnapshot.docs[0].data();
-                    userRole = studentData.role || 'student';
+                    const sData = studentsSnapshot.docs[0].data();
+                    userRole = sData.role || 'student';
                     isStudent = (userRole === 'student');
-                    console.log('✅ Found in students collection, role:', userRole);
                 }
-            } catch (error) {
-                console.log('⚠️ Error querying students collection:', error.message);
-            }
-            
-            // Method 2: Check users collection (BACKUP - email with dot replacement)
+            } catch (e) {}
+
+            // Method 2: users by email key
             if (!isStudent && userRole === null) {
                 try {
                     const userEmailKey = userEmail.replace(/\./g, '_');
-                    const userRef = doc(db, 'users', userEmailKey);
-                    const userDoc = await getDoc(userRef);
-                    
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        userRole = userData.role;
-                        isStudent = (userData.role === 'student');
-                        console.log('✅ Found in users collection (by email key), role:', userRole);
-                    }
-                } catch (error) {
-                    console.log('⚠️ Error checking users collection (email key):', error.message);
-                }
+                    const userDoc = await getDoc(doc(db, 'users', userEmailKey));
+                    if (userDoc.exists()) { userRole = userDoc.data().role; isStudent = userRole === 'student'; }
+                } catch (e) {}
             }
-            
-            // Method 3: Check users collection by UID (LEGACY FALLBACK)
+
+            // Method 3: users by UID
             if (!isStudent && userRole === null) {
                 try {
-                    const userRef = doc(db, 'users', user.uid);
-                    const userDoc = await getDoc(userRef);
-                    
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        userRole = userData.role;
-                        isStudent = (userData.role === 'student');
-                        console.log('✅ Found in users collection (by UID), role:', userRole);
-                    }
-                } catch (error) {
-                    console.log('⚠️ Error checking users collection (by UID):', error.message);
-                }
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists()) { userRole = userDoc.data().role; isStudent = userRole === 'student'; }
+                } catch (e) {}
             }
-            
-            // ✅ FIXED: Proper role validation with detailed error message
+
             if (!isStudent) {
-                console.error('❌ Access Denied - User role:', userRole || 'not found');
-                const errorMsg = userRole 
-                    ? `Access Denied: This dashboard is for students only.\nYour role: ${userRole}`
-                    : 'Access Denied: This dashboard is for students only.\nYour account is not properly configured.';
-                alert(errorMsg);
+                clearTimeout(loadingTimeout);
+                alert(userRole ? `Access Denied: Students only.\nYour role: ${userRole}` : 'Access Denied: Your account is not configured as a student.');
                 await signOut(auth);
                 window.location.href = '../login/index.html';
                 return;
             }
-            
-            console.log('✅ Access Granted - User is a student');
-            
-            // Initialize charts first
-            initializeCharts();
-            
-            // Load student data from students collection
-            await loadStudentData(user);
-            
-            // Show the main content
+
+            // ✅ Show page immediately
+            clearTimeout(loadingTimeout);
             loadingScreen.classList.add('hidden');
             mainContent.classList.remove('hidden');
-            generateMiniCalendar();
-            console.log('✓ Dashboard loaded successfully');
-            
+
+            // ✅ Init charts + calendar skeleton right away
+            initializeCharts();
+            generateMiniCalendar(); // renders empty calendar immediately
+
+            // ✅ Load student data, then re-render calendar with deadlines
+            loadStudentData(user).then(() => {
+                generateMiniCalendar(); // re-render now that studentData is available
+                console.log('✓ Student data fully loaded');
+            }).catch(err => {
+                console.error('Background load error:', err);
+            });
+
         } catch (error) {
-            console.error('Error loading dashboard:', error);
-            alert('Error loading dashboard. Please try again.');
+            console.error('Error during auth check:', error);
+            clearTimeout(loadingTimeout);
             loadingScreen.classList.add('hidden');
             mainContent.classList.remove('hidden');
         }
-    } else {    
-        console.log('No user, redirecting to login');
+    } else {
+        clearTimeout(loadingTimeout);
         window.location.href = '../login/index.html';
     }
 });
+
+window.addEventListener('pagehide', () => {
+    if (unsubscribeAuth) unsubscribeAuth();
+});
+window.addEventListener('beforeunload', () => {
+    if (unsubscribeAuth) unsubscribeAuth();
+});
+        // ✅ Unsubscribe auth listener when leaving page (prevents memory leaks)
+        window.addEventListener('pagehide', () => {
+            unsubscribeAuth();
+        });
         
         // Generate Calendar
         function generateMiniCalendar() {
