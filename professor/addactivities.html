@@ -737,11 +737,11 @@
                     <div class="norm-panel">
                         <div class="norm-panel-title"><i class="fas fa-ruler-combined"></i> Threshold Values</div>
                         <div class="norm-grid">
-                            <div class="norm-field"><label>⭐ Excellent</label><input type="number" id="editNormExcellent" step="0.5"></div>
-                            <div class="norm-field"><label>👍 Good</label><input type="number" id="editNormGood" step="0.5"></div>
-                            <div class="norm-field"><label>📊 Average</label><input type="number" id="editNormAverage" step="0.5"></div>
-                            <div class="norm-field"><label>📉 Below Average</label><input type="number" id="editNormBelowAverage" step="0.5"></div>
-                        </div>
+                        <div class="norm-field"><label>⭐ Excellent</label><input type="number" id="editNormExcellent" step="0.5" min="0" max="9999" oninput="validateNormInput(this)"></div>
+                        <div class="norm-field"><label>👍 Good</label><input type="number" id="editNormGood" step="0.5" min="0" max="9999" oninput="validateNormInput(this)"></div>
+                        <div class="norm-field"><label>📊 Average</label><input type="number" id="editNormAverage" step="0.5" min="0" max="9999" oninput="validateNormInput(this)"></div>
+                        <div class="norm-field"><label>📉 Below Average</label><input type="number" id="editNormBelowAverage" step="0.5" min="0" max="9999" oninput="validateNormInput(this)"></div>
+                    </div>
                         <div class="flex gap-2 mt-3">
                             <button type="button" onclick="resetEditNormsToDefault()" class="text-xs px-3 py-1.5 bg-white border border-purple-300 text-purple-600 rounded-lg hover:bg-purple-50 transition-all"><i class="fas fa-undo mr-1"></i> Reset to Default</button>
                         </div>
@@ -825,10 +825,10 @@
                 <div class="norm-panel">
                     <div class="norm-panel-title"><i class="fas fa-ruler-combined"></i> Threshold Values <span id="snLowerTag" class="norm-lower-tag hidden ml-1">lower is better</span></div>
                     <div class="norm-grid">
-                        <div class="norm-field"><label>⭐ Excellent</label><input type="number" id="snExcellent" step="0.5"></div>
-                        <div class="norm-field"><label>👍 Good</label><input type="number" id="snGood" step="0.5"></div>
-                        <div class="norm-field"><label>📊 Average</label><input type="number" id="snAverage" step="0.5"></div>
-                        <div class="norm-field"><label>📉 Below Average</label><input type="number" id="snBelowAverage" step="0.5"></div>
+                        <div class="norm-field"><label>⭐ Excellent</label><input type="number" id="snExcellent" step="0.5" min="0" max="9999" oninput="validateNormInput(this)"></div>
+                        <div class="norm-field"><label>👍 Good</label><input type="number" id="snGood" step="0.5" min="0" max="9999" oninput="validateNormInput(this)"></div>
+                        <div class="norm-field"><label>📊 Average</label><input type="number" id="snAverage" step="0.5" min="0" max="9999" oninput="validateNormInput(this)"></div>
+                        <div class="norm-field"><label>📉 Below Average</label><input type="number" id="snBelowAverage" step="0.5" min="0" max="9999" oninput="validateNormInput(this)"></div>
                     </div>
                     <div class="flex items-center gap-2 mt-3">
                         <span class="text-xs text-text-muted">Current source:</span>
@@ -1012,7 +1012,50 @@ function applyPresetVideo() {
     if (sb) { sb.disabled = false; sb.textContent = 'Schedule Test'; }
     if (window.currentUser) window.loadScheduledTests(window.currentUser.email, window.currentUser.uid);
 };
+        function validateNormInput(input) {
+    // Strip any non-numeric characters except decimal point
+    let val = input.value;
 
+    // Remove anything that's not a digit or decimal point
+    val = val.replace(/[^0-9.]/g, '');
+
+    // Prevent negative — already blocked by min="0" but belt-and-suspenders
+    if (parseFloat(val) < 0) val = '0';
+
+    // Limit to 4 digits before decimal point (max 9999)
+    const parts = val.split('.');
+    if (parts[0] && parts[0].length > 3) {
+    parts[0] = parts[0].slice(0, 3);
+    val = parts.join('.');
+    input.value = val;
+    showNormInputError(input, 'Max 3 digits allowed (0–999)');
+    return;
+}
+
+    // Clear error if valid
+    input.value = val;
+    clearNormInputError(input);
+}
+
+function showNormInputError(input, message) {
+    let errEl = input.parentElement.querySelector('.norm-input-error');
+    if (!errEl) {
+        errEl = document.createElement('small');
+        errEl.className = 'norm-input-error';
+        errEl.style.cssText = 'color:#dc2626;font-size:10px;display:block;margin-top:3px;font-weight:600;';
+        input.parentElement.appendChild(errEl);
+    }
+    errEl.textContent = message;
+    input.style.borderColor = '#dc2626';
+    input.style.boxShadow = '0 0 0 2px rgba(220,38,38,0.15)';
+}
+
+function clearNormInputError(input) {
+    const errEl = input.parentElement.querySelector('.norm-input-error');
+    if (errEl) errEl.remove();
+    input.style.borderColor = '';
+    input.style.boxShadow = '';
+}
     window.addEventListener('pagehide', () => { clearInterval(window._headerDateInterval); clearInterval(window._statusInterval); });
     window.addEventListener('beforeunload', () => { clearInterval(window._statusInterval); });
 </script>
@@ -1473,6 +1516,18 @@ async function loadTestResults(userEmail) {
             if (!testGroups.has(groupKey)||(CATEGORY_ORDER[category]||3)>(CATEGORY_ORDER[testGroups.get(groupKey).category]||0)) {
                 testGroups.set(groupKey, { ...r, id:ds.id, category, testName:r.testName||'Unknown', submittedAt:submittedDate });
             }
+            // Store ALL attempts separately for the modal view
+            const allKey = `all_${studentEmail}`;
+            if (!window._allAttemptsMap) window._allAttemptsMap = new Map();
+            if (!window._allAttemptsMap.has(allKey)) window._allAttemptsMap.set(allKey, []);
+            window._allAttemptsMap.get(allKey).push({
+                id: ds.id,
+                testName: r.testName||'Unknown',
+                category,
+                result: r.result||r.resultData||r.repetitions||'N/A',
+                date: submittedDate,
+                attempt: r.attemptNumber||1
+            });
         }));
 
         testGroups.forEach(result => {
@@ -1574,15 +1629,21 @@ window.showStudentTestResults = function(se) {
     document.getElementById('studentNameDetail').textContent    = sd.studentName;
     document.getElementById('studentSectionDetail').textContent = sd.section;
     document.getElementById('studentInfoHeader').style.display  = 'flex';
-document.getElementById('studentTestsTableBody').innerHTML = [...sd.tests]
+// Build full attempts list from raw studentResultsMap data
+const allAttempts = window._allAttemptsMap?.get(`all_${se}`) || [...sd.tests];
+
+document.getElementById('studentTestsTableBody').innerHTML = [...allAttempts]
   .sort((a, b) => b.date - a.date)
-  .map(t => `<tr>
-    <td data-label="Date">${t.date.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}<br><small style="color:#8a98ae;">${t.date.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></td>
-    <td data-label="Test Name"><strong>${esc(t.testName)}</strong></td>
-    <td data-label="Performance">${renderCategoryBadge(t.category)}</td>
-    <td data-label="Result">${esc(String(t.result||'N/A'))}</td>
-    <td data-label="Attempt">Attempt ${t.attempt||1}</td>
-  </tr>`).join('');
+  .map(t => {
+    const isBest = sd.tests.some(bt => bt.id === t.id);
+    return `<tr style="${isBest ? 'background:#f0fdf4;' : ''}">
+        <td data-label="Date">${t.date.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}<br><small style="color:#8a98ae;">${t.date.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></td>
+        <td data-label="Test Name"><strong>${esc(t.testName)}</strong></td>
+        <td data-label="Performance">${renderCategoryBadge(t.category)}${isBest ? '<br><small style="color:#059669;font-weight:700;font-size:10px;">★ Best</small>' : ''}</td>
+        <td data-label="Result">${esc(String(t.result||'N/A'))}</td>
+        <td data-label="Attempt">Attempt ${t.attempt||1}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="5" style="text-align:center;padding:20px;color:#8a98ae;">No results found</td></tr>`;
     document.getElementById('studentTestResultsModal').style.display = 'flex';
     document.getElementById('modalBodyContent').scrollTop = 0;
 };

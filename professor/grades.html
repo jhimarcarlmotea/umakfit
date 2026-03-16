@@ -186,7 +186,7 @@
             </h4>
             <div class="rounded-xl border border-border overflow-hidden">
                 <table class="detail-table">
-                    <thead><tr><th>Date</th><th>Activity</th><th>Result</th><th>Category</th></tr></thead>
+                    <thead><tr><th>Date</th><th>Activity</th><th>Result</th><th>Performance</th></tr></thead>
                     <tbody id="detailTableBody"></tbody>
                 </table>
             </div>
@@ -349,10 +349,10 @@
                             <option value="Poor">Poor</option>
                         </select>
                         <select id="sortBy" class="filter-select" onchange="applyFilters()">
-                            <option value="best">Best First</option>
-                            <option value="worst">Needs Improvement First</option>
                             <option value="name-asc">Name A–Z</option>
                             <option value="name-desc">Name Z–A</option>
+                            <option value="best">Best First</option>
+                            <option value="worst">Needs Improvement First</option>
                         </select>
                     </div>
                 </div>
@@ -469,8 +469,8 @@
     }
     function _ageGroup(a){return a<=18?'15-18':a<=22?'19-22':a<=26?'23-26':'27-30';}
     function _genderKey(g){return(g||'').toString().toLowerCase().startsWith('f')?'female':'male';}
-    function getCategoryIcon(c){return{Excellent:'⭐',Good:'👍',Average:'📊','Below Average':'📉',Poor:'⚠️'}[c]||'—';}
-    function getCategoryClass(c){return{Excellent:'category-excellent',Good:'category-good',Average:'category-average','Below Average':'category-below-average',Poor:'category-poor'}[c]||'category-default';}
+    function getCategoryClass(c){return{Excellent:'category-excellent',Good:'category-good',Average:'category-average','Below Average':'category-below-average',Poor:'category-poor',Athletic:'category-good',Fitness:'category-good','Essential Fat':'category-average',Lean:'category-excellent',Overfat:'category-below-average',Obese:'category-poor','No Grades':'category-default'}[c]||'category-default';}
+    function getCategoryIcon(c){return{Excellent:'⭐',Good:'👍',Average:'📊','Below Average':'📉',Poor:'⚠️',Athletic:'💪',Fitness:'🏃',Lean:'⭐','Essential Fat':'📊',Overfat:'📉',Obese:'⚠️'}[c]||'—';}
     function renderCategoryBadge(cat){
         if(!cat||cat==='No Grades')return'<span class="category-badge category-default">— No Grades</span>';
         return`<span class="category-badge ${getCategoryClass(cat)}">${getCategoryIcon(cat)} ${esc(cat)}</span>`;
@@ -585,27 +585,80 @@
         // 3. Deduplicate
         const seen=new Set();const unique=allDocs.filter(d=>{if(seen.has(d.id))return false;seen.add(d.id);return true;});
         // 4. Classify best per student+test
-        const best=new Map();
+       // 4. Classify ALL attempts per student+test (keep all, mark best later)
+        const allAttempts=[];
+        const bestPerTest=new Map(); // mk → best entry (for overall calculation)
         for(const ds of unique){
             const data=ds.data();const se=data.studentEmail||'';if(!se)continue;
             const testId=data.testId||ds.id;const testName=data.testName||'Unknown Activity';
             const mk=`${se}_${testId}`;const student=studentsMap.get(se);
             const sa=_studentAge(student);const sg=student?.gender||data.gender||'male';
-            const stored=data.score||data.category;
-            const cat=stored&&['Excellent','Good','Average','Below Average','Poor'].includes(stored)?stored:await classifyResult(testName,data.result??data.resultData??data.repetitions??data,testId,se,sg,sa);
-            const cs=CATEGORY_ORDER[cat]||3;
+            const isSkinfold=(testName||'').toLowerCase().includes('skinfold');
+            let cat;
+            if(isSkinfold){
+                // Skinfold: use body composition categories from result string or stored value
+                const stored=data.score||data.category;
+                const BODY_CATS=new Set(['Lean','Essential Fat','Athletic','Fitness','Average','Overfat','Obese']);
+                if(stored&&BODY_CATS.has(stored)){cat=stored;}
+                else{
+                    // Try to extract from result string
+                    const rawStr=String(data.result||data.resultData||'').toLowerCase();
+                    if(rawStr.includes('lean'))cat='Lean';
+                    else if(rawStr.includes('essential'))cat='Essential Fat';
+                    else if(rawStr.includes('athletic'))cat='Athletic';
+                    else if(rawStr.includes('fitness'))cat='Fitness';
+                    else if(rawStr.includes('overfat'))cat='Overfat';
+                    else if(rawStr.includes('obese'))cat='Obese';
+                    else{
+                        // Classify by body fat % and gender
+                        const pct=parseFloat(String(data.result||data.resultData||''));
+                        const isFemale=sg==='female';
+                        if(!isNaN(pct)){
+                            if(isFemale){cat=pct<14?'Essential Fat':pct<21?'Athletic':pct<25?'Fitness':pct<32?'Average':pct<39?'Overfat':'Obese';}
+                            else{cat=pct<6?'Essential Fat':pct<14?'Athletic':pct<18?'Fitness':pct<25?'Average':pct<30?'Overfat':'Obese';}
+                        }else{cat='Average';}
+                    }
+                }
+            }else{
+                const stored=data.score||data.category;
+                cat=stored&&['Excellent','Good','Average','Below Average','Poor'].includes(stored)?stored:await classifyResult(testName,data.result??data.resultData??data.repetitions??data,testId,se,sg,sa);
+            }
             let sd2=new Date();
             if(data.submittedAt){if(typeof data.submittedAt.toDate==='function')sd2=data.submittedAt.toDate();else if(data.submittedAt.seconds)sd2=new Date(data.submittedAt.seconds*1000);else if(typeof data.submittedAt==='string')sd2=new Date(data.submittedAt);}
-            const ex=best.get(mk);
-            if(!ex||cs>(CATEGORY_ORDER[ex.category]||0)){best.set(mk,{id:ds.id,studentName:data.studentName||'Unknown',section:data.section||'',testName,result:extractDisplayResult(data),category:cat,date:sd2.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),dateObject:sd2,studentEmail:se});}
+            const entry={id:ds.id,studentName:data.studentName||'Unknown',section:data.section||'',testName,result:extractDisplayResult(data),category:cat,date:sd2.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),dateObject:sd2,studentEmail:se,isSkinfold};
+            allAttempts.push(entry);
+            // Track best per test (for overall — skip skinfold)
+            if(!isSkinfold){
+                const cs=CATEGORY_ORDER[cat]||3;
+                const ex=bestPerTest.get(mk);
+                if(!ex||cs>(CATEGORY_ORDER[ex.category]||0))bestPerTest.set(mk,entry);
+            }
         }
-        window._rawGrades=Array.from(best.values()).sort((a,b)=>b.dateObject-a.dateObject);
+        // Store ALL attempts; _bestGrades used for overall category calculation only
+        window._rawGrades=allAttempts.sort((a,b)=>b.dateObject-a.dateObject);
+        window._bestGrades=Array.from(bestPerTest.values());
     }
 
     function buildFinalGrades(){
-        const map={};const raw=window._rawGrades||[];
-        raw.forEach(g=>{const key=g.studentEmail||`${g.studentName}_${g.section}`.toLowerCase();if(!map[key])map[key]={key,name:g.studentName,section:g.section,email:g.studentEmail,categories:[],instances:[]};map[key].categories.push(g.category);map[key].instances.push({name:g.testName,date:g.date,result:g.result,category:g.category});});
-        currentFinalGrades=Object.values(map).map(s=>{const overall=getOverallCategory(s.categories);return{...s,overallCategory:overall,overallScore:CATEGORY_ORDER[overall]||3,totalActivities:s.categories.length};}).sort((a,b)=>b.overallScore-a.overallScore);
+        const map={};
+        const allRaw=window._rawGrades||[];
+        const bestOnly=window._bestGrades||[];
+        // Build instances from ALL attempts (for activity history display)
+        allRaw.forEach(g=>{
+            const key=g.studentEmail||`${g.studentName}_${g.section}`.toLowerCase();
+            if(!map[key])map[key]={key,name:g.studentName,section:g.section,email:g.studentEmail,categories:[],instances:[]};
+            map[key].instances.push({name:g.testName,date:g.date,dateObject:g.dateObject,result:g.result,category:g.category,isSkinfold:g.isSkinfold});
+        });
+        // Build overall category from BEST non-skinfold attempts only
+        bestOnly.forEach(g=>{
+            const key=g.studentEmail||`${g.studentName}_${g.section}`.toLowerCase();
+            if(!map[key])map[key]={key,name:g.studentName,section:g.section,email:g.studentEmail,categories:[],instances:[]};
+            map[key].categories.push(g.category);
+        });
+        currentFinalGrades=Object.values(map).map(s=>{
+            const overall=s.categories.length?getOverallCategory(s.categories):'No Grades';
+            return{...s,overallCategory:overall,overallScore:CATEGORY_ORDER[overall]||0,totalActivities:s.instances.length};
+        }).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
         filteredFinalGrades=[...currentFinalGrades];renderTable(filteredFinalGrades);updateStats(filteredFinalGrades);
     }
 
@@ -640,27 +693,58 @@
 
     window.showDetail=function(key){
         const g=currentFinalGrades.find(x=>x.key===key);if(!g)return;
+        const SKINFOLD_CATS=new Set(['Lean','Essential Fat','Athletic','Fitness','Overfat','Obese']);
         document.getElementById('detailAvatar').textContent=(g.name||'?').charAt(0).toUpperCase();
         document.getElementById('detailStudentName').textContent=g.name||'Student';
         document.getElementById('detailStudentSection').textContent=`Section: ${g.section} • ${g.email||''}`;
         document.getElementById('detailTotalAct').textContent=g.totalActivities;
         document.getElementById('detailAvgCategory').innerHTML=renderCategoryBadge(g.overallCategory);
-        const cc={Excellent:'linear-gradient(135deg,#0e8a5f,#0a6646)',Good:'linear-gradient(135deg,#2d6fc4,#1e4d8c)',Average:'linear-gradient(135deg,#b07e16,#8a6010)','Below Average':'linear-gradient(135deg,#ea580c,#c2410c)',Poor:'linear-gradient(135deg,#c0392b,#922b21)'};
+        const cc={Excellent:'linear-gradient(135deg,#0e8a5f,#0a6646)',Good:'linear-gradient(135deg,#2d6fc4,#1e4d8c)',Average:'linear-gradient(135deg,#b07e16,#8a6010)','Below Average':'linear-gradient(135deg,#ea580c,#c2410c)',Poor:'linear-gradient(135deg,#c0392b,#922b21)','No Grades':'linear-gradient(135deg,#64748b,#475569)'};
         document.getElementById('detailStatusCard').style.background=cc[g.overallCategory]||cc.Average;
         document.getElementById('detailStatusText').textContent=g.overallCategory;
+        // Build best-per-test map (excluding skinfold from "best" logic for non-skinfold tests)
+        const bestMap={};
+        g.instances.forEach(act=>{
+            const isSkinfold=act.isSkinfold||((act.name||'').toLowerCase().includes('skinfold'))||SKINFOLD_CATS.has(act.category);
+            if(isSkinfold)return; // skinfold never gets "best" star
+            const mk=act.name;
+            if(!bestMap[mk]){bestMap[mk]={...act};}
+            else{
+                const ps=CATEGORY_ORDER[bestMap[mk].category]||0;
+                const cs=CATEGORY_ORDER[act.category]||0;
+                if(cs>ps)bestMap[mk]={...act};
+            }
+        });
+        // Mark best attempts in full list
         const sorted=[...g.instances].sort((a,b)=>new Date(b.date)-new Date(a.date));
-        document.getElementById('detailTableBody').innerHTML=sorted.map(act=>`<tr><td style="color:#64748b;">${esc(act.date||'—')}</td><td style="font-weight:600;color:#0a1628;">${esc(act.name)}</td><td style="font-family:monospace;">${esc(String(act.result??'—'))}</td><td>${renderCategoryBadge(act.category)}</td></tr>`).join('');
+        const attemptCount={};
+        const sortedWithAttempt=sorted.map(act=>{
+            const mk=act.name;
+            if(!attemptCount[mk])attemptCount[mk]=0;
+            attemptCount[mk]++;
+            const attemptNum=attemptCount[mk];
+            const isSkinfold=(act.name||'').toLowerCase().includes('skinfold')||SKINFOLD_CATS.has(act.category);
+           const isBest=!act.isSkinfold&&bestMap[mk]&&bestMap[mk].dateObject&&act.dateObject&&bestMap[mk].dateObject.getTime()===act.dateObject.getTime()&&bestMap[mk].result===act.result;
+            return{...act,attemptNum,isSkinfold,isBest};
+        });
+        document.getElementById('detailTableBody').innerHTML=sortedWithAttempt.map(act=>`
+            <tr style="${act.isBest?'background:#f0fdf4;':''}">
+                <td style="color:#64748b;">${esc(act.date||'—')}</td>
+                <td style="font-weight:600;color:#0a1628;">${esc(act.name)}<br><small style="color:#94a3b8;font-weight:400;">Attempt ${act.attemptNum}</small></td>
+                <td style="font-family:monospace;">${esc(String(act.result??'—'))}</td>
+                <td>${renderCategoryBadge(act.category)}${act.isBest&&!act.isSkinfold?'<br><small style="color:#059669;font-weight:700;font-size:10px;">★ Best</small>':''}</td>
+            </tr>`).join('');
         document.getElementById('studentDetailModal').classList.add('open');
     };
 
-    window.applyFilters=function(){
+   window.applyFilters=function(){
         const sec=document.getElementById('filterSection').value,cf=document.getElementById('filterCategory').value,sort=document.getElementById('sortBy').value;
         let filtered=[...currentFinalGrades];
         if(sec)filtered=filtered.filter(g=>g.section===sec);if(cf)filtered=filtered.filter(g=>g.overallCategory===cf);
         if(sort==='best')filtered.sort((a,b)=>b.overallScore-a.overallScore);
         else if(sort==='worst')filtered.sort((a,b)=>a.overallScore-b.overallScore);
-        else if(sort==='name-asc')filtered.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
         else if(sort==='name-desc')filtered.sort((a,b)=>(b.name||'').localeCompare(a.name||''));
+        else filtered.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
         filteredFinalGrades=filtered;renderTable(filtered);updateStats(filtered);
     };
 
