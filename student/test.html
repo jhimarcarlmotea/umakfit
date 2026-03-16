@@ -413,7 +413,84 @@
             if (c === 'excellent') return 5; if (c === 'good' || c === 'athletic' || c === 'fitness') return 4; if (c === 'average') return 3; if (c === 'below average' || c === 'overfat') return 2; if (c === 'poor' || c === 'obese') return 1; return 3;
         }
         function rankToCategory(rank) { if (rank >= 4.5) return 'Excellent'; if (rank >= 3.5) return 'Good'; if (rank >= 2.5) return 'Average'; if (rank >= 1.5) return 'Below Average'; return 'Poor'; }
+                // ========== RESOLVE NORM CATEGORY (checks custom student norms first) ==========
+        const _normResolutionCache = new Map();
 
+        async function resolveNormCategoryForStudent(testName, result, scheduledTestId) {
+            if (!testName) return null;
+            const normalized = testName.toLowerCase();
+            const numericValue = extractNumericResult(result);
+
+            // Cache key
+            const cacheKey = `${studentData?.email}|${testName}|${numericValue}|${scheduledTestId || ''}`;
+            if (_normResolutionCache.has(cacheKey)) return _normResolutionCache.get(cacheKey);
+
+            // Skinfold — special case
+            if (normalized.includes('skinfold')) {
+                const cat = (typeof result === 'string' && result.match(/\(([^)]+)\)/)?.[1]) || 'Completed';
+                _normResolutionCache.set(cacheKey, cat);
+                return cat;
+            }
+
+            // Resolve test key
+            const testKeyMap = {
+                'step test': 'steptest', '3-minute': 'steptest',
+                'push-up': 'pushup', 'pushup': 'pushup',
+                'curl-up': 'curlup', 'curl up': 'curlup',
+                'sit-and-reach': 'sitreach', 'sit and reach': 'sitreach'
+            };
+            let testKey = null;
+            for (const [k, v] of Object.entries(testKeyMap)) {
+                if (normalized.includes(k)) { testKey = v; break; }
+            }
+            if (!testKey) {
+                // Fallback to inline norm lookup
+                const cat = getNormCategory(testName, result);
+                _normResolutionCache.set(cacheKey, cat);
+                return cat;
+            }
+
+            function applyThresholds(thresholds, lowerIsBetter) {
+                for (const cat of ['Excellent', 'Good', 'Average', 'Below Average']) {
+                    const t = thresholds[cat];
+                    if (t == null) continue;
+                    if (lowerIsBetter && numericValue <= t) return cat;
+                    if (!lowerIsBetter && numericValue >= t) return cat;
+                }
+                return 'Poor';
+            }
+
+            // 1. Student-specific custom norms (highest priority)
+            if (studentData?.email) {
+                try {
+                    const snap = await getDoc(doc(db, 'studentNorms', studentData.email, 'tests', testKey));
+                    if (snap.exists()) {
+                        const nd = snap.data();
+                        const cat = applyThresholds(nd.thresholds, nd.lowerIsBetter ?? false);
+                        _normResolutionCache.set(cacheKey, cat);
+                        return cat;
+                    }
+                } catch (_) {}
+            }
+
+            // 2. Test-level custom norms (from scheduledTest doc)
+            if (scheduledTestId) {
+                try {
+                    const snap = await getDoc(doc(db, 'scheduledTests', scheduledTestId));
+                    if (snap.exists() && snap.data().customNorms?.thresholds) {
+                        const nd = snap.data().customNorms;
+                        const cat = applyThresholds(nd.thresholds, nd.lowerIsBetter ?? false);
+                        _normResolutionCache.set(cacheKey, cat);
+                        return cat;
+                    }
+                } catch (_) {}
+            }
+
+            // 3. Fallback to inline hardcoded norms
+            const cat = getNormCategory(testName, result);
+            _normResolutionCache.set(cacheKey, cat);
+            return cat;
+        }
         // ========== PARALLEL DATA FETCHING ==========
 
         async function fetchStudentDoc(email) {
@@ -520,15 +597,16 @@
 
             // Build attempts map from already-fetched testResults (no extra queries!)
             const attemptsMap = new Map(); // testId -> { attempts, hasExcellent }
-            testResults.forEach(r => {
+            await Promise.all(testResults.map(async r => {
                 const testId = r.testId;
                 if (!testId) return;
                 if (!attemptsMap.has(testId)) attemptsMap.set(testId, { attempts: 0, hasExcellent: false });
                 const entry = attemptsMap.get(testId);
                 entry.attempts++;
-                const normCat = getNormCategory(r.testName, r.result ?? r.resultData ?? r.rawResult);
+                const rawResult = r.result ?? r.resultData ?? r.rawResult;
+                const normCat = await resolveNormCategoryForStudent(r.testName, rawResult, testId);
                 if (normCat === 'Excellent') entry.hasExcellent = true;
-            });
+            }));
 
             // Separate available vs overdue
             const seenIds = new Set();
@@ -611,7 +689,7 @@
                         const currentAttempts = attemptData.attempts;
                         const isUnlimited = test.attemptsAllowed === 0;
                         const hasAttempts = currentAttempts > 0;
-                        const canRetry = isUnlimited || currentAttempts < test.attemptsAllowed;
+                        const canRetry = !attemptData.hasExcellent && (isUnlimited || currentAttempts < test.attemptsAllowed);
                         if (attemptData.hasExcellent) return;
                         if (!isUnlimited && hasAttempts && currentAttempts >= test.attemptsAllowed) return;
                         const isViewOnly = test.isViewOnly === true;
@@ -621,6 +699,7 @@
                         let statusIcon = 'circle', statusText = 'Not Started';
                         if (isFutureTest) { statusIcon = 'calendar-event'; const dateStr = testDateTime.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); const timeStr = testDateTime.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit', hour12:true }); statusText = `Available on ${dateStr} at ${timeStr}`; }
                         else if (isViewOnly) { statusIcon = 'eye'; statusText = 'View Only'; }
+                        else if (attemptData.hasExcellent) { statusIcon = 'trophy-fill'; statusText = 'Excellent achieved!'; }
                         else if (!isUnlimited && currentAttempts >= test.attemptsAllowed) { statusIcon = 'check-circle-fill'; statusText = `All ${currentAttempts} attempt${currentAttempts !== 1 ? 's' : ''} completed`; }
                         else if (hasAttempts) { statusIcon = 'arrow-clockwise'; statusText = `${currentAttempts} completed attempt${currentAttempts !== 1 ? 's' : ''}`; }
                         else { statusIcon = 'play-circle'; statusText = 'Ready to Start'; }
@@ -651,7 +730,7 @@
                                                 ? `<div class="flex-1 sm:flex-initial px-5 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 border-2 border-gray-300 cursor-not-allowed"><i class="bi bi-eye"></i><span>View Only</span></div>`
                                                 : canRetry
                                                     ? `<button onclick="startTest('${test.id}')" class="workout-start-btn flex-1 sm:flex-initial px-5 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm uppercase tracking-wide hover:bg-black hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"><i class="bi bi-${hasAttempts ? 'arrow-clockwise' : 'play-fill'}"></i><span>${hasAttempts ? 'Retry' : 'Start'}</span></button>`
-                                                    : `<div class="flex-1 sm:flex-initial px-5 py-3 bg-green-100 text-green-700 rounded-xl font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 border-2 border-green-300"><i class="bi bi-check-circle-fill"></i><span>Completed</span></div>`}
+                                                   : `<div class="flex-1 sm:flex-initial px-5 py-3 bg-green-100 text-green-700 rounded-xl font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 border-2 border-green-300"><i class="bi bi-${attemptData.hasExcellent ? 'trophy-fill' : 'check-circle-fill'}"></i><span>${attemptData.hasExcellent ? 'Excellent!' : 'Completed'}</span></div>`}
                                     </div>
                                 </div>
                             </div>

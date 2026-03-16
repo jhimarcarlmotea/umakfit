@@ -410,8 +410,7 @@
                     <div class="grid grid-cols-3 gap-4">
                         <div class="summary-stat"><div class="summary-stat-label">Total Results</div><div class="summary-stat-value" id="totalResults">0</div></div>
                         <div class="summary-stat"><div class="summary-stat-label">Unique Students</div><div class="summary-stat-value" id="uniqueStudents">0</div></div>
-                        <div class="summary-stat"><div class="summary-stat-label">Average Category</div><div class="summary-stat-value" id="averageCategory">Average</div></div>
-                    </div>
+                        <div class="summary-stat"><div class="summary-stat-label">Overall Performance</div><div class="summary-stat-value" id="averageCategory">Average</div></div>                    </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div class="relative">
@@ -428,9 +427,7 @@
                 <div class="table-responsive" style="border-radius: 8px; border: 1px solid #e1e6ef;">
                     <table class="custom-table" id="resultsTable">
                         <thead style="position: sticky; top: 0; z-index: 10;">
-                            <tr><th>Student Name</th><th>Section</th><th>Tests</th><th>Best Category</th><th>Overall Category</th><th>Last Activity</th><th>Action</th></tr>
-                        </thead>
-                        <tbody id="resultsTableBody">
+                        <tr><th>Student Name</th><th>Section</th><th>Tests</th><th>Best Performance</th><th>Overall Performance</th><th>Last Activity</th><th>Action</th></tr>                        <tbody id="resultsTableBody">
                             <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">No Test Results Yet</div></div></td></tr>
                         </tbody>
                     </table>
@@ -497,7 +494,7 @@
             <div class="table-responsive">
                 <table class="custom-table" style="min-width:100%;">
                     <thead style="position:sticky;top:0;background:linear-gradient(90deg,rgba(10,22,40,.92) 0%,rgba(30,77,140,.92) 100%);z-index:10;">
-                        <tr><th>Date & Time</th><th>Test Name</th><th>Category</th><th>Result</th><th>Attempt</th></tr>
+                        <tr><th>Date & Time</th><th>Test Name</th><th>Performance</th><th>Result</th><th>Attempt</th></tr>
                     </thead>
                     <tbody id="studentTestsTableBody"></tbody>
                 </table>
@@ -527,8 +524,8 @@
                         <option value="https://www.youtube.com/watch?v=vOH16gNAFxE">Sit-and-Reach Test</option>
                         <option value="https://www.youtube.com/watch?v=2243TPIBOI8">Skinfold Caliper</option>
                     </select>
-                    <button type="button" onclick="toggleCustomURLInput()" class="px-3 py-2 bg-blue hover:bg-royal text-white rounded-lg text-xs font-semibold transition-all whitespace-nowrap"><i class="fas fa-plus"></i> Add / Change</button>
-                </div>
+                    <button type="button" onclick="toggleCustomURLInput()" class="px-3 py-2 bg-blue hover:bg-royal text-white rounded-lg text-xs font-semibold transition-all whitespace-nowrap"><i class="fas fa-pencil-alt"></i> Change</button>                </div>
+                           <p id="videoChangeError" style="display:none;color:#dc2626;font-size:12px;margin-top:4px;"><i class="fas fa-exclamation-circle mr-1"></i>Please select a preset video first before clicking Change.</p>
                 <div id="customURLWrapper" class="hidden mt-2">
                     <div class="flex gap-2 items-center">
                         <input type="url" class="form-control" id="videoURL" placeholder="Paste your YouTube URL here...">
@@ -549,7 +546,7 @@
             <!-- Test Type -->
             <div class="form-group">
                 <label class="form-label">Test Type <span class="text-danger">*</span></label>
-                <select class="form-select" id="testType" required onchange="updateAttemptsDisplay(); loadNormPreviewForSchedule();">
+                    <select class="form-select" id="testType" required onchange="updateAttemptsDisplay();">
                     <option value="">Select Test Type</option>
                     <option value="3-Minute Step Test">3-Minute Step Test</option>
                     <option value="Curl-Up Test">Curl-Up Test</option>
@@ -558,40 +555,15 @@
                     <option value="Skinfold Caliper">Skinfold Caliper Measurements</option>
                 </select>
             </div>
-            <!-- Norm Panel -->
-            <div id="normCustomPanel" class="hidden">
-                <div class="flex items-center justify-between mb-2">
-                    <label class="form-label mb-0 flex items-center gap-2">
-                        <i class="fas fa-sliders-h text-purple-600"></i> Scoring Norms
-                        <span id="normSourceBadge" class="norm-source-badge norm-source-fallback">fallback</span>
-                        <span id="normLowerTag" class="norm-lower-tag hidden">lower is better</span>
-                    </label>
-                    <button type="button" onclick="toggleNormPanel()" id="normToggleBtn" class="text-xs px-3 py-1 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg font-semibold transition-all flex items-center gap-1">
-                        <i class="fas fa-chevron-down" id="normToggleIcon"></i> Customize Norms
-                    </button>
-                </div>
-                <div id="normEditorWrapper" class="hidden">
-                    <div class="norm-panel">
-                        <div class="norm-panel-title"><i class="fas fa-ruler-combined"></i> Threshold Values <span class="text-xs font-normal text-purple-500">(edit to override for this test)</span></div>
-                        <div class="norm-grid">
-                            <div class="norm-field"><label>⭐ Excellent (≥)</label><input type="number" id="normExcellent" step="0.5"></div>
-                            <div class="norm-field"><label>👍 Good (≥)</label><input type="number" id="normGood" step="0.5"></div>
-                            <div class="norm-field"><label>📊 Average (≥)</label><input type="number" id="normAverage" step="0.5"></div>
-                            <div class="norm-field"><label>📉 Below Average (≥)</label><input type="number" id="normBelowAverage" step="0.5"></div>
-                        </div>
-                        <p class="text-xs text-purple-500 mt-3">Below <strong>Below Average</strong> = <strong>Poor</strong>. These norms apply to all students in this test.</p>
-                        <div class="flex gap-2 mt-3">
-                            <button type="button" onclick="resetNormsToDefault()" class="text-xs px-3 py-1.5 bg-white border border-purple-300 text-purple-600 rounded-lg hover:bg-purple-50 transition-all"><i class="fas fa-undo mr-1"></i> Reset to Default</button>
-                            <button type="button" onclick="previewNormClassification()" class="text-xs px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all"><i class="fas fa-eye mr-1"></i> Preview</button>
-                        </div>
-                        <div id="normPreviewResult" class="hidden mt-3 p-3 bg-white rounded-lg border border-purple-200 text-sm"></div>
-                    </div>
-                </div>
-            </div>
+           
+           
             <!-- Section -->
             <div class="form-group">
-                <label class="form-label">Section</label>
-                <select class="form-select" id="testSection"><option value="">Select Section</option></select>
+                <label class="form-label">Section <span class="text-danger">*</span></label>
+                <div id="testSectionCheckboxes" style="max-height:180px;overflow-y:auto;border:1px solid #d1d5db;border-radius:6px;padding:8px;background:#f9fafb;display:flex;flex-direction:column;gap:6px;">
+                    <p class="text-text-muted text-sm">No sections available.</p>
+                </div>
+                <p id="testSectionError" style="display:none;color:#dc2626;font-size:12px;margin-top:4px;"><i class="fas fa-exclamation-circle mr-1"></i>Please select at least one section.</p>
             </div>
             <!-- Dates -->
             <div class="form-group">
@@ -643,7 +615,7 @@
                         <option value="https://www.youtube.com/watch?v=vOH16gNAFxE">Sit-and-Reach Test</option>
                         <option value="https://www.youtube.com/watch?v=2243TPIBOI8">Skinfold Caliper</option>
                     </select>
-                    <button type="button" onclick="toggleEditCustomURLInput()" class="px-3 py-2 bg-blue hover:bg-royal text-white rounded-lg text-xs font-semibold transition-all whitespace-nowrap"><i class="fas fa-plus"></i> Add / Change</button>
+                        <button type="button" onclick="toggleEditCustomURLInput()" class="px-3 py-2 bg-blue hover:bg-royal text-white rounded-lg text-xs font-semibold transition-all whitespace-nowrap"><i class="fas fa-pencil-alt"></i> Change</button>
                 </div>
                 <div id="editCustomURLWrapper" class="hidden mt-2">
                     <div class="flex gap-2 items-center">
@@ -886,15 +858,52 @@
     window.showErrorModal = showErrorModal;
 
     // ── Video helpers ──
-    function toggleCustomURLInput()  { const w=document.getElementById('customURLWrapper'); w.classList.toggle('hidden'); if(!w.classList.contains('hidden')) document.getElementById('videoURL').focus(); }
+    function toggleCustomURLInput() {
+    const preset = document.getElementById('videoPresetSelect').value;
+    const w = document.getElementById('customURLWrapper');
+    const errEl = document.getElementById('videoChangeError');
+    if (!preset) {
+        if (errEl) { errEl.style.display = 'block'; }
+        return;
+    }
+    if (errEl) errEl.style.display = 'none';
+    w.classList.toggle('hidden');
+    if (!w.classList.contains('hidden')) document.getElementById('videoURL').focus();
+}
     function closeCustomURLInput()   { document.getElementById('customURLWrapper').classList.add('hidden'); document.getElementById('videoURL').value=''; }
-    function applyPresetVideo()      { const s=document.getElementById('videoPresetSelect'),v=s.value; if(!v){clearVideoURL();return;} document.getElementById('videoURLFinal').value=v; showVideoPreview(s.options[s.selectedIndex].text,v); closeCustomURLInput(); }
+function applyPresetVideo() {
+    const s = document.getElementById('videoPresetSelect'), v = s.value;
+    const errEl = document.getElementById('videoChangeError');
+    if (errEl) errEl.style.display = 'none';
+    if (!v) { clearVideoURL(); return; }
+    document.getElementById('videoURLFinal').value = v;
+    showVideoPreview(s.options[s.selectedIndex].text, v);
+    closeCustomURLInput();
+    }    
     function applyCustomVideo()      { const v=document.getElementById('videoURL').value.trim(); if(!v){showErrorModal('Please paste a YouTube URL first.');return;} if(!_isYT(v)){showErrorModal('Please enter a valid YouTube URL.');return;} document.getElementById('videoURLFinal').value=v; showVideoPreview('Custom Video',v); closeCustomURLInput(); }
-    function showVideoPreview(l,u)   { document.getElementById('videoPreviewLabel').textContent=l+' — '+u; document.getElementById('videoPreview').classList.remove('hidden'); }
-    function clearVideoURL()         { document.getElementById('videoURLFinal').value=''; document.getElementById('videoURL').value=''; document.getElementById('videoPresetSelect').value=''; document.getElementById('videoPreview').classList.add('hidden'); document.getElementById('videoPreviewLabel').textContent=''; closeCustomURLInput(); }
-    function _isYT(v)                { return v.includes('youtube.com/watch?v=')||v.includes('youtu.be/')||v.includes('youtube.com/embed/'); }
+        function showVideoPreview(l,u)   { document.getElementById('videoPreviewLabel').textContent=l+' — '+u; document.getElementById('videoPreview').classList.remove('hidden'); }
+        function clearVideoURL()         { document.getElementById('videoURLFinal').value=''; document.getElementById('videoURL').value=''; document.getElementById('videoPresetSelect').value=''; document.getElementById('videoPreview').classList.add('hidden'); document.getElementById('videoPreviewLabel').textContent=''; closeCustomURLInput(); }
+        function _isYT(v)                { return v.includes('youtube.com/watch?v=')||v.includes('youtu.be/')||v.includes('youtube.com/embed/'); }
 
-    function toggleEditCustomURLInput() { const w=document.getElementById('editCustomURLWrapper'); w.classList.toggle('hidden'); if(!w.classList.contains('hidden')) document.getElementById('editVideoURL').focus(); }
+        function toggleEditCustomURLInput() {
+        const preset = document.getElementById('editVideoPresetSelect').value;
+        const w = document.getElementById('editCustomURLWrapper');
+        let errEl = document.getElementById('editVideoChangeError');
+        if (!errEl) {
+            errEl = document.createElement('p');
+            errEl.id = 'editVideoChangeError';
+            errEl.style.cssText = 'display:none;color:#dc2626;font-size:12px;margin-top:4px;';
+            errEl.innerHTML = '<i class="fas fa-exclamation-circle mr-1"></i>Please select a preset video first before clicking Change.';
+            document.getElementById('editVideoPresetSelect').closest('.flex').after(errEl);
+        }
+        if (!preset) {
+            errEl.style.display = 'block';
+            return;
+        }
+        errEl.style.display = 'none';
+        w.classList.toggle('hidden');
+        if (!w.classList.contains('hidden')) document.getElementById('editVideoURL').focus();
+    }
     function closeEditCustomURLInput()  { document.getElementById('editCustomURLWrapper').classList.add('hidden'); document.getElementById('editVideoURL').value=''; }
     function applyEditPresetVideo()     { const s=document.getElementById('editVideoPresetSelect'),v=s.value; if(!v){clearEditVideoURL();return;} document.getElementById('editVideoURLFinal').value=v; showEditVideoPreview(s.options[s.selectedIndex].text,v); closeEditCustomURLInput(); }
     function applyEditCustomVideo()     { const v=document.getElementById('editVideoURL').value.trim(); if(!v){showErrorModal('Please paste a YouTube URL first.');return;} if(!_isYT(v)){showErrorModal('Please enter a valid YouTube URL.');return;} document.getElementById('editVideoURLFinal').value=v; showEditVideoPreview('Custom Video',v); closeEditCustomURLInput(); }
@@ -912,16 +921,19 @@
     function clearResultFilters() { document.getElementById('searchResults').value=''; document.getElementById('filterSection').value=''; window.resultsCurrentPage=1; if(window.renderStudentResultsTableGlobal) window.renderStudentResultsTableGlobal(); }
     window.filterScheduleTable = function() { if(window.allScheduledTests?.length&&window.renderScheduleTable) window.renderScheduleTable(window.allScheduledTests, window._enabledTestsMap||new Map()); };
     window.closeScheduleTestModal = function() {
-        document.getElementById('scheduleTestModal').style.display='none';
-        ['testType','testSection','testDate','testDeadline'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-        document.getElementById('testDeadlineTime').value='23:59'; document.getElementById('testTime').value='00:00';
-        document.getElementById('attemptsAllowed').value='1';
-        document.getElementById('normCustomPanel').classList.add('hidden'); document.getElementById('normEditorWrapper').classList.add('hidden');
-        clearVideoURL();
-        const sb=document.querySelector('#scheduleTestModal .modal-footer button:last-child');
-        if(sb){sb.disabled=false;sb.textContent='Schedule Test';}
-        if(window.currentUser) window.loadScheduledTests(window.currentUser.email, window.currentUser.uid);
-    };
+    document.getElementById('scheduleTestModal').style.display = 'none';
+    // clear checkboxes
+    document.querySelectorAll('#testSectionCheckboxes input[type="checkbox"]').forEach(cb => { cb.checked = false; cb.closest('label').style.background = 'white'; });
+    document.getElementById('testSectionError').style.display = 'none';
+    ['testType', 'testDate', 'testDeadline'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('testDeadlineTime').value = '23:59';
+    document.getElementById('testTime').value = '00:00';
+    document.getElementById('attemptsAllowed').value = '1';
+    clearVideoURL();
+    const sb = document.querySelector('#scheduleTestModal .modal-footer button:last-child');
+    if (sb) { sb.disabled = false; sb.textContent = 'Schedule Test'; }
+    if (window.currentUser) window.loadScheduledTests(window.currentUser.email, window.currentUser.uid);
+};
 
     window.addEventListener('pagehide', () => { clearInterval(window._headerDateInterval); clearInterval(window._statusInterval); });
     window.addEventListener('beforeunload', () => { clearInterval(window._statusInterval); });
@@ -1033,6 +1045,37 @@ async function getDefaultThresholds(testKey, gender='male', ageGroup='19-22') {
  * Uses a session cache keyed by result doc ID so repeated calls are free.
  */
 async function classifyResult({ resultId, savedScore, testName, result, studentEmail, gender, age, testData }) {
+    // 0️⃣ Skinfold — uses body composition categories, not standard fitness norms
+    if ((testName||'').toLowerCase().includes('skinfold')) {
+        if (savedScore && savedScore !== '') return savedScore;
+        const raw = String(result||'');
+        const lower = raw.toLowerCase();
+        for (const cat of ['Lean','Essential Fat','Athletic','Fitness','Average','Overfat','Obese']) {
+            if (lower.includes(cat.toLowerCase())) return cat;
+        }
+        // Try to extract body fat % and classify by gender
+        const pct = parseFloat(raw);
+        if (!isNaN(pct)) {
+            const isFemale = (gender||'male').startsWith('f');
+            if (isFemale) {
+                if (pct < 14) return 'Essential Fat';
+                if (pct < 21) return 'Athletic';
+                if (pct < 25) return 'Fitness';
+                if (pct < 32) return 'Average';
+                if (pct < 39) return 'Overfat';
+                return 'Obese';
+            } else {
+                if (pct < 6)  return 'Essential Fat';
+                if (pct < 14) return 'Athletic';
+                if (pct < 18) return 'Fitness';
+                if (pct < 25) return 'Average';
+                if (pct < 30) return 'Overfat';
+                return 'Obese';
+            }
+        }
+        return 'Average';
+    }
+
     // 1️⃣ Saved score — cheapest path
     if (savedScore && savedScore !== '') return savedScore;
 
@@ -1291,6 +1334,11 @@ async function loadTestResults(userEmail) {
         const studentsMap = new Map();
         (await getDocs(collection(db,'students'))).forEach(d => { const data=d.data(); if(data.email) studentsMap.set(data.email, data); });
 
+        // Re-fetch sections if not yet loaded
+        if (!window.assignedSections?.length) {
+            window.assignedSections = await resolveAssignedSections(userEmail);
+        }
+
         // Populate section filter dropdown
         if (window.assignedSections?.length > 0) {
             window.assignedSections.forEach(s => {
@@ -1331,9 +1379,11 @@ async function loadTestResults(userEmail) {
                 else if (r.submittedAt.seconds) submittedDate=new Date(r.submittedAt.seconds*1000);
                 else if (typeof r.submittedAt==='string') submittedDate=new Date(r.submittedAt);
             }
+           const VALID_CATEGORIES = ['Excellent','Good','Average','Below Average','Poor'];
+            const rawSaved = r.score||r.category||null;
             const category = await classifyResult({
                 resultId: ds.id,
-                savedScore: r.score||r.category||null,
+                savedScore: (rawSaved && VALID_CATEGORIES.includes(rawSaved)) ? rawSaved : null,
                 testName: r.testName||'',
                 result: rawResult,
                 studentEmail,
@@ -1399,8 +1449,8 @@ function renderStudentResultsTable() {
             <td data-label="Student Name"><strong>${esc(sd.studentName)}</strong></td>
             <td data-label="Section">${esc(sd.section)}</td>
             <td data-label="Tests"><strong>${sd.totalTests}</strong></td>
-            <td data-label="Best Category"><div class="flex flex-col items-center">${renderCategoryBadge(sd.bestCategory)}<span class="text-[10px] text-text-muted mt-1">via ${esc(bestTestName)}</span></div></td>
-            <td data-label="Overall Category"><div class="flex flex-col items-center">${renderCategoryBadge(sd.overallCategory)}<span class="text-[10px] text-text-muted mt-1">from ${sd.totalTests} test${sd.totalTests!==1?'s':''}</span></div></td>
+            <td data-label="Best Performance"><div class="flex flex-col items-center">${renderCategoryBadge(sd.bestCategory)}<span class="text-[10px] text-text-muted mt-1">via ${esc(bestTestName)}</span></div></td>
+            <td data-label="Overall Performance"><div class="flex flex-col items-center">${renderCategoryBadge(sd.overallCategory)}<span class="text-[10px] text-text-muted mt-1">from ${sd.totalTests} test${sd.totalTests!==1?'s':''}</span></div></td>
             <td data-label="Last Activity">${la}</td>
             <td data-label="Actions"><button class="btn-action btn-view" onclick="event.stopPropagation();showStudentTestResults('${se}')"><i class="fas fa-chart-line"></i> View</button></td>
         </tr>`;
@@ -1462,6 +1512,7 @@ window.closeStudentTestResultsModal = () => document.getElementById('studentTest
 window.manageStudents = async function(testId, testName, section) {
     try {
         window.currentManagingTestId = testId;
+        window._currentManagingTestName = testName;
         document.getElementById('currentTestId').value = testId;
         document.getElementById('testInfoHeader').textContent = `${testName} - ${section}`;
         document.getElementById('manageStudentsModal').style.display = 'flex';
@@ -1470,13 +1521,20 @@ window.manageStudents = async function(testId, testName, section) {
         else { window.selectedStudentEmails=new Set(td.selectedStudents); window.autoSelectAll=false; }
         await loadStudentsForTest(section);
         window._studentCustomNorms = new Map();
-        // Non-blocking background pre-load of custom norm flags
+        // Pre-load ALL existing student norms for this test type (persists across test instances)
+        const currentTestKey = resolveTestKey(window._currentManagingTestName || '');
         const emails = window.currentTestStudents.map(s=>s.email);
         Promise.all(emails.map(async email => {
-            try { const cn=await getStudentCustomNorms(db,email); if(cn.size>0) window._studentCustomNorms.set(email,cn); } catch(_){}
+            try {
+                const cn = await getStudentCustomNorms(db, email);
+                if (cn.size > 0) {
+                    // Store ALL norms, not just for current test key
+                    window._studentCustomNorms.set(email, cn);
+                }
+            } catch(_) {}
         })).then(() => renderStudentListForTest(document.getElementById('studentSearchBox').value));
-    } catch(e) { showErrorModal('Error loading students: '+e.message); }
-};
+            } catch(e) { showErrorModal('Error loading students: '+e.message); }
+        };
 
 async function loadStudentsForTest(section) {
     const container = document.getElementById('studentsListContainer');
@@ -1515,7 +1573,7 @@ function renderStudentListForTest(filterText='') {
                 <div class="student-name-sm">${esc(s.displayName||s.name||s.email)}${normBadge}</div>
                 <div class="student-details">${esc(s.studentNumber||'N/A')} • ${esc(s.email)}</div>
             </div>
-            <button type="button" onclick="openStudentNormModal('${safeEmail}','${safeName}')" title="Set custom norms"
+           <button type="button" onclick="openStudentNormModal('${safeEmail}','${safeName}','${(window._currentManagingTestName||'').replace(/'/g,"\\'")}')" title="Set custom norms"
                 style="flex-shrink:0;padding:5px 10px;border:1.5px solid #7c3aed;border-radius:12px;background:${hasCustomNorm?'#7c3aed':'white'};color:${hasCustomNorm?'white':'#7c3aed'};font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">
                 <i class="fas fa-sliders-h"></i> Norms
             </button>
@@ -1569,76 +1627,112 @@ window.closeManageStudentsModal = function() {
 
 // ── Schedule New Test ─────────────────────────────────────────────
 window.showScheduleTestModal = function() {
-    const ss = document.getElementById('testSection');
-    ss.innerHTML = '<option value="">Select Section</option>';
-    const seen = new Set();
-    (window.assignedSections||[]).forEach(s => {
-        if (seen.has(s.section)) return; seen.add(s.section);
-        const o=document.createElement('option');
-        o.value=s.section; o.textContent=`${s.section} (${s.students} students) - ${s.time||'TBA'} / ${s.day||'TBA'}`;
-        ss.appendChild(o);
-    });
-    if (!window.assignedSections?.length) { const o=document.createElement('option'); o.value='no-sections'; o.textContent='No sections assigned'; o.disabled=true; ss.appendChild(o); }
-    document.getElementById('testType').value='';
+    const container = document.getElementById('testSectionCheckboxes');
+    container.innerHTML = '';
+    if (!window.assignedSections?.length) {
+        container.innerHTML = '<p class="text-text-muted text-sm">No sections assigned.</p>';
+    } else {
+        const seen = new Set();
+        window.assignedSections.forEach(s => {
+            if (seen.has(s.section)) return; seen.add(s.section);
+            const label = document.createElement('label');
+            label.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;background:white;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;font-size:14px;transition:background 0.15s;';
+            label.innerHTML = `<input type="checkbox" value="${esc(s.section)}" style="width:16px;height:16px;cursor:pointer;flex-shrink:0;">
+                <span><strong>${esc(s.section)}</strong> <span style="color:#8a98ae;font-size:12px;">(${s.students} students) — ${esc(s.time||'TBA')} / ${esc(s.day||'TBA')}</span></span>`;
+            label.addEventListener('mouseenter', () => label.style.background = '#f3f4f6');
+            label.addEventListener('mouseleave', () => { const cb = label.querySelector('input'); label.style.background = cb.checked ? '#eff6ff' : 'white'; });
+            label.querySelector('input').addEventListener('change', function() { label.style.background = this.checked ? '#eff6ff' : 'white'; document.getElementById('testSectionError').style.display = 'none'; });
+            container.appendChild(label);
+        });
+    }
+    document.getElementById('testType').value = '';
     clearVideoURL();
-    document.getElementById('attemptsAllowed').value='2'; document.getElementById('attemptsDisplay').value='2 Attempts';
+    document.getElementById('attemptsAllowed').value = '2';
+    document.getElementById('attemptsDisplay').value = '2 Attempts';
     updateAttemptsDisplay();
-    document.getElementById('normCustomPanel').classList.add('hidden'); window._schedulePendingNorm=null;
-    const today=new Date().toISOString().split('T')[0];
-    document.getElementById('testDate').value=today;
-    const nw=new Date(); nw.setDate(nw.getDate()+7);
-    document.getElementById('testDeadline').value=nw.toISOString().split('T')[0];
-    document.getElementById('testDeadlineTime').value='23:59'; document.getElementById('testTime').value='00:00';
-    const sb=document.querySelector('#scheduleTestModal .modal-footer button:last-child');
-    if(sb){sb.disabled=false;sb.textContent='Schedule Test';}
-    document.getElementById('scheduleTestModal').style.display='flex';
+    window._schedulePendingNorm = null;
+    document.getElementById('testSectionError').style.display = 'none';
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('testDate').value = today;
+    const nw = new Date(); nw.setDate(nw.getDate() + 7);
+    document.getElementById('testDeadline').value = nw.toISOString().split('T')[0];
+    document.getElementById('testDeadlineTime').value = '23:59';
+    document.getElementById('testTime').value = '00:00';
+    const sb = document.querySelector('#scheduleTestModal .modal-footer button:last-child');
+    if (sb) { sb.disabled = false; sb.textContent = 'Schedule Test'; }
+    document.getElementById('scheduleTestModal').style.display = 'flex';
 };
 
 window.scheduleTest = async function() {
-    const testType=document.getElementById('testType').value, testSection=document.getElementById('testSection').value;
-    const testDate=document.getElementById('testDate').value, testTime=document.getElementById('testTime').value;
-    const testDeadline=document.getElementById('testDeadline').value, testDeadlineTime=document.getElementById('testDeadlineTime').value;
-    const videoURL=document.getElementById('videoURLFinal').value, norm=readScheduleNorms();
-    if (!testType||!testSection||!testDate||!testTime||!testDeadline||!testDeadlineTime) { showWarningModal('Please fill in all required fields.',()=>{},()=>{}); return; }
-    const tdt=new Date(`${testDate}T${testTime}`), ddt=new Date(`${testDeadline}T${testDeadlineTime}`), now=new Date();
-    if (testDate<now.toISOString().split('T')[0]) { showErrorModal('❌ Test date cannot be in the past.'); return; }
-    if (ddt<=tdt) { showErrorModal('❌ Deadline must be after test date/time.'); return; }
-    if (testSection==='no-sections') { showWarningModal('You need a section assigned first.',()=>{},()=>{}); return; }
-    if (videoURL && !_isYT(videoURL)) { showWarningModal('Please provide a valid YouTube URL or leave empty.',()=>{},()=>{}); return; }
-    const nl=(testType||'').toLowerCase(), attemptsAllowed=(nl.includes('skinfold')||nl.includes('step test')||nl.includes('3-minute'))?1:2;
-    const sb=document.querySelector('#scheduleTestModal .modal-footer button:last-child');
-    const cb=document.querySelector('#scheduleTestModal .modal-footer button:first-child');
-    const origText=sb?.textContent||'Schedule Test';
+    const testType    = document.getElementById('testType').value;
+    const testDate    = document.getElementById('testDate').value;
+    const testTime    = document.getElementById('testTime').value;
+    const testDeadline     = document.getElementById('testDeadline').value;
+    const testDeadlineTime = document.getElementById('testDeadlineTime').value;
+    const videoURL    = document.getElementById('videoURLFinal').value;
+
+    // Collect checked sections
+    const checkedBoxes = document.querySelectorAll('#testSectionCheckboxes input[type="checkbox"]:checked');
+    const selectedSections = Array.from(checkedBoxes).map(cb => cb.value);
+
+    if (!testType || !testDate || !testTime || !testDeadline || !testDeadlineTime) {
+        showWarningModal('Please fill in all required fields.', () => {}, () => {}); return;
+    }
+    if (selectedSections.length === 0) {
+        document.getElementById('testSectionError').style.display = 'block'; return;
+    }
+    const tdt = new Date(`${testDate}T${testTime}`), ddt = new Date(`${testDeadline}T${testDeadlineTime}`), now = new Date();
+    if (testDate < now.toISOString().split('T')[0]) { showErrorModal('❌ Test date cannot be in the past.'); return; }
+    if (ddt <= tdt) { showErrorModal('❌ Deadline must be after test date/time.'); return; }
+    if (videoURL && !_isYT(videoURL)) { showWarningModal('Please provide a valid YouTube URL or leave empty.', () => {}, () => {}); return; }
+
+    const nl = (testType || '').toLowerCase();
+    const attemptsAllowed = (nl.includes('skinfold') || nl.includes('step test') || nl.includes('3-minute')) ? 1 : 2;
+
+    const sb = document.querySelector('#scheduleTestModal .modal-footer button:last-child');
+    const cb2 = document.querySelector('#scheduleTestModal .modal-footer button:first-child');
+    const origText = sb?.textContent || 'Schedule Test';
     try {
-        if(sb){sb.disabled=true;sb.textContent='Scheduling...';} if(cb) cb.disabled=true;
-        const secInfo=window.assignedSections.find(s=>s.section===testSection);
-        const studSnap=await getDocs(query(collection(db,'students'),where('section','==',testSection)));
-        const allEmails=[]; studSnap.forEach(d=>{const dd=d.data();if(dd.email)allEmails.push(dd.email);});
-        const status=tdt<=now&&ddt>=now?'active':ddt<now?'completed':'scheduled';
-        const testData={
-            testName:testType, section:testSection, date:testDate, time:testTime,
-            dateTime:tdt.toISOString(), deadline:testDeadline, deadlineTime:testDeadlineTime,
-            deadlineDateTime:ddt.toISOString(), attemptsAllowed, instructions:'',
-            professorEmail:window.currentUser.email, professorId:window.currentUser.uid,
-            professorName:window.currentUser.displayName||window.currentUser.email,
-            status, totalStudents:allEmails.length, completedStudents:0, selectedStudents:allEmails,
-            sectionTime:secInfo?.time||'Not Set', sectionDay:secInfo?.day||'Not Set', sectionRoom:secInfo?.room||'Not Set',
-            courseCode:secInfo?.courseCode||'PE 3', createdAt:serverTimestamp(), isVisible:true, isActive:true, visibleToStudents:true,
-            videoURL:videoURL||'',
-            customNorms:norm?{thresholds:norm.thresholds,lowerIsBetter:norm.lowerIsBetter,source:norm.source,setAt:new Date().toISOString()}:null
-        };
-        const docRef=await addDoc(collection(db,'scheduledTests'),testData);
-        // Notifications (fire-and-forget)
-        Promise.all(allEmails.map(email => {
-            const stu=studSnap.docs.find(d=>d.data().email===email); if(!stu) return;
-            return addDoc(collection(db,'notifications'),{type:'new_test',title:'Fitness Test Available',message:`${testType} has been assigned. Deadline: ${testDeadline} at ${testDeadlineTime}`,section:testSection,testName:testType,testId:docRef.id,testDate,deadline:testDeadline,deadlineTime:testDeadlineTime,studentEmail:email,studentId:stu.id,isRead:false,createdAt:serverTimestamp(),timestamp:new Date().toISOString()});
-        })).catch(e=>console.warn('Notification error:',e));
+        if (sb) { sb.disabled = true; sb.textContent = 'Scheduling...'; }
+        if (cb2) cb2.disabled = true;
+
+        // Create one scheduled test per section
+        let totalScheduled = 0;
+        for (const testSection of selectedSections) {
+            const secInfo = window.assignedSections.find(s => s.section === testSection);
+            const studSnap = await getDocs(query(collection(db, 'students'), where('section', '==', testSection)));
+            const allEmails = []; studSnap.forEach(d => { const dd = d.data(); if (dd.email) allEmails.push(dd.email); });
+            const status = tdt <= now && ddt >= now ? 'active' : ddt < now ? 'completed' : 'scheduled';
+            const testData = {
+                testName: testType, section: testSection, date: testDate, time: testTime,
+                dateTime: tdt.toISOString(), deadline: testDeadline, deadlineTime: testDeadlineTime,
+                deadlineDateTime: ddt.toISOString(), attemptsAllowed, instructions: '',
+                professorEmail: window.currentUser.email, professorId: window.currentUser.uid,
+                professorName: window.currentUser.displayName || window.currentUser.email,
+                status, totalStudents: allEmails.length, completedStudents: 0, selectedStudents: allEmails,
+                sectionTime: secInfo?.time || 'Not Set', sectionDay: secInfo?.day || 'Not Set', sectionRoom: secInfo?.room || 'Not Set',
+                courseCode: secInfo?.courseCode || 'PE 3', createdAt: serverTimestamp(), isVisible: true, isActive: true, visibleToStudents: true,
+                videoURL: videoURL || '',
+                customNorms: null
+            };
+            const docRef = await addDoc(collection(db, 'scheduledTests'), testData);
+            totalScheduled++;
+            // Notifications (fire-and-forget)
+            Promise.all(allEmails.map(email => {
+                const stu = studSnap.docs.find(d => d.data().email === email); if (!stu) return;
+                return addDoc(collection(db, 'notifications'), { type: 'new_test', title: 'Fitness Test Available', message: `${testType} has been assigned. Deadline: ${testDeadline} at ${testDeadlineTime}`, section: testSection, testName: testType, testId: docRef.id, testDate, deadline: testDeadline, deadlineTime: testDeadlineTime, studentEmail: email, studentId: stu.id, isRead: false, createdAt: serverTimestamp(), timestamp: new Date().toISOString() });
+            })).catch(e => console.warn('Notification error:', e));
+        }
+
+        if (sb) { sb.disabled = false; sb.textContent = origText; }
+        if (cb2) cb2.disabled = false;
         window.closeScheduleTestModal();
-        showSuccessModal(`✅ Test scheduled for ${allEmails.length} student(s)!${norm&&norm.source==='test-custom'?' Custom norms applied.':''}`);
+        showSuccessModal(`✅ Test scheduled for ${totalScheduled} section(s)!`);
         await loadScheduledTests(window.currentUser.email, window.currentUser.uid);
-    } catch(e) {
-        showErrorModal('Error scheduling test: '+e.message);
-        if(sb){sb.disabled=false;sb.textContent=origText;} if(cb) cb.disabled=false;
+    } catch (e) {
+        showErrorModal('Error scheduling test: ' + e.message);
+        if (sb) { sb.disabled = false; sb.textContent = origText; }
+        if (cb2) cb2.disabled = false;
     }
 };
 
@@ -1768,23 +1862,54 @@ function readEditNorms() {
     return { thresholds:{Excellent:e,Good:g,Average:a,'Below Average':b}, lowerIsBetter:window._editPendingNorm?.lowerIsBetter??false, source:'test-custom' };
 }
 
-// ── Per-student Norm Modal ────────────────────────────────────────
-window._studentCustomNorms = new Map();
+        // ── Per-student Norm Modal ────────────────────────────────────────
+        window._studentCustomNorms = new Map();
 
-window.openStudentNormModal = async function(studentEmail, studentName) {
-    const parts=studentName.split(' ');
-    document.getElementById('snAvatarCircle').textContent  = ((parts[0]||'').charAt(0)+(parts[parts.length-1]||'').charAt(0)).toUpperCase()||'?';
-    document.getElementById('snStudentName').textContent   = studentName;
-    document.getElementById('snStudentEmail').textContent  = studentEmail;
-    document.getElementById('snStudentEmailHidden').value  = studentEmail;
-    document.getElementById('snStudentLabel').textContent  = studentEmail;
-    document.getElementById('snTestKeySelect').value       = '';
-    document.getElementById('snThresholdPanel').classList.add('hidden');
-    document.getElementById('snCurrentBadge').textContent  = 'select test';
-    document.getElementById('snCurrentBadge').className    = 'norm-source-badge norm-source-fallback';
-    document.getElementById('studentNormModal').style.display='flex';
-};
-window.closeStudentNormModal = () => document.getElementById('studentNormModal').style.display='none';
+        window.openStudentNormModal = async function(studentEmail, studentName, testName) {
+            const parts=studentName.split(' ');
+            document.getElementById('snAvatarCircle').textContent  = ((parts[0]||'').charAt(0)+(parts[parts.length-1]||'').charAt(0)).toUpperCase()||'?';
+            document.getElementById('snStudentName').textContent   = studentName;
+            document.getElementById('snStudentEmail').textContent  = studentEmail;
+            document.getElementById('snStudentEmailHidden').value  = studentEmail;
+            document.getElementById('snStudentLabel').textContent  = studentEmail;
+            
+            document.getElementById('snTestNameLabel').textContent = testName || 'this test';
+            document.getElementById('snThresholdPanel').classList.add('hidden');
+            document.getElementById('snCurrentBadge').textContent  = 'select test';
+             document.getElementById('snCurrentBadge').className    = 'norm-source-badge norm-source-fallback';
+            document.getElementById('studentNormModal').style.display='none';
+
+            // Auto-select test key from current managing test
+
+            // Auto-select test key from current managing test
+            if (testName) {
+                const autoKey = resolveTestKey(testName);
+                const sel = document.getElementById('snTestKeySelect');
+                if (autoKey && sel.querySelector(`option[value="${autoKey}"]`)) {
+                    sel.value = autoKey;
+                    sel.disabled = true;
+                    sel.closest('.form-group').style.display = 'none';
+                    await window.loadStudentNormForKey();
+                } else {
+                    sel.value = '';
+                    sel.disabled = false;
+                    sel.closest('.form-group').style.display = '';
+                }
+            } else {
+                const sel = document.getElementById('snTestKeySelect');
+                sel.value = '';
+                sel.disabled = false;
+                sel.closest('.form-group').style.display = '';
+            }
+            // Show modal only after data is ready — no flash
+            document.getElementById('studentNormModal').style.display='flex';
+        };
+        window.closeStudentNormModal = () => {
+            document.getElementById('studentNormModal').style.display='none';
+            const sel = document.getElementById('snTestKeySelect');
+            sel.disabled = false;
+            sel.closest('.form-group').style.display = '';
+        };
 
 window.loadStudentNormForKey = async function() {
     const testKey=document.getElementById('snTestKeySelect').value, studentEmail=document.getElementById('snStudentEmailHidden').value, panel=document.getElementById('snThresholdPanel');
@@ -1799,13 +1924,118 @@ window.loadStudentNormForKey = async function() {
     const badge=document.getElementById('snSourceBadge'); badge.textContent=source; badge.className=`norm-source-badge norm-source-${source==='db'?'db':source==='student'?'custom':'fallback'}`;
     const hb=document.getElementById('snCurrentBadge'); hb.textContent=source==='student'?'🎛 Custom':'default'; hb.className=`norm-source-badge ${source==='student'?'norm-source-custom':'norm-source-fallback'}`;
     panel.classList.remove('hidden');
+
+    // ── Check if student already has test results for this test key ──
+    // ── Check if student has COMPLETED results for the CURRENT scheduled test only ──
+        const currentTestId = document.getElementById('currentTestId').value;
+        let hasResults = false;
+        try {
+            if (currentTestId) {
+        const resultsSnap = await getDocs(query(
+            collection(db, 'testResults'),
+            where('studentEmail', '==', studentEmail),
+            where('testId', '==', currentTestId),
+            where('status', '==', 'completed')
+        ));
+        hasResults = !resultsSnap.empty;
+    }
+
+    } catch(_) {}
+
+    // Lock or unlock the norm inputs based on whether results exist
+    const inputs = ['snExcellent','snGood','snAverage','snBelowAverage'];
+    const saveBtn = document.querySelector('#studentNormModal .modal-footer button:last-child');
+    const resetBtn = document.querySelector('#studentNormModal .modal-footer button:nth-child(2)');
+
+    // Remove any existing lock banner
+    document.getElementById('snLockBanner')?.remove();
+
+    if (hasResults) {
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            el.disabled = true;
+            el.style.background = '#f3f4f6';
+            el.style.color = '#9ca3af';
+            el.style.cursor = 'not-allowed';
+        });
+        if (saveBtn) { saveBtn.disabled = true; saveBtn.style.opacity = '0.5'; saveBtn.style.cursor = 'not-allowed'; }
+        if (resetBtn) { resetBtn.disabled = true; resetBtn.style.opacity = '0.5'; resetBtn.style.cursor = 'not-allowed'; }
+
+        // Insert lock banner above the norm panel
+        const lockBanner = document.createElement('div');
+        lockBanner.id = 'snLockBanner';
+        lockBanner.style.cssText = 'display:flex;align-items:center;gap:10px;background:#fef3c7;border:1.5px solid #f59e0b;border-radius:10px;padding:10px 14px;margin-bottom:12px;';
+        lockBanner.innerHTML = `
+            <i class="fas fa-lock" style="color:#d97706;font-size:16px;flex-shrink:0;"></i>
+            <div>
+                <div style="font-weight:700;color:#92400e;font-size:13px;">Norms Locked — Student Already Took This Test</div>
+                <div style="font-size:12px;color:#b45309;margin-top:2px;">Norms cannot be edited after a student has submitted results.</div>
+            </div>`;
+        panel.insertBefore(lockBanner, panel.firstChild);
+    } else {
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            el.disabled = false;
+            el.style.background = '';
+            el.style.color = '';
+            el.style.cursor = '';
+        });
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.style.opacity = ''; saveBtn.style.cursor = ''; }
+        if (resetBtn) { resetBtn.disabled = false; resetBtn.style.opacity = ''; resetBtn.style.cursor = ''; }
+    }
 };
 
 window.saveStudentNormOverride = async function() {
-    const studentEmail=document.getElementById('snStudentEmailHidden').value, testKey=document.getElementById('snTestKeySelect').value, lb=document.getElementById('snLowerIsBetter').value==='1';
+    const studentEmail=document.getElementById('snStudentEmailHidden').value,
+          testKey=document.getElementById('snTestKeySelect').value,
+          lb=document.getElementById('snLowerIsBetter').value==='1';
     if (!testKey) { showWarningModal('Please select a test type first.',()=>{},()=>{}); return; }
-    const e=parseFloat(document.getElementById('snExcellent').value), g=parseFloat(document.getElementById('snGood').value), a=parseFloat(document.getElementById('snAverage').value), b=parseFloat(document.getElementById('snBelowAverage').value);
+
+    // Double-check: block save if student already has results
+    // Double-check: block save only if student completed THIS specific scheduled test
+    const currentTestId = document.getElementById('currentTestId').value;
+    try {
+        if (currentTestId) {
+            const resultsSnap = await getDocs(query(
+                collection(db, 'testResults'),
+                where('studentEmail', '==', studentEmail),
+                where('testId', '==', currentTestId),
+                where('status', '==', 'completed')
+            ));
+            if (!resultsSnap.empty) {
+                showErrorModal('❌ Cannot edit norms — this student has already completed this test.');
+                return;
+            }
+        }
+    } catch(_) {}
+    const e=parseFloat(document.getElementById('snExcellent').value),
+          g=parseFloat(document.getElementById('snGood').value),
+          a=parseFloat(document.getElementById('snAverage').value),
+          b=parseFloat(document.getElementById('snBelowAverage').value);
     if ([e,g,a,b].some(isNaN)) { showWarningModal('Please fill in all four threshold values.',()=>{},()=>{}); return; }
+
+    // Duplicate check
+    const vals = [e, g, a, b];
+    if (new Set(vals).size !== vals.length) {
+        showErrorModal('❌ All threshold values must be unique. No duplicate numbers allowed.');
+        return;
+    }
+
+    // Order validation
+    if (!lb) {
+        // Higher is better: Excellent > Good > Average > Below Average
+        if (!(e > g && g > a && a > b)) {
+            showErrorModal('❌ Values must be strictly descending:\nExcellent > Good > Average > Below Average.\nExcellent should be the highest number.');
+            return;
+        }
+    } else {
+        // Lower is better: Excellent < Good < Average < Below Average
+        if (!(e < g && g < a && a < b)) {
+            showErrorModal('❌ For "lower is better" tests, values must be strictly ascending:\nExcellent < Good < Average < Below Average.\nExcellent should be the lowest number.');
+            return;
+        }
+    }
+
     try {
         await saveStudentNorm(db, studentEmail, testKey, {Excellent:e,Good:g,Average:a,'Below Average':b}, {lowerIsBetter:lb,unit:testKey==='steptest'?'bpm':testKey==='sitreach'?'cm':'reps',setProfessorEmail:window.currentUser.email});
         if (!window._studentCustomNorms.has(studentEmail)) window._studentCustomNorms.set(studentEmail,new Map());
