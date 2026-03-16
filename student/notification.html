@@ -5,297 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notifications - UMakFit</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            font-family: 'Inter', sans-serif;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-        }
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        .font-manrope { font-family: 'Manrope', sans-serif; }
 
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
-            margin: 0;
-            padding: 0;
-        }
-
-        /* ========== NOTIFICATION BELL BADGE ========== */
-        .notification-bell-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #ef4444;
-            color: white;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 0.15rem 0.4rem;
-            border-radius: 10px;
-            min-width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        /* ========== DROPDOWN ========== */
-        /* Scrollbar for notification dropdowns */
-        #notificationDropdown::-webkit-scrollbar,
-        #notificationDropdownMobile::-webkit-scrollbar,
-        #notificationDropdownBody::-webkit-scrollbar,
-        #notificationDropdownBodyMobile::-webkit-scrollbar { width: 6px; }
-
-        #notificationDropdown::-webkit-scrollbar-track,
-        #notificationDropdownMobile::-webkit-scrollbar-track,
-        #notificationDropdownBody::-webkit-scrollbar-track,
-        #notificationDropdownBodyMobile::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-
-        #notificationDropdown::-webkit-scrollbar-thumb,
-        #notificationDropdownMobile::-webkit-scrollbar-thumb,
-        #notificationDropdownBody::-webkit-scrollbar-thumb,
-        #notificationDropdownBodyMobile::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
-
-        #notificationDropdown::-webkit-scrollbar-thumb:hover,
-        #notificationDropdownMobile::-webkit-scrollbar-thumb:hover,
-        #notificationDropdownBody::-webkit-scrollbar-thumb:hover,
-        #notificationDropdownBodyMobile::-webkit-scrollbar-thumb:hover { background: #2563eb; }
-
-        .btn-view-all-dropdown {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
-            border: none;
-            padding: 0.5rem 1.25rem;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .btn-view-all-dropdown:hover {
-            background: linear-gradient(135deg, #2563eb, #1e40af);
-            transform: translateY(-2px);
-        }
-
-        /* ========== SLIDE ANIMATIONS ========== */
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.1); } }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 
         .slide-down { animation: slideDown 0.3s ease; }
+        .fade-in-up { animation: fadeInUp 0.3s ease both; }
 
-        /* ========== HAMBURGER ========== */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            cursor: pointer;
-            z-index: 60;
-        }
+        .spinner { border:4px solid #e5e7eb; border-top:4px solid #3b82f6; border-radius:50%; width:50px; height:50px; animation:spin 1s linear infinite; }
 
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
+        .hamburger { display:none; flex-direction:column; gap:4px; cursor:pointer; z-index:60; }
+        .hamburger span { width:25px; height:3px; background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%); border-radius:2px; transition:all 0.3s ease; }
+        .hamburger.active span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+        .hamburger.active span:nth-child(2) { opacity:0; }
+        .hamburger.active span:nth-child(3) { transform:rotate(-45deg) translate(7px,-6px); }
+        @media (max-width:1023px) { .hamburger { display:flex; } }
 
-        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-        .hamburger.active span:nth-child(2) { opacity: 0; }
-        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -6px); }
+        .mobile-drawer { position:fixed; top:0; right:-100%; width:280px; height:100vh; background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%); z-index:55; transition:right 0.3s ease; box-shadow:-5px 0 15px rgba(0,0,0,0.3); overflow-y:auto; }
+        .mobile-drawer.active { right:0; }
+        .drawer-overlay { position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,0.5); z-index:50; opacity:0; visibility:hidden; transition:opacity 0.3s ease,visibility 0.3s ease; }
+        .drawer-overlay.active { opacity:1; visibility:visible; }
 
-        /* ========== MOBILE DRAWER ========== */
-        .mobile-drawer {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 280px;
-            height: 100vh;
-            background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
-            z-index: 55;
-            transition: right 0.3s ease;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
-            overflow-y: auto;
-        }
+        .notification-badge { position:absolute; top:-4px; right:-4px; background:#ef4444; color:white; font-size:10px; font-weight:700; padding:0.15rem 0.4rem; border-radius:10px; min-width:18px; height:18px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.3); animation:pulse 2s infinite; }
 
-        .mobile-drawer.active { right: 0; }
+        /* Notif scrollbar */
+        .notif-scroll::-webkit-scrollbar { width:6px; }
+        .notif-scroll::-webkit-scrollbar-track { background:#f1f1f1; border-radius:10px; }
+        .notif-scroll::-webkit-scrollbar-thumb { background:#3b82f6; border-radius:10px; }
+        .notif-scroll::-webkit-scrollbar-thumb:hover { background:#2563eb; }
 
-        .drawer-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100vh;
-            background: rgba(0,0,0,0.5);
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
+        /* Notif card */
+        .notif-card { position:relative; overflow:hidden; transition:all 0.25s ease; }
+        .notif-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg,#3b82f6,#2563eb); border-radius:4px 0 0 4px; opacity:0; transition:opacity 0.2s; }
+        .notif-card.unread::before { opacity:1; }
+        .notif-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(59,130,246,0.12); border-color:#93c5fd !important; }
 
-        .drawer-overlay.active { opacity: 1; visibility: visible; }
-
-        @media (max-width: 1023px) {
-            .hamburger { display: flex; }
-            .notification-dropdown { width: calc(100vw - 2rem); right: 0; left: auto; }
-        }
-
-        /* ========== LOADING ========== */
-        .spinner {
-            border: 4px solid #e5e7eb;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ========== NOTIFICATION CARDS ========== */
-        .notif-card {
-            background: #fff;
-            border-radius: 14px;
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 1rem;
-            border: 1.5px solid #e5e7eb;
-            transition: all 0.25s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .notif-card::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 4px;
-            background: linear-gradient(180deg, #3b82f6, #2563eb);
-            border-radius: 4px 0 0 4px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .notif-card.unread::before { opacity: 1; }
-
-        .notif-card.unread {
-            background: #f0f7ff;
-            border-color: #bfdbfe;
-        }
-
-        .notif-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(59,130,246,0.12);
-            border-color: #93c5fd;
-        }
-
-        .notif-icon-wrap {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-size: 20px;
-        }
-
-        .notif-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #3b82f6;
-            flex-shrink: 0;
-            margin-top: 6px;
-        }
-
-        /* ========== FILTER TABS ========== */
-        .filter-tab {
-            padding: 0.5rem 1.25rem;
-            border-radius: 100px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1.5px solid #e5e7eb;
-            background: #fff;
-            color: #6b7280;
-            transition: all 0.2s;
-        }
-
-        .filter-tab.active {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: #fff;
-            border-color: transparent;
-            box-shadow: 0 4px 12px rgba(59,130,246,0.25);
-        }
-
-        .filter-tab:hover:not(.active) {
-            border-color: #3b82f6;
-            color: #3b82f6;
-        }
-
-        /* ========== EMPTY STATE ========== */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-
-        /* ========== MARK ALL READ BTN ========== */
-        .btn-mark-all {
-            background: linear-gradient(90deg, rgba(18,27,103,1) 0%, rgba(59,130,246,1) 100%);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 0.6rem 1.25rem;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.25s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-mark-all:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
-        }
-
-        /* ========== PROFILE DROPDOWN ========== */
-        #profileDropdown, #profileDropdownMobile,
-        #notificationDropdown, #notificationDropdownMobile {
-            z-index: 9999 !important;
-        }
-
-        @keyframes slide-in {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .animate-slide-in { animation: slide-in 0.3s ease-out; }
-
-        /* ========== LOGOUT POPUP ========== */
-        @keyframes fadeInLogout { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUpLogout {
-            from { opacity:0; transform:translateY(24px) scale(0.97); }
-            to { opacity:1; transform:translateY(0) scale(1); }
-        }
+        /* Filter tab */
+        .filter-tab { padding:0.5rem 1.25rem; border-radius:100px; font-size:13px; font-weight:600; cursor:pointer; border:1.5px solid #e5e7eb; background:#fff; color:#6b7280; transition:all 0.2s; }
+        .filter-tab.active { background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff; border-color:transparent; box-shadow:0 4px 12px rgba(59,130,246,0.25); }
+        .filter-tab:hover:not(.active) { border-color:#3b82f6; color:#3b82f6; }
     </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50/40 min-h-screen">
+
     <!-- Loading Screen -->
     <div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
         <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
@@ -304,192 +63,132 @@
     </div>
 
     <div id="mainContent" style="display:none;">
-        <!-- ========== NAVBAR ========== -->
-        <nav class="shadow-lg" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
+
+        <!-- Navigation -->
+        <nav class="shadow-lg" style="background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%);">
             <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
                 <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-                    <!-- Logo -->
                     <a href="./studentDashboard.html" class="flex items-center gap-2 sm:gap-3">
                         <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
-                        <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                        <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope"
+                              style="background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
                             UMakFit
                         </span>
                     </a>
 
                     <!-- Desktop Nav -->
                     <div class="hidden lg:flex items-center gap-2 flex-wrap">
-                        <a href="./studentDashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-speedometer2"></i><span class="hidden xl:inline">Dashboard</span>
-                        </a>
-                        <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-clipboard-check"></i><span class="hidden xl:inline">Test</span>
-                        </a>
-                        <a href="./studentlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-book"></i><span class="hidden xl:inline">Lesson</span>
-                        </a>
-                        <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
-                        </a>
-                        <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-graph-up"></i><span class="hidden xl:inline">Progress</span>
-                        </a>
-                        <a href="./achievements.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-trophy"></i><span class="hidden xl:inline">Achievements</span>
-                        </a>
-
-                        <!-- Notification Bell Desktop -->
+                        <a href="./studentDashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-speedometer2"></i><span class="hidden xl:inline">Dashboard</span></a>
+                        <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-clipboard-check"></i><span class="hidden xl:inline">Test</span></a>
+                        <a href="./studentlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-book"></i><span class="hidden xl:inline">Lesson</span></a>
+                        <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span></a>
+                        <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-graph-up"></i><span class="hidden xl:inline">Progress</span></a>
+                        <a href="./achievements.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-trophy"></i><span class="hidden xl:inline">Achievements</span></a>
                         <div class="relative">
-                            <button id="notificationBellBtn"
-                                class="w-9 h-9 xl:w-10 xl:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
+                            <button id="notificationBellBtn" class="relative w-9 h-9 xl:w-10 xl:h-10 bg-white text-gray-900 border-2 border-white/30 rounded-full flex items-center justify-center hover:scale-110 transition-all shadow-sm">
                                 <i class="bi bi-bell-fill text-base xl:text-lg"></i>
-                                <span id="navNotificationCount" class="notification-bell-badge hidden">0</span>
+                                <span id="navNotificationCount" class="notification-badge hidden">0</span>
                             </button>
-                            <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl z-[9999] slide-down max-h-[480px] overflow-y-auto">
-                                <div class="p-3 sm:p-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center rounded-t-xl sticky top-0 z-10">
-                                    <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
-                                        <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                                    </h6>
-                                    <button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600 p-1 transition-colors">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
+                            <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl z-[9999] max-h-[480px] overflow-y-auto notif-scroll slide-down">
+                                <div class="sticky top-0 z-10 px-4 py-3 border-b-2 border-gray-200 bg-gradient-to-r from-slate-50 to-white flex justify-between items-center rounded-t-xl">
+                                    <h6 class="font-bold text-gray-900 text-sm flex items-center gap-2"><i class="bi bi-bell-fill text-blue-500"></i> Notifications</h6>
+                                    <button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button>
                                 </div>
-                                <div id="notificationDropdownBody" class="max-h-96 overflow-y-auto">
-                                    <div class="p-6 sm:p-8 text-center text-gray-400">
-                                        <i class="bi bi-bell-slash text-4xl sm:text-5xl mb-3 block"></i>
-                                        <p class="text-gray-600 text-sm sm:text-base">No notifications yet</p>
-                                    </div>
+                                <div id="notificationDropdownBody" class="max-h-[360px] overflow-y-auto notif-scroll">
+                                    <div class="py-6 px-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl block mb-3"></i><p class="text-gray-600 text-sm">No notifications yet</p></div>
                                 </div>
-                                <div class="p-2 sm:p-3 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0">
-                                    <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
-                                        View All Notifications
-                                    </button>
+                                <div class="sticky bottom-0 px-3 py-2 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl">
+                                    <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg font-semibold text-xs hover:from-blue-600 hover:to-blue-700 transition-all">View All Notifications</button>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Profile Dropdown Desktop -->
                         <div class="relative">
-                            <img src="" alt="Profile" id="profilePictureBtn"
-                                class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
+                            <img src="" alt="Profile" id="profilePictureBtn" class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
                             <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
                                 <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-4 border-blue-500 object-cover">
+                                    <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-[3px] border-blue-500 object-cover">
                                     <h6 id="profileDropdownName" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
                                     <p id="profileDropdownEmail" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
                                 </div>
                                 <div class="p-2">
-                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-                                    </a>
+                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors"><i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i><span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span></a>
                                     <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
-                                        <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
-                                        <span class="font-medium text-sm sm:text-base">Logout</span>
-                                    </div>
+                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500"><i class="bi bi-box-arrow-right text-lg sm:text-xl"></i><span class="font-medium text-sm sm:text-base">Logout</span></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Mobile Right Icons -->
+                    <!-- Mobile Right -->
                     <div class="flex lg:hidden items-center gap-2 sm:gap-3">
-                        <!-- Mobile Notification Bell -->
                         <div class="relative">
-                            <button id="notificationBellBtnMobile"
-                                class="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
-                                <i class="bi bi-bell-fill text-base sm:text-lg"></i>
-                                <span id="navNotificationCountMobile" class="notification-bell-badge hidden">0</span>
+                            <button id="notificationBellBtnMobile" class="relative w-9 h-9 sm:w-10 sm:h-10 bg-white text-gray-900 border-2 border-white/30 rounded-full flex items-center justify-center hover:scale-110 transition-all shadow-sm">
+                                <i class="bi bi-bell-fill text-base"></i>
+                                <span id="navNotificationCountMobile" class="notification-badge hidden">0</span>
                             </button>
-                           <div id="notificationDropdownMobile" class="hidden fixed right-2 left-2 top-20 bg-white rounded-xl shadow-2xl z-[9999] slide-down max-h-[calc(100vh-6rem)] overflow-y-auto">
-                                <div class="p-3 sm:p-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center rounded-t-xl sticky top-0 z-10">
-                                    <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
-                                        <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                                    </h6>
-                                    <button id="closeNotificationBtnMobile" class="text-gray-400 hover:text-gray-600 p-1 transition-colors">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
+                            <div id="notificationDropdownMobile" class="hidden fixed right-2 left-2 top-20 max-h-[calc(100vh-6rem)] overflow-y-auto notif-scroll bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                                <div class="sticky top-0 z-10 px-4 py-3 border-b-2 border-gray-200 bg-gradient-to-r from-slate-50 to-white flex justify-between items-center rounded-t-xl">
+                                    <h6 class="font-bold text-gray-900 text-sm flex items-center gap-2"><i class="bi bi-bell-fill text-blue-500"></i> Notifications</h6>
+                                    <button id="closeNotificationBtnMobile" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button>
                                 </div>
-                                <div id="notificationDropdownBodyMobile" class="max-h-96 overflow-y-auto">
-                                    <div class="p-6 sm:p-8 text-center text-gray-400">
-                                        <i class="bi bi-bell-slash text-4xl sm:text-5xl mb-3 block"></i>
-                                        <p class="text-gray-600 text-sm sm:text-base">No notifications yet</p>
-                                    </div>
+                                <div id="notificationDropdownBodyMobile" class="max-h-96 overflow-y-auto notif-scroll">
+                                    <div class="py-6 px-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl block mb-3"></i><p class="text-gray-600 text-sm">No notifications yet</p></div>
                                 </div>
-                                <div class="p-2 sm:p-3 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0">
-                                    <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
-                                        View All Notifications
-                                    </button>
+                                <div class="sticky bottom-0 px-3 py-2 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl">
+                                    <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg font-semibold text-xs hover:from-blue-600 hover:to-blue-700 transition-all">View All Notifications</button>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Mobile Profile -->
                         <div class="relative">
-                            <img src="" alt="Profile" id="profilePictureBtnMobile"
-                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
+                            <img src="" alt="Profile" id="profilePictureBtnMobile" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
                             <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
                                 <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-4 border-blue-500 object-cover">
+                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-[3px] border-blue-500 object-cover">
                                     <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
                                     <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
                                 </div>
                                 <div class="p-2">
-                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-                                    </a>
+                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors"><i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i><span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span></a>
                                     <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
-                                        <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
-                                        <span class="font-medium text-sm sm:text-base">Logout</span>
-                                    </div>
+                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500"><i class="bi bi-box-arrow-right text-lg sm:text-xl"></i><span class="font-medium text-sm sm:text-base">Logout</span></div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Hamburger -->
-                        <div class="hamburger" id="hamburger">
-                            <span></span><span></span><span></span>
-                        </div>
+                        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <!-- Drawer Overlay -->
         <div class="drawer-overlay" id="drawerOverlay"></div>
-
-        <!-- Mobile Drawer -->
         <div class="mobile-drawer" id="mobileDrawer">
             <div class="p-6 pt-8">
                 <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
                     <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
-                    <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">UMakFIT</span>
+                    <span class="text-2xl font-extrabold font-manrope" style="background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">UMakFIT</span>
                 </div>
                 <nav class="space-y-2">
                     <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-speedometer2 mr-3"></i>Dashboard</a>
                     <a href="./test.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-clipboard-check mr-3"></i>Test</a>
                     <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-book mr-3"></i>Lessons</a>
-                    <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-award mr-3"></i>Grades</a>
+                    <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-activity mr-3"></i>Performance</a>
                     <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-graph-up mr-3"></i>Progress</a>
                     <a href="./achievements.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-trophy mr-3"></i>Achievements</a>
                 </nav>
             </div>
         </div>
 
-        <!-- ========== MAIN CONTENT ========== -->
-        <div class="container mx-auto px-4 sm:px-6" style="max-width: 1400px;">
+        <!-- Main Content -->
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
 
             <!-- Page Header -->
-            <div class="relative mb-8 sm:mb-10 mt-8 sm:mt-12">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-                        <i class="bi bi-bell-fill text-xl sm:text-2xl text-white"></i>
-                    </div>
-                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-yellow-500 bg-clip-text text-transparent leading-tight">
-                        Notifications
-                    </h1>
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                    <i class="bi bi-bell-fill text-xl sm:text-2xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">Notifications</h1>
+                    <p class="text-sm text-gray-500 mt-0.5">Stay updated with your section</p>
                 </div>
             </div>
 
@@ -510,543 +209,457 @@
                         <span id="countRead" class="ml-1.5 bg-gray-100 text-gray-600 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
                     </button>
                 </div>
-
                 <!-- Mark All Read -->
-                <button class="btn-mark-all" onclick="markAllAsRead()">
+                <button onclick="markAllAsRead()"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm cursor-pointer transition-all hover:opacity-90 hover:-translate-y-0.5 hover:shadow-lg shadow-blue-500/30"
+                    style="background:linear-gradient(90deg,#121b67 0%,#3b82f6 100%);">
                     <i class="bi bi-check2-all"></i> Mark all as read
                 </button>
             </div>
 
             <!-- Notification List -->
             <div id="notificationList" class="mb-10">
-                <!-- Cards injected here -->
-                <div class="text-center py-16 text-gray-400" id="loadingNotifs">
-                    <div class="spinner mx-auto mb-4"></div>
+                <div class="flex flex-col items-center justify-center py-16 text-gray-400" id="loadingNotifs">
+                    <div class="spinner mb-4"></div>
                     <p class="text-sm font-medium">Loading notifications...</p>
                 </div>
             </div>
         </div>
 
-        <!-- ========== FOOTER ========== -->
-        <footer style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%); border-top: 1px solid rgba(255,255,255,0.07); padding: clamp(3rem,6vw,5rem) clamp(1.5rem,5vw,4rem) 2rem; margin-top: 3rem;">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <!-- Footer -->
+        <footer style="background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%);border-top:1px solid rgba(255,255,255,0.07);" class="mt-12 px-6 sm:px-10 lg:px-16 pt-12 pb-8">
+            <div class="container mx-auto max-w-7xl">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
                     <div>
                         <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                            <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" alt="UMak Logo" class="h-12 w-auto object-contain">
-                            <div>
-                                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
-                                <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
-                            </div>
+                            <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
+                            <div><h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6><p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p></div>
                         </div>
-                        <p class="text-sm lg:text-base leading-relaxed text-blue-100">
-                            UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati.
-                        </p>
-                        <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
-                            <span style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-size:0.7rem;padding:4px 10px;border-radius:100px;font-weight:500;">Fitness Tracking</span>
-                            <span style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-size:0.7rem;padding:4px 10px;border-radius:100px;font-weight:500;">Performance Assessment</span>
-                            <span style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-size:0.7rem;padding:4px 10px;border-radius:100px;font-weight:500;">Health & Wellness</span>
-                        </div>
+                        <p class="text-sm lg:text-base leading-relaxed text-blue-100">UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati.</p>
                     </div>
                     <div>
                         <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
                         <div class="grid grid-cols-2 gap-4 lg:gap-6">
                             <div class="space-y-3">
-                                <a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-book mr-2"></i>Lessons</a>
-                                <a href="./test.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-clipboard-check mr-2"></i>Tests</a>
-                                <a href="./progress.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-graph-up mr-2"></i>Progress</a>
+                                <a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-book mr-2"></i>Lessons</a>
+                                <a href="./test.html" class="block text-blue-100 hover:text-yellow-300 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-clipboard-check mr-2"></i>Tests</a>
+                                <a href="./progress.html" class="block text-blue-100 hover:text-yellow-300 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-graph-up mr-2"></i>Progress</a>
                             </div>
                             <div class="space-y-3">
-                                <a href="./studentgrades.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-award mr-2"></i>Grades</a>
-                                <a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-person-circle mr-2"></i>Profile</a>
-                                <a href="./achievements.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-trophy mr-2"></i>Achievements</a>
+                                <a href="./studentgrades.html" class="block text-blue-100 hover:text-yellow-300 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-award mr-2"></i>Grades</a>
+                                <a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-person-circle mr-2"></i>Profile</a>
+                                <a href="./achievements.html" class="block text-blue-100 hover:text-yellow-300 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-trophy mr-2"></i>Achievements</a>
                             </div>
                         </div>
                     </div>
                     <div>
                         <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
                         <div class="space-y-4 lg:space-y-5">
-                            <div class="flex items-start gap-3">
-                                <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
-                                <p class="text-sm lg:text-base text-blue-100">College of Human Kinetics<br>University of Makati<br>3rd floor, Administration Building, JP Rizal Ext., West Rembo, Taguig City</p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
-                                <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">chk@umak.edu.ph</a>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
-                                <span class="text-blue-100 text-sm lg:text-base">+63 933 189 7230</span>
-                            </div>
-                            <div style="display:flex;gap:8px;margin-top:1rem;">
-                                <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" style="width:34px;height:34px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.8rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(200,153,42,0.15)';this.style.color='#E8BA4A';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.5)';">f</a>
-                                <a href="#" style="width:34px;height:34px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.8rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(200,153,42,0.15)';this.style.color='#E8BA4A';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.5)';">𝕏</a>
-                                <a href="#" style="width:34px;height:34px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.8rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(200,153,42,0.15)';this.style.color='#E8BA4A';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.5)';">◎</a>
-                                <a href="#" style="width:34px;height:34px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.8rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(200,153,42,0.15)';this.style.color='#E8BA4A';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.5)';">▶</a>
+                            <div class="flex items-start gap-3"><i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i><p class="text-sm lg:text-base text-blue-100">College of Human Kinetics<br>University of Makati<br>3rd floor, Administration Building,<br>JP Rizal Ext., West Rembo, Taguig City</p></div>
+                            <div class="flex items-center gap-3"><i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i><a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">chk@umak.edu.ph</a></div>
+                            <div class="flex items-center gap-3"><i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i><span class="text-blue-100 text-sm lg:text-base">+63 933 189 7230</span></div>
+                            <div class="flex items-center gap-4 pt-2 justify-center lg:justify-start">
+                                <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110"><i class="bi bi-facebook text-white text-lg"></i></a>
+                                <a href="https://www.instagram.com" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110"><i class="bi bi-instagram text-white text-lg"></i></a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="border-t border-blue-600/50 mt-8 lg:mt-12 pt-6 lg:pt-8">
-                    <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
-                        <p class="text-xs lg:text-sm text-blue-200">© 2025 University of Makati - College of Human Kinetics. All Rights Reserved.</p>
-                        <div class="flex flex-wrap justify-center gap-3 lg:gap-4">
-                            <a href="https://umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">University of Makati</a>
-                            <span class="text-blue-400">•</span>
-                            <a href="https://library.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">UMak Online Library</a>
-                            <span class="text-blue-400">•</span>
-                            <a href="https://tbl.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">TBL Hub</a>
-                        </div>
-                    </div>
+                <div class="border-t border-white/10 mt-8 pt-6 text-center">
+                    <p class="text-xs lg:text-sm text-blue-200/70">© 2025 University of Makati — College of Human Kinetics. All Rights Reserved.</p>
                 </div>
             </div>
         </footer>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getFirestore, doc, getDoc, collection, query, where, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
-        authDomain: "umakfit-e3b1d.firebaseapp.com",
-        projectId: "umakfit-e3b1d",
-        storageBucket: "umakfit-e3b1d.appspot.com",
-        messagingSenderId: "276569891504",
-        appId: "1:276569891504:web:39b1732b519f4d8b785175"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+            authDomain: "umakfit-e3b1d.firebaseapp.com",
+            projectId: "umakfit-e3b1d",
+            storageBucket: "umakfit-e3b1d.appspot.com",
+            messagingSenderId: "276569891504",
+            appId: "1:276569891504:web:39b1732b519f4d8b785175"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    window.auth = auth;
-    window.signOut = signOut;
+        // ========== STATE ==========
+        let studentData = null;
+        let allNotifications = [];
+        let currentFilter = 'all';
+        let unsubscribeNotifications = null;
+        let currentUser = null;
 
-    let studentData = null;
-    let allNotifications = [];
-    let currentFilter = 'all';
-
-    // ========== HELPERS ==========
-    function getReadNotifications() {
-        if (!studentData?.email) return [];
-        return JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-    }
-
-    function saveReadNotifications(ids) {
-        if (!studentData?.email) return;
-        localStorage.setItem(`readNotifications_${studentData.email}`, JSON.stringify(ids));
-    }
-
-    function isRead(notifId) {
-        return getReadNotifications().includes(notifId);
-    }
-
-    function formatDate(timestamp) {
-        if (!timestamp) return 'Unknown date';
-        let date;
-        if (timestamp.toDate) date = timestamp.toDate();
-        else date = new Date(timestamp);
-
-        const now = new Date();
-        const diff = now - date;
-        const mins = Math.floor(diff / 60000);
-        const hours = Math.floor(diff / 3600000);
-        const days = Math.floor(diff / 86400000);
-
-        if (mins < 1) return 'Just now';
-        if (mins < 60) return `${mins}m ago`;
-        if (hours < 24) return `${hours}h ago`;
-        if (days < 7) return `${days}d ago`;
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    }
-
-    function getNotifIcon(title) {
-        const t = (title || '').toLowerCase();
-        if (t.includes('test') || t.includes('exam')) return { icon: 'bi-clipboard-check-fill', bg: 'bg-blue-100', color: 'text-blue-600' };
-        if (t.includes('grade') || t.includes('result')) return { icon: 'bi-award-fill', bg: 'bg-yellow-100', color: 'text-yellow-600' };
-        if (t.includes('lesson') || t.includes('class')) return { icon: 'bi-book-fill', bg: 'bg-green-100', color: 'text-green-600' };
-        if (t.includes('achieve') || t.includes('badge')) return { icon: 'bi-trophy-fill', bg: 'bg-purple-100', color: 'text-purple-600' };
-        if (t.includes('remind') || t.includes('due')) return { icon: 'bi-clock-fill', bg: 'bg-orange-100', color: 'text-orange-600' };
-        return { icon: 'bi-bell-fill', bg: 'bg-blue-100', color: 'text-blue-500' };
-    }
-
-    // ========== RENDER ==========
-    window.setFilter = function(filter) {
-        currentFilter = filter;
-        ['tabAll', 'tabUnread', 'tabRead'].forEach(id => {
-            document.getElementById(id).classList.remove('active');
-        });
-        document.getElementById('tab' + filter.charAt(0).toUpperCase() + filter.slice(1)).classList.add('active');
-        renderNotifications();
-    };
-
-    function renderNotifications() {
-        const list = document.getElementById('notificationList');
-        const readList = getReadNotifications();
-
-        let filtered = allNotifications;
-        if (currentFilter === 'unread') filtered = allNotifications.filter(n => !readList.includes(n.id));
-        if (currentFilter === 'read') filtered = allNotifications.filter(n => readList.includes(n.id));
-
-        // Update counts
-        const unreadCount = allNotifications.filter(n => !readList.includes(n.id)).length;
-        const readCount = allNotifications.filter(n => readList.includes(n.id)).length;
-        document.getElementById('countAll').textContent = allNotifications.length;
-        document.getElementById('countUnread').textContent = unreadCount;
-        document.getElementById('countRead').textContent = readCount;
-        updateNavBadge(unreadCount);
-
-        if (filtered.length === 0) {
-            list.innerHTML = `
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm py-20 text-center">
-                    <i class="bi bi-bell-slash text-6xl text-gray-200 block mb-4"></i>
-                    <h3 class="text-lg font-semibold text-gray-500 mb-1">No notifications</h3>
-                    <p class="text-sm text-gray-400">
-                        ${currentFilter === 'unread' ? "You're all caught up!" : currentFilter === 'read' ? 'No read notifications yet.' : 'No notifications for your section yet.'}
-                    </p>
-                </div>
-            `;
-            return;
+        // ========== LOCAL STORAGE HELPERS ==========
+        function getReadList() {
+            if (!studentData?.email) return [];
+            return JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
         }
 
-        list.innerHTML = filtered.map(notif => {
-            const read = readList.includes(notif.id);
-            const { icon, bg, color } = getNotifIcon(notif.title);
-            return `
-                <div class="notif-card ${read ? '' : 'unread'}" onclick="markOneAsRead('${notif.id}', this)" id="notif-${notif.id}">
-                    <div class="flex items-start gap-3 sm:gap-4">
-                        <div class="notif-icon-wrap ${bg} ${color}">
-                            <i class="bi ${icon}"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-start justify-between gap-2 flex-wrap">
-                                <h6 class="font-semibold text-gray-900 text-sm sm:text-base mb-0.5 leading-snug">${notif.title || 'Notification'}</h6>
-                                <div class="flex items-center gap-2 flex-shrink-0">
-                                    <span class="text-xs text-gray-400 whitespace-nowrap">${formatDate(notif.createdAt)}</span>
-                                    ${!read ? '<div class="notif-dot"></div>' : ''}
-                                </div>
-                            </div>
-                            <p class="text-sm text-gray-600 leading-relaxed mb-0">${notif.message || ''}</p>
-                            ${notif.section ? `<span class="inline-block mt-2 text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
-                                <i class="bi bi-people-fill mr-1"></i>${notif.section}
-                            </span>` : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
+        function saveReadList(ids) {
+            if (!studentData?.email) return;
+            localStorage.setItem(`studentData.email}`, JSON.stringify(ids));
+            // ✅ Correct key
+            localStorage.setItem(`readNotifications_${studentData.email}`, JSON.stringify(ids));
+        }
 
-    window.markOneAsRead = function(id, el) {
-        const readList = getReadNotifications();
-        if (!readList.includes(id)) {
-            readList.push(id);
-            saveReadNotifications(readList);
-            // Remove unread styling
-            el.classList.remove('unread');
-            const dot = el.querySelector('.notif-dot');
-            if (dot) dot.remove();
+        function formatDate(timestamp) {
+            if (!timestamp) return 'Unknown date';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            const mins = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            if (mins < 1) return 'Just now';
+            if (mins < 60) return `${mins}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            return date.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+        }
+
+        function getNotifMeta(title) {
+            const t = (title || '').toLowerCase();
+            if (t.includes('test') || t.includes('exam'))    return { icon:'bi-clipboard-check-fill', bg:'bg-blue-100',   color:'text-blue-600' };
+            if (t.includes('grade') || t.includes('result')) return { icon:'bi-award-fill',            bg:'bg-yellow-100', color:'text-yellow-600' };
+            if (t.includes('lesson') || t.includes('class')) return { icon:'bi-book-fill',             bg:'bg-green-100',  color:'text-green-600' };
+            if (t.includes('achiev') || t.includes('badge')) return { icon:'bi-trophy-fill',           bg:'bg-purple-100', color:'text-purple-600' };
+            if (t.includes('remind') || t.includes('due'))   return { icon:'bi-clock-fill',            bg:'bg-orange-100', color:'text-orange-600' };
+            return { icon:'bi-bell-fill', bg:'bg-blue-100', color:'text-blue-500' };
+        }
+
+        // ========== RENDER ==========
+        window.setFilter = function(filter) {
+            currentFilter = filter;
+            ['All','Unread','Read'].forEach(f => {
+                document.getElementById('tab' + f)?.classList.toggle('active', f.toLowerCase() === filter);
+            });
             renderNotifications();
-        }
-    };
+        };
 
-    window.markAllAsRead = function() {
-        const allIds = allNotifications.map(n => n.id);
-        const existing = getReadNotifications();
-        const merged = [...new Set([...existing, ...allIds])];
-        saveReadNotifications(merged);
-        renderNotifications();
-    };
+        function renderNotifications() {
+            const list = document.getElementById('notificationList');
+            const readList = getReadList();
 
-    function updateNavBadge(count) {
-        const badge = document.getElementById('navNotificationCount');
-        const badgeMobile = document.getElementById('navNotificationCountMobile');
-        if (count > 0) {
-            if (badge) { badge.textContent = count; badge.classList.remove('hidden'); }
-            if (badgeMobile) { badgeMobile.textContent = count; badgeMobile.classList.remove('hidden'); }
-        } else {
-            if (badge) badge.classList.add('hidden');
-            if (badgeMobile) badgeMobile.classList.add('hidden');
-        }
-    }
+            // Counts
+            const unreadCount = allNotifications.filter(n => !readList.includes(n.id)).length;
+            const readCount   = allNotifications.filter(n =>  readList.includes(n.id)).length;
+            document.getElementById('countAll').textContent    = allNotifications.length;
+            document.getElementById('countUnread').textContent = unreadCount;
+            document.getElementById('countRead').textContent   = readCount;
+            updateNavBadge(unreadCount);
 
-    // ========== LOAD DATA ==========
-    async function loadStudentData(user) {
-        try {
-            const q = query(collection(db, 'students'), where('email', '==', user.email));
-            const snap = await getDocs(q);
-            if (!snap.empty) {
-                snap.forEach(d => { studentData = d.data(); });
-            } else {
-                const ref = doc(db, 'students', user.uid);
-                const d = await getDoc(ref);
-                if (d.exists()) studentData = d.data();
-            }
-        } catch (e) {
-            console.error('Error loading student data:', e);
-        }
-    }
+            // Filter
+            let filtered = allNotifications;
+            if (currentFilter === 'unread') filtered = allNotifications.filter(n => !readList.includes(n.id));
+            if (currentFilter === 'read')   filtered = allNotifications.filter(n =>  readList.includes(n.id));
 
-let unsubscribeNotifications = null;
-
-    async function loadAllNotifications() {
-        document.getElementById('loadingNotifs').style.display = 'flex';
-        try {
-            if (!studentData?.section) {
-                document.getElementById('loadingNotifs').style.display = 'none';
-                renderNotifications();
+            if (filtered.length === 0) {
+                const msgs = {
+                    unread: "You're all caught up! No unread notifications.",
+                    read:   'No read notifications yet.',
+                    all:    'No notifications for your section yet.'
+                };
+                list.innerHTML = `
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm py-20 text-center">
+                        <i class="bi bi-bell-slash text-6xl text-gray-200 block mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-500 mb-1">No notifications</h3>
+                        <p class="text-sm text-gray-400">${msgs[currentFilter]}</p>
+                    </div>`;
                 return;
             }
 
-            const q = query(collection(db, 'notifications'), where('section', '==', studentData.section));
-            const snap = await getDocs(q);
+            list.innerHTML = filtered.map((notif, i) => {
+                const read = readList.includes(notif.id);
+                const { icon, bg, color } = getNotifMeta(notif.title);
+                return `
+                    <div class="notif-card fade-in-up bg-white rounded-2xl p-5 sm:p-6 mb-3 border-[1.5px] cursor-pointer
+                        ${read ? 'border-gray-200' : 'border-blue-200 bg-blue-50/60 unread'}"
+                        style="animation-delay:${i * 40}ms"
+                        onclick="markOneAsRead('${notif.id}', this)"
+                        id="notif-${notif.id}">
+                        <div class="flex items-start gap-3 sm:gap-4">
+                            <div class="w-11 h-11 rounded-xl ${bg} ${color} flex items-center justify-center text-xl flex-shrink-0">
+                                <i class="bi ${icon}"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-2 flex-wrap mb-1">
+                                    <h6 class="font-semibold text-gray-900 text-sm sm:text-base leading-snug">${notif.title || 'Notification'}</h6>
+                                    <div class="flex items-center gap-2 flex-shrink-0">
+                                        <span class="text-xs text-gray-400 whitespace-nowrap">${formatDate(notif.createdAt)}</span>
+                                        ${!read ? '<div class="w-2.5 h-2.5 rounded-full bg-blue-500 mt-0.5 flex-shrink-0"></div>' : ''}
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-600 leading-relaxed">${notif.message || ''}</p>
+                                ${notif.section ? `
+                                    <span class="inline-flex items-center gap-1 mt-2 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-full">
+                                        <i class="bi bi-people-fill"></i>${notif.section}
+                                    </span>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
 
-            const seen = new Set();
-            allNotifications = [];
-            snap.forEach(d => {
-                const data = d.data();
-                const key = `${data.title}|${data.message}|${data.createdAt?.toDate?.().getTime() || ''}`;
-                if (!seen.has(key)) {
-                    seen.add(key);
-                    allNotifications.push({ id: d.id, ...data });
-                }
-            });
-
-            allNotifications.sort((a, b) => {
-                const da = a.createdAt?.toDate?.() || new Date(0);
-                const db2 = b.createdAt?.toDate?.() || new Date(0);
-                return db2 - da;
-            });
-
-            document.getElementById('loadingNotifs').style.display = 'none';
-            renderNotifications();
-
-            // Real-time listener — kill previous one first
-            if (unsubscribeNotifications) unsubscribeNotifications();
-            unsubscribeNotifications = onSnapshot(q, async () => {
-                // Re-fetch cleanly instead of calling loadAllNotifications recursively
-                const freshSnap = await getDocs(q);
-                const freshSeen = new Set();
-                allNotifications = [];
-                freshSnap.forEach(d => {
-                    const data = d.data();
-                    const key = `${data.title}|${data.message}|${data.createdAt?.toDate?.().getTime() || ''}`;
-                    if (!freshSeen.has(key)) {
-                        freshSeen.add(key);
-                        allNotifications.push({ id: d.id, ...data });
-                    }
-                });
-                allNotifications.sort((a, b) => {
-                    const da = a.createdAt?.toDate?.() || new Date(0);
-                    const db2 = b.createdAt?.toDate?.() || new Date(0);
-                    return db2 - da;
-                });
+        window.markOneAsRead = function(id, el) {
+            const readList = getReadList();
+            if (!readList.includes(id)) {
+                saveReadList([...new Set([...readList, id])]);
+                el.classList.remove('unread', 'border-blue-200', 'bg-blue-50/60');
+                el.classList.add('border-gray-200');
+                el.querySelector('.bg-blue-500.rounded-full')?.remove();
                 renderNotifications();
-            });
-
-        } catch (e) {
-            console.error('Error loading notifications:', e);
-            document.getElementById('loadingNotifs').style.display = 'none';
-            document.getElementById('notificationList').innerHTML = `
-                <div class="bg-white rounded-2xl border border-red-100 shadow-sm p-8 text-center">
-                    <i class="bi bi-exclamation-triangle text-4xl text-red-300 block mb-3"></i>
-                    <p class="text-gray-500 text-sm">Failed to load notifications. Please refresh.</p>
-                </div>
-            `;
-        }
-    }
-
-    // ========== DROPDOWN NAV (same pattern as profile page) ==========
-    async function loadNotificationDropdown(isMobile = false) {
-        const bodyId = isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody';
-        const body = document.getElementById(bodyId);
-        if (!body) return;
-
-        if (!allNotifications.length) {
-            body.innerHTML = `<div class="text-center py-8 text-gray-400"><i class="bi bi-bell-slash text-4xl block mb-2"></i><p class="text-sm">No notifications yet</p></div>`;
-            return;
-        }
-
-        const readList = getReadNotifications();
-        const slice = allNotifications.slice(0, 5);
-        body.innerHTML = slice.map(n => {
-            const read = readList.includes(n.id);
-            const dateStr = n.createdAt?.toDate?.()
-                ? n.createdAt.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-                : 'Recently';
-            return `
-                <div class="px-5 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${read ? '' : 'bg-blue-50/60'}">
-                    <strong class="block text-sm font-semibold text-gray-900 mb-1">${n.title || 'Notification'}</strong>
-                    <p class="text-xs text-gray-500 mb-1">${n.message || ''}</p>
-                    <small class="text-gray-400 text-xs">${dateStr}</small>
-                </div>
-            `;
-        }).join('');
-
-        // Mark shown as read
-        const unreadShown = slice.filter(n => !readList.includes(n.id)).map(n => n.id);
-        if (unreadShown.length) {
-            const merged = [...new Set([...readList, ...unreadShown])];
-            saveReadNotifications(merged);
-            renderNotifications();
-        }
-    }
-
-    function toggleNotificationDropdown(event) {
-        event?.stopPropagation();
-        const isMobile = window.innerWidth < 1024;
-        const dropdown = isMobile ? document.getElementById('notificationDropdownMobile') : document.getElementById('notificationDropdown');
-        if (!dropdown) return;
-        const isHidden = dropdown.classList.contains('hidden');
-        if (isHidden) {
-            dropdown.classList.remove('hidden');
-            loadNotificationDropdown(isMobile);
-            const pd = document.getElementById('profileDropdown');
-            const pdm = document.getElementById('profileDropdownMobile');
-            if (pd) pd.classList.add('hidden');
-            if (pdm) pdm.classList.add('hidden');
-        } else {
-            dropdown.classList.add('hidden');
-        }
-    }
-
-    function closeNotificationDropdown() {
-        ['notificationDropdown', 'notificationDropdownMobile'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.add('hidden');
-        });
-    }
-
-    window.toggleProfileDropdown = function() {
-        const isMobile = window.innerWidth < 1024;
-        const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
-        closeNotificationDropdown();
-        dropdown.classList.toggle('hidden');
-    };
-
-    function updateProfileUI(user) {
-        const photoURL = user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(studentData?.firstName || 'User')}&background=3b82f6&color=fff&size=128`;
-        ['profilePictureBtn', 'profilePictureBtnMobile', 'profileDropdownPicture', 'profileDropdownPictureMobile'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.src = photoURL;
-        });
-        const name = user?.displayName || `${studentData?.firstName || ''} ${studentData?.lastName || ''}`.trim() || 'Student';
-        const email = studentData?.email || user?.email || '';
-        ['profileDropdownName', 'profileDropdownNameMobile'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = name;
-        });
-        ['profileDropdownEmail', 'profileDropdownEmailMobile'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = email;
-        });
-    }
-onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            // Show page immediately, load data in background
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-            setupEventListeners();
-            await loadStudentData(user);
-            updateProfileUI(user);
-            await loadAllNotifications();
-        } else {
-            window.location.href = '../login/index.html';
-        }
-    });
-
-    function setupEventListeners() {
-        document.getElementById('notificationBellBtn')?.addEventListener('click', toggleNotificationDropdown);
-        document.getElementById('notificationBellBtnMobile')?.addEventListener('click', toggleNotificationDropdown);
-        document.getElementById('closeNotificationBtn')?.addEventListener('click', (e) => { e.stopPropagation(); closeNotificationDropdown(); });
-        document.getElementById('closeNotificationBtnMobile')?.addEventListener('click', (e) => { e.stopPropagation(); closeNotificationDropdown(); });
-        document.getElementById('profilePictureBtn')?.addEventListener('click', window.toggleProfileDropdown);
-        document.getElementById('profilePictureBtnMobile')?.addEventListener('click', window.toggleProfileDropdown);
-
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('#notificationBellBtn') && !e.target.closest('#notificationBellBtnMobile') &&
-                !e.target.closest('#notificationDropdown') && !e.target.closest('#notificationDropdownMobile')) {
-                closeNotificationDropdown();
             }
-            if (!e.target.closest('#profilePictureBtn') && !e.target.closest('#profilePictureBtnMobile') &&
-                !e.target.closest('#profileDropdown') && !e.target.closest('#profileDropdownMobile')) {
+        };
+
+        window.markAllAsRead = function() {
+            const allIds = allNotifications.map(n => n.id);
+            saveReadList([...new Set([...getReadList(), ...allIds])]);
+            renderNotifications();
+        };
+
+        function updateNavBadge(count) {
+            ['navNotificationCount','navNotificationCountMobile'].forEach(id => {
+                const el = document.getElementById(id); if (!el) return;
+                if (count > 0) { el.textContent = count > 99 ? '99+' : count; el.classList.remove('hidden'); }
+                else el.classList.add('hidden');
+            });
+        }
+
+        // ========== FETCH (parallel pattern from dashboard) ==========
+        async function fetchStudentData(user) {
+            try {
+                // ✅ Parallel: try email query and UID doc at the same time
+                const [emailSnap, uidSnap] = await Promise.all([
+                    getDocs(query(collection(db,'students'), where('email','==',user.email))),
+                    getDoc(doc(db,'students',user.uid))
+                ]);
+                if (!emailSnap.empty) {
+                    emailSnap.forEach(d => { studentData = { ...d.data(), studentId: d.id }; });
+                } else if (uidSnap.exists()) {
+                    studentData = { ...uidSnap.data(), studentId: user.uid };
+                } else {
+                    studentData = {
+                        displayName: user.displayName || user.email.split('@')[0],
+                        email: user.email,
+                        section: null
+                    };
+                }
+            } catch(e) {
+                console.error('Error fetching student:', e);
+                studentData = { displayName: user.displayName || 'Student', email: user.email, section: null };
+            }
+        }
+
+        async function fetchNotificationsOnce() {
+            if (!studentData?.section) return [];
+            try {
+                const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section)));
+                const seen = new Set();
+                const result = [];
+                snap.forEach(d => {
+                    const data = d.data();
+                    const key = `${data.title}|${data.message}|${data.createdAt?.toDate?.().getTime()||''}`;
+                    if (!seen.has(key)) { seen.add(key); result.push({ id:d.id, ...data }); }
+                });
+                return result.sort((a,b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)));
+            } catch(e) { console.error(e); return []; }
+        }
+
+        async function loadAllNotifications() {
+            document.getElementById('loadingNotifs').style.display = 'flex';
+            allNotifications = await fetchNotificationsOnce();
+            document.getElementById('loadingNotifs').style.display = 'none';
+            renderNotifications();
+
+            // ✅ Real-time listener (clean up previous first)
+            if (!studentData?.section) return;
+            if (unsubscribeNotifications) unsubscribeNotifications();
+            const q = query(collection(db,'notifications'), where('section','==',studentData.section));
+            unsubscribeNotifications = onSnapshot(q, async () => {
+                allNotifications = await fetchNotificationsOnce();
+                renderNotifications();
+            }, e => console.error('Snapshot error:', e));
+        }
+
+        // ========== DROPDOWN (uses already-fetched allNotifications) ==========
+        function loadNotificationDropdown(isMobile = false) {
+            const bodyId = isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody';
+            const body = document.getElementById(bodyId); if (!body) return;
+
+            if (!allNotifications.length) {
+                body.innerHTML = `<div class="py-6 px-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl block mb-3"></i><p class="text-gray-600 text-sm">No notifications yet</p></div>`;
+                return;
+            }
+
+            const readList = getReadList();
+            const slice = allNotifications.slice(0, 5);
+            body.innerHTML = slice.map(n => {
+                const isRead = readList.includes(n.id);
+                const dateStr = n.createdAt?.toDate?.()?.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) || 'Recently';
+                return `
+                    <div class="px-5 py-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors ${isRead ? '' : 'bg-blue-50/60'}">
+                        <strong class="text-gray-900 text-sm font-semibold block mb-1">${n.title||'Notification'}</strong>
+                        <p class="text-gray-600 text-xs leading-relaxed mb-1">${n.message||''}</p>
+                        <small class="text-gray-400 text-[11px]">${dateStr}</small>
+                    </div>`;
+            }).join('');
+
+            // ✅ Mark shown as read
+            const unreadShown = slice.filter(n => !readList.includes(n.id)).map(n => n.id);
+            if (unreadShown.length) {
+                saveReadList([...new Set([...readList, ...unreadShown])]);
+                renderNotifications();
+            }
+        }
+
+        function toggleNotificationDropdown(event) {
+            event?.stopPropagation();
+            const isMobile = window.innerWidth < 1024;
+            const dropdown = document.getElementById(isMobile ? 'notificationDropdownMobile' : 'notificationDropdown');
+            if (!dropdown) return;
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                loadNotificationDropdown(isMobile);
                 document.getElementById('profileDropdown')?.classList.add('hidden');
                 document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+            } else {
+                dropdown.classList.add('hidden');
             }
-        });
+        }
 
-        // Hamburger
-        const hamburger = document.getElementById('hamburger');
-        const mobileDrawer = document.getElementById('mobileDrawer');
-        const drawerOverlay = document.getElementById('drawerOverlay');
-        hamburger?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            hamburger.classList.toggle('active');
-            mobileDrawer.classList.toggle('active');
-            drawerOverlay.classList.toggle('active');
-            document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-        });
-        drawerOverlay?.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            mobileDrawer.classList.remove('active');
-            drawerOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-        document.querySelectorAll('.mobile-nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                mobileDrawer.classList.remove('active');
-                drawerOverlay.classList.remove('active');
+        function closeNotificationDropdown() {
+            document.getElementById('notificationDropdown')?.classList.add('hidden');
+            document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
+        }
+
+        window.toggleProfileDropdown = function() {
+            const isMobile = window.innerWidth < 1024;
+            document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown')?.classList.toggle('hidden');
+            closeNotificationDropdown();
+        };
+
+        function updateProfileUI(user) {
+            const photo = user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(studentData?.firstName || user?.displayName || 'User')}&background=3b82f6&color=fff&size=128`;
+            const name  = user?.displayName || `${studentData?.firstName||''} ${studentData?.lastName||''}`.trim() || 'Student';
+            const email = studentData?.email || user?.email || '';
+            ['profilePictureBtn','profilePictureBtnMobile','profileDropdownPicture','profileDropdownPictureMobile'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.src = photo;
+            });
+            ['profileDropdownName','profileDropdownNameMobile'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.textContent = name;
+            });
+            ['profileDropdownEmail','profileDropdownEmailMobile'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.textContent = email;
+            });
+        }
+
+        // ========== HAMBURGER ==========
+        function setupHamburger() {
+            const hamburger    = document.getElementById('hamburger');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+            const overlay      = document.getElementById('drawerOverlay');
+            hamburger?.addEventListener('click', e => {
+                e.stopPropagation();
+                hamburger.classList.toggle('active');
+                mobileDrawer.classList.toggle('active');
+                overlay.classList.toggle('active');
+                document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+            });
+            overlay?.addEventListener('click', () => {
+                hamburger.classList.remove('active'); mobileDrawer.classList.remove('active'); overlay.classList.remove('active');
                 document.body.style.overflow = '';
             });
-        });
-    }
+            document.querySelectorAll('.mobile-nav-link').forEach(l => l.addEventListener('click', () => {
+                hamburger.classList.remove('active'); mobileDrawer.classList.remove('active'); overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }));
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    hamburger?.classList.remove('active'); mobileDrawer?.classList.remove('active'); overlay?.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
 
-    // ========== LOGOUT ==========
-    window.handleLogout = function() {
-        const existing = document.getElementById('logoutOverlay');
-        if (existing) existing.remove();
+        // ========== LOGOUT ==========
+        window.handleLogout = function() {
+            const existing = document.getElementById('logoutOverlay'); if (existing) existing.remove();
+            const overlay = document.createElement('div');
+            overlay.id = 'logoutOverlay';
+            overlay.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-[99999] p-4';
+            overlay.innerHTML = `
+                <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center" style="animation:slideDown .35s cubic-bezier(.4,0,.2,1)">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                        <svg width="32" height="32" viewBox="0 0 48 48" fill="none"><path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/><path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div class="text-xl font-semibold text-gray-900 mb-1">Log Out</div>
+                    <div class="text-sm text-gray-500 mb-6 leading-relaxed">Are you sure you want to log out of your account?</div>
+                    <div class="h-px bg-gray-200 -mx-8 mb-5"></div>
+                    <div class="flex gap-3">
+                        <button id="logoutCancelBtn" class="flex-1 py-3 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-medium cursor-pointer hover:bg-gray-50 transition-colors">Cancel</button>
+                        <button id="logoutConfirmBtn" class="flex-1 py-3 rounded-full border-0 bg-red-500 text-white text-sm font-medium cursor-pointer hover:bg-red-600 transition-colors">Log Out</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+            document.getElementById('profileDropdown')?.classList.add('hidden');
+            document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+            document.getElementById('logoutCancelBtn').addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+            document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('logoutConfirmBtn');
+                btn.textContent = 'Logging out...'; btn.disabled = true; btn.style.opacity = '.7';
+                try { await signOut(auth); window.location.href = '../login/index.html'; }
+                catch(e) { overlay.remove(); alert('Error logging out. Please try again.'); }
+            });
+        };
 
-        const overlay = document.createElement('div');
-        overlay.id = 'logoutOverlay';
-        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:1rem;animation:fadeInLogout 0.2s ease;';
-        overlay.innerHTML = `
-            <div style="background:#fff;border-radius:24px;padding:2rem 1.5rem 1.5rem;max-width:360px;width:100%;box-shadow:0 8px 40px rgba(60,64,67,0.18);animation:slideUpLogout 0.35s cubic-bezier(.4,0,.2,1);text-align:center;font-family:'Inter',sans-serif;">
-                <div style="width:68px;height:68px;background:#fce8e6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;">
-                    <svg width="34" height="34" viewBox="0 0 48 48" fill="none"><path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/><path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/></svg>
-                </div>
-                <div style="font-size:1.25rem;font-weight:600;color:#202124;margin-bottom:0.35rem;">Log Out</div>
-                <div style="font-size:0.875rem;color:#5f6368;margin-bottom:1.5rem;line-height:1.5;">Are you sure you want to log out of your account?</div>
-                <div style="height:1px;background:#e8eaed;margin:0 -1.5rem 1.25rem;"></div>
-                <div style="display:flex;gap:0.75rem;">
-                    <button id="logoutCancelBtn" style="flex:1;padding:0.75rem 0.5rem;border-radius:100px;border:1.5px solid #dadce0;background:#fff;color:#3c4043;font-size:0.9375rem;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;min-height:48px;">Cancel</button>
-                    <button id="logoutConfirmBtn" style="flex:1;padding:0.75rem 0.5rem;border-radius:100px;border:none;background:#ea4335;color:#fff;font-size:0.9375rem;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;min-height:48px;">Log Out</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(overlay);
+        // ========== AUTH (show page immediately, parallel data load) ==========
+        onAuthStateChanged(auth, async user => {
+            if (user) {
+                currentUser = user;
+                // ✅ Show page immediately — no blocking
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
 
-        document.getElementById('logoutCancelBtn').addEventListener('click', () => overlay.remove());
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-        document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
-            const btn = document.getElementById('logoutConfirmBtn');
-            btn.textContent = 'Logging out...';
-            btn.disabled = true;
-            try {
-                await signOut(auth);
+                setupHamburger();
+
+                // ✅ Setup event listeners before data loads so UI is interactive
+                document.getElementById('notificationBellBtn')?.addEventListener('click', toggleNotificationDropdown);
+                document.getElementById('notificationBellBtnMobile')?.addEventListener('click', toggleNotificationDropdown);
+                document.getElementById('closeNotificationBtn')?.addEventListener('click', e => { e.stopPropagation(); closeNotificationDropdown(); });
+                document.getElementById('closeNotificationBtnMobile')?.addEventListener('click', e => { e.stopPropagation(); closeNotificationDropdown(); });
+                document.getElementById('profilePictureBtn')?.addEventListener('click', window.toggleProfileDropdown);
+                document.getElementById('profilePictureBtnMobile')?.addEventListener('click', window.toggleProfileDropdown);
+                document.addEventListener('click', e => {
+                    if (!e.target.closest('#notificationBellBtn') && !e.target.closest('#notificationBellBtnMobile') &&
+                        !e.target.closest('#notificationDropdown') && !e.target.closest('#notificationDropdownMobile')) closeNotificationDropdown();
+                    if (!e.target.closest('#profilePictureBtn') && !e.target.closest('#profilePictureBtnMobile') &&
+                        !e.target.closest('#profileDropdown') && !e.target.closest('#profileDropdownMobile')) {
+                        document.getElementById('profileDropdown')?.classList.add('hidden');
+                        document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+                    }
+                });
+
+                // ✅ Load student data first (needed for section), then notifications
+                await fetchStudentData(user);
+                updateProfileUI(user);
+                await loadAllNotifications();
+            } else {
                 window.location.href = '../login/index.html';
-            } catch (e) {
-                overlay.remove();
-                alert('Error logging out. Please try again.');
             }
         });
-    };
-    window.addEventListener('pagehide', () => {
-        if (unsubscribeNotifications) unsubscribeNotifications();
-    });
+
+        window.addEventListener('pagehide', () => {
+            if (unsubscribeNotifications) unsubscribeNotifications();
+        });
     </script>
 </body>
 </html>

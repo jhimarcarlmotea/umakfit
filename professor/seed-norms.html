@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMakFit — Seed Fitness Norms</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'DM Sans', sans-serif; }
+        body { margin: 0; min-height: 100vh; background: #0a1628; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .card { background: white; border-radius: 20px; padding: 40px; max-width: 560px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .logo { font-size: 28px; font-weight: 800; color: #c8a84b; letter-spacing: 2px; margin-bottom: 4px; }
+        .subtitle { font-size: 13px; color: #8a98ae; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 32px; }
+        h2 { font-size: 22px; font-weight: 700; color: #0a1628; margin: 0 0 8px; }
+        p { color: #4a5a72; font-size: 14px; line-height: 1.6; margin: 0 0 24px; }
+        .warning { background: #fef3d4; border: 1px solid #c8a84b; border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #7a5a10; margin-bottom: 24px; display: flex; gap: 10px; align-items: flex-start; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: linear-gradient(135deg, #1e4d8c, #2d6fc4); color: white; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(30,77,140,0.35); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .log-box { margin-top: 24px; background: #0a1628; border-radius: 12px; padding: 16px; max-height: 280px; overflow-y: auto; font-family: 'DM Mono', monospace; font-size: 12px; display: none; }
+        .log-line { padding: 2px 0; }
+        .log-line.ok   { color: #4ade80; }
+        .log-line.info { color: #93c5fd; }
+        .log-line.done { color: #c8a84b; font-weight: 700; font-size: 14px; margin-top: 8px; }
+        .log-line.err  { color: #f87171; }
+        .progress { margin-top: 16px; background: #e1e6ef; border-radius: 100px; height: 8px; overflow: hidden; display: none; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #1e4d8c, #2d6fc4); border-radius: 100px; transition: width 0.3s; width: 0%; }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+        .badge-idle    { background: #f1f5f9; color: #64748b; }
+        .badge-running { background: #dbeafe; color: #1e40af; }
+        .badge-done    { background: #d1fae5; color: #065f46; }
+        .badge-error   { background: #fee2e2; color: #991b1b; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+        .dot.spin { animation: pulse 1s ease-in-out infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="logo">UMakFit</div>
+    <div class="subtitle">Database Seeder</div>
+
+    <h2>Seed Fitness Norms</h2>
+    <p>This will write <strong>32 default norm documents</strong> into your Firestore <code>fitnessNorms</code> collection — one for each combination of test type, gender, and age group.</p>
+
+    <div class="warning">
+        ⚠️ <span>Run this <strong>once only</strong>. Running it again is safe (it will just overwrite with the same values), but it's unnecessary.</span>
+    </div>
+
+    <div class="status-badge badge-idle" id="statusBadge">
+        <div class="dot"></div> <span id="statusText">Ready</span>
+    </div>
+
+    <button class="btn btn-primary" id="seedBtn" onclick="runSeed()">
+        🌱 Run Seed Norms
+    </button>
+
+    <div class="progress" id="progressWrap">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="log-box" id="logBox"></div>
+</div>
+
+<script type="module">
+    import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+        authDomain: "umakfit-e3b1d.firebaseapp.com",
+        projectId: "umakfit-e3b1d",
+        storageBucket: "umakfit-e3b1d.appspot.com",
+        messagingSenderId: "276569891504",
+        appId: "1:276569891504:web:39b1732b519f4d8b785175"
+    };
+
+    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    const NORMS = {
+        pushup: {
+            label: 'Push-Up Test', unit: 'reps', lowerIsBetter: false,
+            male:   { '15-18':{Excellent:40,Good:31,Average:21,'Below Average':11}, '19-22':{Excellent:38,Good:28,Average:18,'Below Average':9}, '23-26':{Excellent:35,Good:25,Average:16,'Below Average':8}, '27-30':{Excellent:32,Good:23,Average:14,'Below Average':6} },
+            female: { '15-18':{Excellent:25,Good:19,Average:13,'Below Average':7}, '19-22':{Excellent:23,Good:17,Average:11,'Below Average':6}, '23-26':{Excellent:20,Good:15,Average:9,'Below Average':5}, '27-30':{Excellent:18,Good:13,Average:8,'Below Average':4} },
+        },
+        curlup: {
+            label: 'Curl-Up Test', unit: 'reps', lowerIsBetter: false,
+            male:   { '15-18':{Excellent:50,Good:41,Average:31,'Below Average':21}, '19-22':{Excellent:47,Good:38,Average:28,'Below Average':19}, '23-26':{Excellent:44,Good:35,Average:25,'Below Average':17}, '27-30':{Excellent:40,Good:32,Average:22,'Below Average':15} },
+            female: { '15-18':{Excellent:45,Good:36,Average:26,'Below Average':16}, '19-22':{Excellent:42,Good:34,Average:24,'Below Average':15}, '23-26':{Excellent:39,Good:31,Average:21,'Below Average':13}, '27-30':{Excellent:36,Good:28,Average:19,'Below Average':11} },
+        },
+        sitreach: {
+            label: 'Sit-and-Reach Test', unit: 'cm', lowerIsBetter: false,
+            male:   { '15-18':{Excellent:38,Good:33,Average:26,'Below Average':18}, '19-22':{Excellent:37,Good:32,Average:25,'Below Average':17}, '23-26':{Excellent:35.5,Good:30.5,Average:23.5,'Below Average':15.5}, '27-30':{Excellent:34,Good:29,Average:22,'Below Average':14} },
+            female: { '15-18':{Excellent:39,Good:34,Average:27,'Below Average':19}, '19-22':{Excellent:38,Good:33,Average:26,'Below Average':18}, '23-26':{Excellent:37,Good:32,Average:25,'Below Average':17}, '27-30':{Excellent:36,Good:31,Average:24,'Below Average':16} },
+        },
+        steptest: {
+            label: '3-Minute Step Test', unit: 'bpm', lowerIsBetter: true,
+            male:   { '15-18':{Excellent:84,Good:97,Average:108,'Below Average':118}, '19-22':{Excellent:79,Good:89,Average:105,'Below Average':116}, '23-26':{Excellent:80,Good:90,Average:106,'Below Average':117}, '27-30':{Excellent:81,Good:91,Average:107,'Below Average':118} },
+            female: { '15-18':{Excellent:89,Good:103,Average:113,'Below Average':124}, '19-22':{Excellent:85,Good:98,Average:109,'Below Average':118}, '23-26':{Excellent:86,Good:99,Average:110,'Below Average':119}, '27-30':{Excellent:88,Good:101,Average:112,'Below Average':121} },
+        },
+    };
+
+    function log(msg, type='ok') {
+        const box = document.getElementById('logBox');
+        box.style.display = 'block';
+        const line = document.createElement('div');
+        line.className = `log-line ${type}`;
+        line.textContent = msg;
+        box.appendChild(line);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function setStatus(text, type) {
+        const badge = document.getElementById('statusBadge');
+        const dot   = badge.querySelector('.dot');
+        const span  = document.getElementById('statusText');
+        badge.className = `status-badge badge-${type}`;
+        dot.className   = `dot${type==='running'?' spin':''}`;
+        span.textContent = text;
+    }
+
+    window.runSeed = async function() {
+        const btn = document.getElementById('seedBtn');
+
+        // Check auth
+        const user = auth.currentUser;
+        if (!user) {
+            log('❌ Not logged in! Please log in first via professor.html, then come back here.', 'err');
+            setStatus('Not authenticated', 'error');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = '⏳ Seeding…';
+        setStatus('Running…', 'running');
+
+        const progressWrap = document.getElementById('progressWrap');
+        const progressBar  = document.getElementById('progressBar');
+        progressWrap.style.display = 'block';
+
+        const genders   = ['male', 'female'];
+        const ageGroups = ['15-18', '19-22', '23-26', '27-30'];
+        const total     = Object.keys(NORMS).length * genders.length * ageGroups.length;
+        let count = 0;
+
+        log(`👤 Logged in as: ${user.email}`, 'info');
+        log(`📦 Writing ${total} documents to fitnessNorms…`, 'info');
+
+        try {
+            for (const [testKey, testData] of Object.entries(NORMS)) {
+                for (const gender of genders) {
+                    for (const ageGroup of ageGroups) {
+                        const docId = `${testKey}_${gender}_${ageGroup}`;
+                        await setDoc(doc(db, 'fitnessNorms', docId), {
+                            testKey,
+                            testName:      testData.label,
+                            gender,
+                            ageGroup,
+                            thresholds:    testData[gender][ageGroup],
+                            lowerIsBetter: testData.lowerIsBetter,
+                            unit:          testData.unit,
+                            updatedAt:     new Date().toISOString(),
+                            isDefault:     true,
+                        });
+                        count++;
+                        progressBar.style.width = `${(count / total) * 100}%`;
+                        log(`✅ Seeded: ${docId}`);
+                    }
+                }
+            }
+            log(``, 'info');
+            log(`🎉 Done! Seeded ${count} documents into fitnessNorms.`, 'done');
+            setStatus(`Done — ${count} docs written`, 'done');
+            btn.textContent = '✅ Seeding Complete';
+        } catch (err) {
+            log(`❌ Error: ${err.message}`, 'err');
+            setStatus('Error — check console', 'error');
+            btn.disabled = false;
+            btn.textContent = '🔁 Retry';
+        }
+    };
+
+    // Check login state on load
+    onAuthStateChanged(auth, user => {
+        if (!user) {
+            document.getElementById('statusBadge').className = 'status-badge badge-error';
+            document.getElementById('statusText').textContent = 'Not logged in';
+            document.getElementById('seedBtn').disabled = true;
+            document.getElementById('seedBtn').textContent = '🔒 Login Required';
+            const logBox = document.getElementById('logBox');
+            logBox.style.display = 'block';
+            const line = document.createElement('div');
+            line.className = 'log-line err';
+            line.textContent = '⚠️ You must be logged in. Open professor.html first, then return here.';
+            logBox.appendChild(line);
+        }
+    });
+</script>
+</body>
+</html>

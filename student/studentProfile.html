@@ -9,896 +9,165 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;800&display=swap" rel="stylesheet">
     <style>
-    * {
-        font-family: 'Inter', sans-serif;
-        box-sizing: border-box;
-        -webkit-font-smoothing: antialiased;
-    }
-    
-    body {
-        background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
-        margin: 0;
-        padding: 0;
-    }
-    
-        /* Navigation */
-        .navbar-custom {
-            background: linear-gradient(180deg, rgba(30, 58, 138, 1) 0%, rgba(59, 130, 246, 1) 100%);
-            padding: 20px 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-bottom: none;
-            height: auto;
-        }
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        .font-manrope { font-family: 'Manrope', sans-serif; }
 
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin: 0;
-            padding: 0;
-        }
+        @keyframes spin      { 0%   { transform: rotate(0deg);   } 100% { transform: rotate(360deg); } }
+        @keyframes pulse     { 0%,100% { transform: scale(1);    } 50%  { transform: scale(1.1);     } }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes slide-in  { from { transform:translateX(400px); opacity:0; } to { transform:translateX(0); opacity:1; } }
 
-        .navbar-brand-img {
-            height: 60px;
-            width: auto;
-            object-fit: contain;
-        }
+        .slide-down      { animation: slideDown 0.3s ease; }
+        .animate-slide-in{ animation: slide-in 0.3s ease-out; }
 
-        .navbar-brand-text {
-            font-family: "Manrope", Helvetica;
-            font-weight: 800;
-            font-size: 28px;
-            background: linear-gradient(90deg, rgba(245, 158, 11, 1) 0%, rgba(255, 229, 0, 1) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
-        }
-
-        .nav-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .nav-pills-custom {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 0;
-            margin: 0;
-            list-style: none;
-        }
-
-        .nav-link-custom {
-            font-family: "Manrope", Helvetica;
-            font-weight: 600;
-            color: #000000;
-            font-size: 14px;
-            padding: 12px 18px;
-            border-radius: 8px;
-            background-color: #ffffff;
-            transition: all 0.3s;
-            border: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            text-decoration: none;
-        }
-
-        .nav-link-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            color: #000000;
-        }
-
-        .nav-link-custom i {
-            font-size: 14px;
-        }
-
-        .nav-link-custom.active {
-            background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%);
-            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
-        }
-
-        .notification-bell-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            width: 42px;
-            height: 42px;
+        .spinner {
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #3b82f6;
             border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 0;
+            width: 50px; height: 50px;
+            animation: spin 1s linear infinite;
         }
 
-        .notification-bell-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: scale(1.1);
-        }
-
-        .notification-bell-btn i {
-            font-size: 20px;
-        }
-
-        .btn-logout-nav {
-            background: linear-gradient(90deg, rgba(251, 191, 36, 1) 0%, rgba(245, 158, 11, 1) 100%);
-            border: none;
-            color: #000000;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-family: "Manrope", Helvetica;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-logout-nav:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4);
-        }
-
+        /* Notification bell badge */
         .notification-bell-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #ef4444;
-            color: white;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 0.15rem 0.4rem;
-            border-radius: 10px;
-            min-width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: absolute; top: -4px; right: -4px;
+            background: #ef4444; color: white;
+            font-size: 10px; font-weight: 700;
+            padding: .15rem .4rem; border-radius: 10px;
+            min-width: 18px; height: 18px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,.3);
             animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .notification-bell-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .notification-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            width: 380px;
-            max-height: 480px;
-            overflow-y: auto;
-            z-index: 1050;
-            display: none;
-            margin-top: 0.5rem;
-            animation: slideDown 0.3s ease;
-        }
-
-        .notification-dropdown.show {
-            display: block;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .notification-dropdown-header {
-            padding: 1rem 1.25rem;
-            border-bottom: 2px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(135deg, #f8fafc, #ffffff);
-            border-radius: 12px 12px 0 0;
-        }
-
-        .notification-dropdown-header h6 {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 700;
-            color: #111827;
-        }
-
-        .notification-dropdown-body {
-            max-height: 360px;
-            overflow-y: auto;
-        }
-
-        .notification-dropdown-item {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid #f3f4f6;
-            transition: background-color 0.2s ease;
-            cursor: pointer;
-        }
-
-        .notification-dropdown-item:hover {
-            background-color: #f9fafb;
-        }
-
-        .notification-dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .notification-dropdown-item strong {
-            color: #111827;
-            font-size: 14px;
-            display: block;
-            margin-bottom: 0.35rem;
-            font-weight: 600;
-        }
-
-        .notification-dropdown-item p {
-            color: #6b7280;
-            font-size: 13px;
-            margin: 0;
-            line-height: 1.5;
-        }
-
-        .notification-dropdown-item small {
-            color: #9ca3af;
-            font-size: 11px;
-            display: block;
-            margin-top: 0.35rem;
-        }
-
-        .notification-dropdown-footer {
-            padding: 0.75rem 1.25rem;
-            border-top: 2px solid #e5e7eb;
-            text-align: center;
-            background-color: #f9fafb;
-            border-radius: 0 0 12px 12px;
-        }
-
-        .btn-view-all-dropdown {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
-            border: none;
-            padding: 0.5rem 1.25rem;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .btn-view-all-dropdown:hover {
-            background: linear-gradient(135deg, #2563eb, #1e40af);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-        }
-
-        .notification-dropdown-empty {
-            padding: 2rem 1.25rem;
-            text-align: center;
-            color: #9ca3af;
-        }
-
-        .notification-dropdown-empty i {
-            font-size: 48px;
-            color: #d1d5db;
-            margin-bottom: 0.75rem;
-            display: block;
-        }
-
-        .notification-dropdown-empty p {
-            color: #6b7280;
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .navbar-toggler {
-            background-color: #ffffff;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-        }
-
-        .navbar-toggler:focus {
-            box-shadow: 0 0 0 0.25rem rgba(255,255,255,0.25);
-        }
-
-        .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0,0,0,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
-        }
-            @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .slide-down {
-            animation: slideDown 0.3s ease;
-        }
-
-        /* Ensure dropdown z-index is high enough */
-        #profileDropdown,
-        #profileDropdownMobile,
-        #notificationDropdown,
-        #notificationDropdownMobile {
-            z-index: 9999 !important;
-        }
-
-   
-        .profile-title {
-        font-family: "Inter", sans-serif;
-        font-weight: 600;
-        color: #0f172a;
-        font-size: 2rem;
-        line-height: 1.3;
-        letter-spacing: -0.5px;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
-        text-align: left;
-        position: relative;
-        padding-left: 1rem;
-        border-left: 4px solid #3b82f6;
-    }
-
-    .profile-title::after {
-        content: "";
-        display: block;
-        width: 80px;
-        height: 2px;
-        background: linear-gradient(90deg, #3b82f6, transparent);
-        margin-top: 0.75rem;
-        border-radius: 2px;
-    }
-
-
-    
-    .profile-sidebar {
-        background-color: #ffffff;
-        border-radius: 8px;
-        padding: 2rem 1.5rem;
-    }
-    
-    .profile-avatar {
-    width: 120px;
-    height: 120px;
-    background-color: transparent;
-    border-radius: 50%;
-    margin: 0 auto 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    border: 3px solid #3b82f6;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .profile-avatar i {
-        font-size: 82px;
-        color: #666;
-    }
-
-    .profile-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    .profile-name {
-        font-family: 'Inter', Helvetica;
-        font-weight: 600;
-        color: #000000;
-        font-size: 18px;
-        letter-spacing: -0.18px;
-        line-height: 25.2px;
-        text-align: center;
-        margin-bottom: 0.5rem;
-    }
-    
-    .profile-id {
-        font-family: 'Inter', Helvetica;
-        font-weight: 400;
-        color: #000000;
-        font-size: 13px;
-        letter-spacing: -0.13px;
-        line-height: 18.2px;
-        text-align: center;
-        margin-bottom: 1.5rem;
-    }
-    
-    .profile-section-badge {
-        background-color: #1e3a8a;
-        border-radius: 18px;
-        padding: 0.5rem 1rem;
-        color: #ffffff;
-        font-family: 'Inter', Helvetica;
-        font-weight: 400;
-        font-size: 12px;
-        letter-spacing: -0.12px;
-        line-height: 16.8px;
-        text-align: center;
-        margin: 0 auto 1.5rem;
-    }
-    
-    .profile-info-item {
-        border-top: 1px solid #e0e0e0;
-        padding: 1rem 0;
-    }
-    
-    .profile-info-label {
-        font-family: 'Inter', Helvetica;
-        font-weight: 400;
-        color: rgba(0, 0, 0, 0.5);
-        font-size: 8px;
-        letter-spacing: -0.08px;
-        line-height: 11.2px;
-        text-transform: uppercase;
-        margin-bottom: 0.25rem;
-    }
-    
-    .profile-info-value {
-        font-family: 'Inter', Helvetica;
-        font-weight: 400;
-        color: #000000;
-        font-size: 11px;
-        letter-spacing: -0.11px;
-        line-height: 15.4px;
-    }
-    
-    .medical-condition-box {
-        background-color: #ffffff;
-        border: 1px solid #1e3a8a;
-        border-radius: 2px;
-        padding: 1rem;
-        min-height: 83px;
-        margin-top: 1rem;
-    }
-    
-    .edit-profile-btn {
-        background: linear-gradient(90deg, rgba(18, 27, 103, 1) 0%, rgba(59, 130, 246, 1) 100%);
-        color: #ffffff;
-        border: none;
-        border-radius: 7px;
-        padding: 0.5rem;
-        width: 100%;
-        font-family: 'Inter', Helvetica;
-        font-weight: 400;
-        font-size: 14px;
-        letter-spacing: -0.14px;
-        line-height: 19.6px;
-        margin-top: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .edit-profile-btn:hover {
-        opacity: 0.9;
-        transform: translateY(-2px);
-    }
-    
-    .physiological-card,
-    .test-history-card {
-        background-color: #ffffff;
-        border-radius: 7px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        overflow: hidden;
-    }
-    
-    .card-title-custom {
-        font-family: 'Inter', Helvetica;
-        font-weight: 600;
-        color: #000000;
-        font-size: 18px;
-        letter-spacing: -0.18px;
-        line-height: 25.2px;
-        margin-bottom: 1.5rem;
-    }
-    
-    .physio-box {
-        background-color: #eceff8;
-        border: 1px solid #9f9f9f;
-        border-radius: 6px;
-        padding: 1.5rem;
-        text-align: center;
-    }
-    
-    .physio-icon {
-        width: 45px;
-        height: 45px;
-        margin-bottom: 0.5rem;
-        object-fit: cover;
-    }
-    
-    .physio-label {
-        font-family: 'Inter', Helvetica;
-        font-weight: 400;
-        color: #000000;
-        font-size: 13px;
-        letter-spacing: -0.13px;
-        line-height: 18.2px;
-        margin-bottom: 0.5rem;
-    }
-    
-    .physio-value {
-        font-family: 'Inter', Helvetica;
-        font-weight: 700;
-        color: #000000;
-        font-size: 24px;
-        letter-spacing: -0.24px;
-        line-height: 33.6px;
-    }
-    
-    .physio-unit {
-        font-size: 13px;
-        font-weight: 400;
-        letter-spacing: -0.13px;
-        line-height: 18.2px;
-    }
         /* Notification dropdown scrollbar */
         #notificationDropdown::-webkit-scrollbar,
         #notificationDropdownMobile::-webkit-scrollbar,
         #notificationDropdownBody::-webkit-scrollbar,
         #notificationDropdownBodyMobile::-webkit-scrollbar { width: 6px; }
-
         #notificationDropdown::-webkit-scrollbar-track,
         #notificationDropdownMobile::-webkit-scrollbar-track,
         #notificationDropdownBody::-webkit-scrollbar-track,
         #notificationDropdownBodyMobile::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-
         #notificationDropdown::-webkit-scrollbar-thumb,
         #notificationDropdownMobile::-webkit-scrollbar-thumb,
         #notificationDropdownBody::-webkit-scrollbar-thumb,
         #notificationDropdownBodyMobile::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
-
         #notificationDropdown::-webkit-scrollbar-thumb:hover,
         #notificationDropdownMobile::-webkit-scrollbar-thumb:hover,
         #notificationDropdownBody::-webkit-scrollbar-thumb:hover,
         #notificationDropdownBodyMobile::-webkit-scrollbar-thumb:hover { background: #2563eb; }
-    .test-history-table {
-        width: 100%;
-    }
-    
-    .test-history-header {
-        background-color: #eceff8;
-        border: 1px solid #9f9f9f;
-    }
-    
-    .test-history-header th {
-        font-family: 'Inter', Helvetica;
-        font-weight: 600;
-        color: #000000;
-        font-size: 18px;
-        letter-spacing: -0.18px;
-        line-height: 25.2px;
-        padding: 1rem;
-    }
-    
-    .test-history-row {
-        border-bottom: 2px solid #e0e0e0;
-    }
-    
-    .test-history-cell {
-        font-family: 'Inter', Helvetica;
-        font-weight: 600;
-        color: #000000;
-        font-size: 18px;
-        letter-spacing: -0.18px;
-        line-height: 25.2px;
-        padding: 1rem;
-    }
-    
-    .test-badge {
-        padding: 0.25rem 0.75rem;
-        border-radius: 14px;
-        font-family: 'Inter', Helvetica;
-        font-weight: 600;
-        font-size: 11px;
-        letter-spacing: 0;
-        line-height: 17.4px;
-        display: inline-block;
-    }
-    
-    .badge-excellent {
-        background-color: #a4fbb1;
-        color: #000000;
-    }
-    
-    .badge-good {
-        background-color: #3b82f6;
-        color: #000000;
-    }
-    
-    .badge-needs-improvement {
-        background-color: #fbbf24;
-        color: #000000;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1.5rem;
-        color: #64748b;
-    }
-    
-    .empty-state i {
-        font-size: 56px;
-        color: #cbd5e1;
-        margin-bottom: 1rem;
-    }
-    
-    /* Footer responsive fix */
-    @media (min-width: 768px) {
-        .footer-custom .container-fluid {
-            max-width: 100%;
-            padding-left: 2rem;
-            padding-right: 2rem;
+
+        /* Hamburger */
+        .hamburger { display:none; flex-direction:column; gap:4px; cursor:pointer; z-index:60; }
+        .hamburger span { width:25px; height:3px; background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%); border-radius:2px; transition:all .3s ease; }
+        .hamburger.active span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+        .hamburger.active span:nth-child(2) { opacity:0; }
+        .hamburger.active span:nth-child(3) { transform:rotate(-45deg) translate(7px,-6px); }
+        @media (max-width:1023px) { .hamburger { display:flex; } }
+
+        /* Mobile Drawer */
+        .mobile-drawer { position:fixed; top:0; right:-100%; width:280px; height:100vh; background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%); z-index:55; transition:right .3s ease; box-shadow:-5px 0 15px rgba(0,0,0,.3); overflow-y:auto; }
+        .mobile-drawer.active { right:0; }
+        .drawer-overlay { position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,.5); z-index:50; opacity:0; visibility:hidden; transition:opacity .3s ease,visibility .3s ease; }
+        .drawer-overlay.active { opacity:1; visibility:visible; }
+
+        /* Notification dropdown mobile width */
+        @media (max-width:1023px) {
+            #notificationDropdown, #notificationDropdownMobile { width: calc(100vw - 2rem); right:0; left:auto; }
         }
-    }
 
-    @media (min-width: 992px) {
-        .footer-custom .container-fluid {
-            max-width: 100%;
-            padding-left: 3rem;
-            padding-right: 3rem;
-        }
-    }
-
-    @media (min-width: 1200px) {
-        .footer-custom .container-fluid {
-            max-width: 100%;
-            padding-left: 4rem;
-            padding-right: 4rem;
-        }
-    }
-    
-    .loading {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255,255,255,0.98);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        flex-direction: column;
-        gap: 20px;
-    }
-    
-    .spinner {
-        border: 4px solid #e5e7eb;
-        border-top: 4px solid #3b82f6;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-   @media (max-width: 991px) {
-        .nav-link-custom {
-            width: 100%;
-            justify-content: flex-start;
-        }
-        
-        .btn-logout-nav {
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .notification-bell-container {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-    }
-    
-    @keyframes slide-in {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-
-    .animate-slide-in {
-        animation: slide-in 0.3s ease-out;
-    }
-    
-    /* Hamburger Menu Styles */
-    .hamburger {
-        display: none;
-        flex-direction: column;
-        gap: 4px;
-        cursor: pointer;
-        z-index: 60;
-    }
-
-    .hamburger span {
-        width: 25px;
-        height: 3px;
-        background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-        border-radius: 2px;
-        transition: all 0.3s ease;
-    }
-
-    .hamburger.active span:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 5px);
-    }
-
-    .hamburger.active span:nth-child(2) {
-        opacity: 0;
-    }
-
-    .hamburger.active span:nth-child(3) {
-        transform: rotate(-45deg) translate(7px, -6px);
-    }
-
-    /* Mobile Drawer */
-    .mobile-drawer {
-        position: fixed;
-        top: 0;
-        right: -100%;
-        width: 280px;
-        height: 100vh;
-        background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
-        z-index: 55;
-        transition: right 0.3s ease;
-        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-        overflow-y: auto;
-    }
-
-    .mobile-drawer.active {
-        right: 0;
-    }
-
-    .drawer-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 50;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .drawer-overlay.active {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    @media (max-width: 1023px) {
-        .hamburger {
-            display: flex;
-        }
-        
-        .notification-dropdown {
-            width: calc(100vw - 2rem);
-            right: 0;
-            left: auto;
-        }
-    }
+        /* dropdown empty state style */
+        .notification-dropdown-empty { padding: 2rem 1.5rem; text-align: center; color: #9ca3af; }
+        .notification-dropdown-empty i { font-size: 3rem; margin-bottom: 0.75rem; display: block; }
+        .notification-dropdown-empty p { color: #6b7280; font-size: 0.9rem; }
+        .notification-dropdown-item { padding: 1rem 1.25rem; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.2s; }
+        .notification-dropdown-item:hover { background: #f9fafb; }
+        .notification-dropdown-item strong { font-size: 0.9rem; color: #111827; display: block; margin-bottom: 0.2rem; }
+        .notification-dropdown-item p { font-size: 0.8rem; color: #4b5563; margin-bottom: 0.25rem; line-height: 1.4; }
+        .notification-dropdown-item small { font-size: 0.7rem; color: #9ca3af; }
     </style>
 </head>
-<body>
-<!-- Loading Screen -->
-<div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
-    <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
-    <div class="spinner"></div>
-    <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Profile...</div>
-</div>
+<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen">
 
-    <div id="mainContent" style="display: none;">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
+        <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
+        <div class="spinner"></div>
+        <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Profile...</div>
+    </div>
+
+    <div id="mainContent" style="display:none;">
+
         <!-- Navigation -->
-        <nav class="shadow-lg" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
+        <nav class="shadow-lg" style="background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%);">
             <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
                 <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+
                     <!-- Logo -->
                     <a href="./studentDashboard.html" class="flex items-center gap-2 sm:gap-3">
-                        <img src="UMakfit Logo (2).png" 
-                             alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
-                       <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                        <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
+                        <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope"
+                              style="background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
                             UMakFit
                         </span>
                     </a>
-                    
+
                     <!-- Desktop Navigation -->
                     <div class="hidden lg:flex items-center gap-2 flex-wrap">
                         <a href="./studentDashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-speedometer2"></i> 
-                            <span class="hidden xl:inline">Dashboard</span>
+                            <i class="bi bi-speedometer2"></i><span class="hidden xl:inline">Dashboard</span>
                         </a>
                         <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-clipboard-check"></i> 
-                            <span class="hidden xl:inline">Test</span>
+                            <i class="bi bi-clipboard-check"></i><span class="hidden xl:inline">Test</span>
                         </a>
                         <a href="./studentlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-book"></i> 
-                            <span class="hidden xl:inline">Lesson</span>
+                            <i class="bi bi-book"></i><span class="hidden xl:inline">Lesson</span>
                         </a>
-                       <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                    <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
-                </a>
+                        <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                            <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
+                        </a>
                         <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-graph-up"></i> 
-                            <span class="hidden xl:inline">Progress</span>
+                            <i class="bi bi-graph-up"></i><span class="hidden xl:inline">Progress</span>
                         </a>
                         <a href="./achievements.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-trophy"></i> 
-                            <span class="hidden xl:inline">Achievements</span>
+                            <i class="bi bi-trophy"></i><span class="hidden xl:inline">Achievements</span>
                         </a>
-                        
-                        <!-- Notification Bell - Desktop -->
+
+                        <!-- Notification Bell Desktop -->
                         <div class="relative">
-                            <button id="notificationBellBtn" 
-                                    class="w-9 h-9 xl:w-10 xl:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
+                            <button id="notificationBellBtn"
+                                    class="relative w-9 h-9 xl:w-10 xl:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
                                 <i class="bi bi-bell-fill text-base xl:text-lg"></i>
                                 <span id="navNotificationCount" class="notification-bell-badge hidden">0</span>
                             </button>
-                            
-                            <!-- Notification Dropdown - Desktop -->
-                            <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl z-[9999] slide-down max-h-[480px] overflow-y-auto">
-                                <div class="p-3 sm:p-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center rounded-t-xl sticky top-0 z-10">
+
+                            <!-- Notification Dropdown Desktop -->
+                            <div id="notificationDropdown"
+                                 class="hidden absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl z-[9999] slide-down max-h-[480px] overflow-y-auto">
+                                <div class="sticky top-0 z-10 p-3 sm:p-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center rounded-t-xl">
                                     <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2"><i class="bi bi-bell-fill text-blue-500"></i> Notifications</h6>
                                     <button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button>
                                 </div>
                                 <div id="notificationDropdownBody" class="max-h-96 overflow-y-auto">
-                                    <div class="p-6 sm:p-8 text-center text-gray-400"><i class="bi bi-bell-slash text-4xl sm:text-5xl mb-3 block"></i><p class="text-gray-600 text-sm sm:text-base">No notifications yet</p></div>
+                                    <!-- dynamic content -->
                                 </div>
-                                <div class="p-2 sm:p-3 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0">
-                                    <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">View All Notifications</button>
+                                <div class="sticky bottom-0 p-2 sm:p-3 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl">
+                                    <button onclick="window.location.href='./notification.html'"
+                                            class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
+                                        View All Notifications
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                                    
-                        <!-- Profile Dropdown -->
+
+                        <!-- Profile Dropdown Desktop -->
                         <div class="relative">
                             <img src="" alt="Profile" id="profilePictureBtn"
-                                class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
-                            
+                                 class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
                             <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
                                 <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                                    <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-[3px] border-blue-500 object-cover">
                                     <h6 id="profileDropdownName" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
                                     <p id="profileDropdownEmail" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
                                 </div>
@@ -908,7 +177,7 @@
                                         <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
                                     </a>
                                     <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                    <div onclick="window.handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
                                         <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
                                         <span class="font-medium text-sm sm:text-base">Logout</span>
                                     </div>
@@ -921,36 +190,36 @@
                     <div class="flex lg:hidden items-center gap-2 sm:gap-3">
                         <!-- Mobile Notification Bell -->
                         <div class="relative">
-                            <button id="notificationBellBtnMobile" 
-                                    class="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
+                            <button id="notificationBellBtnMobile"
+                                    class="relative w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
                                 <i class="bi bi-bell-fill text-base sm:text-lg"></i>
                                 <span id="navNotificationCountMobile" class="notification-bell-badge hidden">0</span>
                             </button>
-                            
-                            <!-- Mobile Notification Dropdown -->
-                            <div id="notificationDropdownMobile" class="hidden fixed right-2 left-2 top-20 bg-white rounded-xl shadow-2xl z-[9999] slide-down max-h-[calc(100vh-6rem)] overflow-y-auto">
-                                <div class="p-3 sm:p-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center rounded-t-xl sticky top-0 z-10">
+                            <div id="notificationDropdownMobile"
+                                 class="hidden fixed right-2 left-2 top-20 bg-white rounded-xl shadow-2xl z-[9999] slide-down max-h-[calc(100vh-6rem)] overflow-y-auto">
+                                <div class="sticky top-0 z-10 p-3 sm:p-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center rounded-t-xl">
                                     <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2"><i class="bi bi-bell-fill text-blue-500"></i> Notifications</h6>
                                     <button id="closeNotificationBtnMobile" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button>
                                 </div>
                                 <div id="notificationDropdownBodyMobile" class="max-h-96 overflow-y-auto">
-                                    <div class="p-6 sm:p-8 text-center text-gray-400"><i class="bi bi-bell-slash text-4xl sm:text-5xl mb-3 block"></i><p class="text-gray-600 text-sm sm:text-base">No notifications yet</p></div>
+                                    <!-- dynamic content -->
                                 </div>
-                                <div class="p-2 sm:p-3 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0">
-                                    <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">View All Notifications</button>
+                                <div class="sticky bottom-0 p-2 sm:p-3 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl">
+                                    <button onclick="window.location.href='./notification.html'"
+                                            class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
+                                        View All Notifications
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Mobile Profile -->
                         <div class="relative">
                             <img src="" alt="Profile" id="profilePictureBtnMobile"
-                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
-                            
-                            <!-- Mobile Profile Dropdown -->
+                                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
                             <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
                                 <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-[3px] border-blue-500 object-cover">
                                     <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
                                     <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
                                 </div>
@@ -960,20 +229,16 @@
                                         <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
                                     </a>
                                     <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                    <div onclick="window.handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
                                         <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
                                         <span class="font-medium text-sm sm:text-base">Logout</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Hamburger Menu Button -->
-                        <div class="hamburger" id="hamburger">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
+
+                        <!-- Hamburger -->
+                        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
                     </div>
                 </div>
             </div>
@@ -985,42 +250,29 @@
         <!-- Mobile Drawer -->
         <div class="mobile-drawer" id="mobileDrawer">
             <div class="p-6 pt-8">
-                <!-- Drawer Header -->
                 <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
-                    <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
-                         alt="UMak Logo" class="h-12 w-auto object-contain">
-                    <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                    <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
+                    <span class="text-2xl font-extrabold font-manrope"
+                          style="background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
                         UMakFIT
                     </span>
                 </div>
-
-                <!-- Navigation Links -->
                 <nav class="space-y-2">
-                    <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-speedometer2 mr-3"></i>Dashboard
-                    </a>
-                    <a href="./test.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-clipboard-check mr-3"></i>Test
-                    </a>
-                    <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-book mr-3"></i>Lessons
-                    </a>
-                    <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-award mr-3"></i>Grades
-                    </a>
-                    <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-graph-up mr-3"></i>Progress
-                    </a>
-                    <a href="./achievements.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-trophy mr-3"></i>Achievements
-                    </a>
+                    <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-speedometer2 mr-3"></i>Dashboard</a>
+                    <a href="./test.html"             class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-clipboard-check mr-3"></i>Test</a>
+                    <a href="./studentlesson.html"    class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-book mr-3"></i>Lessons</a>
+                    <a href="./studentgrades.html"    class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-award mr-3"></i>Grades</a>
+                    <a href="./progress.html"         class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-graph-up mr-3"></i>Progress</a>
+                    <a href="./achievements.html"     class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-trophy mr-3"></i>Achievements</a>
                 </nav>
             </div>
         </div>
 
         <!-- Profile Content -->
-        <div class="container" style="max-width: 1400px;">
-           <div class="relative mb-8 sm:mb-10 mt-8 sm:mt-12">
+        <div class="container" style="max-width:1400px;">
+
+            <!-- Page Header -->
+            <div class="relative mb-8 sm:mb-10 mt-8 sm:mt-12">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
                         <i class="bi bi-person-circle text-xl sm:text-2xl text-white"></i>
@@ -1030,67 +282,76 @@
                     </h1>
                 </div>
             </div>
-            
+
             <div class="row">
                 <!-- Left Sidebar -->
                 <div class="col-lg-3">
-                    <div class="profile-sidebar">
-                       <div class="profile-avatar">
-                            <img src="" alt="Profile" id="profileAvatarImage" class="w-100 h-100 rounded-circle object-cover" style="display: none;">
-                            <i class="bi bi-person-circle" id="profileAvatarIcon"></i>
+                    <div class="bg-white rounded-xl p-6 sm:p-8 shadow-sm mb-6">
+
+                        <!-- Avatar -->
+                        <div class="w-[120px] h-[120px] rounded-full border-[3px] border-blue-500 shadow-md mx-auto mb-6 flex items-center justify-center overflow-hidden bg-transparent relative">
+                            <img src="" alt="Profile" id="profileAvatarImage" class="w-full h-full object-cover rounded-full" style="display:none;">
+                            <i class="bi bi-person-circle text-gray-400" id="profileAvatarIcon" style="font-size:82px;"></i>
                         </div>
-                        <div class="profile-name" id="profileName">Student Name</div>
-                        <div class="profile-id" id="profileId">ID: 000000</div>
-                        <div class="profile-section-badge" id="profileSection">Section</div>
-                        
-                        <div class="profile-info-item">
-                            <div class="profile-info-label">Age & Gender</div>
-                            <div class="profile-info-value" id="profileAgeGender">-- years - --</div>
+
+                        <!-- Name & ID -->
+                        <div id="profileName" class="font-semibold text-gray-900 text-lg text-center mb-1">Student Name</div>
+                        <div id="profileId" class="text-gray-500 text-sm text-center mb-4">ID: 000000</div>
+
+                        <!-- Section Badge -->
+                        <div id="profileSection" class="bg-blue-900 text-white text-xs text-center rounded-full px-4 py-2 mx-auto mb-6 w-fit">Section</div>
+
+                        <!-- Info Items -->
+                        <div class="border-t border-gray-200 py-4">
+                            <div class="text-[8px] uppercase text-gray-400 tracking-wide mb-1">Age &amp; Gender</div>
+                            <div id="profileAgeGender" class="text-xs text-gray-800">-- years - --</div>
                         </div>
-                        
-                        <div class="profile-info-item">
-                            <div class="profile-info-label">Email Address</div>
-                            <div class="profile-info-value" id="profileEmail">email@umak.edu.ph</div>
+                        <div class="border-t border-gray-200 py-4">
+                            <div class="text-[8px] uppercase text-gray-400 tracking-wide mb-1">Email Address</div>
+                            <div id="profileEmail" class="text-xs text-gray-800 break-all">email@umak.edu.ph</div>
                         </div>
-                        
-                        <div class="profile-info-item">
-                            <div class="profile-info-label">Contact Number</div>
-                            <div class="profile-info-value" id="profileContact">+63 000000000</div>
+                        <div class="border-t border-gray-200 py-4">
+                            <div class="text-[8px] uppercase text-gray-400 tracking-wide mb-1">Contact Number</div>
+                            <div id="profileContact" class="text-xs text-gray-800">+63 000000000</div>
                         </div>
-                        
-                        <div class="profile-info-item" style="border-bottom: 1px solid #e0e0e0;">
-                            <div class="profile-info-label">Medical Condition</div>
+                        <div class="border-t border-b border-gray-200 py-4">
+                            <div class="text-[8px] uppercase text-gray-400 tracking-wide mb-1">Medical Condition</div>
                         </div>
-                        
-                        <div class="medical-condition-box">
-                            <div class="profile-info-value" id="profileMedical">None</div>
+                        <div class="border border-blue-900 rounded-sm p-3 mt-3 min-h-[83px]">
+                            <div id="profileMedical" class="text-xs text-gray-800">None</div>
                         </div>
-                        
-                        <button class="edit-profile-btn" onclick="editProfile()">Edit Profile</button>
-                        <!-- Edit Profile Modal -->
+
+                        <!-- Edit Button -->
+                        <button onclick="window.editProfile()"
+                                class="mt-4 w-full py-2 rounded-[7px] text-white text-sm font-normal cursor-pointer transition-all hover:opacity-90 hover:-translate-y-0.5"
+                                style="background:linear-gradient(90deg,#121b67 0%,#3b82f6 100%);">
+                            Edit Profile
+                        </button>
+
+                        <!-- Edit Profile Modal (Bootstrap) -->
                         <div class="modal fade" id="editProfileModal" tabindex="-1">
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
-                                    <div class="modal-header" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white;">
+                                    <div class="modal-header" style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:white;">
                                         <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Edit Profile</h5>
                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body">
                                         <form id="editProfileForm">
                                             <div class="row g-3">
-                                    <div class="col-md-6">
-                                            <label class="form-label fw-bold">Birthday</label>
-<input type="date" class="form-control" id="editBirthday" required onchange="autoFillAge(); this.setCustomValidity('')" oninput="this.setCustomValidity('')">
-                                            <small class="text-muted">Must be at least 15 years old</small>
-                                        </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Age</label>
-                                        <input type="text" class="form-control" id="editAge" 
-                                            readonly 
-                                            disabled
-                                            placeholder="Auto-calculated from birthday"
-                                            style="background:#f1f5f9; color:#64748b; cursor:not-allowed; font-weight:600;">
-                                    </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">Birthday</label>
+                                                    <input type="date" class="form-control" id="editBirthday" required
+                                                        onchange="window.autoFillAge(); this.setCustomValidity('')"
+                                                        oninput="this.setCustomValidity('')">
+                                                    <small class="text-muted">Must be at least 15 years old</small>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">Age</label>
+                                                    <input type="text" class="form-control" id="editAge" readonly disabled
+                                                        placeholder="Auto-calculated from birthday"
+                                                        style="background:#f1f5f9;color:#64748b;cursor:not-allowed;font-weight:600;">
+                                                </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label fw-bold">Gender</label>
                                                     <select class="form-select" id="editGender" required>
@@ -1099,164 +360,117 @@
                                                         <option value="Female">Female</option>
                                                     </select>
                                                 </div>
-                                               <div class="col-md-6">
+                                                <div class="col-md-6">
                                                     <label class="form-label fw-bold">Email Address</label>
                                                     <input type="email" class="form-control" id="editEmail" required readonly disabled
-                                                        style="background:#f1f5f9; color:#64748b; cursor:not-allowed;">
+                                                        style="background:#f1f5f9;color:#64748b;cursor:not-allowed;">
                                                     <small class="text-muted">Email cannot be changed</small>
                                                 </div>
                                                 <div class="col-md-6">
-                                                        <label class="form-label fw-bold">Contact Number</label>
-                                                       <input type="tel" class="form-control" id="editContact" placeholder="09XXXXXXXXX" maxlength="11" required
-                                                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                                                        <small class="text-muted">Format: 11 digits starting with 09 (e.g. 09947845672)</small>
-                                                        <div id="contactError" style="color:#dc2626; font-size:12px; display:none; margin-top:4px;">
-                                                            ⚠️ Phone number must be exactly 11 digits starting with 09
-                                                        </div>
+                                                    <label class="form-label fw-bold">Contact Number</label>
+                                                    <input type="tel" class="form-control" id="editContact" placeholder="09XXXXXXXXX" maxlength="11" required
+                                                        oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                                                    <small class="text-muted">Format: 11 digits starting with 09 (e.g. 09947845672)</small>
+                                                    <div id="contactError" style="color:#dc2626;font-size:12px;display:none;margin-top:4px;">⚠️ Phone number must be exactly 11 digits starting with 09</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">Height</label>
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control" id="editHeight" min="100" max="250" required placeholder="100–250" maxlength="3" inputmode="numeric"
+                                                            onkeydown="if(['e','E','+','-','.'].includes(event.key)) event.preventDefault();"
+                                                            oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,3);this.setCustomValidity('');window.validateHeightWeight();">
+                                                        <span class="input-group-text">cm</span>
                                                     </div>
-                                             <div class="col-md-6">
-        <label class="form-label fw-bold">Height</label>
-        <div class="input-group">
- <input type="number" class="form-control" id="editHeight" 
-    min="100" max="250" required placeholder="100–250"
-    maxlength="3" inputmode="numeric"
-    onkeydown="if(['e','E','+','-','.'].includes(event.key)) event.preventDefault();"
-    oninput="
-        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 3);
-        this.setCustomValidity('');
-        var hVal = parseFloat(this.value);
-                    var sBtn = document.querySelector('#editProfileModal .btn-primary');
-                    var wVal = parseFloat(document.getElementById('editWeight').value);
-                    var wHas = document.getElementById('editWeight').value !== '';
-                    var wBad = wHas && (isNaN(wVal) || wVal < 30 || wVal > 130);
-                    if(this.value !== '' && (isNaN(hVal) || hVal < 100 || hVal > 250)) {
-                        this.style.borderColor = '#dc2626';
-                        document.getElementById('heightError').style.display = 'block';
-                        if(sBtn) sBtn.disabled = true;
-                    } else {
-                        this.style.borderColor = '';
-                        document.getElementById('heightError').style.display = 'none';
-                        if(sBtn) sBtn.disabled = wBad;
-                    }
-                ">
-                <span class="input-group-text">cm</span>
-            </div>
-            <small class="text-muted">Range: 100 cm – 250 cm</small>
-            <div id="heightError" style="color:#dc2626; font-size:12px; display:none; margin-top:4px;">
-                ⚠️ Height must be between 100 and 250 cm
-            </div>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label fw-bold">Weight</label>
-            <div class="input-group">
- <input type="number" class="form-control" id="editWeight" 
-    min="30" max="130" required placeholder="30–130"
-    maxlength="3" inputmode="numeric"
-    onkeydown="if(['e','E','+','-','.'].includes(event.key)) event.preventDefault();"
-    oninput="
-        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 3);
-        this.setCustomValidity('');
-        var wVal = parseFloat(this.value);
-                        var sBtn = document.querySelector('#editProfileModal .btn-primary');
-                        var hVal = parseFloat(document.getElementById('editHeight').value);
-                        var hHas = document.getElementById('editHeight').value !== '';
-                        var hBad = hHas && (isNaN(hVal) || hVal < 100 || hVal > 250);
-                        if(this.value !== '' && (isNaN(wVal) || wVal < 30 || wVal > 130)) {
-                            this.style.borderColor = '#dc2626';
-                            document.getElementById('weightError').style.display = 'block';
-                            if(sBtn) sBtn.disabled = true;
-                        } else {
-                            this.style.borderColor = '';
-                            document.getElementById('weightError').style.display = 'none';
-                            if(sBtn) sBtn.disabled = hBad;
-                        }
-                    ">
-                <span class="input-group-text">kg</span>
-            </div>
-            <small class="text-muted">Range: 30 kg – 130 kg</small>
-            <div id="weightError" style="color:#dc2626; font-size:12px; display:none; margin-top:4px;">
-                ⚠️ Weight must be between 30 and 130 kg
-            </div>
-        </div>
-
-<div class="col-12">
-    <label class="form-label fw-bold">Medical Condition</label>
-    <textarea class="form-control" id="editMedical" rows="3" 
-        placeholder="Enter any medical conditions or allergies"
-        maxlength="1000"
-        oninput="document.getElementById('medicalCharCount').textContent = this.value.length"></textarea>
-    <div class="d-flex justify-content-between mt-1">
-        <small class="text-muted">Maximum 1000 characters</small>
-        <small id="medicalCharCount" class="text-muted">0</small>
-    </div>
-</div>
-     </div>
-</form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary" onclick="saveProfile()" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6); border: none;">
-                <i class="bi bi-save me-2"></i>Save Changes
-            </button>
+                                                    <small class="text-muted">Range: 100 cm – 250 cm</small>
+                                                    <div id="heightError" style="color:#dc2626;font-size:12px;display:none;margin-top:4px;">⚠️ Height must be between 100 and 250 cm</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">Weight</label>
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control" id="editWeight" min="30" max="130" required placeholder="30–130" maxlength="3" inputmode="numeric"
+                                                            onkeydown="if(['e','E','+','-','.'].includes(event.key)) event.preventDefault();"
+                                                            oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,3);this.setCustomValidity('');window.validateHeightWeight();">
+                                                        <span class="input-group-text">kg</span>
+                                                    </div>
+                                                    <small class="text-muted">Range: 30 kg – 130 kg</small>
+                                                    <div id="weightError" style="color:#dc2626;font-size:12px;display:none;margin-top:4px;">⚠️ Weight must be between 30 and 130 kg</div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label fw-bold">Medical Condition</label>
+                                                    <textarea class="form-control" id="editMedical" rows="3" placeholder="Enter any medical conditions or allergies" maxlength="1000"
+                                                        oninput="document.getElementById('medicalCharCount').textContent=this.value.length"></textarea>
+                                                    <div class="d-flex justify-content-between mt-1">
+                                                        <small class="text-muted">Maximum 1000 characters</small>
+                                                        <small id="medicalCharCount" class="text-muted">0</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" onclick="window.saveProfile()"
+                                                style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:none;">
+                                            <i class="bi bi-save me-2"></i>Save Changes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            </div>
-        </div>
-    </div>
-</div>
 
                 <!-- Right Content -->
                 <div class="col-lg-9">
+
                     <!-- Physiological Data -->
-                    <div class="physiological-card">
-                        <h5 class="card-title-custom">Physiological Data</h5>
+                    <div class="bg-white rounded-[7px] p-6 mb-6 overflow-hidden">
+                        <h5 class="font-semibold text-gray-900 text-lg mb-6">Physiological Data</h5>
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <div class="physio-box">
-                                    <img src="https://c.animaapp.com/vkhEa8zW/img/image-126@2x.png" alt="Height" class="physio-icon">
-                                    <div class="physio-label">HEIGHT</div>
-                                    <div class="physio-value">
-                                        <span id="profileHeight">0</span>
-                                        <span class="physio-unit">CM</span>
+                                <div class="bg-[#eceff8] border border-gray-400 rounded-[6px] p-6 text-center">
+                                    <img src="https://c.animaapp.com/vkhEa8zW/img/image-126@2x.png" alt="Height" class="w-[45px] h-[45px] mb-2 object-cover mx-auto">
+                                    <div class="text-gray-700 text-sm mb-2">HEIGHT</div>
+                                    <div class="font-bold text-gray-900 text-[24px]">
+                                        <span id="profileHeight">0</span><span class="text-sm font-normal"> CM</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="physio-box">
-                                    <img src="https://c.animaapp.com/vkhEa8zW/img/image-127@2x.png" alt="Weight" class="physio-icon">
-                                    <div class="physio-label">WEIGHT</div>
-                                    <div class="physio-value">
-                                        <span id="profileWeight">0</span>
-                                        <span class="physio-unit">KG</span>
+                                <div class="bg-[#eceff8] border border-gray-400 rounded-[6px] p-6 text-center">
+                                    <img src="https://c.animaapp.com/vkhEa8zW/img/image-127@2x.png" alt="Weight" class="w-[45px] h-[45px] mb-2 object-cover mx-auto">
+                                    <div class="text-gray-700 text-sm mb-2">WEIGHT</div>
+                                    <div class="font-bold text-gray-900 text-[24px]">
+                                        <span id="profileWeight">0</span><span class="text-sm font-normal"> KG</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="physio-box">
-                                    <img src="https://c.animaapp.com/vkhEa8zW/img/image-127@2x.png" alt="BMI" class="physio-icon">
-                                    <div class="physio-label">BMI</div>
-                                    <div class="physio-value" id="profileBMI">0.00</div>
+                                <div class="bg-[#eceff8] border border-gray-400 rounded-[6px] p-6 text-center">
+                                    <img src="https://c.animaapp.com/vkhEa8zW/img/image-127@2x.png" alt="BMI" class="w-[45px] h-[45px] mb-2 object-cover mx-auto">
+                                    <div class="text-gray-700 text-sm mb-2">BMI</div>
+                                    <div id="profileBMI" class="font-bold text-gray-900 text-[24px]">0.00</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Account Activity -->
-                    <div class="test-history-card">
-                        <h5 class="card-title-custom">Account Activity</h5>
+                    <div class="bg-white rounded-[7px] p-6 mb-6 overflow-hidden">
+                        <h5 class="font-semibold text-gray-900 text-lg mb-6">Account Activity</h5>
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <div class="physio-box">
-                                    <i class="bi bi-clock-history" style="font-size: 45px; color: #3b82f6;"></i>
-                                    <div class="physio-label">LAST LOGIN</div>
-                                    <div class="physio-value" style="font-size: 16px;" id="lastLogin">Never</div>
+                                <div class="bg-[#eceff8] border border-gray-400 rounded-[6px] p-6 text-center">
+                                    <i class="bi bi-clock-history text-blue-500 mb-2 block" style="font-size:45px;"></i>
+                                    <div class="text-gray-700 text-sm mb-2">LAST LOGIN</div>
+                                    <div id="lastLogin" class="font-bold text-gray-900 text-base">Never</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="physio-box">
-                                    <i class="bi bi-calendar-check" style="font-size: 45px; color: #10b981;"></i>
-                                    <div class="physio-label">ACCOUNT CREATED</div>
-                                    <div class="physio-value" style="font-size: 16px;" id="accountCreated">N/A</div>
+                                <div class="bg-[#eceff8] border border-gray-400 rounded-[6px] p-6 text-center">
+                                    <i class="bi bi-calendar-check text-emerald-500 mb-2 block" style="font-size:45px;"></i>
+                                    <div class="text-gray-700 text-sm mb-2">ACCOUNT CREATED</div>
+                                    <div id="accountCreated" class="font-bold text-gray-900 text-base">N/A</div>
                                 </div>
                             </div>
                         </div>
@@ -1266,113 +480,84 @@
         </div>
 
         <!-- Footer -->
-        <footer style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%); border-top: 1px solid rgba(255,255,255,0.07); padding: clamp(3rem,6vw,5rem) clamp(1.5rem,5vw,4rem) 2rem; margin-top: 3rem;">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <footer style="background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%);border-top:1px solid rgba(255,255,255,.07);"
+                class="mt-12 px-6 sm:px-10 lg:px-16 pt-12 pb-8">
+            <div class="container mx-auto max-w-7xl">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
-                    <!-- About UmakFit & College of Human Kinetics -->
+
                     <div>
                         <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                            <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" 
-                                 alt="UMak Logo" class="h-12 w-auto object-contain">
+                            <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
                             <div>
                                 <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
                                 <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
                             </div>
                         </div>
                         <p class="text-sm lg:text-base leading-relaxed text-blue-100">
-                            UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati. 
+                            UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati.
                             Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
                         </p>
                         <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
-                            <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Fitness Tracking</span>
-                            <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Performance Assessment</span>
-                            <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Health & Wellness</span>
+                            <span class="bg-white/[.06] border border-white/[.08] text-white/50 text-[.7rem] px-2.5 py-1 rounded-full font-medium">Fitness Tracking</span>
+                            <span class="bg-white/[.06] border border-white/[.08] text-white/50 text-[.7rem] px-2.5 py-1 rounded-full font-medium">Performance Assessment</span>
+                            <span class="bg-white/[.06] border border-white/[.08] text-white/50 text-[.7rem] px-2.5 py-1 rounded-full font-medium">Health &amp; Wellness</span>
                         </div>
                     </div>
 
-                    <!-- Quick Links -->
                     <div>
                         <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
                         <div class="grid grid-cols-2 gap-4 lg:gap-6">
                             <div class="space-y-3">
-                                <a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-book mr-2"></i>Lessons
-                                </a>
-                                <a href="./test.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-clipboard-check mr-2"></i>Tests
-                                </a>
-                                <a href="./progress.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-graph-up mr-2"></i>Progress
-                                </a>
+                                <a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-book mr-2"></i>Lessons</a>
+                                <a href="./test.html"          class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-clipboard-check mr-2"></i>Tests</a>
+                                <a href="./progress.html"      class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-graph-up mr-2"></i>Progress</a>
                             </div>
                             <div class="space-y-3">
-                                <a href="./studentgrades.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-award mr-2"></i>Grades
-                                </a>
-                                <a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-person-circle mr-2"></i>Profile
-                                </a>
-                                <a href="./achievements.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                    <i class="bi bi-trophy mr-2"></i>Achievements
-                                </a>
+                                <a href="./studentgrades.html"  class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-award mr-2"></i>Grades</a>
+                                <a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-person-circle mr-2"></i>Profile</a>
+                                <a href="./achievements.html"   class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-trophy mr-2"></i>Achievements</a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Contact & Social -->
                     <div>
                         <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
                         <div class="space-y-4 lg:space-y-5">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
                                 <p class="text-sm lg:text-base text-blue-100">
-                                    College of Human Kinetics<br>
-                                    University of Makati<br>
-                                    3rd floor, Administration Building, University of Makati, 
-                                    JP Rizal Ext., West Rembo, Taguig City<br>
-                                    
+                                    College of Human Kinetics<br>University of Makati<br>
+                                    3rd floor, Administration Building,<br>JP Rizal Ext., West Rembo, Taguig City
                                 </p>
                             </div>
                             <div class="flex items-center gap-3">
                                 <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
-                                <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">
-                                    chk@umak.edu.ph
-                                </a>
+                                <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">chk@umak.edu.ph</a>
                             </div>
                             <div class="flex items-center gap-3">
                                 <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
                                 <span class="text-blue-100 text-sm lg:text-base">+63 933 189 7230</span>
                             </div>
-                            <div style="display:flex; gap:8px; margin-top:1rem;">
-                            <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" style="width:34px;height:34px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.8rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(200,153,42,0.15)';this.style.borderColor='rgba(200,153,42,0.3)';this.style.color='#E8BA4A';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.5)';">f</a>
-                            <a href="#" style="width:34px;height:34px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.8rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(200,153,42,0.15)';this.style.borderColor='rgba(200,153,42,0.3)';this.style.color='#E8BA4A';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.5)';">𝕏</a>
-                            <a href="#" style="width:34px;height:34px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.8rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(200,153,42,0.15)';this.style.borderColor='rgba(200,153,42,0.3)';this.style.color='#E8BA4A';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.5)';">◎</a>
-                            <a href="#" style="width:34px;height:34px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.8rem;transition:all 0.2s;" onmouseover="this.style.background='rgba(200,153,42,0.15)';this.style.borderColor='rgba(200,153,42,0.3)';this.style.color='#E8BA4A';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.5)';">▶</a>
-                        </div>
+                            <div class="flex gap-2 pt-2 justify-center lg:justify-start">
+                                <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank"
+                                   class="w-9 h-9 bg-white/[.06] border border-white/10 rounded-lg flex items-center justify-center text-white/50 text-sm hover:bg-amber-500/15 hover:border-amber-500/30 hover:text-amber-400 transition-all">f</a>
+                                <a href="#" class="w-9 h-9 bg-white/[.06] border border-white/10 rounded-lg flex items-center justify-center text-white/50 text-sm hover:bg-amber-500/15 hover:border-amber-500/30 hover:text-amber-400 transition-all">𝕏</a>
+                                <a href="#" class="w-9 h-9 bg-white/[.06] border border-white/10 rounded-lg flex items-center justify-center text-white/50 text-sm hover:bg-amber-500/15 hover:border-amber-500/30 hover:text-amber-400 transition-all">◎</a>
+                                <a href="#" class="w-9 h-9 bg-white/[.06] border border-white/10 rounded-lg flex items-center justify-center text-white/50 text-sm hover:bg-amber-500/15 hover:border-amber-500/30 hover:text-amber-400 transition-all">▶</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Divider -->
+
                 <div class="border-t border-blue-600/50 mt-8 lg:mt-12 pt-6 lg:pt-8">
                     <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
-                        <div class="text-center lg:text-left">
-                            <p class="text-xs lg:text-sm text-blue-200">
-                                © 2025 University of Makati - College of Human Kinetics. All Rights Reserved.
-                            </p>
-                        </div>
+                        <p class="text-xs lg:text-sm text-blue-200 text-center lg:text-left">© 2025 University of Makati - College of Human Kinetics. All Rights Reserved.</p>
                         <div class="flex flex-wrap justify-center gap-3 lg:gap-4">
-                            <a href="https://umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                                University of Makati
-                            </a>
+                            <a href="https://umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">University of Makati</a>
                             <span class="text-blue-400">•</span>
-                            <a href="https://library.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                                UMak Online Library
-                            </a>
+                            <a href="https://library.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">UMak Online Library</a>
                             <span class="text-blue-400">•</span>
-                            <a href="https://tbl.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">
-                                TBL Hub
-                            </a>
+                            <a href="https://tbl.umak.edu.ph" target="_blank" class="text-xs lg:text-sm text-blue-200 hover:text-yellow-300 transition-colors">TBL Hub</a>
                         </div>
                     </div>
                 </div>
@@ -1382,1258 +567,550 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, onSnapshot, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
-        authDomain: "umakfit-e3b1d.firebaseapp.com",
-        projectId: "umakfit-e3b1d",
-        storageBucket: "umakfit-e3b1d.appspot.com",
-        messagingSenderId: "276569891504",
-        appId: "1:276569891504:web:39b1732b519f4d8b785175"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
+            authDomain: "umakfit-e3b1d.firebaseapp.com",
+            projectId: "umakfit-e3b1d",
+            storageBucket: "umakfit-e3b1d.appspot.com",
+            messagingSenderId: "276569891504",
+            appId: "1:276569891504:web:39b1732b519f4d8b785175"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    window.auth = auth;
-    window.signOut = signOut;
+        window.auth = auth;
+        window.signOut = signOut;
 
-    // Global variables
-    let studentData = null;
-    let studentDocId = null;
+        let studentData = null;
+        let studentDocId = null;
+        let unsubscribeNotificationListener = null;
 
-    // ========== NOTIFICATION SYSTEM ==========
-    
-    async function checkUnreadNotifications() {
-        try {
-            if (!studentData || !studentData.section) return;
-
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);            
-            const notificationsSnapshot = await getDocs(notificationsQuery);
-            
-            const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-            
-            let unreadCount = 0;
-            notificationsSnapshot.forEach(doc => {
-                if (!readNotifications.includes(doc.id)) {
-                    unreadCount++;
-                }
-            });
-            
-            const countBadge = document.getElementById('navNotificationCount');
-            const countBadgeMobile = document.getElementById('navNotificationCountMobile');
-            
-            if (unreadCount > 0) {
-                if (countBadge) {
-                    countBadge.textContent = unreadCount;
-                    countBadge.classList.remove('hidden');
-                }
-                if (countBadgeMobile) {
-                    countBadgeMobile.textContent = unreadCount;
-                    countBadgeMobile.classList.remove('hidden');
-                }
-            } else {
-                if (countBadge) countBadge.classList.add('hidden');
-                if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
+        // ========== HELPERS ==========
+        function capitalize(str) { if (!str) return ''; return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(); }
+        function extractUmakIdFromEmail(email) {
+            if (!email) return 'Not Assigned';
+            const emailLower = email.toLowerCase();
+            let emailWithoutDomain = emailLower.replace('@umak.edu.ph', '');
+            const parts = emailWithoutDomain.split('.');
+            if (parts.length >= 1) {
+                const lastPart = parts[parts.length - 1];
+                const idPattern = /^[a-z][0-9]+$/i;
+                if (idPattern.test(lastPart)) return lastPart.toUpperCase();
+                const alnumPattern = /^[a-z0-9]+$/i;
+                if (alnumPattern.test(lastPart) && lastPart.length >= 7) return lastPart.toUpperCase();
+                if (parts.length === 1 && alnumPattern.test(lastPart)) return lastPart.toUpperCase();
             }
-        } catch (error) {
-            console.error('Error checking unread notifications:', error);
+            return 'Not Assigned';
         }
-    }
-
-    async function loadNotificationDropdown(isMobile = false) {
-        try {
-            const activeBodyId = isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody';
-            const dropdownBody = document.getElementById(activeBodyId);
-            
-            if (!dropdownBody) return;
-
-            if (!studentData || !studentData.section) {
-                dropdownBody.innerHTML = `
-                    <div class="notification-dropdown-empty">
-                        <i class="bi bi-bell-slash"></i>
-                        <p>No section assigned</p>
-                    </div>
-                `;
-                return;
-            }
-
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);            
-            const notificationsSnapshot = await getDocs(notificationsQuery);
-            const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-            
-            if (!notificationsSnapshot.empty) {
-                const seenNotifications = new Set();
-                const uniqueNotifications = [];
-                
-                notificationsSnapshot.forEach(doc => {
-                    const notification = doc.data();
-                    const contentKey = `${notification.title}|${notification.message}|${notification.createdAt?.toDate?.().getTime() || ''}`;
-                    
-                    if (!seenNotifications.has(contentKey)) {
-                        seenNotifications.add(contentKey);
-                        uniqueNotifications.push({ id: doc.id, ...notification });
-                    }
-                });
-                
-                uniqueNotifications.sort((a, b) => {
-                    const dateA = a.createdAt?.toDate?.() || new Date(0);
-                    const dateB = b.createdAt?.toDate?.() || new Date(0);
-                    return dateB - dateA;
-                });
-                
-                const unreadNotificationIds = [];
-                uniqueNotifications.forEach(notification => {
-                    if (!readNotifications.includes(notification.id)) {
-                        unreadNotificationIds.push(notification.id);
-                    }
-                });
-                
-                let html = '';
-                uniqueNotifications.slice(0, 5).forEach(notification => {
-                    const createdDate = notification.createdAt?.toDate?.();
-                    const dateStr = createdDate ? createdDate.toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    }) : 'Recently';
-                    
-                    const isRead = readNotifications.includes(notification.id);
-                    
-                    html += `
-                        <div class="notification-dropdown-item ${isRead ? 'bg-gray-50' : 'bg-white'}" data-notification-id="${notification.id}">
-                            <strong>${notification.title || 'Notification'}</strong>
-                            <p>${notification.message || ''}</p>
-                            <small>${dateStr}</small>
-                        </div>
-                    `;
-                });
-                
-                dropdownBody.innerHTML = html;
-                
-                if (unreadNotificationIds.length > 0) {
-                    markNotificationsAsRead(unreadNotificationIds);
-                }
-                
-            } else {
-                dropdownBody.innerHTML = `
-                    <div class="notification-dropdown-empty">
-                        <i class="bi bi-bell-slash"></i>
-                        <p>No notifications yet</p>
-                    </div>
-                `;
-            }
-        } catch (error) {
-            console.error('Error loading notifications:', error);
-        }
-    }
-
-    function markNotificationsAsRead(notificationIds) {
-        if (!studentData || !studentData.email || !notificationIds.length) return;
-        
-        const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-        const updatedReadNotifications = [...new Set([...readNotifications, ...notificationIds])];
-        
-        localStorage.setItem(`readNotifications_${studentData.email}`, JSON.stringify(updatedReadNotifications));
-        updateNotificationBadgeAfterRead(notificationIds);
-    }
-
-    async function updateNotificationBadgeAfterRead(markedAsReadIds) {
-        try {
-            if (!studentData || !studentData.section) return;
-            
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);            
-            const notificationsSnapshot = await getDocs(notificationsQuery);
-            const uniqueNotificationIds = new Set();
-            
-            notificationsSnapshot.forEach(doc => {
-                uniqueNotificationIds.add(doc.id);
-            });
-            
-            const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-            
-            let unreadCount = 0;
-            uniqueNotificationIds.forEach(notificationId => {
-                if (!readNotifications.includes(notificationId)) {
-                    unreadCount++;
-                }
-            });
-            
-            const countBadge = document.getElementById('navNotificationCount');
-            const countBadgeMobile = document.getElementById('navNotificationCountMobile');
-            
-            if (unreadCount > 0) {
-                if (countBadge) {
-                    countBadge.textContent = unreadCount;
-                    countBadge.classList.remove('hidden');
-                }
-                if (countBadgeMobile) {
-                    countBadgeMobile.textContent = unreadCount;
-                    countBadgeMobile.classList.remove('hidden');
-                }
-            } else {
-                if (countBadge) countBadge.classList.add('hidden');
-                if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
-            }
-        } catch (error) {
-            console.error('Error updating notification badge:', error);
-        }
-    }
-
- function toggleNotificationDropdown(event) {
-    event?.stopPropagation();
-    const isMobile = window.innerWidth < 1024;
-    const dropdown = isMobile ? 
-        document.getElementById('notificationDropdownMobile') : 
-        document.getElementById('notificationDropdown');
-    
-    if (!dropdown) return;
-
-    // Support both Tailwind `hidden` class AND CSS `display:none` style
-    const isHidden = dropdown.classList.contains('hidden') || 
-                     window.getComputedStyle(dropdown).display === 'none';
-    
-    if (isHidden) {
-        // Close the other dropdown first
-        const other = isMobile ? 
-            document.getElementById('notificationDropdown') : 
-            document.getElementById('notificationDropdownMobile');
-        if (other) { other.classList.add('hidden'); other.style.display = ''; }
-
-        dropdown.classList.remove('hidden');
-        dropdown.style.display = 'block';
-        loadNotificationDropdown(isMobile);
-        
-        const profileDropdown = document.getElementById('profileDropdown');
-        const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-        if (profileDropdown) profileDropdown.classList.add('hidden');
-        if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
-    } else {
-        dropdown.classList.add('hidden');
-        dropdown.style.display = '';
-    }
-}
-
-function closeNotificationDropdown() {
-    const notificationDropdown = document.getElementById('notificationDropdown');
-    const notificationDropdownMobile = document.getElementById('notificationDropdownMobile');
-    if (notificationDropdown) { notificationDropdown.classList.add('hidden'); notificationDropdown.style.display = ''; }
-    if (notificationDropdownMobile) { notificationDropdownMobile.classList.add('hidden'); notificationDropdownMobile.style.display = ''; }
-}
-let unsubscribeNotificationListener = null;
-
-function setupNotificationListener() {
-    try {
-        if (!studentData || !studentData.section) return;
-
-        // Cleanup previous listener if any
-        if (unsubscribeNotificationListener) {
-            unsubscribeNotificationListener();
-            unsubscribeNotificationListener = null;
-        }
-
-        const notificationsQuery = query(
-            collection(db, 'notifications'),
-            where('section', '==', studentData.section),
-            where('studentEmail', '==', studentData.email)
-        );
-
-        unsubscribeNotificationListener = onSnapshot(notificationsQuery, (snapshot) => {
-            // debug log removed
-            checkUnreadNotifications();
-        }, (error) => {
-            console.error('❌ Error in notification listener:', error);
-        });
-
-    } catch (error) {
-        console.error('Error setting up notification listener:', error);
-    }
-}
-
-// Kill listener when user navigates away
-window.addEventListener('pagehide', () => {
-    if (unsubscribeNotificationListener) {
-        unsubscribeNotificationListener();
-        unsubscribeNotificationListener = null;
-    }
-});
-window.addEventListener('beforeunload', () => {
-    if (unsubscribeNotificationListener) {
-        unsubscribeNotificationListener();
-        unsubscribeNotificationListener = null;
-    }
-});
-    // ========== END NOTIFICATION SYSTEM ==========
-
-    // Helper function to capitalize names
-    function capitalize(str) {
-        if (!str) return '';
-        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-    }
-
-    // Function to extract UMak ID from email
-    function extractUmakIdFromEmail(email) {
-        if (!email) return 'Not Assigned';
-        
-        const emailLower = email.toLowerCase();
-        let emailWithoutDomain = emailLower.replace('@umak.edu.ph', '');
-        const parts = emailWithoutDomain.split('.');
-        
-        if (parts.length >= 1) {
-            const lastPart = parts[parts.length - 1];
-            const idPattern = /^[a-z][0-9]+$/i;
-            
-            if (idPattern.test(lastPart)) {
-                return lastPart.toUpperCase();
-            }
-            
-            const alnumPattern = /^[a-z0-9]+$/i;
-            if (alnumPattern.test(lastPart) && lastPart.length >= 7) {
-                return lastPart.toUpperCase();
-            }
-            
-            if (parts.length === 1 && alnumPattern.test(lastPart)) {
-                return lastPart.toUpperCase();
-            }
-        }
-        
-        return 'Not Assigned';
-    }
-
-    // Function to extract name from email
-    function extractNameFromEmail(email) {
-        if (!email) return { firstName: 'Student', lastName: '' };
-        
-        const emailLower = email.toLowerCase();
-        const emailWithoutDomain = emailLower.replace('@umak.edu.ph', '');
-        const parts = emailWithoutDomain.split('.');
-        
-        if (parts.length === 1) {
+        function extractNameFromEmail(email) {
+            if (!email) return { firstName: 'Student', lastName: '' };
+            const emailLower = email.toLowerCase();
+            const emailWithoutDomain = emailLower.replace('@umak.edu.ph', '');
+            const parts = emailWithoutDomain.split('.');
+            if (parts.length === 1) return { firstName: 'Student', lastName: '' };
+            if (parts.length === 2) return { firstName: capitalize(parts[0]), lastName: '' };
+            if (parts.length >= 3) return { firstName: capitalize(parts[0]), lastName: capitalize(parts[parts.length-2]) };
             return { firstName: 'Student', lastName: '' };
-        } else if (parts.length === 2) {
-            return { 
-                firstName: capitalize(parts[0]), 
-                lastName: '' 
-            };
-        } else if (parts.length >= 3) {
-            const firstName = parts[0];
-            const lastName = parts[parts.length - 2]; 
-            return {
-                firstName: capitalize(firstName),
-                lastName: capitalize(lastName)
-            };
         }
-        
-        return { firstName: 'Student', lastName: '' };
-    }
+        function calculateBMI(weight, height) { const h = height/100; return (weight / (h*h)).toFixed(2); }
+        function getBMICategory(bmi) { const v=parseFloat(bmi); if(v<18.5) return 'Underweight'; if(v<25) return 'Normal'; if(v<30) return 'Overweight'; return 'Obese'; }
+        function calculateAge(birthday) { if(!birthday) return 0; const today=new Date(); const birth=new Date(birthday); let age=today.getFullYear()-birth.getFullYear(); const m=today.getMonth()-birth.getMonth(); if(m<0||(m===0&&today.getDate()<birth.getDate())) age--; return age; }
+        window.calculateAge = calculateAge; // expose for modal onchange
 
-    function calculateBMI(weight, height) {
-        const heightInMeters = height / 100;
-        return (weight / (heightInMeters * heightInMeters)).toFixed(2);
-    }
-
-    function getBMICategory(bmi) {
-        const bmiValue = parseFloat(bmi);
-        if (bmiValue < 18.5) return 'Underweight';
-        if (bmiValue >= 18.5 && bmiValue < 25) return 'Normal';
-        if (bmiValue >= 25 && bmiValue < 30) return 'Overweight';
-        return 'Obese';
-    }
-
-    async function loadStudentProfile(user) {
-        try {
-            // debug log removed
-            
-            const studentsQuery = query(
-                collection(db, 'students'),
-                where('email', '==', user.email)
-            );
-            const studentsSnapshot = await getDocs(studentsQuery);
-            
-            if (!studentsSnapshot.empty) {
-                // debug log removed
-                studentsSnapshot.forEach((doc) => {
-                    studentData = doc.data();
-                    studentDocId = doc.id;
+        // ========== NOTIFICATIONS ==========
+        async function checkUnreadNotifications() {
+            try {
+                if (!studentData?.section) return;
+                const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)));
+                const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`)||'[]');
+                let unread=0; snap.forEach(d=>{ if(!read.includes(d.id)) unread++; });
+                ['navNotificationCount','navNotificationCountMobile'].forEach(id=>{
+                    const el=document.getElementById(id); if(!el) return;
+                    if(unread>0){ el.textContent=unread; el.classList.remove('hidden'); } else el.classList.add('hidden');
                 });
-            } else {
-                // debug log removed
-                const studentRef = doc(db, 'students', user.uid);
-                const studentDoc = await getDoc(studentRef);
-                if (studentDoc.exists()) {
-                    studentData = studentDoc.data();
-                    studentDocId = user.uid;
-                    // debug log removed
-                } else {
-                    // debug log removed
-                    const extractedId = extractUmakIdFromEmail(user.email);
-                    const nameInfo = extractNameFromEmail(user.email);
-                    
-                    studentData = {
-                        firstName: nameInfo.firstName,
-                        lastName: nameInfo.lastName,
-                        umakId: extractedId,
-                        section: 'Not Assigned',
-                        department: 'Not Assigned',
-                        yearLevel: 'Not Assigned',
-                        age: 0,
-                        gender: 'Not Specified',
-                        email: user.email,
-                        contactNumber: 'Not Provided',
-                        height: 0,
-                        weight: 0,
-                        medicalCondition: 'None',
-                        emergencyContactName: 'Not provided',
-                        emergencyContactNumber: 'Not provided',
-                        emergencyContactRelation: 'Not provided',
-                        createdAt: new Date().toISOString(),
-                        lastLogin: new Date().toISOString()
-                    };
-                    studentDocId = user.uid;
-                    // debug log removed
-                }
-            }
-            
-            if (studentData) {
-                window.currentStudentId = studentDocId;
-                window.currentStudentData = studentData;
-                
-                let displayName = '';
-                if (user.displayName) {
-                    displayName = user.displayName;
-                    const nameParts = user.displayName.split(' ');
-                    if (nameParts.length >= 2) {
-                        studentData.firstName = nameParts[0];
-                        studentData.lastName = nameParts.slice(1).join(' ');
-                    } else {
-                        studentData.firstName = user.displayName;
-                        studentData.lastName = '';
-                    }
-                } else if (studentData.firstName || studentData.lastName) {
-                    displayName = `${studentData.firstName || ''} ${studentData.lastName || ''}`.trim();
-                } else {
-                    displayName = user.email.split('@')[0];
-                }
-
-                document.getElementById('profileName').textContent = displayName;
-                
-                let displayId = studentData.umakId;
-                if (!displayId || displayId === 'Not Assigned') {
-                    displayId = extractUmakIdFromEmail(user.email);
-                }
-                document.getElementById('profileId').textContent = `ID: ${displayId}`;
-                
-                let sectionInfo = '';
-                if (studentData.section && studentData.section !== 'Not Assigned') {
-                    sectionInfo = studentData.section;
-                    if (studentData.department && studentData.department !== 'Not Assigned') {
-                        sectionInfo += ` • ${studentData.department}`;
-                    }
-                    if (studentData.yearLevel && studentData.yearLevel !== 'Not Assigned') {
-                        sectionInfo += ` • Year ${studentData.yearLevel}`;
-                    }
-                } else {
-                    sectionInfo = 'Not Assigned';
-                }
-                document.getElementById('profileSection').textContent = sectionInfo;
-                
-const displayAge = studentData.birthday 
-    ? calculateAge(studentData.birthday) 
-    : (studentData.age || 0);
-document.getElementById('profileAgeGender').textContent = 
-    `${displayAge} years - ${studentData.gender || 'Not Specified'}`;
-    window.autoFillAge = function() {
-    const birthday = document.getElementById('editBirthday').value;
-    const ageField = document.getElementById('editAge');
-    if (birthday) {
-        const age = calculateAge(birthday);
-        ageField.value = age + ' years old';
-    } else {
-        ageField.value = '';
-    }
-};
-                    document.getElementById('profileEmail').textContent = 
-                    studentData.email || user.email;
-                document.getElementById('profileContact').textContent = 
-                    studentData.contactNumber || 'Not Provided';
-                document.getElementById('profileMedical').textContent = 
-                    studentData.medicalCondition || 'None';
-                document.getElementById('profileHeight').textContent = 
-                    studentData.height || 0;
-                document.getElementById('profileWeight').textContent = 
-                    studentData.weight || 0;
-                
-                if (studentData.height && studentData.weight && studentData.height > 0 && studentData.weight > 0) {
-                    const bmi = calculateBMI(studentData.weight, studentData.height);
-                    document.getElementById('profileBMI').textContent = bmi;
-                } else {
-                    document.getElementById('profileBMI').textContent = '0.00';
-                }
-                
-                if (studentData.lastLogin) {
-                    try {
-                        let lastLoginDate;
-                        if (studentData.lastLogin.toDate) {
-                            lastLoginDate = studentData.lastLogin.toDate();
-                        } else {
-                            lastLoginDate = new Date(studentData.lastLogin);
-                        }
-                        
-                        document.getElementById('lastLogin').textContent = lastLoginDate.toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        });
-                    } catch (error) {
-                        console.error('Error parsing lastLogin:', error);
-                        document.getElementById('lastLogin').textContent = 'Recently';
-                    }
-                } else {
-                    document.getElementById('lastLogin').textContent = 'Never';
-                }
-
-                if (studentData.createdAt) {
-                    try {
-                        let createdDate;
-                        if (studentData.createdAt.toDate) {
-                            createdDate = studentData.createdAt.toDate();
-                        } else if (typeof studentData.createdAt === 'string') {
-                            createdDate = new Date(studentData.createdAt);
-                        } else if (studentData.createdAt.seconds) {
-                            createdDate = new Date(studentData.createdAt.seconds * 1000);
-                        } else {
-                            createdDate = new Date(studentData.createdAt);
-                        }
-                        
-                        if (!isNaN(createdDate.getTime())) {
-                            document.getElementById('accountCreated').textContent = createdDate.toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            });
-                        } else {
-                            document.getElementById('accountCreated').textContent = 'Not Available';
-                        }
-                    } catch (error) {
-                        console.error('Error parsing createdAt:', error, studentData.createdAt);
-                        document.getElementById('accountCreated').textContent = 'Not Available';
-                    }
-                } else {
-                    document.getElementById('accountCreated').textContent = 'Not Available';
-                }
-                
-                // Setup notification listener after student data is loaded
-                setupNotificationListener();
-                await checkUnreadNotifications();
-                
-                updateProfileUI();
-                updateProfileAvatar();
-                
-                // Update last login time
-                await updateLastLogin(studentDocId);
-            }
-        } catch (error) {
-            console.error('Error loading profile:', error);
-            let displayName = '';
-            if (user.displayName) {
-                displayName = user.displayName;
-            } else {
-                const nameInfo = extractNameFromEmail(user.email);
-                displayName = `${nameInfo.firstName} ${nameInfo.lastName}`.trim();
-            }
-            document.getElementById('profileName').textContent = displayName;
-            
-            const extractedId = extractUmakIdFromEmail(user.email);
-            document.getElementById('profileId').textContent = `ID: ${extractedId}`;
-            
-            document.getElementById('profileEmail').textContent = user.email;
-            document.getElementById('lastLogin').textContent = 'Now';
-            document.getElementById('accountCreated').textContent = new Date().toLocaleDateString();
-
-            updateProfileUI();
-            updateProfileAvatar();
+            } catch(e){ console.error(e); }
         }
-    }
 
-    // Hamburger Menu and Drawer functionality
-    const hamburger = document.getElementById('hamburger');
-    const mobileDrawer = document.getElementById('mobileDrawer');
-    const drawerOverlay = document.getElementById('drawerOverlay');
-    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-
-    if (hamburger) {
-        hamburger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            hamburger.classList.toggle('active');
-            mobileDrawer.classList.toggle('active');
-            drawerOverlay.classList.toggle('active');
-            document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-
-            // Close profile and notification dropdowns when hamburger is opened
-            document.getElementById('profileDropdown')?.classList.add('hidden');
-            document.getElementById('profileDropdownMobile')?.classList.add('hidden');
-            document.getElementById('notificationDropdown')?.classList.add('hidden');
-            document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
-        });
-    }
-
-    if (drawerOverlay) {
-        drawerOverlay.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            mobileDrawer.classList.remove('active');
-            drawerOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    }
-
-     window.addEventListener('resize', () => {
-        if (window.innerWidth >= 1024) {
-            hamburger?.classList.remove('active');
-            mobileDrawer?.classList.remove('active');
-            drawerOverlay?.classList.remove('active');
-            document.body.style.overflow = '';
-            document.getElementById('profileDropdown')?.classList.add('hidden');
-            document.getElementById('profileDropdownMobile')?.classList.add('hidden');
-            document.getElementById('notificationDropdown')?.classList.add('hidden');
-            document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
+        async function loadNotificationDropdown(isMobile=false) {
+            try {
+                const bodyId = isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody';
+                const body = document.getElementById(bodyId);
+                if (!body) return;
+                if (!studentData || !studentData.section) {
+                    body.innerHTML = `<div class="notification-dropdown-empty"><i class="bi bi-bell-slash"></i><p>No section assigned</p></div>`;
+                    return;
+                }
+                const q = query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email));
+                const snap = await getDocs(q);
+                const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`)||'[]');
+                if (!snap.empty) {
+                    const seen = new Set(); const unique = [];
+                    snap.forEach(d=>{ const n=d.data(); const k=`${n.title}|${n.message}|${n.createdAt?.toDate?.().getTime()||''}`; if(!seen.has(k)){ seen.add(k); unique.push({id:d.id, ...n}); } });
+                    unique.sort((a,b)=> (b.createdAt?.toDate?.()||new Date(0)) - (a.createdAt?.toDate?.()||new Date(0)) );
+                    const unreadIds = unique.filter(n=>!read.includes(n.id)).map(n=>n.id);
+                    let html = '';
+                    unique.slice(0,5).forEach(n=>{
+                        const d = n.createdAt?.toDate?.();
+                        const ds = d ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Recently';
+                        const isRead = read.includes(n.id);
+                        html += `<div class="notification-dropdown-item ${isRead?'bg-gray-50':'bg-white'}" data-notification-id="${n.id}">
+                            <strong>${n.title||'Notification'}</strong>
+                            <p>${n.message||''}</p>
+                            <small>${ds}</small>
+                        </div>`;
+                    });
+                    body.innerHTML = html;
+                    if (unreadIds.length>0) markNotificationsAsRead(unreadIds);
+                } else {
+                    body.innerHTML = `<div class="notification-dropdown-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet</p></div>`;
+                }
+            } catch(e){ console.error(e); }
         }
-    });
 
-    async function updateLastLogin(studentId) {
-        try {
-            const studentRef = doc(db, 'students', studentId);
-            await updateDoc(studentRef, {
-                lastLogin: new Date().toISOString()
+        function markNotificationsAsRead(ids) {
+            if (!studentData?.email || !ids.length) return;
+            const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`)||'[]');
+            localStorage.setItem(`readNotifications_${studentData.email}`, JSON.stringify([...new Set([...read, ...ids])]));
+            updateNotificationBadgeAfterRead();
+        }
+        async function updateNotificationBadgeAfterRead() {
+            try {
+                if (!studentData?.section) return;
+                const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)));
+                const ids = new Set(); snap.forEach(d=> ids.add(d.id));
+                const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`)||'[]');
+                let unread=0; ids.forEach(id=>{ if(!read.includes(id)) unread++; });
+                ['navNotificationCount','navNotificationCountMobile'].forEach(id=>{
+                    const el=document.getElementById(id); if(!el) return;
+                    if(unread>0){ el.textContent=unread; el.classList.remove('hidden'); } else el.classList.add('hidden');
+                });
+            } catch(e){ console.error(e); }
+        }
+
+        function toggleNotificationDropdown(event) {
+            event?.stopPropagation();
+            const isMobile = window.innerWidth < 1024;
+            const dropdown = document.getElementById(isMobile ? 'notificationDropdownMobile' : 'notificationDropdown');
+            if (!dropdown) return;
+            const isHidden = dropdown.classList.contains('hidden') || window.getComputedStyle(dropdown).display === 'none';
+            if (isHidden) {
+                const other = document.getElementById(isMobile ? 'notificationDropdown' : 'notificationDropdownMobile');
+                if (other) { other.classList.add('hidden'); other.style.display = ''; }
+                dropdown.classList.remove('hidden'); dropdown.style.display = 'block';
+                loadNotificationDropdown(isMobile);
+                const pd = document.getElementById('profileDropdown'); if(pd) pd.classList.add('hidden');
+                const pdm = document.getElementById('profileDropdownMobile'); if(pdm) pdm.classList.add('hidden');
+            } else {
+                dropdown.classList.add('hidden'); dropdown.style.display = '';
+            }
+        }
+
+        function closeNotificationDropdown() {
+            ['notificationDropdown','notificationDropdownMobile'].forEach(id=>{
+                const el=document.getElementById(id); if(el){ el.classList.add('hidden'); el.style.display=''; }
             });
-            // debug log removed
-        } catch (error) {
-            console.error('Error updating last login:', error);
         }
-    }
 
-    onAuthStateChanged(auth, async (user) => {
-        const loadingScreen = document.getElementById('loadingScreen');
-        const mainContent = document.getElementById('mainContent');
+        function setupNotificationListener() {
+            if (!studentData?.section) return;
+            if (unsubscribeNotificationListener) { unsubscribeNotificationListener(); unsubscribeNotificationListener=null; }
+            const q = query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email));
+            unsubscribeNotificationListener = onSnapshot(q, ()=> checkUnreadNotifications(), (e)=> console.error(e));
+        }
 
-        if (user) {
+        window.toggleNotificationDropdown = toggleNotificationDropdown;
+        window.closeNotificationDropdown = closeNotificationDropdown;
+
+        // ========== PROFILE LOAD ==========
+        async function loadStudentProfile(user) {
             try {
-                await loadStudentProfile(user);
-                loadingScreen.style.display = 'none';
-                mainContent.style.display = 'block';
-                setupEventListeners();
-            } catch (error) {
-                console.error('Error loading profile:', error);
-                loadingScreen.style.display = 'none';
-                mainContent.style.display = 'block';
+                const q = query(collection(db,'students'), where('email','==',user.email));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    snap.forEach(d=>{ studentData = d.data(); studentDocId = d.id; });
+                } else {
+                    const sdoc = await getDoc(doc(db,'students',user.uid));
+                    if (sdoc.exists()) { studentData = sdoc.data(); studentDocId = user.uid; }
+                    else {
+                        const ni = extractNameFromEmail(user.email);
+                        studentData = {
+                            firstName: ni.firstName, lastName: ni.lastName,
+                            umakId: extractUmakIdFromEmail(user.email),
+                            section:'Not Assigned', department:'Not Assigned', yearLevel:'Not Assigned',
+                            age:0, gender:'Not Specified', email:user.email, contactNumber:'Not Provided',
+                            height:0, weight:0, medicalCondition:'None',
+                            createdAt: new Date().toISOString(), lastLogin: new Date().toISOString()
+                        };
+                        studentDocId = user.uid;
+                    }
+                }
+
+                if (studentData) {
+                    window.currentStudentId = studentDocId;
+                    window.currentStudentData = studentData;
+
+                    let displayName = '';
+                    if (user.displayName) {
+                        displayName = user.displayName;
+                        const p = user.displayName.split(' ');
+                        if (p.length>=2) { studentData.firstName = p[0]; studentData.lastName = p.slice(1).join(' '); }
+                        else studentData.firstName = user.displayName;
+                    } else if (studentData.firstName || studentData.lastName) displayName = `${studentData.firstName||''} ${studentData.lastName||''}`.trim();
+                    else displayName = user.email.split('@')[0];
+                    document.getElementById('profileName').textContent = displayName;
+
+                    let displayId = studentData.umakId;
+                    if (!displayId || displayId==='Not Assigned') displayId = extractUmakIdFromEmail(user.email);
+                    document.getElementById('profileId').textContent = `ID: ${displayId}`;
+
+                    let sec = (studentData.section && studentData.section!=='Not Assigned') ? studentData.section : 'Not Assigned';
+                    if (sec!=='Not Assigned') {
+                        if (studentData.department && studentData.department!=='Not Assigned') sec += ` • ${studentData.department}`;
+                        if (studentData.yearLevel && studentData.yearLevel!=='Not Assigned') sec += ` • Year ${studentData.yearLevel}`;
+                    }
+                    document.getElementById('profileSection').textContent = sec;
+
+                    const displayAge = studentData.birthday ? calculateAge(studentData.birthday) : (studentData.age || 0);
+                    document.getElementById('profileAgeGender').textContent = `${displayAge} years - ${studentData.gender||'Not Specified'}`;
+
+                    document.getElementById('profileEmail').textContent = studentData.email || user.email;
+                    document.getElementById('profileContact').textContent = studentData.contactNumber || 'Not Provided';
+                    document.getElementById('profileMedical').textContent = studentData.medicalCondition || 'None';
+                    document.getElementById('profileHeight').textContent = studentData.height || 0;
+                    document.getElementById('profileWeight').textContent = studentData.weight || 0;
+                    if (studentData.height && studentData.weight && studentData.height>0 && studentData.weight>0)
+                        document.getElementById('profileBMI').textContent = calculateBMI(studentData.weight, studentData.height);
+                    else document.getElementById('profileBMI').textContent = '0.00';
+
+                    try {
+                        let d = studentData.lastLogin?.toDate ? studentData.lastLogin.toDate() : new Date(studentData.lastLogin);
+                        document.getElementById('lastLogin').textContent = isNaN(d) ? 'Recently' : d.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+                    } catch { document.getElementById('lastLogin').textContent = 'Recently'; }
+
+                    try {
+                        let d = studentData.createdAt?.toDate ? studentData.createdAt.toDate() : (studentData.createdAt?.seconds ? new Date(studentData.createdAt.seconds*1000) : new Date(studentData.createdAt));
+                        document.getElementById('accountCreated').textContent = !isNaN(d) ? d.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : 'Not Available';
+                    } catch { document.getElementById('accountCreated').textContent = 'Not Available'; }
+
+                    setupNotificationListener();
+                    await checkUnreadNotifications();
+                    updateProfileUI();
+                    updateProfileAvatar();
+                    await updateLastLogin(studentDocId);
+                }
+            } catch (e) {
+                console.error('Error loading profile:', e);
+                const ni = extractNameFromEmail(user.email);
+                document.getElementById('profileName').textContent = user.displayName || `${ni.firstName} ${ni.lastName}`.trim();
+                document.getElementById('profileId').textContent = `ID: ${extractUmakIdFromEmail(user.email)}`;
+                document.getElementById('profileEmail').textContent = user.email;
+                document.getElementById('lastLogin').textContent = 'Now';
+                document.getElementById('accountCreated').textContent = new Date().toLocaleDateString();
+                updateProfileUI(); updateProfileAvatar();
             }
-        } else {
-            window.location.href = '../login/index.html';
-        }
-    });
-
-    window.handleLogout = async function() {
-        if (confirm('Are you sure you want to logout?')) {
-            try {
-                await signOut(auth);
-                window.location.href = '../login/index.html';
-            } catch (error) {
-                console.error('Error logging out:', error);
-            }
-        }
-    };
-
-   window.editProfile = function() {
-    const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
-    
-    const data = window.currentStudentData || {};
-    document.getElementById('editBirthday').value = data.birthday || '';
-    if (data.birthday) {
-        document.getElementById('editAge').value = calculateAge(data.birthday) + ' years old';
-    } else {
-        document.getElementById('editAge').value = '';
-    }
-
-    // Set max date to 15 years ago
-    const today = new Date();
-    document.getElementById('editBirthday').max = today.toISOString().split('T')[0];
-
-    document.getElementById('editGender').value = data.gender || '';
-    document.getElementById('editEmail').value = data.email || '';
-    document.getElementById('editContact').value = data.contactNumber || '';
-    document.getElementById('editHeight').value = data.height || '';
-    document.getElementById('editWeight').value = data.weight || '';
-document.getElementById('editMedical').value = data.medicalCondition || '';
-document.getElementById('medicalCharCount').textContent = (data.medicalCondition || '').length;
-    // Reset Save button and error states
-    const saveBtn = document.querySelector('#editProfileModal .btn-primary');
-    if (saveBtn) saveBtn.disabled = false;
-    document.getElementById('heightError').style.display = 'none';
-    document.getElementById('weightError').style.display = 'none';
-    document.getElementById('editHeight').style.borderColor = '';
-    document.getElementById('editWeight').style.borderColor = '';
-    
-    modal.show();
-};
-
-    window.saveProfile = async function() {
-    const form = document.getElementById('editProfileForm');
-    
-        const birthday = document.getElementById('editBirthday').value;
-        if (!birthday) {
-            document.getElementById('editBirthday').focus();
-            document.getElementById('editBirthday').setCustomValidity('Please enter your birthday.');
-            document.getElementById('editBirthday').reportValidity();
-            return;
         }
 
-        const age = calculateAge(birthday);
-        if (age < 15) {
-            document.getElementById('editBirthday').focus();
-            document.getElementById('editBirthday').setCustomValidity('Age must be at least 15 years old.');
-            document.getElementById('editBirthday').reportValidity();
-            return;
-        } else {
+        async function updateLastLogin(id) {
+            try { await updateDoc(doc(db,'students',id), { lastLogin: new Date().toISOString() }); } catch(e){ console.error(e); }
+        }
+
+        // ========== PROFILE DROPDOWN AVATAR ==========
+        function updateProfileUI() {
+            if (!auth.currentUser || !window.currentStudentData) return;
+            const photo = auth.currentUser.photoURL || 'https://ui-avatars.com/api/?name='+encodeURIComponent(window.currentStudentData?.firstName||'User')+'&background=3b82f6&color=fff&size=128';
+            ['profilePictureBtn','profilePictureBtnMobile'].forEach(id=>{ const el=document.getElementById(id); if(el) el.src=photo; });
+            ['profileDropdownPicture','profileDropdownPictureMobile'].forEach(id=>{ const el=document.getElementById(id); if(el) el.src=photo; });
+            const name = auth.currentUser.displayName || `${window.currentStudentData?.firstName||''} ${window.currentStudentData?.lastName||''}`.trim() || 'Student';
+            const email = window.currentStudentData?.email || auth.currentUser.email || '';
+            ['profileDropdownName','profileDropdownNameMobile'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=name; });
+            ['profileDropdownEmail','profileDropdownEmailMobile'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=email; });
+        }
+
+        function updateProfileAvatar() {
+            if (!auth.currentUser) return;
+            const photo = auth.currentUser.photoURL;
+            const img = document.getElementById('profileAvatarImage');
+            const icon = document.getElementById('profileAvatarIcon');
+            if (photo) { img.src=photo; img.style.display='block'; icon.style.display='none'; }
+            else { img.style.display='none'; icon.style.display='block'; }
+        }
+
+        // ========== EDIT MODAL HELPERS ==========
+        window.autoFillAge = function() {
+            const birthday = document.getElementById('editBirthday').value;
+            const ageField = document.getElementById('editAge');
+            if (birthday) ageField.value = calculateAge(birthday) + ' years old';
+            else ageField.value = '';
+        };
+
+        window.validateHeightWeight = function() {
+            const h = parseFloat(document.getElementById('editHeight').value);
+            const w = parseFloat(document.getElementById('editWeight').value);
+            const hOk = !isNaN(h) && h>=100 && h<=250;
+            const wOk = !isNaN(w) && w>=30 && w<=130;
+            const saveBtn = document.querySelector('#editProfileModal .btn-primary');
+            document.getElementById('heightError').style.display = hOk ? 'none' : 'block';
+            document.getElementById('weightError').style.display = wOk ? 'none' : 'block';
+            if (saveBtn) saveBtn.disabled = !(hOk && wOk);
+        };
+
+        window.editProfile = function() {
+            const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+            const data = window.currentStudentData || {};
+            document.getElementById('editBirthday').value = data.birthday || '';
+            if (data.birthday) document.getElementById('editAge').value = calculateAge(data.birthday) + ' years old';
+            else document.getElementById('editAge').value = '';
+            document.getElementById('editBirthday').max = new Date().toISOString().split('T')[0];
+            document.getElementById('editGender').value = data.gender || '';
+            document.getElementById('editEmail').value = data.email || '';
+            document.getElementById('editContact').value = data.contactNumber || '';
+            document.getElementById('editHeight').value = data.height || '';
+            document.getElementById('editWeight').value = data.weight || '';
+            document.getElementById('editMedical').value = data.medicalCondition || '';
+            document.getElementById('medicalCharCount').textContent = (data.medicalCondition || '').length;
+            const saveBtn = document.querySelector('#editProfileModal .btn-primary');
+            if (saveBtn) saveBtn.disabled = false;
+            document.getElementById('heightError').style.display = 'none';
+            document.getElementById('weightError').style.display = 'none';
+            document.getElementById('editHeight').style.borderColor = '';
+            document.getElementById('editWeight').style.borderColor = '';
+            modal.show();
+        };
+
+        window.saveProfile = async function() {
+            const form = document.getElementById('editProfileForm');
+            const birthday = document.getElementById('editBirthday').value;
+            if (!birthday) { document.getElementById('editBirthday').setCustomValidity('Please enter your birthday.'); document.getElementById('editBirthday').reportValidity(); return; }
+            const age = calculateAge(birthday);
+            if (age < 15) { document.getElementById('editBirthday').setCustomValidity('Age must be at least 15 years old.'); document.getElementById('editBirthday').reportValidity(); return; }
             document.getElementById('editBirthday').setCustomValidity('');
-        }
+
             const height = parseFloat(document.getElementById('editHeight').value);
-    const weight = parseFloat(document.getElementById('editWeight').value);
+            const weight = parseFloat(document.getElementById('editWeight').value);
+            if (isNaN(height) || height<100 || height>250) { document.getElementById('editHeight').setCustomValidity('Height must be between 100 and 250 cm.'); document.getElementById('editHeight').reportValidity(); return; }
+            document.getElementById('editHeight').setCustomValidity('');
+            if (isNaN(weight) || weight<30 || weight>130) { document.getElementById('editWeight').setCustomValidity('Weight must be between 30 and 130 kg.'); document.getElementById('editWeight').reportValidity(); return; }
+            document.getElementById('editWeight').setCustomValidity('');
 
-    if (isNaN(height) || height < 100 || height > 250) {
-        document.getElementById('editHeight').focus();
-        document.getElementById('editHeight').setCustomValidity('Height must be between 100 and 250 cm.');
-        document.getElementById('editHeight').reportValidity();
-        return;
-    } else {
-        document.getElementById('editHeight').setCustomValidity('');
-    }
+            const medicalVal = document.getElementById('editMedical').value;
+            if (medicalVal.length > 1000) { document.getElementById('editMedical').setCustomValidity('Medical condition must not exceed 1000 characters.'); document.getElementById('editMedical').reportValidity(); return; }
+            document.getElementById('editMedical').setCustomValidity('');
 
-    if (isNaN(weight) || weight < 30 || weight > 130) {
-        document.getElementById('editWeight').focus();
-        document.getElementById('editWeight').setCustomValidity('Weight must be between 30 and 130 kg.');
-        document.getElementById('editWeight').reportValidity();
-        return;
-    } else {
-        document.getElementById('editWeight').setCustomValidity('');
-    }
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-        
-        try {
-            const email = window.currentStudentData?.email || auth.currentUser?.email || '';
-            const extractedId = extractUmakIdFromEmail(email);
-            const nameInfo = extractNameFromEmail(email);
-            
-            const heightVal = parseFloat(document.getElementById('editHeight').value) || 0;
-            const weightVal = parseFloat(document.getElementById('editWeight').value) || 0;
-            
-            const oldHeight = window.currentStudentData?.height || 0;
-            const oldWeight = window.currentStudentData?.weight || 0;
-            
-            let firstName = nameInfo.firstName;
-            let lastName = nameInfo.lastName;
+            if (!form.checkValidity()) { form.reportValidity(); return; }
 
-            if (auth.currentUser?.displayName) {
-                const nameParts = auth.currentUser.displayName.split(' ');
-                if (nameParts.length >= 2) {
-                    firstName = nameParts[0];
-                    lastName = nameParts.slice(1).join(' ');
-                } else {
-                    firstName = auth.currentUser.displayName;
-                    lastName = '';
+            try {
+                const email = window.currentStudentData?.email || auth.currentUser?.email || '';
+                const extractedId = extractUmakIdFromEmail(email);
+                const ni = extractNameFromEmail(email);
+                let firstName=ni.firstName, lastName=ni.lastName;
+                if (auth.currentUser?.displayName) {
+                    const p = auth.currentUser.displayName.split(' ');
+                    if (p.length>=2) { firstName=p[0]; lastName=p.slice(1).join(' '); } else firstName=auth.currentUser.displayName;
                 }
-            }
-const medicalVal = document.getElementById('editMedical').value;
-if (medicalVal.length > 1000) {
-    document.getElementById('editMedical').focus();
-    document.getElementById('editMedical').setCustomValidity('Medical condition must not exceed 1000 characters.');
-    document.getElementById('editMedical').reportValidity();
-    return;
-} else {
-    document.getElementById('editMedical').setCustomValidity('');
-}
-
-            const updatedData = {
-                firstName: firstName,
-                lastName: lastName,
-birthday: document.getElementById('editBirthday').value,
-age: calculateAge(document.getElementById('editBirthday').value),
-                gender: document.getElementById('editGender').value,
-                email: email,
-                contactNumber: document.getElementById('editContact').value,
-                height: height,
-                weight: weight,
-                medicalCondition: document.getElementById('editMedical').value,
-                umakId: extractedId,
-                updatedAt: new Date().toISOString()
-            };
-            
-            // debug log removed
-            
-            const { collection, addDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
-            
-            const studentRef = doc(db, 'students', window.currentStudentId);
-            await updateDoc(studentRef, updatedData);
-            
-            const bmiChanged = (height !== oldHeight || weight !== oldWeight) && height > 0 && weight > 0;
-            
-            if (bmiChanged) {
-                const bmi = calculateBMI(weight, height);
-                const category = getBMICategory(bmi);
-                
-                const bmiData = {
-                    studentId: window.currentStudentId,
-                    studentName: `${nameInfo.firstName} ${nameInfo.lastName}`.trim(),
-                    umakId: extractedId,
-                    section: window.currentStudentData?.section || 'Not Assigned',
-                    email: email,
-                    height: height,
-                    weight: weight,
-                    bmi: parseFloat(bmi),
-                    category: category,
-                    testType: 'pre',
-                    recordedAt: new Date().toISOString(),
-                    recordedBy: 'student',
-                    updatedAt: new Date().toISOString()
+                const oldHeight = window.currentStudentData?.height || 0;
+                const oldWeight = window.currentStudentData?.weight || 0;
+                const updatedData = {
+                    firstName, lastName, birthday, age: calculateAge(birthday),
+                    gender: document.getElementById('editGender').value, email,
+                    contactNumber: document.getElementById('editContact').value,
+                    height, weight, medicalCondition: medicalVal,
+                    umakId: extractedId, updatedAt: new Date().toISOString()
                 };
-                
-                // debug log removed
-                await addDoc(collection(db, 'BMI'), bmiData);
-                // debug log removed
-                showProfileSavePopup('success', 'Profile and BMI record updated successfully!');
+
+                const studentRef = doc(db, 'students', window.currentStudentId);
+                await updateDoc(studentRef, updatedData);
+
+                const bmiChanged = (height !== oldHeight || weight !== oldWeight) && height>0 && weight>0;
+                if (bmiChanged) {
+                    const bmi = calculateBMI(weight, height);
+                    const category = getBMICategory(bmi);
+                    await addDoc(collection(db,'BMI'), {
+                        studentId: window.currentStudentId,
+                        studentName: `${ni.firstName} ${ni.lastName}`.trim(),
+                        umakId: extractedId,
+                        section: window.currentStudentData?.section || 'Not Assigned',
+                        email, height, weight,
+                        bmi: parseFloat(bmi), category, testType: 'pre',
+                        recordedAt: new Date().toISOString(), recordedBy: 'student',
+                        updatedAt: new Date().toISOString()
+                    });
+                    showProfileSavePopup('success','Profile and BMI record updated successfully!');
+                } else {
+                    showProfileSavePopup('success','Profile updated successfully!');
+                }
+
+                bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+                await loadStudentProfile(auth.currentUser);
+                updateProfileUI(); updateProfileAvatar();
+            } catch(e) {
+                console.error(e);
+                showProfileSavePopup('error','Failed to update profile. Please try again.');
+            }
+        };
+
+        function showProfileSavePopup(type, message) {
+            const existing = document.getElementById('profileSavePopupOverlay');
+            if (existing) existing.remove();
+            const isSuccess = type==='success';
+            const overlay = document.createElement('div');
+            overlay.id = 'profileSavePopupOverlay';
+            overlay.className = 'fixed inset-0 bg-black/45 flex items-center justify-center z-[99999] p-4';
+            overlay.innerHTML = `
+                <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center font-inter">
+                    <div class="w-16 h-16 ${isSuccess?'bg-green-50':'bg-red-50'} rounded-full flex items-center justify-center mx-auto mb-5">
+                        ${isSuccess ?
+                            '<svg width="34" height="34" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" stroke="#34a853" stroke-width="3.5"/><path d="M15 24l7 7 11-12" stroke="#34a853" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+                            :
+                            '<svg width="34" height="34" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" stroke="#ea4335" stroke-width="3.5"/><path d="M24 16v10" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/><circle cx="24" cy="32" r="2" fill="#ea4335"/></svg>'}
+                    </div>
+                    <div class="text-xl font-semibold text-gray-900 mb-1">${isSuccess?'Changes Saved!':'Save Failed'}</div>
+                    <div class="text-sm text-gray-500 mb-6 leading-relaxed">${message}</div>
+                    <div class="h-px bg-gray-200 -mx-8 mb-5"></div>
+                    <button id="profileSavePopupOkBtn" class="w-full py-3 rounded-full border-0 ${isSuccess?'bg-green-500 hover:bg-green-600':'bg-red-500 hover:bg-red-600'} text-white text-sm font-medium cursor-pointer transition-colors">OK</button>
+                </div>`;
+            document.body.appendChild(overlay);
+            document.getElementById('profileSavePopupOkBtn').addEventListener('click', ()=> overlay.remove());
+            overlay.addEventListener('click', (e)=> { if(e.target===overlay) overlay.remove(); });
+        }
+
+        // ========== LOGOUT ==========
+        window.handleLogout = function() {
+            showLogoutConfirmPopup();
+        };
+
+        function showLogoutConfirmPopup() {
+            document.getElementById('logoutOverlay')?.remove();
+            const overlay = document.createElement('div');
+            overlay.id = 'logoutOverlay';
+            overlay.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-[99999] p-4';
+            overlay.innerHTML = `
+                <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center font-inter">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                        <svg width="32" height="32" viewBox="0 0 48 48" fill="none"><path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/><path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div class="text-xl font-semibold text-gray-900 mb-1">Log Out</div>
+                    <div class="text-sm text-gray-500 mb-6 leading-relaxed">Are you sure you want to log out of your account?</div>
+                    <div class="h-px bg-gray-200 -mx-8 mb-5"></div>
+                    <div class="flex gap-3">
+                        <button id="logoutCancelBtn" class="flex-1 py-3 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-medium cursor-pointer hover:bg-gray-50 transition-colors">Cancel</button>
+                        <button id="logoutConfirmBtn" class="flex-1 py-3 rounded-full border-0 bg-red-500 text-white text-sm font-medium cursor-pointer hover:bg-red-600 transition-colors">Log Out</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+            ['profileDropdown','profileDropdownMobile'].forEach(id=> document.getElementById(id)?.classList.add('hidden'));
+            document.getElementById('logoutCancelBtn').addEventListener('click', ()=> overlay.remove());
+            overlay.addEventListener('click', e=> { if(e.target===overlay) overlay.remove(); });
+            document.getElementById('logoutConfirmBtn').addEventListener('click', async ()=>{
+                const btn = document.getElementById('logoutConfirmBtn');
+                btn.textContent='Logging out...'; btn.disabled=true; btn.style.opacity='.7';
+                try { await signOut(auth); window.location.href='../login/index.html'; } catch(e){ overlay.remove(); alert('Error logging out.'); }
+            });
+        }
+
+        // ========== PROFILE DROPDOWN TOGGLE ==========
+        window.toggleProfileDropdown = function() {
+            const isMobile = window.innerWidth < 1024;
+            const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
+            closeNotificationDropdown();
+            dropdown.classList.toggle('hidden');
+            if (!dropdown.classList.contains('hidden')) setTimeout(()=> document.addEventListener('click', closeProfileOnClickOutside), 100);
+            else document.removeEventListener('click', closeProfileOnClickOutside);
+        };
+
+        function closeProfileOnClickOutside(event) {
+            const isMobile = window.innerWidth < 1024;
+            const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
+            const pb = document.getElementById('profilePictureBtn');
+            const pbm = document.getElementById('profilePictureBtnMobile');
+            if (!dropdown.contains(event.target) && !pb?.contains(event.target) && !pbm?.contains(event.target)) {
+                dropdown.classList.add('hidden');
+                document.removeEventListener('click', closeProfileOnClickOutside);
+            }
+        }
+
+        // ========== HAMBURGER ==========
+        function initHamburger() {
+            const hamburger = document.getElementById('hamburger');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+            const drawerOverlay = document.getElementById('drawerOverlay');
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+            if (!hamburger) return;
+            hamburger.addEventListener('click', e=> {
+                e.stopPropagation();
+                hamburger.classList.toggle('active');
+                mobileDrawer.classList.toggle('active');
+                drawerOverlay.classList.toggle('active');
+                document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+                ['profileDropdown','profileDropdownMobile','notificationDropdown','notificationDropdownMobile'].forEach(id=> document.getElementById(id)?.classList.add('hidden'));
+            });
+            drawerOverlay.addEventListener('click', ()=>{
+                hamburger.classList.remove('active');
+                mobileDrawer.classList.remove('active');
+                drawerOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+            mobileNavLinks.forEach(l=> l.addEventListener('click', ()=>{
+                hamburger.classList.remove('active');
+                mobileDrawer.classList.remove('active');
+                drawerOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }));
+            window.addEventListener('resize', ()=>{
+                if (window.innerWidth>=1024) {
+                    hamburger.classList.remove('active');
+                    mobileDrawer.classList.remove('active');
+                    drawerOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        // ========== EVENT LISTENERS ==========
+        function setupEventListeners() {
+            document.getElementById('notificationBellBtn')?.addEventListener('click', toggleNotificationDropdown);
+            document.getElementById('notificationBellBtnMobile')?.addEventListener('click', toggleNotificationDropdown);
+            document.getElementById('closeNotificationBtn')?.addEventListener('click', e=> { e.stopPropagation(); closeNotificationDropdown(); });
+            document.getElementById('closeNotificationBtnMobile')?.addEventListener('click', e=> { e.stopPropagation(); closeNotificationDropdown(); });
+            document.getElementById('profilePictureBtn')?.addEventListener('click', window.toggleProfileDropdown);
+            document.getElementById('profilePictureBtnMobile')?.addEventListener('click', window.toggleProfileDropdown);
+            document.addEventListener('click', event=> {
+                if (!event.target.closest('#notificationBellBtn') && !event.target.closest('#notificationBellBtnMobile') && !event.target.closest('#notificationDropdown') && !event.target.closest('#notificationDropdownMobile'))
+                    closeNotificationDropdown();
+                if (!event.target.closest('#profilePictureBtn') && !event.target.closest('#profilePictureBtnMobile') && !event.target.closest('#profileDropdown') && !event.target.closest('#profileDropdownMobile')) {
+                    document.getElementById('profileDropdown')?.classList.add('hidden');
+                    document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+                }
+            });
+        }
+
+        // ========== AUTH INIT ==========
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    await loadStudentProfile(user);
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    setupEventListeners();
+                    initHamburger();
+                } catch (e) {
+                    console.error(e);
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                }
             } else {
-                showProfileSavePopup('success', 'Profile updated successfully!');
-            }
-            
-            bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
-            
-            const user = auth.currentUser;
-            await loadStudentProfile(user);
-            updateProfileUI();
-            updateProfileAvatar();
-        } catch (error) {
-            console.error('Error updating profile:', error);
-            showProfileSavePopup('error', 'Failed to update profile. Please try again.');
-        }
-    };
-            function showProfileSavePopup(type, message) {
-    const existing = document.getElementById('profileSavePopupOverlay');
-    if (existing) existing.remove();
-
-    const isSuccess = type === 'success';
-
-    const overlay = document.createElement('div');
-    overlay.id = 'profileSavePopupOverlay';
-    overlay.style.cssText = `
-        position: fixed; inset: 0; background: rgba(0,0,0,0.45);
-        display: flex; align-items: center; justify-content: center;
-        z-index: 99999; padding: 1rem;
-        animation: fadeInPopup 0.2s ease;
-    `;
-
-    overlay.innerHTML = `
-        <style>
-            @keyframes fadeInPopup { from { opacity:0; } to { opacity:1; } }
-            @keyframes slideUpPopup { from { opacity:0; transform:translateY(24px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
-        </style>
-        <div style="
-            background:#fff;
-            border-radius:24px;
-            padding:2rem 1.5rem 1.5rem;
-            max-width:360px;
-            width:100%;
-            box-shadow:0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
-            animation:slideUpPopup 0.35s cubic-bezier(.4,0,.2,1);
-            text-align:center;
-            font-family:'Inter',sans-serif;
-        ">
-            <!-- Icon -->
-            <div style="
-                width:68px; height:68px;
-                background:${isSuccess ? '#e6f4ea' : '#fce8e6'};
-                border-radius:50%;
-                display:flex; align-items:center; justify-content:center;
-                margin:0 auto 1.25rem;
-            ">
-                ${isSuccess ? `
-                <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#34a853" stroke-width="3.5"/>
-                    <path d="M15 24l7 7 11-12" stroke="#34a853" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>` : `
-                <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="18" stroke="#ea4335" stroke-width="3.5"/>
-                    <path d="M24 16v10" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                    <circle cx="24" cy="32" r="2" fill="#ea4335"/>
-                </svg>`}
-            </div>
-
-            <!-- Title -->
-            <div style="font-size:1.2rem; font-weight:600; color:#202124; margin-bottom:0.35rem; letter-spacing:-0.01em;">
-                ${isSuccess ? 'Changes Saved!' : 'Save Failed'}
-            </div>
-
-            <!-- Message -->
-            <div style="font-size:0.875rem; color:#5f6368; margin-bottom:1.5rem; line-height:1.5;">
-                ${message}
-            </div>
-
-            <!-- Divider -->
-            <div style="height:1px; background:#e8eaed; margin:0 -1.5rem 1.25rem;"></div>
-
-            <!-- Button -->
-            <button id="profileSavePopupOkBtn" style="
-                width:100%;
-                padding:0.75rem;
-                border-radius:100px;
-                border:none;
-                background:${isSuccess ? '#34a853' : '#ea4335'};
-                color:#fff;
-                font-size:0.9375rem;
-                font-weight:500;
-                cursor:pointer;
-                font-family:'Inter',sans-serif;
-                min-height:48px;
-                transition:opacity 0.15s;
-            ">OK</button>
-        </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    document.getElementById('profileSavePopupOkBtn').addEventListener('click', () => {
-        overlay.remove();
-    });
-
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) overlay.remove();
-    });
-}
-    // Profile dropdown toggle
-    window.toggleProfileDropdown = function() {
-        const isMobile = window.innerWidth < 1024;
-        const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
-        const notificationDropdown = document.getElementById('notificationDropdown');
-        
-        if (notificationDropdown) {
-            notificationDropdown.classList.add('hidden');
-        }
-        
-        dropdown.classList.toggle('hidden');
-        if (!dropdown.classList.contains('hidden')) {
-            setTimeout(() => {
-                document.addEventListener('click', closeProfileOnClickOutside);
-            }, 100);
-        } else {
-            document.removeEventListener('click', closeProfileOnClickOutside);
-        }
-    };
-
-    // Close dropdowns when clicking outside
-    function closeProfileOnClickOutside(event) {
-        const isMobile = window.innerWidth < 1024;
-        const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
-        const notificationDropdown = document.getElementById('notificationDropdown');
-        const profileBtn = document.getElementById('profilePictureBtn');
-        const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-        const notificationBtn = document.getElementById('notificationBellBtn');
-        
-        if (!dropdown.contains(event.target) && !profileBtn?.contains(event.target) && !profileBtnMobile?.contains(event.target)) {
-            dropdown.classList.add('hidden');
-        }
-        
-        if (notificationDropdown && !notificationDropdown.contains(event.target) && !notificationBtn?.contains(event.target)) {
-            notificationDropdown.classList.add('hidden');
-        }
-        
-        if (dropdown.classList.contains('hidden') && (!notificationDropdown || notificationDropdown.classList.contains('hidden'))) {
-            document.removeEventListener('click', closeProfileOnClickOutside);
-        }
-    }
-
-    // Setup event listeners
-    function setupEventListeners() {
-        const notificationBtn = document.getElementById('notificationBellBtn');
-        const notificationBtnMobile = document.getElementById('notificationBellBtnMobile');
-        
-        if (notificationBtn) notificationBtn.addEventListener('click', toggleNotificationDropdown);
-        if (notificationBtnMobile) notificationBtnMobile.addEventListener('click', toggleNotificationDropdown);
-        
-        const closeNotificationBtn = document.getElementById('closeNotificationBtn');
-        const closeNotificationBtnMobile = document.getElementById('closeNotificationBtnMobile');
-        
-        if (closeNotificationBtn) {
-            closeNotificationBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                closeNotificationDropdown();
-            });
-        }
-        
-        if (closeNotificationBtnMobile) {
-            closeNotificationBtnMobile.addEventListener('click', (e) => {
-                e.stopPropagation();
-                closeNotificationDropdown();
-            });
-        }
-        
-        const profileBtn = document.getElementById('profilePictureBtn');
-        const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-        
-        if (profileBtn) profileBtn.addEventListener('click', toggleProfileDropdown);
-        if (profileBtnMobile) profileBtnMobile.addEventListener('click', toggleProfileDropdown);
-        
-        document.addEventListener('click', (event) => {
-            if (!event.target.closest('#notificationBellBtn') && 
-                !event.target.closest('#notificationBellBtnMobile') && 
-                !event.target.closest('#notificationDropdown') && 
-                !event.target.closest('#notificationDropdownMobile')) {
-                closeNotificationDropdown();
-            }
-            
-            if (!event.target.closest('#profilePictureBtn') && 
-                !event.target.closest('#profilePictureBtnMobile') && 
-                !event.target.closest('#profileDropdown') && 
-                !event.target.closest('#profileDropdownMobile')) {
-                const profileDropdown = document.getElementById('profileDropdown');
-                const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-                if (profileDropdown) profileDropdown.classList.add('hidden');
-                if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
+                window.location.href = '../login/index.html';
             }
         });
-    }
 
-    function updateProfileUI() {
-        if (!auth.currentUser || !window.currentStudentData) return;
-        
-        const photoURL = auth.currentUser?.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(window.currentStudentData?.firstName || 'User') + '&background=3b82f6&color=fff&size=128';
-        
-        const profileBtn = document.getElementById('profilePictureBtn');
-        const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-        if (profileBtn) profileBtn.src = photoURL;
-        if (profileBtnMobile) profileBtnMobile.src = photoURL;
-        
-        const dropdownPic = document.getElementById('profileDropdownPicture');
-        const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
-        if (dropdownPic) dropdownPic.src = photoURL;
-        if (dropdownPicMobile) dropdownPicMobile.src = photoURL;
-        
-        let displayName = '';
-        if (auth.currentUser?.displayName) {
-            displayName = auth.currentUser.displayName;
-        } else if (window.currentStudentData?.firstName || window.currentStudentData?.lastName) {
-            displayName = `${window.currentStudentData?.firstName || ''} ${window.currentStudentData?.lastName || ''}`.trim();
-        } else {
-            displayName = 'Student';
-        }
-        
-        const dropdownName = document.getElementById('profileDropdownName');
-        const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
-        if (dropdownName) dropdownName.textContent = displayName;
-        if (dropdownNameMobile) dropdownNameMobile.textContent = displayName;
-        
-        const dropdownEmail = document.getElementById('profileDropdownEmail');
-        const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
-        if (dropdownEmail) dropdownEmail.textContent = window.currentStudentData?.email || auth.currentUser?.email || '';
-        if (dropdownEmailMobile) dropdownEmailMobile.textContent = window.currentStudentData?.email || auth.currentUser?.email || '';
-    }
-function calculateAge(birthday) {
-    if (!birthday) return 0;
-    const today = new Date();
-    const birth = new Date(birthday);
-    let age = today.getFullYear() - birth.getFullYear();
-    const m = today.getMonth() - birth.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
-    return age;
-}
-    // Update profile avatar image
-    function updateProfileAvatar() {
-        if (!auth.currentUser) return;
-        
-        const photoURL = auth.currentUser.photoURL;
-        const avatarImage = document.getElementById('profileAvatarImage');
-        const avatarIcon = document.getElementById('profileAvatarIcon');
-        
-        if (photoURL) {
-            avatarImage.src = photoURL;
-            avatarImage.style.display = 'block';
-            avatarIcon.style.display = 'none';
-        } else {
-            avatarImage.style.display = 'none';
-            avatarIcon.style.display = 'block';
-        }
-    }
-
-    // Check if redirected from test page to edit profile
-    window.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('editProfile') === 'true') {
-            setTimeout(() => {
-                if (window.currentStudentData) {
-                    editProfile();
-                    const notification = document.createElement('div');
-                    notification.className = 'fixed top-4 right-4 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg z-[10000] animate-slide-in';
-                    notification.innerHTML = '<i class="bi bi-info-circle me-2"></i>Please complete your profile to take tests';
-                    document.body.appendChild(notification);
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 5000);
-                }
-            }, 1000);
-        }
-    });
-            window.handleLogout = function() {
-    showLogoutConfirmPopup();
-};
-
-function showLogoutConfirmPopup() {
-    // Remove existing popup if any
-    const existing = document.getElementById('logoutOverlay');
-    if (existing) existing.remove();
-
-    const overlay = document.createElement('div');
-    overlay.id = 'logoutOverlay';
-    overlay.style.cssText = `
-        position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-        display: flex; align-items: center; justify-content: center;
-        z-index: 99999; padding: 1rem;
-        animation: fadeInLogout 0.2s ease;
-    `;
-
-    overlay.innerHTML = `
-        <style>
-            @keyframes fadeInLogout { from { opacity:0; } to { opacity:1; } }
-            @keyframes slideUpLogout { from { opacity:0; transform:translateY(24px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
-        </style>
-        <div style="
-            background:#fff;
-            border-radius:24px;
-            padding:2rem 1.5rem 1.5rem;
-            max-width:360px;
-            width:100%;
-            box-shadow:0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
-            animation:slideUpLogout 0.35s cubic-bezier(.4,0,.2,1);
-            text-align:center;
-            font-family:'Inter',sans-serif;
-        ">
-            <!-- Icon -->
-            <div style="
-                width:68px; height:68px;
-                background:#fce8e6;
-                border-radius:50%;
-                display:flex; align-items:center; justify-content:center;
-                margin:0 auto 1.25rem;
-            ">
-                <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
-                    <path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                    <path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-
-            <!-- Title -->
-            <div style="font-size:1.25rem; font-weight:600; color:#202124; margin-bottom:0.35rem; letter-spacing:-0.01em;">
-                Log Out
-            </div>
-
-            <!-- Subtitle -->
-            <div style="font-size:0.875rem; color:#5f6368; margin-bottom:1.5rem; line-height:1.5;">
-                Are you sure you want to log out of your account?
-            </div>
-
-            <!-- Divider -->
-            <div style="height:1px; background:#e8eaed; margin:0 -1.5rem 1.25rem;"></div>
-
-            <!-- Buttons -->
-            <div style="display:flex; gap:0.75rem;">
-                <button id="logoutCancelBtn" style="
-                    flex:1;
-                    padding:0.75rem 0.5rem;
-                    border-radius:100px;
-                    border:1.5px solid #dadce0;
-                    background:#fff;
-                    color:#3c4043;
-                    font-size:0.9375rem;
-                    font-weight:500;
-                    cursor:pointer;
-                    font-family:'Inter',sans-serif;
-                    transition:background 0.15s;
-                    min-height:48px;
-                ">Cancel</button>
-                <button id="logoutConfirmBtn" style="
-                    flex:1;
-                    padding:0.75rem 0.5rem;
-                    border-radius:100px;
-                    border:none;
-                    background:#ea4335;
-                    color:#fff;
-                    font-size:0.9375rem;
-                    font-weight:500;
-                    cursor:pointer;
-                    font-family:'Inter',sans-serif;
-                    transition:background 0.15s, box-shadow 0.15s;
-                    min-height:48px;
-                ">Log Out</button>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    // Close profile dropdowns first
-    const profileDropdown = document.getElementById('profileDropdown');
-    const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-    if (profileDropdown) profileDropdown.classList.add('hidden');
-    if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
-
-    // Cancel button
-    document.getElementById('logoutCancelBtn').addEventListener('click', () => {
-        overlay.remove();
-    });
-
-    // Click outside to close
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) overlay.remove();
-    });
-
-    // Confirm logout
-    document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
-        const confirmBtn = document.getElementById('logoutConfirmBtn');
-        confirmBtn.textContent = 'Logging out...';
-        confirmBtn.disabled = true;
-        confirmBtn.style.opacity = '0.7';
-
-        try {
-            await signOut(auth);
-            window.location.href = '../login/index.html';
-        } catch (error) {
-            console.error('Logout error:', error);
-            overlay.remove();
-            alert('Error logging out. Please try again.');
-        }
-    });
-}
-    // Make functions globally available
-    window.toggleNotificationDropdown = toggleNotificationDropdown;
-    window.closeNotificationDropdown = closeNotificationDropdown;
+        // Cleanup listeners on page unload
+        window.addEventListener('pagehide', ()=> { if(unsubscribeNotificationListener) { unsubscribeNotificationListener(); unsubscribeNotificationListener=null; } });
+        window.addEventListener('beforeunload', ()=> { if(unsubscribeNotificationListener) { unsubscribeNotificationListener(); unsubscribeNotificationListener=null; } });
     </script>
 </body>
 </html>

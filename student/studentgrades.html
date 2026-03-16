@@ -10,139 +10,55 @@
     <style>
         * { font-family: 'Inter', sans-serif; }
         .font-manrope { font-family: 'Manrope', sans-serif; }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .pulse-animation { animation: pulse 2s infinite; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .slide-down { animation: slideDown 0.3s ease; }
-        
-        .spinner {
-            border: 4px solid #e5e7eb;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
+        .spinner { border: 4px solid #e5e7eb; border-top: 4px solid #3b82f6; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
 
         #testResultsContainer::-webkit-scrollbar { width: 8px; }
         #testResultsContainer::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         #testResultsContainer::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         #testResultsContainer::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        .notification-badge {
-            position: absolute; top: -4px; right: -4px;
-            background: #ef4444; color: white; font-size: 10px; font-weight: 700;
-            padding: 0.15rem 0.4rem; border-radius: 10px; min-width: 18px; height: 18px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3); animation: pulse 2s infinite;
-        }
-
-        .notification-dropdown {
-            position: absolute; top: 100%; right: 0; margin-top: 0.5rem;
-            width: 24rem; max-width: calc(100vw - 2rem); background: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-            z-index: 9999; max-height: 480px; overflow-y: auto; animation: slideDown 0.3s ease;
-        }
-
-        .notification-dropdown-header {
-            padding: 0.75rem 1rem; border-bottom: 2px solid #e5e7eb;
-            background: linear-gradient(135deg, #f8fafc, #ffffff);
-            display: flex; justify-content: space-between; align-items: center;
-            border-radius: 0.75rem 0.75rem 0 0; position: sticky; top: 0; z-index: 10;
-        }
-
+        .notification-badge { position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; font-size: 10px; font-weight: 700; padding: 0.15rem 0.4rem; border-radius: 10px; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); animation: pulse 2s infinite; }
+        .notification-dropdown { position: absolute; top: 100%; right: 0; margin-top: 0.5rem; width: 24rem; max-width: calc(100vw - 2rem); background: white; border-radius: 0.75rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); z-index: 9999; max-height: 480px; overflow-y: auto; animation: slideDown 0.3s ease; }
+        .notification-dropdown-header { padding: 0.75rem 1rem; border-bottom: 2px solid #e5e7eb; background: linear-gradient(135deg, #f8fafc, #ffffff); display: flex; justify-content: space-between; align-items: center; border-radius: 0.75rem 0.75rem 0 0; position: sticky; top: 0; z-index: 10; }
         @media (min-width: 640px) { .notification-dropdown-header { padding: 1rem 1.25rem; } }
-
         .notification-dropdown-body { max-height: 360px; overflow-y: auto; }
-
-        .notification-item {
-            padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6;
-            transition: background-color 0.2s ease; cursor: pointer;
-        }
+        .notification-item { padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6; transition: background-color 0.2s ease; cursor: pointer; }
         .notification-item:hover { background-color: #f9fafb; }
         .notification-item:last-child { border-bottom: none; }
         .notification-item strong { color: #111827; font-size: 0.875rem; display: block; margin-bottom: 0.25rem; font-weight: 600; }
         .notification-item p { color: #6b7280; font-size: 0.8125rem; margin-bottom: 0.25rem; line-height: 1.5; }
         .notification-item small { color: #9ca3af; font-size: 0.6875rem; display: block; }
-
-        .notification-dropdown-footer {
-            padding: 0.5rem 0.75rem; border-top: 2px solid #e5e7eb;
-            background-color: #f9fafb; border-radius: 0 0 0.75rem 0.75rem;
-            position: sticky; bottom: 0;
-        }
+        .notification-dropdown-footer { padding: 0.5rem 0.75rem; border-top: 2px solid #e5e7eb; background-color: #f9fafb; border-radius: 0 0 0.75rem 0.75rem; position: sticky; bottom: 0; }
         @media (min-width: 640px) { .notification-dropdown-footer { padding: 0.75rem 1rem; } }
-
         .notification-empty { padding: 1.5rem 2rem; text-align: center; color: #9ca3af; }
         .notification-empty i { font-size: 3rem; margin-bottom: 0.75rem; display: block; }
         .notification-empty p { color: #6b7280; font-size: 0.875rem; }
 
         .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; z-index: 60; }
-        .hamburger span {
-            width: 25px; height: 3px;
-            background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-            border-radius: 2px; transition: all 0.3s ease;
-        }
+        .hamburger span { width: 25px; height: 3px; background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); border-radius: 2px; transition: all 0.3s ease; }
         .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
         .hamburger.active span:nth-child(2) { opacity: 0; }
         .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -6px); }
-
-        .mobile-drawer {
-            position: fixed; top: 0; right: -100%; width: 280px; height: 100vh;
-            background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
-            z-index: 55; transition: right 0.3s ease;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.3); overflow-y: auto;
-        }
+        .mobile-drawer { position: fixed; top: 0; right: -100%; width: 280px; height: 100vh; background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%); z-index: 55; transition: right 0.3s ease; box-shadow: -5px 0 15px rgba(0,0,0,0.3); overflow-y: auto; }
         .mobile-drawer.active { right: 0; }
-
-        .drawer-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            background: rgba(0,0,0,0.5); z-index: 50; opacity: 0; visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
+        .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.5); z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
         .drawer-overlay.active { opacity: 1; visibility: visible; }
 
-        /* Norm Category Badge Styles */
-        .norm-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 4px 12px; border-radius: 50px;
-            font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-        }
+        .norm-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .norm-excellent { background: #f0fdf4; color: #059669; border: 1px solid #86efac; }
         .norm-good { background: #eff6ff; color: #2563eb; border: 1px solid #93c5fd; }
         .norm-average { background: #fffbeb; color: #d97706; border: 1px solid #fcd34d; }
         .norm-below-average { background: #fff7ed; color: #ea580c; border: 1px solid #fdba74; }
         .norm-poor { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
         .norm-completion { background: #f5f3ff; color: #7c3aed; border: 1px solid #c4b5fd; }
+        .norm-indicator { display: inline-flex; align-items: center; justify-content: center; padding: 6px 16px; border-radius: 50px; font-size: 0.8rem; font-weight: 700; }
 
-        /* Category Summary Card norm indicator */
-        .norm-indicator {
-            display: inline-flex; align-items: center; justify-content: center;
-            padding: 6px 16px; border-radius: 50px;
-            font-size: 0.8rem; font-weight: 700;
-        }
-
-        @media (max-width: 768px) {
-            #testResultsContainer { -webkit-overflow-scrolling: touch; }
-            .notification-dropdown { width: calc(100vw - 2rem); right: 0; left: auto; }
-        }
+        @media (max-width: 768px) { #testResultsContainer { -webkit-overflow-scrolling: touch; } .notification-dropdown { width: calc(100vw - 2rem); right: 0; left: auto; } }
         @media (max-width: 1023px) { .hamburger { display: flex; } }
     </style>
 </head>
@@ -161,164 +77,64 @@
                 <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
                     <a href="./studentDashboard.html" class="flex items-center gap-2 sm:gap-3">
                         <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
-                        <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                            UMakFit
-                        </span>
+                        <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">UMakFit</span>
                     </a>
-                    
-                    <!-- Desktop Navigation -->
                     <div class="hidden lg:flex items-center gap-2 flex-wrap">
-                        <a href="./studentDashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-speedometer2"></i><span class="hidden xl:inline">Dashboard</span>
-                        </a>
-                        <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-clipboard-check"></i><span class="hidden xl:inline">Tests</span>
-                        </a>
-                        <a href="./studentlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-book"></i><span class="hidden xl:inline">Lessons</span>
-                        </a>
-                        <a href="#" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
-                            <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
-                        </a>
-                        <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-graph-up"></i><span class="hidden xl:inline">Progress</span>
-                        </a>
-                        <a href="./achievements.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-trophy"></i><span class="hidden xl:inline">Achievements</span>
-                        </a>
-                        
-                        <!-- Notification Bell -->
+                        <a href="./studentDashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-speedometer2"></i><span class="hidden xl:inline">Dashboard</span></a>
+                        <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-clipboard-check"></i><span class="hidden xl:inline">Tests</span></a>
+                        <a href="./studentlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-book"></i><span class="hidden xl:inline">Lessons</span></a>
+                        <a href="#" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"><i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span></a>
+                        <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-graph-up"></i><span class="hidden xl:inline">Progress</span></a>
+                        <a href="./achievements.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-trophy"></i><span class="hidden xl:inline">Achievements</span></a>
                         <div class="relative">
                             <button id="notificationBellBtn" class="w-9 h-9 xl:w-10 xl:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
                                 <i class="bi bi-bell-fill text-base xl:text-lg"></i>
                                 <span id="navNotificationCount" class="notification-badge hidden">0</span>
                             </button>
                             <div id="notificationDropdown" class="notification-dropdown hidden">
-                                <div class="notification-dropdown-header">
-                                    <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
-                                        <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                                    </h6>
-                                    <button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button>
-                                </div>
-                                <div id="notificationDropdownBody" class="notification-dropdown-body">
-                                    <div class="notification-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet</p></div>
-                                </div>
-                                <div class="notification-dropdown-footer">
-                                    <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
-                                        View All Notifications
-                                    </button>
-                                </div>
+                                <div class="notification-dropdown-header"><h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2"><i class="bi bi-bell-fill text-blue-500"></i> Notifications</h6><button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button></div>
+                                <div id="notificationDropdownBody" class="notification-dropdown-body"><div class="notification-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet</p></div></div>
+                                <div class="notification-dropdown-footer"><button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">View All Notifications</button></div>
                             </div>
                         </div>
-                        
-                        <!-- Profile Dropdown -->
                         <div class="relative">
                             <img src="" alt="Profile" id="profilePictureBtn" class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
                             <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-                                <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
-                                    <h6 id="profileDropdownName" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
-                                    <p id="profileDropdownEmail" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
-                                </div>
-                                <div class="p-2">
-                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-                                    </a>
-                                    <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
-                                        <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
-                                        <span class="font-medium text-sm sm:text-base">Logout</span>
-                                    </div>
-                                </div>
+                                <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center"><img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover"><h6 id="profileDropdownName" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6><p id="profileDropdownEmail" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p></div>
+                                <div class="p-2"><a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors"><i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i><span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span></a><div class="h-px bg-gray-200 my-1 sm:my-2"></div><div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500"><i class="bi bi-box-arrow-right text-lg sm:text-xl"></i><span class="font-medium text-sm sm:text-base">Logout</span></div></div>
                             </div>
                         </div>
                     </div>
-                    
- <!-- Mobile Right Icons -->
-<div class="flex lg:hidden items-center gap-2 sm:gap-3">
-    <div class="relative">
-        <button id="notificationBellBtnMobile" class="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
-            <i class="bi bi-bell-fill text-base sm:text-lg"></i>
-            <span id="navNotificationCountMobile" class="notification-badge hidden">0</span>
-        </button>
-        <div id="notificationDropdownMobile" class="notification-dropdown hidden fixed right-2 left-2 top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
-            <div class="notification-dropdown-header">
-                <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
-                    <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                </h6>
-                <button id="closeNotificationBtnMobile" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button>
-            </div>
-            <div id="notificationDropdownBodyMobile" class="notification-dropdown-body">
-                <div class="notification-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet</p></div>
-            </div>
-            <div class="notification-dropdown-footer">
-                <button onclick="window.location.href='./notifications.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
-                    View All Notifications
-                </button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="relative">
-        <img src="" alt="Profile" id="profilePictureBtnMobile" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
-        <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
-            <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
-                <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
-                <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
-            </div>
-            <div class="p-2">
-                <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                    <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-                    <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-                </a>
-                <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
-                    <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
-                    <span class="font-medium text-sm sm:text-base">Logout</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="hamburger" id="hamburger">
-        <span></span><span></span><span></span>
-    </div>
-</div>
-
-<!-- Mobile Drawer Overlay -->
-<div class="drawer-overlay" id="drawerOverlay"></div>
-
-<!-- Mobile Drawer -->
-<div class="mobile-drawer" id="mobileDrawer">
-    <div class="p-6 pt-8">
-        <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
-            <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
-            <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">UMakFIT</span>
-        </div>
-        <nav class="space-y-2">
-            <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-speedometer2 mr-3"></i>Dashboard</a>
-            <a href="./test.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-clipboard-check mr-3"></i>Test</a>
-            <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-book mr-3"></i>Lessons</a>
-            <a href="./studentgrades.html" class="mobile-nav-link block text-white bg-white/10 font-semibold py-3 px-4 rounded-lg transition-all"><i class="bi bi-activity mr-3"></i>Performance</a>
-            <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-graph-up mr-3"></i>Progress</a>
-            <a href="./achievements.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-trophy mr-3"></i>Achievements</a>
-        </nav>
-    </div>
-</div>
+                    <div class="flex lg:hidden items-center gap-2 sm:gap-3">
+                        <div class="relative">
+                            <button id="notificationBellBtnMobile" class="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
+                                <i class="bi bi-bell-fill text-base sm:text-lg"></i>
+                                <span id="navNotificationCountMobile" class="notification-badge hidden">0</span>
+                            </button>
+                            <div id="notificationDropdownMobile" class="notification-dropdown hidden fixed right-2 left-2 top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
+                                <div class="notification-dropdown-header"><h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2"><i class="bi bi-bell-fill text-blue-500"></i> Notifications</h6><button id="closeNotificationBtnMobile" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button></div>
+                                <div id="notificationDropdownBodyMobile" class="notification-dropdown-body"><div class="notification-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet</p></div></div>
+                                <div class="notification-dropdown-footer"><button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">View All Notifications</button></div>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <img src="" alt="Profile" id="profilePictureBtnMobile" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
+                            <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                                <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center"><img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover"><h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6><p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p></div>
+                                <div class="p-2"><a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors"><i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i><span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span></a><div class="h-px bg-gray-200 my-1 sm:my-2"></div><div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500"><i class="bi bi-box-arrow-right text-lg sm:text-xl"></i><span class="font-medium text-sm sm:text-base">Logout</span></div></div>
+                            </div>
+                        </div>
+                        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+                    </div>
                 </div>
             </div>
         </nav>
-        
-        <!-- Mobile Drawer Overlay -->
+
         <div class="drawer-overlay" id="drawerOverlay"></div>
-
-        <!-- Mobile Drawer -->
         <div class="mobile-drawer" id="mobileDrawer">
             <div class="p-6 pt-8">
                 <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
-                    <img src="https://c.animaapp.com/vkhEa8zW/img/screenshot-2025-09-19-2-53-51-pm-removebg-preview-3@2x.png" alt="UMak Logo" class="h-12 w-auto object-contain">
+                    <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
                     <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">UMakFIT</span>
                 </div>
                 <nav class="space-y-2">
@@ -334,22 +150,15 @@
 
         <!-- Main Content -->
         <div class="container mx-auto px-4 py-8 max-w-7xl">
-            <!-- Page Header -->
             <div class="relative mb-4 sm:mb-8">
                 <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-                        <i class="bi bi-activity text-lg sm:text-xl md:text-2xl text-white"></i>
-                    </div>
-                    <h1 class="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent leading-tight">
-                        My Performance
-                    </h1>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md flex-shrink-0"><i class="bi bi-activity text-lg sm:text-xl md:text-2xl text-white"></i></div>
+                    <h1 class="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent leading-tight">My Performance</h1>
                 </div>
-                <p class="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl pl-0 sm:pl-14">
-                    View your fitness assessment results and performance classifications across all categories.
-                </p>
+                <p class="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl pl-0 sm:pl-14">View your fitness assessment results and performance classifications across all categories.</p>
             </div>
 
-            <!-- Legend / Key -->
+            <!-- Legend -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 mb-6">
                 <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Performance Scale</p>
                 <div class="flex flex-wrap gap-2">
@@ -365,28 +174,18 @@
             <!-- Overall Summary -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
                 <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                        <i class="bi bi-graph-up-arrow text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900">Performance Overview</h2>
-                        <p class="text-sm text-gray-500">Your overall fitness assessment summary</p>
-                    </div>
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center"><i class="bi bi-graph-up-arrow text-white text-xl"></i></div>
+                    <div><h2 class="text-2xl font-bold text-gray-900">Performance Overview</h2><p class="text-sm text-gray-500">Your overall fitness assessment summary</p></div>
                 </div>
-                
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div class="text-center md:text-left">
                         <p class="text-sm text-gray-500 mb-2 font-medium uppercase tracking-wide">Overall Standing</p>
-                        <div id="overallStanding">
-                            <span class="norm-badge norm-average text-base px-4 py-2">--</span>
-                        </div>
+                        <div id="overallStanding"><span class="norm-badge norm-average text-base px-4 py-2">--</span></div>
                         <p class="text-xs text-gray-400 mt-2" id="overallNote"></p>
                     </div>
                     <div class="text-center md:text-left">
                         <p class="text-sm text-gray-500 mb-2 font-medium uppercase tracking-wide">Tests Completed</p>
-                        <p class="text-5xl font-bold text-gray-900">
-                            <span id="completedTests">--</span><span class="text-3xl text-gray-400" id="totalTests">/0</span>
-                        </p>
+                        <p class="text-5xl font-bold text-gray-900"><span id="completedTests">--</span><span class="text-3xl text-gray-400" id="totalTests">/0</span></p>
                     </div>
                     <div class="text-center md:text-left">
                         <p class="text-sm text-gray-500 mb-2 font-medium uppercase tracking-wide">Completion Rate</p>
@@ -399,17 +198,10 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
                 <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                            <i class="bi bi-list-check text-white text-lg"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-xl font-bold text-gray-900">Performance by Category</h2>
-                            <p class="text-sm text-gray-500">Fitness classifications across categories</p>
-                        </div>
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center"><i class="bi bi-list-check text-white text-lg"></i></div>
+                        <div><h2 class="text-xl font-bold text-gray-900">Performance by Category</h2><p class="text-sm text-gray-500">Fitness classifications across categories</p></div>
                     </div>
                 </div>
-                
-                <!-- Table Header - Desktop Only -->
                 <div class="hidden md:block px-6 py-3 bg-gray-50 border-b border-gray-200">
                     <div class="grid grid-cols-12 gap-4 text-sm font-semibold text-gray-600">
                         <div class="col-span-5">Category</div>
@@ -417,25 +209,17 @@
                         <div class="col-span-4 text-right">Classification</div>
                     </div>
                 </div>
-                
                 <div id="categoriesContainer" class="divide-y divide-gray-100"></div>
             </div>
-            
+
             <!-- Detailed Test Results -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col" style="max-height: 600px;">
                 <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                            <i class="bi bi-clipboard-data text-white text-lg"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-xl font-bold text-gray-900">Recent Test Results</h2>
-                            <p class="text-sm text-gray-500">Your most recent fitness assessments</p>
-                        </div>
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center"><i class="bi bi-clipboard-data text-white text-lg"></i></div>
+                        <div><h2 class="text-xl font-bold text-gray-900">Recent Test Results</h2><p class="text-sm text-gray-500">Your most recent fitness assessments</p></div>
                     </div>
                 </div>
-                
-                <!-- Table Header - Desktop Only -->
                 <div class="hidden md:block px-6 py-3 bg-gray-50 border-b border-gray-200 flex-shrink-0">
                     <div class="grid grid-cols-12 gap-4 text-sm font-semibold text-gray-600">
                         <div class="col-span-4">Test Name</div>
@@ -445,7 +229,6 @@
                         <div class="col-span-1 text-right">Action</div>
                     </div>
                 </div>
-                
                 <div id="testResultsContainer" class="divide-y divide-gray-100 overflow-y-auto flex-1"></div>
             </div>
         </div>
@@ -455,97 +238,40 @@
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
                     <div>
-                        <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                            <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
-                            <div>
-                                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
-                                <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
-                            </div>
-                        </div>
-                        <p class="text-sm lg:text-base leading-relaxed text-blue-100">
-                            UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati. Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
-                        </p>
+                        <div class="flex items-center justify-center lg:justify-start gap-3 mb-4"><img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain"><div><h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6><p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p></div></div>
+                        <p class="text-sm lg:text-base leading-relaxed text-blue-100">UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati.</p>
                         <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
-                            <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Fitness Tracking</span>
-                            <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Performance Assessment</span>
-                            <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Health & Wellness</span>
+                            <span style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-size:0.7rem;padding:4px 10px;border-radius:100px;font-weight:500;">Fitness Tracking</span>
+                            <span style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-size:0.7rem;padding:4px 10px;border-radius:100px;font-weight:500;">Performance Assessment</span>
                         </div>
                     </div>
                     <div>
                         <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
                         <div class="grid grid-cols-2 gap-4 lg:gap-6">
-                            <div class="space-y-3">
-                                <a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-book mr-2"></i>Lessons</a>
-                                <a href="./test.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-clipboard-check mr-2"></i>Tests</a>
-                                <a href="./progress.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-graph-up mr-2"></i>Progress</a>
-                            </div>
-                            <div class="space-y-3">
-                                <a href="./studentgrades.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-activity mr-2"></i>Performance</a>
-                                <a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-person-circle mr-2"></i>Profile</a>
-                                <a href="./achievements.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-trophy mr-2"></i>Achievements</a>
-                            </div>
+                            <div class="space-y-3"><a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-book mr-2"></i>Lessons</a><a href="./test.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-clipboard-check mr-2"></i>Tests</a><a href="./progress.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-graph-up mr-2"></i>Progress</a></div>
+                            <div class="space-y-3"><a href="./studentgrades.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-activity mr-2"></i>Performance</a><a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-person-circle mr-2"></i>Profile</a><a href="./achievements.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-trophy mr-2"></i>Achievements</a></div>
                         </div>
                     </div>
                     <div>
                         <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
                         <div class="space-y-4 lg:space-y-5">
-                            <div class="flex items-start gap-3">
-                                <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
-                                <p class="text-sm lg:text-base text-blue-100">College of Human Kinetics<br>University of Makati<br>3rd floor, Administration Building, University of Makati,<br>JP Rizal Ext., West Rembo, Taguig City</p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
-                                <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">chk@umak.edu.ph</a>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
-                                <span class="text-sm lg:text-base text-blue-100">+63 933 189 7230</span>
-                            </div>
-                            <div class="flex items-center gap-4 pt-2 justify-center lg:justify-start">
-                                <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110">
-                                    <i class="bi bi-facebook text-white text-lg"></i>
-                                </a>
-                                <a href="https://www.instagram.com" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110">
-                                    <i class="bi bi-instagram text-white text-lg"></i>
-                                </a>
-                            </div>
+                            <div class="flex items-start gap-3"><i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i><p class="text-sm lg:text-base text-blue-100">College of Human Kinetics<br>University of Makati<br>3rd floor, Administration Building,<br>JP Rizal Ext., West Rembo, Taguig City</p></div>
+                            <div class="flex items-center gap-3"><i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i><a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">chk@umak.edu.ph</a></div>
+                            <div class="flex items-center gap-3"><i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i><span class="text-sm lg:text-base text-blue-100">+63 933 189 7230</span></div>
+                            <div class="flex items-center gap-4 pt-2 justify-center lg:justify-start"><a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110"><i class="bi bi-facebook text-white text-lg"></i></a></div>
                         </div>
                     </div>
                 </div>
-                <div class="border-t border-white/10 mt-8 pt-6 text-center">
-                    <p class="text-xs lg:text-sm text-blue-200/70">© 2025 University of Makati — College of Human Kinetics. All Rights Reserved.</p>
-                </div>
+                <div class="border-t border-white/10 mt-8 pt-6 text-center"><p class="text-xs lg:text-sm text-blue-200/70">© 2025 University of Makati — College of Human Kinetics. All Rights Reserved.</p></div>
             </div>
         </footer>
     </div>
-    <script>
-        window.addEventListener('resize', function() {
-    const hamburger = document.getElementById('hamburger');
-    const mobileDrawer = document.getElementById('mobileDrawer');
-    const drawerOverlay = document.getElementById('drawerOverlay');
-    
-    // Check if we're in desktop view (1024px and above)
-    if (window.innerWidth >= 1024) {
-        // If mobile drawer is open, close it
-        if (hamburger && hamburger.classList.contains('active')) {
-            hamburger.classList.remove('active');
-        }
-        if (mobileDrawer && mobileDrawer.classList.contains('active')) {
-            mobileDrawer.classList.remove('active');
-        }
-        if (drawerOverlay && drawerOverlay.classList.contains('active')) {
-            drawerOverlay.classList.remove('active');
-        }
-        // Restore body overflow
-        document.body.style.overflow = '';
-    }
-});
-        </script>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, collection, query, where, getDocs, doc, getDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getNormCategory, resolveTestKey, extractNumericResult } from './normLookup.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
@@ -560,244 +286,18 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let cachedStudentData = null;
+        // ========== STATE ==========
         let currentUser = null;
         let studentData = null;
+        let normCache = new Map();
+        let normDocsCache = new Map(); // pre-fetched norm documents
+        let cachedNotifications = [];
+        let totalAssignedTests = 0;
 
         const activeListeners = [];
-function registerListener(unsub) { activeListeners.push(unsub); }
-function cleanupAllListeners() { activeListeners.forEach(fn => { try { fn(); } catch(e) {} }); activeListeners.length = 0; }
+        function registerListener(unsub) { activeListeners.push(unsub); }
+        function cleanupAllListeners() { activeListeners.forEach(fn => { try { fn(); } catch (_) {} }); activeListeners.length = 0; }
 
-        // ========== NORM CLASSIFICATION HELPERS (same as studentresult.html) ==========
-
-        function getStudentAgeForNorms() {
-            if (!studentData) return null;
-            if (studentData.birthday) {
-                try {
-                    let birthDate;
-                    if (studentData.birthday.toDate) {
-                        birthDate = studentData.birthday.toDate();
-                    } else {
-                        birthDate = new Date(studentData.birthday);
-                    }
-                    const today = new Date();
-                    let age = today.getFullYear() - birthDate.getFullYear();
-                    const m = today.getMonth() - birthDate.getMonth();
-                    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-                    if (!isNaN(age)) return age;
-                } catch (e) {}
-            }
-            if (typeof studentData.age === 'number') return studentData.age;
-            if (typeof studentData.age === 'string') {
-                const m = studentData.age.match(/(\d+)/);
-                if (m) return parseInt(m[1], 10);
-            }
-            return null;
-        }
-
-        function getAgeGroup(age) {
-            if (age == null) return null;
-            if (age <= 18) return '15-18';
-            if (age <= 22) return '19-22';
-            if (age <= 26) return '23-26';
-            if (age < 15) return '15-18';
-            return '27-30';
-        }
-
-        function getGenderKey() {
-            const g = (studentData?.gender || '').toString().toLowerCase();
-            if (g.startsWith('m')) return 'male';
-            if (g.startsWith('f')) return 'female';
-            return 'male';
-        }
-
-        function extractNumericResult(result) {
-            if (typeof result === 'object' && result !== null) {
-                return result.value || result.result || result.score || result.count || result.repetitions || 0;
-            }
-            if (typeof result === 'string') {
-                const match = result.match(/(\d+\.?\d*)/);
-                if (match) return parseFloat(match[1]);
-                const parsed = parseFloat(result);
-                return isNaN(parsed) ? 0 : parsed;
-            }
-            const parsed = parseFloat(result);
-            return isNaN(parsed) ? 0 : parsed;
-        }
-
-        function getPushUpNormCategory(ageGroup, genderKey, reps) {
-            if (genderKey === 'male') {
-                const thresholds = { '15-18': [40,31,21,11], '19-22': [38,28,18,9], '23-26': [35,25,16,8], '27-30': [32,23,14,6] };
-                const t = thresholds[ageGroup] || thresholds['27-30'];
-                if (reps >= t[0]) return 'Excellent';
-                if (reps >= t[1]) return 'Good';
-                if (reps >= t[2]) return 'Average';
-                if (reps >= t[3]) return 'Below Average';
-                return 'Poor';
-            } else {
-                const thresholds = { '15-18': [25,19,13,7], '19-22': [23,17,11,6], '23-26': [20,15,9,5], '27-30': [18,13,8,4] };
-                const t = thresholds[ageGroup] || thresholds['27-30'];
-                if (reps >= t[0]) return 'Excellent';
-                if (reps >= t[1]) return 'Good';
-                if (reps >= t[2]) return 'Average';
-                if (reps >= t[3]) return 'Below Average';
-                return 'Poor';
-            }
-        }
-
-        function getCurlUpNormCategory(ageGroup, genderKey, reps) {
-            if (genderKey === 'male') {
-                const thresholds = { '15-18': [50,41,31,21], '19-22': [47,38,28,19], '23-26': [44,35,25,17], '27-30': [40,32,22,15] };
-                const t = thresholds[ageGroup] || thresholds['27-30'];
-                if (reps >= t[0]) return 'Excellent';
-                if (reps >= t[1]) return 'Good';
-                if (reps >= t[2]) return 'Average';
-                if (reps >= t[3]) return 'Below Average';
-                return 'Poor';
-            } else {
-                const thresholds = { '15-18': [45,36,26,16], '19-22': [42,34,24,15], '23-26': [39,31,21,13], '27-30': [36,28,19,11] };
-                const t = thresholds[ageGroup] || thresholds['27-30'];
-                if (reps >= t[0]) return 'Excellent';
-                if (reps >= t[1]) return 'Good';
-                if (reps >= t[2]) return 'Average';
-                if (reps >= t[3]) return 'Below Average';
-                return 'Poor';
-            }
-        }
-
-        function getSitAndReachNormCategory(ageGroup, genderKey, v) {
-            if (genderKey === 'male') {
-                const thresholds = { '15-18': [38,33,26,18], '19-22': [37,32,25,17], '23-26': [35.5,30.5,23.5,15.5], '27-30': [34,29,22,14] };
-                const t = thresholds[ageGroup] || thresholds['27-30'];
-                if (v >= t[0]) return 'Excellent';
-                if (v >= t[1]) return 'Good';
-                if (v >= t[2]) return 'Average';
-                if (v >= t[3]) return 'Below Average';
-                return 'Poor';
-            } else {
-                const thresholds = { '15-18': [39,34,27,19], '19-22': [38,33,26,18], '23-26': [37,32,25,17], '27-30': [36,31,24,16] };
-                const t = thresholds[ageGroup] || thresholds['27-30'];
-                if (v >= t[0]) return 'Excellent';
-                if (v >= t[1]) return 'Good';
-                if (v >= t[2]) return 'Average';
-                if (v >= t[3]) return 'Below Average';
-                return 'Poor';
-            }
-        }
-
-        function getStepTestNormCategory(ageGroup, genderKey, hr) {
-            if (genderKey === 'male') {
-                const thresholds = { '15-18': [84,97,108,118], '19-22': [79,89,105,116], '23-26': [80,90,106,117], '27-30': [81,91,107,118] };
-                const t = thresholds[ageGroup] || thresholds['27-30'];
-                if (hr <= t[0]) return 'Excellent';
-                if (hr <= t[1]) return 'Good';
-                if (hr <= t[2]) return 'Average';
-                if (hr <= t[3]) return 'Below Average';
-                return 'Poor';
-            } else {
-                const thresholds = { '15-18': [89,103,113,124], '19-22': [85,98,109,118], '23-26': [86,99,110,119], '27-30': [88,101,112,121] };
-                const t = thresholds[ageGroup] || thresholds['27-30'];
-                if (hr <= t[0]) return 'Excellent';
-                if (hr <= t[1]) return 'Good';
-                if (hr <= t[2]) return 'Average';
-                if (hr <= t[3]) return 'Below Average';
-                return 'Poor';
-            }
-        }
-
-        function getNormCategory(testName, result) {
-            if (!testName) return null;
-            const normalized = testName.toLowerCase();
-            const numericValue = extractNumericResult(result);
-            const age = getStudentAgeForNorms();
-            const ageGroup = getAgeGroup(age);
-            const genderKey = getGenderKey();
-
-            // Skinfold — extract label from result string like "18% (Athletic)"
-            if (normalized.includes('skinfold')) {
-                if (typeof result === 'string') {
-                    const match = result.match(/\(([^)]+)\)/);
-                    if (match) return match[1]; // e.g. "Athletic", "Fitness", "Average"
-                }
-                return 'Completed';
-            }
-
-            // Step test / 3-minute step
-            if (normalized.includes('step test') || normalized.includes('3-minute')) {
-                if (!ageGroup) return 'Completed';
-                return getStepTestNormCategory(ageGroup, genderKey, numericValue);
-            }
-
-            // Push-up
-            if (normalized.includes('push-up') || normalized.includes('pushup')) {
-                if (!ageGroup) return null;
-                return getPushUpNormCategory(ageGroup, genderKey, numericValue);
-            }
-
-            // Curl-up
-            if (normalized.includes('curl-up') || normalized.includes('curl up')) {
-                if (!ageGroup) return null;
-                return getCurlUpNormCategory(ageGroup, genderKey, numericValue);
-            }
-
-            // Sit-and-reach
-            if (normalized.includes('sit-and-reach') || normalized.includes('sit and reach')) {
-                if (!ageGroup) return null;
-                return getSitAndReachNormCategory(ageGroup, genderKey, numericValue);
-            }
-
-            return null;
-        }
-        
-
-        function normCategoryClass(category) {
-            if (!category) return 'norm-average';
-            const c = category.toLowerCase();
-            if (c === 'excellent') return 'norm-excellent';
-            if (c === 'good') return 'norm-good';
-            if (c === 'average') return 'norm-average';
-            if (c === 'below average') return 'norm-below-average';
-            if (c === 'poor') return 'norm-poor';
-            // skinfold categories
-            if (c === 'athletic' || c === 'fitness' || c === 'essential fat') return 'norm-good';
-            if (c === 'overfat') return 'norm-below-average';
-            if (c === 'obese') return 'norm-poor';
-            return 'norm-completion';
-        }
-
-        function normCategoryIcon(category) {
-            if (!category) return 'bi-dash-circle-fill';
-            const c = category.toLowerCase();
-            if (c === 'excellent') return 'bi-star-fill';
-            if (c === 'good') return 'bi-hand-thumbs-up-fill';
-            if (c === 'average') return 'bi-dash-circle-fill';
-            if (c === 'below average') return 'bi-exclamation-circle-fill';
-            if (c === 'poor') return 'bi-x-circle-fill';
-            return 'bi-check-circle-fill';
-        }
-
-        // Map norm category to a numeric rank for computing "overall standing"
-        function normCategoryRank(category) {
-            if (!category) return 3;
-            const c = category.toLowerCase();
-            if (c === 'excellent') return 5;
-            if (c === 'good' || c === 'athletic' || c === 'fitness') return 4;
-            if (c === 'average') return 3;
-            if (c === 'below average' || c === 'overfat') return 2;
-            if (c === 'poor' || c === 'obese') return 1;
-            return 3; // completed/essential fat/etc
-        }
-
-        function rankToCategory(rank) {
-            if (rank === null) return null;
-            if (rank >= 4.5) return 'Excellent';
-            if (rank >= 3.5) return 'Good';
-            if (rank >= 2.5) return 'Average';
-            if (rank >= 1.5) return 'Below Average';
-            return 'Poor';
-        }
-
-        // ========== TEST CATEGORIES ==========
         const testCategories = {
             'Cardiorespiratory Endurance': { tests: ['3-Minute Step Test', 'step test'], icon: '❤️' },
             'Muscular Strength and Endurance': { tests: ['Curl-Up Test', 'curl-up', 'Push-Up Test', 'push-up'], icon: '💪' },
@@ -805,100 +305,536 @@ function cleanupAllListeners() { activeListeners.forEach(fn => { try { fn(); } c
             'Body Composition': { tests: ['Skinfold Caliper Measurements', 'skinfold'], icon: '⚖️' }
         };
 
+        // ========== NORM HELPERS ==========
+
+        function _studentAge() {
+            if (!studentData) return 20;
+            if (studentData.birthday) {
+                try {
+                    const bd = studentData.birthday.toDate ? studentData.birthday.toDate() : new Date(studentData.birthday);
+                    const now = new Date();
+                    let age = now.getFullYear() - bd.getFullYear();
+                    if (now.getMonth() < bd.getMonth() || (now.getMonth() === bd.getMonth() && now.getDate() < bd.getDate())) age--;
+                    if (!isNaN(age) && age > 0) return age;
+                } catch (_) {}
+            }
+            return parseInt(studentData?.age) || 20;
+        }
+
+        function _genderKey() {
+            const g = (studentData?.gender || '').toLowerCase();
+            return g.startsWith('f') ? 'female' : 'male';
+        }
+
+        function _ageGroup() {
+            const age = _studentAge();
+            if (age <= 18) return '15-18';
+            if (age <= 22) return '19-22';
+            if (age <= 26) return '23-26';
+            return '27-30';
+        }
+
+        function applyThresholds(nd, value) {
+            const lowerIsBetter = nd.lowerIsBetter ?? false;
+            for (const cat of ['Excellent', 'Good', 'Average', 'Below Average']) {
+                const threshold = nd.thresholds[cat];
+                if (threshold == null) continue;
+                if (lowerIsBetter && value <= threshold) return cat;
+                if (!lowerIsBetter && value >= threshold) return cat;
+            }
+            return 'Poor';
+        }
+
         function getCategoryForTest(testName) {
             for (const [category, data] of Object.entries(testCategories)) {
-                if (data.tests.some(t => {
-                    const testLower = testName.toLowerCase();
-                    const catTestLower = t.toLowerCase();
-                    return testLower.includes(catTestLower) || catTestLower.includes(testLower);
-                })) {
-                    return category;
-                }
+                if (data.tests.some(t => { const tl = testName.toLowerCase(); const cl = t.toLowerCase(); return tl.includes(cl) || cl.includes(tl); })) return category;
             }
             return 'Cardiorespiratory Endurance';
         }
 
-        // ========== NOTIFICATION SYSTEM ==========
-        
-        async function checkUnreadNotifications() {
-            try {
-                if (!studentData || !studentData.section) return;
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);                const notificationsSnapshot = await getDocs(notificationsQuery);
-                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-                let unreadCount = 0;
-                notificationsSnapshot.forEach(doc => { if (!readNotifications.includes(doc.id)) unreadCount++; });
-                const countBadge = document.getElementById('navNotificationCount');
-                const countBadgeMobile = document.getElementById('navNotificationCountMobile');
-                if (unreadCount > 0) {
-                    if (countBadge) { countBadge.textContent = unreadCount; countBadge.classList.remove('hidden'); }
-                    if (countBadgeMobile) { countBadgeMobile.textContent = unreadCount; countBadgeMobile.classList.remove('hidden'); }
-                } else {
-                    if (countBadge) countBadge.classList.add('hidden');
-                    if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
-                }
-            } catch (error) { console.error('Error checking unread notifications:', error); }
+        function normCategoryClass(cat) {
+            if (!cat) return 'norm-average';
+            const c = cat.toLowerCase();
+            if (c === 'excellent') return 'norm-excellent';
+            if (c === 'good' || c === 'athletic' || c === 'fitness') return 'norm-good';
+            if (c === 'average' || c === 'essential fat') return 'norm-average';
+            if (c === 'below average' || c === 'overfat') return 'norm-below-average';
+            if (c === 'poor' || c === 'obese') return 'norm-poor';
+            return 'norm-completion';
         }
 
-        async function loadNotificationDropdown(isMobile = false) {
-            try {
-                const dropdownBody = document.getElementById(isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody');
-                if (!dropdownBody) return;
-                if (!studentData || !studentData.section) {
-                    dropdownBody.innerHTML = `<div class="notification-empty"><i class="bi bi-bell-slash"></i><p>No section assigned</p></div>`;
-                    return;
-                }
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);                const notificationsSnapshot = await getDocs(notificationsQuery);
-                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-                if (!notificationsSnapshot.empty) {
-                    const seenNotifications = new Set();
-                    const uniqueNotifications = [];
-                    notificationsSnapshot.forEach(doc => {
-                        const notification = doc.data();
-                        const contentKey = `${notification.title}|${notification.message}|${notification.createdAt?.toDate?.().getTime() || ''}`;
-                        if (!seenNotifications.has(contentKey)) { seenNotifications.add(contentKey); uniqueNotifications.push({ id: doc.id, ...notification }); }
-                    });
-                    uniqueNotifications.sort((a, b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)));
-                    const unreadIds = uniqueNotifications.filter(n => !readNotifications.includes(n.id)).map(n => n.id);
-                    let html = '';
-                    uniqueNotifications.slice(0, 5).forEach(notification => {
-                        const createdDate = notification.createdAt?.toDate?.();
-                        const dateStr = createdDate ? createdDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recently';
-                        const isRead = readNotifications.includes(notification.id);
-                        html += `<div class="notification-item ${isRead ? 'bg-gray-50' : 'bg-white'}" data-notification-id="${notification.id}"><strong>${notification.title || 'Notification'}</strong><p>${notification.message || ''}</p><small>${dateStr}</small></div>`;
-                    });
-                    dropdownBody.innerHTML = html;
-                    if (unreadIds.length > 0) markNotificationsAsRead(unreadIds);
-                } else {
-                    dropdownBody.innerHTML = `<div class="notification-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet</p></div>`;
-                }
-            } catch (error) { console.error('Error loading notifications:', error); }
+        function normCategoryIcon(cat) {
+            if (!cat) return 'bi-dash-circle-fill';
+            const c = cat.toLowerCase();
+            if (c === 'excellent') return 'bi-star-fill';
+            if (c === 'good' || c === 'athletic' || c === 'fitness') return 'bi-hand-thumbs-up-fill';
+            if (c === 'average' || c === 'essential fat') return 'bi-dash-circle-fill';
+            if (c === 'below average' || c === 'overfat') return 'bi-exclamation-circle-fill';
+            if (c === 'poor' || c === 'obese') return 'bi-x-circle-fill';
+            return 'bi-check-circle-fill';
         }
 
-        function markNotificationsAsRead(notificationIds) {
-            if (!studentData || !studentData.email || !notificationIds.length) return;
-            const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-            localStorage.setItem(`readNotifications_${studentData.email}`, JSON.stringify([...new Set([...readNotifications, ...notificationIds])]));
-            checkUnreadNotifications();
+        function normCategoryRank(cat) {
+            if (!cat) return 3;
+            const c = cat.toLowerCase();
+            if (c === 'excellent') return 5;
+            if (c === 'good' || c === 'athletic' || c === 'fitness') return 4;
+            if (c === 'average' || c === 'essential fat') return 3;
+            if (c === 'below average' || c === 'overfat') return 2;
+            if (c === 'poor' || c === 'obese') return 1;
+            return 3;
         }
 
-        function toggleNotificationDropdown(event) {
-            event?.stopPropagation();
+        function rankToCategory(rank) {
+            if (rank >= 4.5) return 'Excellent';
+            if (rank >= 3.5) return 'Good';
+            if (rank >= 2.5) return 'Average';
+            if (rank >= 1.5) return 'Below Average';
+            return 'Poor';
+        }
+
+        function toDate(v) {
+            if (!v) return null;
+            if (typeof v.toDate === 'function') return v.toDate();
+            if (v instanceof Date) return v;
+            if (v.seconds) return new Date(v.seconds * 1000);
+            return new Date(v);
+        }
+
+        // ========== PARALLEL NORM DOC PREFETCH ==========
+        // Fetches ALL needed norm documents in one parallel batch
+        // Eliminates per-result sequential Firestore reads
+
+        async function prefetchNormDocs(results) {
+            const gender = _genderKey();
+            const ageGroup = _ageGroup();
+            const email = studentData?.email || '';
+
+            const testKeys = new Set();
+            const testIds = new Set();
+
+            results.forEach(r => {
+                const testKey = resolveTestKey(r.testName);
+                if (testKey) testKeys.add(testKey);
+                if (r.testId) testIds.add(r.testId);
+            });
+
+            const fetchPromises = [];
+
+            // Student-specific norms
+            if (email) {
+                testKeys.forEach(testKey => {
+                    fetchPromises.push(
+                        getDoc(doc(db, 'studentNorms', email, 'tests', testKey))
+                            .then(snap => ({ type: 'student', key: testKey, snap }))
+                            .catch(() => null)
+                    );
+                });
+            }
+
+            // Default norms
+            testKeys.forEach(testKey => {
+                fetchPromises.push(
+                    getDoc(doc(db, 'fitnessNorms', `${testKey}_${gender}_${ageGroup}`))
+                        .then(snap => ({ type: 'default', key: `${testKey}_${gender}_${ageGroup}`, snap }))
+                        .catch(() => null)
+                );
+            });
+
+            // Scheduled tests (for customNorms)
+            testIds.forEach(testId => {
+                fetchPromises.push(
+                    getDoc(doc(db, 'scheduledTests', testId))
+                        .then(snap => ({ type: 'scheduled', key: testId, snap }))
+                        .catch(() => null)
+                );
+            });
+
+            const fetched = await Promise.all(fetchPromises);
+            fetched.forEach(result => {
+                if (!result || !result.snap.exists()) return;
+                normDocsCache.set(`${result.type}:${result.key}`, result.snap.data());
+            });
+        }
+
+        // Synchronous norm lookup using pre-fetched docs
+        function getNormCategorySync(testName, result, testId = null) {
+            if (!studentData || !testName) return null;
+            const testKey = resolveTestKey(testName);
+            if (!testKey) return null;
+
+            const gender = _genderKey();
+            const ageGroup = _ageGroup();
+            const value = extractNumericResult(result);
+            const cacheKey = `${studentData?.email}|${testKey}|${gender}|${ageGroup}|${testId || 'none'}`;
+            if (normCache.has(cacheKey)) return normCache.get(cacheKey);
+
+            // 1. Student-specific norms
+            const studentNorm = normDocsCache.get(`student:${testKey}`);
+            if (studentNorm?.thresholds) {
+                const cat = applyThresholds(studentNorm, value);
+                normCache.set(cacheKey, cat); return cat;
+            }
+
+            // 2. Test-level customNorms
+            if (testId) {
+                const scheduledData = normDocsCache.get(`scheduled:${testId}`);
+                if (scheduledData?.customNorms?.thresholds) {
+                    const cat = applyThresholds(scheduledData.customNorms, value);
+                    normCache.set(cacheKey, cat); return cat;
+                }
+            }
+
+            // 3. Default norms
+            const defaultNorm = normDocsCache.get(`default:${testKey}_${gender}_${ageGroup}`);
+            if (defaultNorm?.thresholds) {
+                const cat = applyThresholds(defaultNorm, value);
+                normCache.set(cacheKey, cat); return cat;
+            }
+
+            return null;
+        }
+
+        // ========== PARALLEL DATA FETCHING ==========
+
+        async function fetchStudentDoc(email) {
+            const snap = await getDocs(query(collection(db, 'students'), where('email', '==', email)));
+            return snap.empty ? null : snap.docs[0].data();
+        }
+
+        async function fetchTestResults(email) {
+            const snap = await getDocs(query(
+                collection(db, 'testResults'),
+                where('studentEmail', '==', email),
+                where('status', 'in', ['completed', 'overdue', 'late'])
+            ));
+            return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        }
+
+        async function fetchAssignedTests(section, email) {
+            if (!section || section === 'Not Assigned') return 0;
+            const snap = await getDocs(query(
+                collection(db, 'scheduledTests'),
+                where('section', '==', section),
+                where('isVisible', '==', true),
+                where('isActive', '==', true)
+            ));
+            const now = new Date();
+            const seenIds = new Set();
+            let count = 0;
+            snap.forEach(d => {
+                const test = d.data();
+                if (seenIds.has(d.id)) return;
+                seenIds.add(d.id);
+                const isSelected = test.selectedStudents?.length ? test.selectedStudents.includes(email) : true;
+                if (!isSelected) return;
+                let testDateTime;
+                if (test.date && test.time) testDateTime = new Date(`${test.date}T${test.time}`);
+                else if (test.date) { testDateTime = new Date(test.date); testDateTime.setHours(0,0,0,0); }
+                else testDateTime = new Date(0);
+                let deadlineDateTime;
+                if (test.deadlineDateTime) deadlineDateTime = new Date(test.deadlineDateTime);
+                else if (test.deadline) {
+                    deadlineDateTime = new Date(test.deadline);
+                    if (test.deadlineTime) { const [h,m] = test.deadlineTime.split(':').map(Number); deadlineDateTime.setHours(h,m,0,0); }
+                    else deadlineDateTime.setHours(23,59,59,999);
+                } else deadlineDateTime = new Date(8640000000000000);
+                if (testDateTime <= now || deadlineDateTime < now) count++;
+            });
+            return count;
+        }
+
+        async function fetchNotifications(section, email) {
+            if (!section || section === 'Not Assigned') return [];
+            const snap = await getDocs(query(
+                collection(db, 'notifications'),
+                where('section', '==', section),
+                where('studentEmail', '==', email)
+            ));
+            return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        }
+
+        // ========== MAIN LOAD (fully parallel) ==========
+
+        async function loadPage(user) {
+            currentUser = user;
+
+            // Phase 1: student doc
+            const rawStudent = await fetchStudentDoc(user.email.toLowerCase()) || await fetchStudentDoc(user.email);
+            studentData = rawStudent ? {
+                displayName: `${rawStudent.firstName || ''} ${rawStudent.lastName || ''}`.trim() || user.displayName || user.email.split('@')[0],
+                email: rawStudent.email || user.email,
+                section: rawStudent.section || 'Not Assigned',
+                gender: rawStudent.gender || '',
+                age: rawStudent.age || 0,
+                birthday: rawStudent.birthday || null,
+                ...rawStudent
+            } : {
+                displayName: user.displayName || user.email.split('@')[0],
+                email: user.email, section: 'Not Assigned'
+            };
+
+            updateProfileUI();
+
+            // Phase 2: fetch everything in parallel
+            const [testResults, assignedCount, notifications] = await Promise.all([
+                fetchTestResults(studentData.email),
+                fetchAssignedTests(studentData.section, studentData.email),
+                fetchNotifications(studentData.section, studentData.email)
+            ]);
+
+            totalAssignedTests = assignedCount;
+            cachedNotifications = notifications;
+
+            // Phase 3: prefetch all norm docs in one parallel batch
+            await prefetchNormDocs(testResults);
+
+            // Phase 4: process everything synchronously (zero more Firestore calls)
+            processAndRender(testResults, totalAssignedTests);
+            processNotifications(notifications);
+
+            // Setup live listeners after initial render
+            setupLiveListeners();
+        }
+
+        // ========== PROCESS & RENDER (sync after prefetch) ==========
+
+        function processAndRender(rawResults, assignedCount) {
+            // Deduplicate: keep one result per testId (prefer completed)
+            const testGroups = {};
+            rawResults.forEach(result => {
+                const testId = result.testId || result.id;
+                const normCat = getNormCategorySync(result.testName, result.result || result.resultData, result.testId);
+                const category = getCategoryForTest(result.testName);
+                const dateObj = toDate(result.submittedAt) || new Date();
+
+                if (!testGroups[testId]) {
+                    testGroups[testId] = { ...result, normCategory: normCat, category, submittedAt: dateObj };
+                } else if (result.status === 'completed' && testGroups[testId].status !== 'completed') {
+                    testGroups[testId] = { ...result, normCategory: normCat, category, submittedAt: dateObj };
+                }
+            });
+
+            const testResults = Object.values(testGroups);
+
+            // Build category data
+            const categoryData = {};
+            Object.keys(testCategories).forEach(cat => { categoryData[cat] = { categories: [], tests: [] }; });
+            const allRanks = [];
+
+            testResults.forEach(result => {
+                if (categoryData[result.category]) {
+                    if (result.normCategory) {
+                        categoryData[result.category].categories.push(result.normCategory);
+                        allRanks.push(normCategoryRank(result.normCategory));
+                    }
+                    categoryData[result.category].tests.push({ name: result.testName, normCategory: result.normCategory });
+                }
+            });
+
+            // Overall standing
+            const overallStandingEl = document.getElementById('overallStanding');
+            const overallNoteEl = document.getElementById('overallNote');
+            if (allRanks.length > 0) {
+                const avgRank = allRanks.reduce((a, b) => a + b, 0) / allRanks.length;
+                const overallCat = rankToCategory(avgRank);
+                overallStandingEl.innerHTML = `<span class="norm-badge ${normCategoryClass(overallCat)} text-sm px-4 py-2"><i class="bi ${normCategoryIcon(overallCat)}"></i> ${overallCat}</span>`;
+                overallNoteEl.textContent = `Based on ${allRanks.length} completed assessment${allRanks.length !== 1 ? 's' : ''}`;
+            } else {
+                overallStandingEl.innerHTML = `<span class="norm-badge norm-average text-sm px-4 py-2"><i class="bi bi-dash-circle-fill"></i> No data yet</span>`;
+                overallNoteEl.textContent = 'Complete tests to see your standing';
+            }
+
+            const testCount = testResults.length;
+            const completionRate = assignedCount > 0 ? Math.round((testCount / assignedCount) * 100) : 0;
+            document.getElementById('completionRate').textContent = completionRate + '%';
+            document.getElementById('completedTests').textContent = testCount;
+            document.getElementById('totalTests').textContent = `/${assignedCount}`;
+
+            renderCategoryPerformance(categoryData);
+            renderTestResults(testResults);
+        }
+
+        function renderCategoryPerformance(categoryData) {
+            const container = document.getElementById('categoriesContainer');
+            if (!container) return;
+            let html = '', hasData = false;
+
+            Object.entries(categoryData).forEach(([category, data]) => {
+                if (!data.tests.length) return;
+                hasData = true;
+                let dominantCat = null;
+                if (data.categories.length > 0) {
+                    const avg = data.categories.map(normCategoryRank).reduce((a,b) => a+b, 0) / data.categories.length;
+                    dominantCat = rankToCategory(avg);
+                }
+                const cls = dominantCat ? normCategoryClass(dominantCat) : 'norm-completion';
+                const ico = dominantCat ? normCategoryIcon(dominantCat) : 'bi-check-circle-fill';
+                const displayCat = dominantCat || 'Completed';
+
+                html += `
+                <div class="px-4 py-4 md:px-6 hover:bg-gray-50 transition-colors">
+                    <div class="block md:hidden">
+                        <div class="flex items-center justify-between mb-2"><h4 class="font-semibold text-gray-900 text-sm">${category}</h4></div>
+                        <div class="flex justify-between items-center"><p class="text-xs text-gray-500">${data.tests.length} test${data.tests.length !== 1 ? 's' : ''}</p><span class="norm-badge ${cls}"><i class="bi ${ico}"></i> ${displayCat}</span></div>
+                    </div>
+                    <div class="hidden md:grid grid-cols-12 gap-4 items-center">
+                        <div class="col-span-5"><h4 class="font-semibold text-gray-900">${category}</h4><p class="text-xs text-gray-500 mt-0.5">${data.tests.length} test${data.tests.length !== 1 ? 's' : ''} completed</p></div>
+                        <div class="col-span-3 text-center"><span class="text-gray-600">${data.tests.length} taken</span></div>
+                        <div class="col-span-4 flex justify-end"><span class="norm-badge ${cls} text-sm"><i class="bi ${ico}"></i> ${displayCat}</span></div>
+                    </div>
+                </div>`;
+            });
+
+            if (!hasData) {
+                html = `<div class="px-6 py-12 text-center"><i class="bi bi-inbox text-gray-300 text-5xl mb-3 block"></i><p class="text-gray-500">No category data available yet</p><p class="text-gray-400 text-sm mt-2">Complete tests to see your performance by category</p></div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function renderTestResults(testResults) {
+            const container = document.getElementById('testResultsContainer');
+            if (!container) return;
+            if (!testResults || testResults.length === 0) {
+                container.innerHTML = `<div class="px-6 py-12 text-center"><i class="bi bi-clipboard-x text-gray-300 text-5xl mb-3 block"></i><p class="text-gray-500 font-medium">No test results yet</p><p class="text-gray-400 text-sm mt-2">Complete tests to see your results here</p></div>`;
+                return;
+            }
+
+            const sorted = [...testResults].sort((a, b) => (toDate(b.submittedAt) || new Date(0)) - (toDate(a.submittedAt) || new Date(0)));
+            let html = '';
+            sorted.forEach(result => {
+                const normCat = result.normCategory;
+                const cls = normCat ? normCategoryClass(normCat) : 'norm-completion';
+                const ico = normCat ? normCategoryIcon(normCat) : 'bi-check-circle-fill';
+                const displayCat = normCat || 'Completed';
+                const dateObj = toDate(result.submittedAt);
+                const date = dateObj ? dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
+                const isOverdue = result.status === 'overdue' || result.status === 'late';
+
+                html += `
+                <div class="px-6 py-4 hover:bg-gray-50 transition-colors ${isOverdue ? 'bg-red-50/30' : ''}">
+                    <div class="block md:hidden">
+                        <div class="mb-3"><h4 class="font-semibold text-gray-900 text-sm mb-1">${result.testName}${isOverdue ? '<span class="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">⚠️ Late</span>' : ''}</h4><p class="text-xs text-gray-500">${result.category}</p><p class="text-xs text-gray-400 mt-1"><i class="bi bi-calendar3"></i> ${date}</p></div>
+                        <div class="flex items-center justify-between"><span class="norm-badge ${cls}"><i class="bi ${ico}"></i> ${displayCat}</span><a href="./studentresult.html?resultId=${result.id}" class="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1">View <i class="bi bi-arrow-right"></i></a></div>
+                    </div>
+                    <div class="hidden md:grid grid-cols-12 gap-4 items-center">
+                        <div class="col-span-4"><h4 class="font-semibold text-gray-900">${result.testName}${isOverdue ? '<span class="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">⚠️ Late</span>' : ''}</h4><p class="text-xs text-gray-500 mt-1">${result.category}</p></div>
+                        <div class="col-span-3"><span class="text-gray-600 text-sm">${result.category}</span></div>
+                        <div class="col-span-2 text-center"><span class="text-gray-600 text-sm"><i class="bi bi-calendar3"></i> ${date}</span></div>
+                        <div class="col-span-2 flex justify-center"><span class="norm-badge ${cls}"><i class="bi ${ico}"></i> ${displayCat}</span></div>
+                        <div class="col-span-1 text-right"><a href="./studentresult.html?resultId=${result.id}" class="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1 hover:gap-2 transition-all">View <i class="bi bi-arrow-right"></i></a></div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // ========== LIVE LISTENERS (post-initial-render) ==========
+
+        function setupLiveListeners() {
+            if (!studentData?.section || studentData.section === 'Not Assigned') return;
+
+            // Listen for new test results
+            const resultsQuery = query(
+                collection(db, 'testResults'),
+                where('studentEmail', '==', studentData.email),
+                where('status', 'in', ['completed', 'overdue', 'late'])
+            );
+            registerListener(onSnapshot(resultsQuery, async snap => {
+                const updatedResults = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                // Re-prefetch norms for any new results not yet cached
+                await prefetchNormDocs(updatedResults);
+                const updatedAssigned = await fetchAssignedTests(studentData.section, studentData.email);
+                totalAssignedTests = updatedAssigned;
+                document.getElementById('totalTests').textContent = `/${updatedAssigned}`;
+                processAndRender(updatedResults, updatedAssigned);
+            }, () => {}));
+
+            // Listen for notifications (lightweight — just update badge)
+            const notifQuery = query(
+                collection(db, 'notifications'),
+                where('section', '==', studentData.section),
+                where('studentEmail', '==', studentData.email)
+            );
+            registerListener(onSnapshot(notifQuery, snap => {
+                cachedNotifications = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                processNotifications(cachedNotifications);
+            }, () => {}));
+        }
+
+        // ========== NOTIFICATIONS ==========
+
+        function processNotifications(notifications) {
+            const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData?.email}`) || '[]');
+            const unread = notifications.filter(n => !read.includes(n.id)).length;
+            updateNotificationBadge(unread);
+        }
+
+        function updateNotificationBadge(count) {
+            ['navNotificationCount', 'navNotificationCountMobile'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (count > 0) { el.textContent = count; el.classList.remove('hidden'); }
+                else el.classList.add('hidden');
+            });
+        }
+
+        function loadNotificationDropdown(isMobile = false) {
+            const bodyId = isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody';
+            const dropBody = document.getElementById(bodyId);
+            if (!dropBody) return;
+
+            if (!cachedNotifications.length) {
+                dropBody.innerHTML = `<div class="notification-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet</p></div>`;
+                return;
+            }
+
+            const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData?.email}`) || '[]');
+            const seen = new Set(), unique = [];
+            cachedNotifications.forEach(n => {
+                const k = `${n.title}|${n.message}|${n.createdAt?.toDate?.().getTime() || ''}`;
+                if (!seen.has(k)) { seen.add(k); unique.push(n); }
+            });
+            unique.sort((a, b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)));
+
+            dropBody.innerHTML = unique.slice(0, 5).map(n => {
+                const d = n.createdAt?.toDate?.();
+                const ds = d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recently';
+                const isRead = read.includes(n.id);
+                return `<div class="notification-item ${isRead ? 'bg-gray-50' : 'bg-white'}"><strong>${n.title || 'Notification'}</strong><p>${n.message || ''}</p><small>${ds}</small></div>`;
+            }).join('');
+
+            const unreadIds = unique.filter(n => !read.includes(n.id)).map(n => n.id);
+            if (unreadIds.length) {
+                localStorage.setItem(`readNotifications_${studentData?.email}`, JSON.stringify([...new Set([...read, ...unreadIds])]));
+                updateNotificationBadge(0);
+            }
+        }
+
+        // ========== UI ==========
+
+        function updateProfileUI() {
+            if (!currentUser) return;
+            const name = studentData?.displayName || `${studentData?.firstName || ''} ${studentData?.lastName || ''}`.trim() || 'Student';
+            const email = studentData?.email || currentUser?.email || '';
+            const photoURL = currentUser?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=128`;
+            ['profilePictureBtn','profileDropdownPicture','profilePictureBtnMobile','profileDropdownPictureMobile'].forEach(id => { const el = document.getElementById(id); if (el) el.src = photoURL; });
+            ['profileDropdownName','profileDropdownNameMobile'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = name; });
+            ['profileDropdownEmail','profileDropdownEmailMobile'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = email; });
+        }
+
+        // ========== DROPDOWN TOGGLES ==========
+
+        function toggleNotificationDropdown(e) {
+            e?.stopPropagation();
             const isMobile = window.innerWidth < 1024;
-            const dropdown = isMobile ? document.getElementById('notificationDropdownMobile') : document.getElementById('notificationDropdown');
-            if (dropdown.classList.contains('hidden')) {
-                dropdown.classList.remove('hidden');
+            const dd = document.getElementById(isMobile ? 'notificationDropdownMobile' : 'notificationDropdown');
+            if (dd.classList.contains('hidden')) {
+                dd.classList.remove('hidden');
                 loadNotificationDropdown(isMobile);
                 document.getElementById('profileDropdown')?.classList.add('hidden');
                 document.getElementById('profileDropdownMobile')?.classList.add('hidden');
-            } else { dropdown.classList.add('hidden'); }
+            } else dd.classList.add('hidden');
         }
 
         function closeNotificationDropdown() {
@@ -906,532 +842,114 @@ const notificationsQuery = query(
             document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
         }
 
-        function setupNotificationListener() {
-            if (!studentData || !studentData.section) return;
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-
-);           
-registerListener(onSnapshot(notificationsQuery, () => checkUnreadNotifications(), error => console.error(error)));
-
-
+        function toggleProfileDropdown(e) {
+            e?.stopPropagation();
+            const isMobile = window.innerWidth < 1024;
+            const dd = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
+            closeNotificationDropdown();
+            hamburger?.classList.remove('active'); mobileDrawer?.classList.remove('active'); drawerOverlay?.classList.remove('active'); document.body.style.overflow = '';
+            dd.classList.toggle('hidden');
         }
-
-  window.toggleProfileDropdown = function() {
-    const isMobile = window.innerWidth < 1024;
-    const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
-    const notificationDropdown = document.getElementById('notificationDropdown');
-    const notificationDropdownMobile = document.getElementById('notificationDropdownMobile');
-    if (notificationDropdown) notificationDropdown.classList.add('hidden');
-    if (notificationDropdownMobile) notificationDropdownMobile.classList.add('hidden');
-
-    // Close hamburger drawer if open
-    hamburger?.classList.remove('active');
-    mobileDrawer?.classList.remove('active');
-    drawerOverlay?.classList.remove('active');
-    document.body.style.overflow = '';
-
-    dropdown.classList.toggle('hidden');
-};
 
         function closeProfileDropdown() {
             document.getElementById('profileDropdown')?.classList.add('hidden');
             document.getElementById('profileDropdownMobile')?.classList.add('hidden');
         }
 
-        function updateProfileUI() {
-            if (!currentUser || !studentData) return;
-            const photoURL = currentUser?.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(studentData?.displayName || `${studentData?.firstName || ''} ${studentData?.lastName || ''}`.trim() || 'User') + '&background=3b82f6&color=fff&size=128';
-            ['profilePictureBtn', 'profileDropdownPicture', 'profilePictureBtnMobile', 'profileDropdownPictureMobile'].forEach(id => {
-                const el = document.getElementById(id); if (el) el.src = photoURL;
-            });
-            const name = studentData?.displayName || `${studentData?.firstName || ''} ${studentData?.lastName || ''}`.trim() || 'Student';
-            const email = studentData?.email || currentUser?.email || '';
-            ['profileDropdownName', 'profileDropdownNameMobile'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = name; });
-            ['profileDropdownEmail', 'profileDropdownEmailMobile'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = email; });
-        }
-
-        // ========== HAMBURGER ==========
-        const hamburger = document.getElementById('hamburger');
-        const mobileDrawer = document.getElementById('mobileDrawer');
-        const drawerOverlay = document.getElementById('drawerOverlay');
-if (hamburger) {
-    hamburger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        hamburger.classList.toggle('active');
-        mobileDrawer.classList.toggle('active');
-        drawerOverlay.classList.toggle('active');
-        document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-
-        // Close profile and notification dropdowns when opening drawer
-        if (mobileDrawer.classList.contains('active')) {
-            document.getElementById('profileDropdownMobile')?.classList.add('hidden');
-            document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
-        }
-    });
-}
-        if (drawerOverlay) {
-            drawerOverlay.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                mobileDrawer.classList.remove('active');
-                drawerOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-        }
-        document.querySelectorAll('.mobile-nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                mobileDrawer.classList.remove('active');
-                drawerOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-        });
-
-        // ========== LOAD STUDENT DATA ==========
-        async function loadStudentData(user) {
-            try {
-                const studentsQuery = query(collection(db, 'students'), where('email', '==', user.email));
-                const studentsSnapshot = await getDocs(studentsQuery);
-                if (!studentsSnapshot.empty) {
-                    studentsSnapshot.forEach((doc) => { studentData = doc.data(); });
-                }
-                return studentData;
-            } catch (error) { console.error('Error loading student data:', error); return null; }
-        }
-
-        // ========== MAIN GRADES LOADING ==========
-        async function loadPerformance() {
-            try {
-                if (!studentData || !studentData.email) {
-                    document.getElementById('loadingScreen').classList.add('hidden');
-                    document.getElementById('mainContent').classList.remove('hidden');
-                    return;
-                }
-
-                setupNotificationListener();
-                await checkUnreadNotifications();
-
-                // Get total assigned tests
-                const assignedTestsQuery = query(
-                    collection(db, 'scheduledTests'),
-                    where('section', '==', studentData.section),
-                    where('isVisible', '==', true),
-                    where('isActive', '==', true)
-                );
-
-                let totalAssignedTests = 0;
-
-registerListener(onSnapshot(assignedTestsQuery, async (assignedSnapshot) => {
-                        const now = new Date();
-                    const seenTestIds = new Set();
-                    totalAssignedTests = 0;
-
-                    assignedSnapshot.forEach((doc) => {
-                        const test = doc.data();
-                        const testId = doc.id;
-                        if (seenTestIds.has(testId)) return;
-                        seenTestIds.add(testId);
-
-                        let isStudentSelected = true;
-                        if (test.selectedStudents && Array.isArray(test.selectedStudents)) {
-                            isStudentSelected = test.selectedStudents.includes(studentData.email);
-                        }
-                        if (!isStudentSelected) return;
-
-                        let testDateTime;
-                        if (test.date && test.time) testDateTime = new Date(`${test.date}T${test.time}`);
-                        else if (test.date) { testDateTime = new Date(test.date); testDateTime.setHours(0,0,0,0); }
-                        else testDateTime = new Date(0);
-
-                        let deadlineDateTime;
-                        if (test.deadlineDateTime) deadlineDateTime = new Date(test.deadlineDateTime);
-                        else if (test.deadline) {
-                            deadlineDateTime = new Date(test.deadline);
-                            if (test.deadlineTime) { const [h,m] = test.deadlineTime.split(':').map(Number); deadlineDateTime.setHours(h,m,0,0); }
-                            else deadlineDateTime.setHours(23,59,59,999);
-                        } else deadlineDateTime = new Date(8640000000000000);
-
-                        if (testDateTime <= now || deadlineDateTime < now) totalAssignedTests++;
-                    });
-
-                    document.getElementById('totalTests').textContent = `/${totalAssignedTests}`;
-                    setupRealTimePerformanceListener(totalAssignedTests);
-                }));
-
-            } catch (error) {
-                console.error('Error loading performance:', error);
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-            }
-        }
-
-        async function setupRealTimePerformanceListener(totalAssignedTests = 0) {
-            try {
-                const resultsQuery = query(
-                    collection(db, 'testResults'),
-                    where('studentEmail', '==', studentData.email),
-                    where('status', 'in', ['completed', 'overdue', 'late'])
-                );
-
-registerListener(onSnapshot(resultsQuery, (resultsSnapshot) => {
-                        const testResults = [];
-                    const categoryData = {};
-
-                    Object.keys(testCategories).forEach(cat => {
-                        categoryData[cat] = { categories: [], tests: [] };
-                    });
-
-                    const testGroups = {};
-
-                    resultsSnapshot.forEach((doc) => {
-                        const result = doc.data();
-
-                        let testDate = new Date();
-                        if (result.submittedAt) {
-                            if (typeof result.submittedAt.toDate === 'function') testDate = result.submittedAt.toDate();
-                            else if (result.submittedAt instanceof Date) testDate = result.submittedAt;
-                            else if (result.submittedAt.seconds) testDate = new Date(result.submittedAt.seconds * 1000);
-                            else testDate = new Date(result.submittedAt);
-                        }
-
-                        // Get norm category
-                        const normCat = getNormCategory(result.testName, result.result || result.resultData);
-                        const category = getCategoryForTest(result.testName);
-                        const testId = result.testId || doc.id;
-
-                        // For deduplication: keep one result per test (prefer completed over overdue)
-                        if (!testGroups[testId]) {
-                            testGroups[testId] = {
-                                ...result,
-                                normCategory: normCat,
-                                category,
-                                id: doc.id,
-                                submittedAt: testDate
-                            };
-                        } else {
-                            // prefer completed status
-                            if (result.status === 'completed' && testGroups[testId].status !== 'completed') {
-                                testGroups[testId] = { ...result, normCategory: normCat, category, id: doc.id, submittedAt: testDate };
-                            }
-                        }
-                    });
-
-                    let testCount = 0;
-                    const allRanks = [];
-
-                    Object.values(testGroups).forEach(result => {
-                        testResults.push(result);
-                        if (categoryData[result.category]) {
-                            if (result.normCategory) {
-                                categoryData[result.category].categories.push(result.normCategory);
-                                allRanks.push(normCategoryRank(result.normCategory));
-                            }
-                            categoryData[result.category].tests.push({ name: result.testName, normCategory: result.normCategory });
-                        }
-                        testCount++;
-                    });
-
-                    // Overall standing from average rank
-                    const overallStandingEl = document.getElementById('overallStanding');
-                    const overallNoteEl = document.getElementById('overallNote');
-                    if (allRanks.length > 0) {
-                        const avgRank = allRanks.reduce((a, b) => a + b, 0) / allRanks.length;
-                        const overallCat = rankToCategory(avgRank);
-                        const cls = normCategoryClass(overallCat);
-                        const ico = normCategoryIcon(overallCat);
-                        overallStandingEl.innerHTML = `<span class="norm-badge ${cls} text-sm px-4 py-2"><i class="bi ${ico}"></i> ${overallCat}</span>`;
-                        overallNoteEl.textContent = `Based on ${allRanks.length} completed assessment${allRanks.length !== 1 ? 's' : ''}`;
-                    } else {
-                        overallStandingEl.innerHTML = `<span class="norm-badge norm-average text-sm px-4 py-2"><i class="bi bi-dash-circle-fill"></i> No data yet</span>`;
-                        overallNoteEl.textContent = 'Complete tests to see your standing';
-                    }
-
-                    const completionRate = totalAssignedTests > 0 ? Math.round((testCount / totalAssignedTests) * 100) : 0;
-                    document.getElementById('completionRate').textContent = completionRate + '%';
-                    document.getElementById('completedTests').textContent = testCount;
-                    document.getElementById('totalTests').textContent = `/${totalAssignedTests}`;
-
-                    renderCategoryPerformance(categoryData);
-                    renderTestResults(testResults);
-
-                    document.getElementById('loadingScreen').classList.add('hidden');
-                    document.getElementById('mainContent').classList.remove('hidden');
-                }));
-
-            } catch (error) {
-                console.error('Error in real-time listener:', error);
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-            }
-        }
-
-        function renderCategoryPerformance(categoryData) {
-            const container = document.getElementById('categoriesContainer');
-            if (!container) return;
-
-            let html = '';
-            let hasData = false;
-
-            Object.entries(categoryData).forEach(([category, data]) => {
-                if (data.tests.length > 0) {
-                    hasData = true;
-
-                    // Compute dominant category
-                    let dominantCat = null;
-                    if (data.categories.length > 0) {
-                        const ranks = data.categories.map(normCategoryRank);
-                        const avgRank = ranks.reduce((a, b) => a + b, 0) / ranks.length;
-                        dominantCat = rankToCategory(avgRank);
-                    }
-
-                    const cls = dominantCat ? normCategoryClass(dominantCat) : 'norm-completion';
-                    const ico = dominantCat ? normCategoryIcon(dominantCat) : 'bi-check-circle-fill';
-                    const displayCat = dominantCat || 'Completed';
-
-                    html += `
-                        <div class="px-4 py-4 md:px-6 hover:bg-gray-50 transition-colors">
-                            <!-- Mobile Layout -->
-                            <div class="block md:hidden">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h4 class="font-semibold text-gray-900 text-sm">${category}</h4>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <p class="text-xs text-gray-500">${data.tests.length} test${data.tests.length !== 1 ? 's' : ''}</p>
-                                    <span class="norm-badge ${cls}"><i class="bi ${ico}"></i> ${displayCat}</span>
-                                </div>
-                            </div>
-                            <!-- Desktop Layout -->
-                            <div class="hidden md:grid grid-cols-12 gap-4 items-center">
-                                <div class="col-span-5">
-                                    <h4 class="font-semibold text-gray-900">${category}</h4>
-                                    <p class="text-xs text-gray-500 mt-0.5">${data.tests.length} test${data.tests.length !== 1 ? 's' : ''} completed</p>
-                                </div>
-                                <div class="col-span-3 text-center">
-                                    <span class="text-gray-600">${data.tests.length} taken</span>
-                                </div>
-                                <div class="col-span-4 flex justify-end">
-                                    <span class="norm-badge ${cls} text-sm"><i class="bi ${ico}"></i> ${displayCat}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-
-            if (!hasData) {
-                html = `
-                    <div class="px-6 py-12 text-center">
-                        <i class="bi bi-inbox text-gray-300 text-5xl mb-3 block"></i>
-                        <p class="text-gray-500">No category data available yet</p>
-                        <p class="text-gray-400 text-sm mt-2">Complete tests to see your performance by category</p>
-                    </div>
-                `;
-            }
-
-            container.innerHTML = html;
-        }
-
-        function renderTestResults(testResults) {
-            const container = document.getElementById('testResultsContainer');
-            if (!container) return;
-
-            if (!testResults || testResults.length === 0) {
-                container.innerHTML = `
-                    <div class="px-6 py-12 text-center">
-                        <i class="bi bi-clipboard-x text-gray-300 text-5xl mb-3 block"></i>
-                        <p class="text-gray-500 font-medium">No test results yet</p>
-                        <p class="text-gray-400 text-sm mt-2">Complete tests to see your results here</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Sort by date desc
-            testResults.sort((a, b) => {
-                const toDate = v => {
-                    if (!v) return new Date(0);
-                    if (typeof v.toDate === 'function') return v.toDate();
-                    if (v instanceof Date) return v;
-                    if (v.seconds) return new Date(v.seconds * 1000);
-                    return new Date(v);
-                };
-                return toDate(b.submittedAt) - toDate(a.submittedAt);
-            });
-
-            let html = '';
-            testResults.forEach((result) => {
-                const normCat = result.normCategory;
-                const cls = normCat ? normCategoryClass(normCat) : 'norm-completion';
-                const ico = normCat ? normCategoryIcon(normCat) : 'bi-check-circle-fill';
-                const displayCat = normCat || 'Completed';
-
-                const toDate = v => {
-                    if (!v) return null;
-                    if (typeof v.toDate === 'function') return v.toDate();
-                    if (v instanceof Date) return v;
-                    if (v.seconds) return new Date(v.seconds * 1000);
-                    return new Date(v);
-                };
-                const dateObj = toDate(result.submittedAt);
-                const date = dateObj ? dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
-
-                const isOverdue = result.status === 'overdue' || result.status === 'late';
-
-                html += `
-                    <div class="px-6 py-4 hover:bg-gray-50 transition-colors ${isOverdue ? 'bg-red-50/30' : ''}">
-                        <!-- Mobile Layout -->
-                        <div class="block md:hidden">
-                            <div class="mb-3">
-                                <h4 class="font-semibold text-gray-900 text-sm mb-1">
-                                    ${result.testName}
-                                    ${isOverdue ? '<span class="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">⚠️ Late</span>' : ''}
-                                </h4>
-                                <p class="text-xs text-gray-500">${result.category}</p>
-                                <p class="text-xs text-gray-400 mt-1"><i class="bi bi-calendar3"></i> ${date}</p>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="norm-badge ${cls}"><i class="bi ${ico}"></i> ${displayCat}</span>
-                                <a href="./studentresult.html?resultId=${result.id}" class="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1">
-                                    View <i class="bi bi-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <!-- Desktop Layout -->
-                        <div class="hidden md:grid grid-cols-12 gap-4 items-center">
-                            <div class="col-span-4">
-                                <h4 class="font-semibold text-gray-900">
-                                    ${result.testName}
-                                    ${isOverdue ? '<span class="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">⚠️ Late</span>' : ''}
-                                </h4>
-                                <p class="text-xs text-gray-500 mt-1">${result.category}</p>
-                            </div>
-                            <div class="col-span-3">
-                                <span class="text-gray-600 text-sm">${result.category}</span>
-                            </div>
-                            <div class="col-span-2 text-center">
-                                <span class="text-gray-600 text-sm"><i class="bi bi-calendar3"></i> ${date}</span>
-                            </div>
-                            <div class="col-span-2 flex justify-center">
-                                <span class="norm-badge ${cls}"><i class="bi ${ico}"></i> ${displayCat}</span>
-                            </div>
-                            <div class="col-span-1 text-right">
-                                <a href="./studentresult.html?resultId=${result.id}" class="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1 hover:gap-2 transition-all">
-                                    View <i class="bi bi-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        // ========== EVENT LISTENERS ==========
         function setupEventListeners() {
             document.getElementById('notificationBellBtn')?.addEventListener('click', toggleNotificationDropdown);
             document.getElementById('notificationBellBtnMobile')?.addEventListener('click', toggleNotificationDropdown);
-            document.getElementById('closeNotificationBtn')?.addEventListener('click', (e) => { e.stopPropagation(); closeNotificationDropdown(); });
-            document.getElementById('closeNotificationBtnMobile')?.addEventListener('click', (e) => { e.stopPropagation(); closeNotificationDropdown(); });
+            document.getElementById('closeNotificationBtn')?.addEventListener('click', e => { e.stopPropagation(); closeNotificationDropdown(); });
+            document.getElementById('closeNotificationBtnMobile')?.addEventListener('click', e => { e.stopPropagation(); closeNotificationDropdown(); });
             document.getElementById('profilePictureBtn')?.addEventListener('click', toggleProfileDropdown);
             document.getElementById('profilePictureBtnMobile')?.addEventListener('click', toggleProfileDropdown);
-
-            document.addEventListener('click', (event) => {
-                if (!event.target.closest('#notificationBellBtn') && !event.target.closest('#notificationBellBtnMobile') && !event.target.closest('#notificationDropdown') && !event.target.closest('#notificationDropdownMobile')) {
-                    closeNotificationDropdown();
-                }
-                if (!event.target.closest('#profilePictureBtn') && !event.target.closest('#profilePictureBtnMobile') && !event.target.closest('#profileDropdown') && !event.target.closest('#profileDropdownMobile')) {
-                    closeProfileDropdown();
-                }
+            document.addEventListener('click', event => {
+                if (!event.target.closest('#notificationBellBtn') && !event.target.closest('#notificationBellBtnMobile') && !event.target.closest('#notificationDropdown') && !event.target.closest('#notificationDropdownMobile')) closeNotificationDropdown();
+                if (!event.target.closest('#profilePictureBtn') && !event.target.closest('#profilePictureBtnMobile') && !event.target.closest('#profileDropdown') && !event.target.closest('#profileDropdownMobile')) closeProfileDropdown();
             });
         }
-// REPLACE WITH:
-let unsubscribeAuth = null;
 
-// Start showing page in max 1.5s regardless
-const loadingTimeout = setTimeout(() => {
-    document.getElementById('loadingScreen').classList.add('hidden');
-    document.getElementById('mainContent').classList.remove('hidden');
-}, 1500);
+        // ========== HAMBURGER ==========
 
-unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        currentUser = user;
-        setupEventListeners();
+        const hamburger = document.getElementById('hamburger');
+        const mobileDrawer = document.getElementById('mobileDrawer');
+        const drawerOverlay = document.getElementById('drawerOverlay');
 
-        // Parallel: load student data + set up UI simultaneously
-        await loadStudentData(user);
-        cachedStudentData = studentData;
-        updateProfileUI();
+        hamburger?.addEventListener('click', e => {
+            e.stopPropagation();
+            hamburger.classList.toggle('active'); mobileDrawer.classList.toggle('active'); drawerOverlay.classList.toggle('active');
+            document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+            if (mobileDrawer.classList.contains('active')) {
+                document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+                document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
+            }
+        });
+        drawerOverlay?.addEventListener('click', () => {
+            hamburger?.classList.remove('active'); mobileDrawer?.classList.remove('active'); drawerOverlay.classList.remove('active'); document.body.style.overflow = '';
+        });
+        document.querySelectorAll('.mobile-nav-link').forEach(l => l.addEventListener('click', () => {
+            hamburger?.classList.remove('active'); mobileDrawer?.classList.remove('active'); drawerOverlay?.classList.remove('active'); document.body.style.overflow = '';
+        }));
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                hamburger?.classList.remove('active'); mobileDrawer?.classList.remove('active'); drawerOverlay?.classList.remove('active'); document.body.style.overflow = '';
+            }
+        });
 
-        clearTimeout(loadingTimeout);
-        document.getElementById('loadingScreen').classList.add('hidden');
-        document.getElementById('mainContent').classList.remove('hidden');
+        // ========== AUTH ==========
 
-        // Non-blocking background load
-        loadPerformance().catch(err => console.error('Performance load error:', err));
-    } else {
-        clearTimeout(loadingTimeout);
-        window.location.href = '../login/index.html';
-    }
-});
+        const loadingScreen = document.getElementById('loadingScreen');
+        const mainContent = document.getElementById('mainContent');
+        let unsubscribeAuth = null;
 
-// Kill all listeners when navigating away
-window.addEventListener('pagehide', () => {
-    cleanupAllListeners();
-    if (unsubscribeAuth) unsubscribeAuth();
-});
+        const loadingTimeout = setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+        }, 1500);
 
-window.addEventListener('beforeunload', () => {
-    cleanupAllListeners();
-    if (unsubscribeAuth) unsubscribeAuth();
-});
+        unsubscribeAuth = onAuthStateChanged(auth, async user => {
+            if (user) {
+                try {
+                    currentUser = user;
+                    setupEventListeners();
+                    await loadPage(user);
+                    clearTimeout(loadingTimeout);
+                    loadingScreen.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                } catch (_) {
+                    clearTimeout(loadingTimeout);
+                    loadingScreen.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                }
+            } else {
+                clearTimeout(loadingTimeout);
+                window.location.href = '../login/index.html';
+            }
+        });
 
-// ✅ Cleanup on page leave
-window.addEventListener('pagehide', () => unsubscribeAuth());
+        window.addEventListener('pagehide', () => { cleanupAllListeners(); if (unsubscribeAuth) unsubscribeAuth(); });
+        window.addEventListener('beforeunload', () => { cleanupAllListeners(); if (unsubscribeAuth) unsubscribeAuth(); });
 
         // ========== LOGOUT ==========
-        window.handleLogout = function() { showLogoutConfirmPopup(); };
 
-        function showLogoutConfirmPopup() {
-            const existing = document.getElementById('logoutOverlay');
-            if (existing) existing.remove();
+        window.handleLogout = function() {
+            const existing = document.getElementById('logoutOverlay'); if (existing) existing.remove();
             const overlay = document.createElement('div');
             overlay.id = 'logoutOverlay';
-            overlay.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:1rem;animation:fadeInLogout 0.2s ease;`;
-            overlay.innerHTML = `
-                <style>@keyframes fadeInLogout{from{opacity:0}to{opacity:1}}@keyframes slideUpLogout{from{opacity:0;transform:translateY(24px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}</style>
-                <div style="background:#fff;border-radius:24px;padding:2rem 1.5rem 1.5rem;max-width:360px;width:100%;box-shadow:0 8px 40px rgba(60,64,67,0.18),0 2px 8px rgba(60,64,67,0.10);animation:slideUpLogout 0.35s cubic-bezier(.4,0,.2,1);text-align:center;font-family:'Inter',sans-serif;">
-                    <div style="width:68px;height:68px;background:#fce8e6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;">
-                        <svg width="34" height="34" viewBox="0 0 48 48" fill="none"><path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/><path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/></svg>
-                    </div>
-                    <div style="font-size:1.25rem;font-weight:600;color:#202124;margin-bottom:0.35rem;">Log Out</div>
-                    <div style="font-size:0.875rem;color:#5f6368;margin-bottom:1.5rem;line-height:1.5;">Are you sure you want to log out of your account?</div>
-                    <div style="height:1px;background:#e8eaed;margin:0 -1.5rem 1.25rem;"></div>
-                    <div style="display:flex;gap:0.75rem;">
-                        <button id="logoutCancelBtn" style="flex:1;padding:0.75rem 0.5rem;border-radius:100px;border:1.5px solid #dadce0;background:#fff;color:#3c4043;font-size:0.9375rem;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;min-height:48px;">Cancel</button>
-                        <button id="logoutConfirmBtn" style="flex:1;padding:0.75rem 0.5rem;border-radius:100px;border:none;background:#ea4335;color:#fff;font-size:0.9375rem;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;min-height:48px;">Log Out</button>
-                    </div>
-                </div>
-            `;
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:1rem;';
+            overlay.innerHTML = `<div style="background:#fff;border-radius:24px;padding:2rem 1.5rem 1.5rem;max-width:360px;width:100%;box-shadow:0 8px 40px rgba(60,64,67,0.18);text-align:center;font-family:'Inter',sans-serif;"><div style="width:68px;height:68px;background:#fce8e6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;"><svg width="34" height="34" viewBox="0 0 48 48" fill="none"><path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/><path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/></svg></div><div style="font-size:1.25rem;font-weight:600;color:#202124;margin-bottom:0.35rem;">Log Out</div><div style="font-size:0.875rem;color:#5f6368;margin-bottom:1.5rem;line-height:1.5;">Are you sure you want to log out of your account?</div><div style="height:1px;background:#e8eaed;margin:0 -1.5rem 1.25rem;"></div><div style="display:flex;gap:0.75rem;"><button id="logoutCancelBtn" style="flex:1;padding:0.75rem 0.5rem;border-radius:100px;border:1.5px solid #dadce0;background:#fff;color:#3c4043;font-size:0.9375rem;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;min-height:48px;">Cancel</button><button id="logoutConfirmBtn" style="flex:1;padding:0.75rem 0.5rem;border-radius:100px;border:none;background:#ea4335;color:#fff;font-size:0.9375rem;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;min-height:48px;">Log Out</button></div></div>`;
             document.body.appendChild(overlay);
             document.getElementById('profileDropdown')?.classList.add('hidden');
             document.getElementById('profileDropdownMobile')?.classList.add('hidden');
             document.getElementById('logoutCancelBtn').addEventListener('click', () => overlay.remove());
-            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+            overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
             document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
                 const btn = document.getElementById('logoutConfirmBtn');
                 btn.textContent = 'Logging out...'; btn.disabled = true; btn.style.opacity = '0.7';
                 try { await signOut(auth); window.location.href = '../login/index.html'; }
-                catch (error) { console.error('Logout error:', error); overlay.remove(); alert('Error logging out. Please try again.'); }
+                catch (_) { overlay.remove(); alert('Error logging out. Please try again.'); }
             });
-        }
-
-        window.toggleNotificationDropdown = toggleNotificationDropdown;
-        window.closeNotificationDropdown = closeNotificationDropdown;
-        window.toggleProfileDropdown = toggleProfileDropdown;
+        };
     </script>
 </body>
 </html>

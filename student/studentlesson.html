@@ -8,675 +8,179 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-   * { font-family: 'Inter', sans-serif; }
-.font-manrope { font-family: 'Manrope', sans-serif; }
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.pulse-animation {
-    animation: pulse 2s infinite;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.slide-down {
-    animation: slideDown 0.3s ease;
-}
-
-.spinner {
-    border: 4px solid #e5e7eb;
-    border-top: 4px solid #3b82f6;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-}
-
-.lesson-card {
-    background: white;
-    border-radius: 16px;
-    padding: 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e5e7eb;
-    transition: all 0.3s ease;
-    margin-bottom: 16px;
-    overflow: hidden;
-}
-
-.lesson-card:hover {
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
-    border-color: #3b82f6;
-}
-
-.lesson-card.expanded:hover {
-    transform: translateY(-2px);
-}
-
-.lesson-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    flex-wrap: wrap;
-    user-select: none;
-}
-
-.lesson-header:hover {
-    background-color: #f9fafb;
-}
-
-.lesson-header:active {
-    background-color: #f3f4f6;
-}
-
-.collapse-icon {
-    width: 36px;
-    height: 36px;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: transform 0.3s ease;
-    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
-}
-
-.lesson-card.expanded .collapse-icon {
-    transform: rotate(90deg);
-}
-
-.lesson-icon {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.25);
-}
-
-.lesson-title-section {
-    flex: 1;
-    min-width: 0;
-}
-
-.lesson-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 6px;
-    line-height: 1.3;
-}
-
-.lesson-meta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    font-size: 13px;
-    color: #6b7280;
-}
-
-.lesson-meta-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-}
-
-.lesson-meta-item i {
-    color: #3b82f6;
-}
-
-.lesson-content-wrapper {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease;
-}
-
-.lesson-card.expanded .lesson-content-wrapper {
-    max-height: 5000px;
-}
-
-.lesson-content-inner {
-    padding: 0 16px 16px 16px;
-    border-top: 2px solid #f3f4f6;
-}
-
-.lesson-description {
-    color: #4b5563;
-    line-height: 1.6;
-    margin-bottom: 16px;
-    margin-top: 16px;
-    font-size: 14px;
-}
-
-.lesson-content-box {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border-left: 3px solid #3b82f6;
-    padding: 16px;
-    border-radius: 10px;
-    margin-bottom: 16px;
-}
-
-.lesson-content-text {
-    color: #374151;
-    line-height: 1.7;
-    font-size: 14px;
-}
-
-.materials-section {
-    margin-top: 20px;
-}
-
-.materials-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1f2937;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.materials-title i {
-    color: #3b82f6;
-    font-size: 16px;
-}
-
-.material-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: #f8fafc;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    margin-bottom: 10px;
-}
-
-.material-item:hover {
-    background: #e0f2fe;
-    border-color: #3b82f6;
-    transform: translateX(4px);
-    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.15);
-}
-
-.material-icon-box {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
-}
-
-.material-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.material-name {
-    font-weight: 600;
-    color: #1f2937;
-    font-size: 14px;
-    display: block;
-    margin-bottom: 3px;
-    word-break: break-word;
-}
-
-.material-size {
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.download-icon {
-    color: #3b82f6;
-    font-size: 20px;
-    flex-shrink: 0;
-}
-
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.status-published {
-    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-    color: #065f46;
-    border: 1px solid #10b981;
-}
-
-.status-draft {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    color: #92400e;
-    border: 1px solid #f59e0b;
-}
-
-/* Notification Styles */
-.notification-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: #ef4444;
-    color: white;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 0.15rem 0.4rem;
-    border-radius: 10px;
-    min-width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    animation: pulse 2s infinite;
-}
-
-.notification-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 0.5rem;
-    width: 24rem;
-    max-width: calc(100vw - 2rem);
-    background: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    z-index: 9999;
-    max-height: 480px;
-    overflow-y: auto;
-    animation: slideDown 0.3s ease;
-}
-
-.notification-dropdown-header {
-    padding: 0.75rem 1rem;
-    border-bottom: 2px solid #e5e7eb;
-    background: linear-gradient(135deg, #f8fafc, #ffffff);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 0.75rem 0.75rem 0 0;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-@media (min-width: 640px) {
-    .notification-dropdown-header {
-        padding: 1rem 1.25rem;
-    }
-}
-
-.notification-dropdown-body {
-    max-height: 360px;
-    overflow-y: auto;
-}
-
-.notification-item {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid #f3f4f6;
-    transition: background-color 0.2s ease;
-    cursor: pointer;
-}
-
-.notification-item:hover {
-    background-color: #f9fafb;
-}
-
-.notification-item:last-child {
-    border-bottom: none;
-}
-
-.notification-item strong {
-    color: #111827;
-    font-size: 0.875rem;
-    display: block;
-    margin-bottom: 0.25rem;
-    font-weight: 600;
-}
-
-.notification-item p {
-    color: #6b7280;
-    font-size: 0.8125rem;
-    margin-bottom: 0.25rem;
-    line-height: 1.5;
-}
-
-.notification-item small {
-    color: #9ca3af;
-    font-size: 0.6875rem;
-    display: block;
-}
-
-.notification-dropdown-footer {
-    padding: 0.5rem 0.75rem;
-    border-top: 2px solid #e5e7eb;
-    background-color: #f9fafb;
-    border-radius: 0 0 0.75rem 0.75rem;
-    position: sticky;
-    bottom: 0;
-}
-
-@media (min-width: 640px) {
-    .notification-dropdown-footer {
-        padding: 0.75rem 1rem;
-    }
-}
-
-.notification-empty {
-    padding: 1.5rem 2rem;
-    text-align: center;
-    color: #9ca3af;
-}
-
-.notification-empty i {
-    font-size: 3rem;
-    margin-bottom: 0.75rem;
-    display: block;
-}
-
-.notification-empty p {
-    color: #6b7280;
-    font-size: 0.875rem;
-}
-
-/* Hamburger Menu Styles */
-.hamburger {
-    display: none;
-    flex-direction: column;
-    gap: 4px;
-    cursor: pointer;
-    z-index: 60;
-}
-
-.hamburger span {
-    width: 25px;
-    height: 3px;
-    background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-    border-radius: 2px;
-    transition: all 0.3s ease;
-}
-
-.hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-
-.hamburger.active span:nth-child(2) {
-    opacity: 0;
-}
-
-.hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -6px);
-}
-
-/* Mobile Drawer */
-.mobile-drawer {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 280px;
-    height: 100vh;
-    background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
-    z-index: 55;
-    transition: right 0.3s ease;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-    overflow-y: auto;
-}
-
-.mobile-drawer.active {
-    right: 0;
-}
-
-.drawer-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 50;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.drawer-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Mobile Responsive Styles */
-@media (max-width: 768px) {
-    .lesson-card {
-        margin-bottom: 12px;
-        border-radius: 14px;
-    }
-    
-    .lesson-header {
-        padding: 14px;
-        gap: 10px;
-    }
-    
-    .collapse-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 7px;
-    }
-    
-    .collapse-icon i {
-        font-size: 14px !important;
-    }
-    
-    .lesson-icon {
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
-    }
-    
-    .lesson-icon i {
-        font-size: 18px !important;
-    }
-    
-    .lesson-title {
-        font-size: 16px;
-    }
-    
-    .lesson-meta {
-        gap: 10px;
-        font-size: 11px;
-    }
-    
-    .lesson-meta-item {
-        gap: 4px;
-    }
-    
-    .lesson-content-inner {
-        padding: 0 14px 14px 14px;
-    }
-    
-    .lesson-description {
-        font-size: 13px;
-        margin-bottom: 14px;
-        margin-top: 14px;
-    }
-    
-    .lesson-content-box {
-        padding: 14px;
-        border-radius: 8px;
-        margin-bottom: 14px;
-    }
-    
-    .lesson-content-text {
-        font-size: 13px;
-    }
-    
-    .materials-section {
-        margin-top: 16px;
-    }
-    
-    .materials-title {
-        font-size: 12px;
-        margin-bottom: 10px;
-    }
-    
-    .material-item {
-        padding: 10px;
-        gap: 10px;
-        border-radius: 8px;
-        margin-bottom: 8px;
-    }
-    
-    .material-icon-box {
-        width: 36px;
-        height: 36px;
-        border-radius: 7px;
-    }
-    
-    .material-icon-box i {
-        font-size: 14px !important;
-    }
-    
-    .material-name {
-        font-size: 13px;
-    }
-    
-    .material-size {
-        font-size: 11px;
-    }
-    
-    .download-icon {
-        font-size: 16px;
-    }
-    
-    .status-badge {
-        padding: 5px 10px;
-        font-size: 10px;
-        gap: 4px;
-    }
-    
-    .notification-dropdown {
-        width: calc(100vw - 2rem);
-        right: 0;
-        left: auto;
-    }
-}
-
-@media (max-width: 480px) {
-    .lesson-title {
-        font-size: 15px;
-    }
-    
-    .lesson-meta {
-        font-size: 10px;
-    }
-    
-    .material-item:hover {
-        transform: translateX(2px);
-    }
-}
-
-@media (max-width: 1023px) {
-    .hamburger {
-        display: flex;
-    }
-}
+        * { font-family: 'Inter', sans-serif; }
+        .font-manrope { font-family: 'Manrope', sans-serif; }
+
+        @keyframes spin    { 0%   { transform: rotate(0deg);   } 100% { transform: rotate(360deg); } }
+        @keyframes pulse   { 0%,100% { transform: scale(1);    } 50%  { transform: scale(1.1);     } }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+
+        .pulse-animation { animation: pulse 2s infinite; }
+        .slide-down      { animation: slideDown 0.3s ease; }
+
+        .spinner {
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px; height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Notification bell badge */
+        .notification-badge {
+            position: absolute; top: -4px; right: -4px;
+            background: #ef4444; color: white;
+            font-size: 10px; font-weight: 700;
+            padding: .15rem .4rem; border-radius: 10px;
+            min-width: 18px; height: 18px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,.3);
+            animation: pulse 2s infinite;
+        }
+
+        /* Notification dropdown scrollbar */
+        .notif-scroll::-webkit-scrollbar       { width: 6px; }
+        .notif-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .notif-scroll::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        .notif-scroll::-webkit-scrollbar-thumb:hover { background: #2563eb; }
+
+        /* Hamburger */
+        .hamburger { display:none; flex-direction:column; gap:4px; cursor:pointer; z-index:60; }
+        .hamburger span { width:25px; height:3px; background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%); border-radius:2px; transition:all .3s ease; }
+        .hamburger.active span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+        .hamburger.active span:nth-child(2) { opacity:0; }
+        .hamburger.active span:nth-child(3) { transform:rotate(-45deg) translate(7px,-6px); }
+        @media (max-width:1023px) { .hamburger { display:flex; } }
+
+        /* Mobile Drawer */
+        .mobile-drawer { position:fixed; top:0; right:-100%; width:280px; height:100vh; background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%); z-index:55; transition:right .3s ease; box-shadow:-5px 0 15px rgba(0,0,0,.3); overflow-y:auto; }
+        .mobile-drawer.active { right:0; }
+        .drawer-overlay { position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,.5); z-index:50; opacity:0; visibility:hidden; transition:opacity .3s ease,visibility .3s ease; }
+        .drawer-overlay.active { opacity:1; visibility:visible; }
+
+        /* Lesson card collapse/expand */
+        .lesson-content-wrapper { max-height:0; overflow:hidden; transition:max-height .4s ease; }
+        .lesson-card.expanded .lesson-content-wrapper { max-height:5000px; }
+        .collapse-icon { transition:transform .3s ease; }
+        .lesson-card.expanded .collapse-icon { transform:rotate(90deg); }
+
+        /* Lesson card hover */
+        .lesson-card { transition:all .3s ease; }
+        .lesson-card:hover { box-shadow:0 4px 16px rgba(59,130,246,.12); border-color:#3b82f6; }
+        .lesson-card.expanded:hover { transform:translateY(-2px); }
+
+        /* Material item hover */
+        .material-item { transition:all .3s ease; }
+        .material-item:hover { background:#e0f2fe; border-color:#3b82f6; transform:translateX(4px); box-shadow:0 3px 10px rgba(59,130,246,.15); }
+        @media (max-width:480px) { .material-item:hover { transform:translateX(2px); } }
+
+        /* Status badges */
+        .status-published { background:linear-gradient(135deg,#d1fae5,#a7f3d0); color:#065f46; border:1px solid #10b981; }
+        .status-draft      { background:linear-gradient(135deg,#fef3c7,#fde68a); color:#92400e; border:1px solid #f59e0b; }
+
+        /* Lesson card styles (injected by JS but kept here for clarity) */
+        .lesson-card { background:white; border-radius:16px; border:1px solid #e5e7eb; margin-bottom:16px; overflow:hidden; }
+        .lesson-header { display:flex; align-items:center; gap:12px; padding:16px; cursor:pointer; transition:background-color .2s ease; flex-wrap:wrap; user-select:none; }
+        .lesson-header:hover { background-color:#f9fafb; }
+        .lesson-header:active { background-color:#f3f4f6; }
+        .lesson-title { font-size:18px; font-weight:700; color:#1f2937; margin-bottom:6px; line-height:1.3; }
+        .lesson-meta { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px; color:#6b7280; }
+        .lesson-meta-item { display:flex; align-items:center; gap:6px; white-space:nowrap; }
+        .lesson-meta-item i { color:#3b82f6; }
+        .lesson-content-inner { padding:0 16px 16px; border-top:2px solid #f3f4f6; }
+        .lesson-description { color:#4b5563; line-height:1.6; margin-bottom:16px; margin-top:16px; font-size:14px; }
+        .lesson-content-box { background:linear-gradient(135deg,#f0f9ff,#e0f2fe); border-left:3px solid #3b82f6; padding:16px; border-radius:10px; margin-bottom:16px; }
+        .lesson-content-text { color:#374151; line-height:1.7; font-size:14px; }
+        .materials-section { margin-top:20px; }
+        .materials-title { font-size:14px; font-weight:700; color:#1f2937; text-transform:uppercase; letter-spacing:.5px; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+        .materials-title i { color:#3b82f6; font-size:16px; }
+        .material-item { display:flex; align-items:center; gap:12px; padding:12px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; text-decoration:none; margin-bottom:10px; }
+        .material-icon-box { width:40px; height:40px; background:linear-gradient(135deg,#3b82f6,#2563eb); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 2px 6px rgba(59,130,246,.25); }
+        .material-info { flex:1; min-width:0; }
+        .material-name { font-weight:600; color:#1f2937; font-size:14px; display:block; margin-bottom:3px; word-break:break-word; }
+        .material-size { font-size:12px; color:#6b7280; }
+        .download-icon { color:#3b82f6; font-size:20px; flex-shrink:0; }
+        .status-badge { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; white-space:nowrap; }
+        .lesson-title-section { flex:1; min-width:0; }
+        .collapse-icon { width:36px; height:36px; background:linear-gradient(135deg,#3b82f6,#2563eb); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 2px 6px rgba(59,130,246,.25); }
+        .lesson-icon { width:48px; height:48px; background:linear-gradient(135deg,#3b82f6,#2563eb); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 3px 10px rgba(59,130,246,.25); }
+        @media (max-width:768px) {
+            .lesson-header { padding:14px; gap:10px; }
+            .collapse-icon { width:32px; height:32px; border-radius:7px; }
+            .lesson-icon { width:42px; height:42px; border-radius:10px; }
+            .lesson-title { font-size:16px; }
+            .lesson-meta { gap:10px; font-size:11px; }
+            .lesson-content-inner { padding:0 14px 14px; }
+            .lesson-description { font-size:13px; }
+            .lesson-content-box { padding:14px; border-radius:8px; margin-bottom:14px; }
+            .lesson-content-text { font-size:13px; }
+            .material-item { padding:10px; gap:10px; border-radius:8px; margin-bottom:8px; }
+            .material-icon-box { width:36px; height:36px; border-radius:7px; }
+            .material-name { font-size:13px; }
+            .material-size { font-size:11px; }
+            .download-icon { font-size:16px; }
+            .status-badge { padding:5px 10px; font-size:10px; }
+        }
+        @media (max-width:480px) { .lesson-title { font-size:15px; } .lesson-meta { font-size:10px; } }
     </style>
 </head>
 <body class="bg-gray-50">
+
     <!-- Loading Screen -->
-<div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
-    <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
-    <div class="spinner"></div>
-    <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Lessons...</div>
-</div>
+    <div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
+        <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
+        <div class="spinner"></div>
+        <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Lessons...</div>
+    </div>
 
     <div id="mainContent" class="hidden">
+
         <!-- Navigation -->
-        <nav class="shadow-lg" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
+        <nav class="shadow-lg" style="background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%);">
             <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
                 <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+
                     <!-- Logo -->
                     <a href="#" class="flex items-center gap-2 sm:gap-3">
-                        <img src="UMakfit Logo (2).png" 
-                             alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
+                        <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
                         <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope bg-gradient-to-r from-yellow-400 to-yellow-200 bg-clip-text text-transparent">
                             UMakFit
                         </span>
                     </a>
-                    
+
                     <!-- Desktop Navigation -->
                     <div class="hidden lg:flex items-center gap-2 flex-wrap">
                         <a href="./studentDashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-speedometer2"></i> 
-                            <span class="hidden xl:inline">Dashboard</span>
+                            <i class="bi bi-speedometer2"></i><span class="hidden xl:inline">Dashboard</span>
                         </a>
                         <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-clipboard-check"></i> 
-                            <span class="hidden xl:inline">Tests</span>
+                            <i class="bi bi-clipboard-check"></i><span class="hidden xl:inline">Tests</span>
                         </a>
                         <a href="#" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
-                            <i class="bi bi-book"></i> 
-                            <span class="hidden xl:inline">Lessons</span>
+                            <i class="bi bi-book"></i><span class="hidden xl:inline">Lessons</span>
                         </a>
-                <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                                    <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
-                                </a>
+                        <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
+                            <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
+                        </a>
                         <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-graph-up"></i> 
-                            <span class="hidden xl:inline">Progress</span>
+                            <i class="bi bi-graph-up"></i><span class="hidden xl:inline">Progress</span>
                         </a>
                         <a href="./achievements.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-trophy"></i> 
-                            <span class="hidden xl:inline">Achievements</span>
+                            <i class="bi bi-trophy"></i><span class="hidden xl:inline">Achievements</span>
                         </a>
-                        
-                        <!-- Notification Bell - Desktop -->
+
+                        <!-- Notification Bell Desktop -->
                         <div class="relative">
-                            <button id="notificationBellBtn" 
-                                    class="w-9 h-9 xl:w-10 xl:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
+                            <button id="notificationBellBtn"
+                                    class="relative w-9 h-9 xl:w-10 xl:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
                                 <i class="bi bi-bell-fill text-base xl:text-lg"></i>
                                 <span id="navNotificationCount" class="notification-badge hidden">0</span>
                             </button>
-                            
-                            <!-- Notification Dropdown - Desktop -->
-                            <div id="notificationDropdown" class="notification-dropdown hidden">
-                                <div class="notification-dropdown-header">
+
+                            <!-- Notification Dropdown Desktop -->
+                            <div id="notificationDropdown"
+                                 class="hidden absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl z-[9999] max-h-[480px] overflow-y-auto notif-scroll slide-down">
+                                <div class="sticky top-0 z-10 px-4 py-3 sm:px-5 sm:py-4 border-b-2 border-gray-200 bg-gradient-to-r from-slate-50 to-white flex justify-between items-center rounded-t-xl">
                                     <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
                                         <i class="bi bi-bell-fill text-blue-500"></i> Notifications
                                     </h6>
@@ -684,28 +188,25 @@
                                         <i class="bi bi-x-lg"></i>
                                     </button>
                                 </div>
-                                <div id="notificationDropdownBody" class="notification-dropdown-body">
-                                    <div class="notification-empty">
-                                        <i class="bi bi-bell-slash"></i>
-                                        <p>No notifications yet</p>
-                                    </div>
+                                <div id="notificationDropdownBody" class="max-h-[360px] overflow-y-auto notif-scroll">
+                                    <!-- dynamic content -->
                                 </div>
-                                <div class="notification-dropdown-footer">
-                                    <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
+                                <div class="sticky bottom-0 px-3 py-2 sm:px-4 sm:py-3 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl">
+                                    <button onclick="window.location.href='./notification.html'"
+                                            class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
                                         View All Notifications
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Profile Dropdown -->
+
+                        <!-- Profile Dropdown Desktop -->
                         <div class="relative">
                             <img src="" alt="Profile" id="profilePictureBtn"
                                  class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
-                            
                             <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
                                 <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                                    <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-[3px] border-blue-500 object-cover">
                                     <h6 id="profileDropdownName" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
                                     <p id="profileDropdownEmail" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
                                 </div>
@@ -715,7 +216,7 @@
                                         <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
                                     </a>
                                     <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                                   <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                    <div onclick="window.handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
                                         <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
                                         <span class="font-medium text-sm sm:text-base">Logout</span>
                                     </div>
@@ -723,20 +224,20 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Mobile Right Icons -->
                     <div class="flex lg:hidden items-center gap-2 sm:gap-3">
                         <!-- Mobile Notification Bell -->
                         <div class="relative">
-                            <button id="notificationBellBtnMobile" 
-                                    class="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
+                            <button id="notificationBellBtnMobile"
+                                    class="relative w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
                                 <i class="bi bi-bell-fill text-base sm:text-lg"></i>
                                 <span id="navNotificationCountMobile" class="notification-badge hidden">0</span>
                             </button>
-                            
-                            <!-- Mobile Notification Dropdown -->
-                            <div id="notificationDropdownMobile" class="notification-dropdown hidden fixed right-2 left-2 top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
-                                <div class="notification-dropdown-header">
+
+                            <div id="notificationDropdownMobile"
+                                 class="hidden fixed right-2 left-2 top-20 max-h-[calc(100vh-6rem)] overflow-y-auto notif-scroll bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                                <div class="sticky top-0 z-10 px-4 py-3 border-b-2 border-gray-200 bg-gradient-to-r from-slate-50 to-white flex justify-between items-center rounded-t-xl">
                                     <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
                                         <i class="bi bi-bell-fill text-blue-500"></i> Notifications
                                     </h6>
@@ -744,29 +245,25 @@
                                         <i class="bi bi-x-lg"></i>
                                     </button>
                                 </div>
-                                <div id="notificationDropdownBodyMobile" class="notification-dropdown-body">
-                                    <div class="notification-empty">
-                                        <i class="bi bi-bell-slash"></i>
-                                        <p>No notifications yet</p>
-                                    </div>
+                                <div id="notificationDropdownBodyMobile" class="max-h-96 overflow-y-auto notif-scroll">
+                                    <!-- dynamic content -->
                                 </div>
-                                <div class="notification-dropdown-footer">
-                                    <button onclick="window.location.href='./notifications.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
+                                <div class="sticky bottom-0 px-3 py-2 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl">
+                                    <button onclick="window.location.href='./notifications.html'"
+                                            class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
                                         View All Notifications
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Mobile Profile -->
                         <div class="relative">
                             <img src="" alt="Profile" id="profilePictureBtnMobile"
                                  class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
-                            
-                            <!-- Mobile Profile Dropdown -->
                             <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
                                 <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-[3px] border-blue-500 object-cover">
                                     <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
                                     <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
                                 </div>
@@ -776,19 +273,17 @@
                                         <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
                                     </a>
                                     <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
+                                    <div onclick="window.handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
                                         <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
                                         <span class="font-medium text-sm sm:text-base">Logout</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Hamburger Menu Button -->
+
+                        <!-- Hamburger -->
                         <div class="hamburger" id="hamburger">
-                            <span></span>
-                            <span></span>
-                            <span></span>
+                            <span></span><span></span><span></span>
                         </div>
                     </div>
                 </div>
@@ -801,16 +296,13 @@
         <!-- Mobile Drawer -->
         <div class="mobile-drawer" id="mobileDrawer">
             <div class="p-6 pt-8">
-                <!-- Drawer Header -->
                 <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
-                    <img src="UMakfit Logo (2).png" 
-                         alt="UMak Logo" class="h-12 w-auto object-contain">
-                    <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                    <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
+                    <span class="text-2xl font-extrabold font-manrope"
+                          style="background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
                         UMakFIT
                     </span>
                 </div>
-
-                <!-- Navigation Links -->
                 <nav class="space-y-2">
                     <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
                         <i class="bi bi-speedometer2 mr-3"></i>Dashboard
@@ -822,8 +314,8 @@
                         <i class="bi bi-book mr-3"></i>Lesson
                     </a>
                     <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                    <i class="bi bi-activity mr-3"></i>Performance
-                </a>
+                        <i class="bi bi-activity mr-3"></i>Performance
+                    </a>
                     <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
                         <i class="bi bi-graph-up mr-3"></i>Progress
                     </a>
@@ -836,6 +328,7 @@
 
         <!-- Main Content -->
         <div class="container mx-auto px-4 py-8 max-w-7xl">
+
             <!-- Page Header -->
             <div class="mb-6 sm:mb-8">
                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
@@ -848,7 +341,7 @@
             <div id="noLessonsState" class="bg-white rounded-2xl shadow-lg p-8 sm:p-12 text-center">
                 <div class="max-w-lg mx-auto">
                     <div class="mb-6">
-                        <i class="bi bi-journal-bookmark text-gray-300" style="font-size: 80px;"></i>
+                        <i class="bi bi-journal-bookmark text-gray-300" style="font-size:80px;"></i>
                     </div>
                     <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3">No Materials Available</h2>
                     <p class="text-sm sm:text-lg text-gray-600 mb-6 px-4">Your professor hasn't uploaded any lessons yet. Materials will appear here once they're available.</p>
@@ -859,139 +352,109 @@
                 </div>
             </div>
 
-            <!-- Lessons Container (Hidden initially, will show when lessons exist) -->
-            <div id="lessonsContainer" class="hidden space-y-6">
-                <!-- Lesson cards will be dynamically inserted here -->
+            <!-- Lessons Container -->
+            <div id="lessonsContainer" class="hidden space-y-4">
+                <!-- Lesson cards injected by JS -->
             </div>
         </div>
+
         <!-- Footer -->
-    <footer style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%); border-top: 1px solid rgba(255,255,255,0.07); padding: clamp(3rem,6vw,5rem) clamp(1.5rem,5vw,4rem) 2rem; margin-top: 3rem;">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
-                <!-- About UmakFit & College of Human Kinetics -->
-                <div>
-                    <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                        <img src="UMakfit Logo (2).png" 
-                             alt="UMak Logo" class="h-12 w-auto object-contain">
-                        <div>
-                            <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
-                            <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
+        <footer style="background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%);border-top:1px solid rgba(255,255,255,.07);"
+                class="mt-12 px-6 sm:px-10 lg:px-16 pt-12 pb-8">
+            <div class="container mx-auto max-w-7xl">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
+
+                    <div>
+                        <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                            <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
+                            <div>
+                                <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
+                                <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
+                            </div>
+                        </div>
+                        <p class="text-sm lg:text-base leading-relaxed text-blue-100">
+                            UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati.
+                            Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
+                        </p>
+                        <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
+                            <span class="bg-white/[.06] border border-white/[.08] text-white/50 text-[.7rem] px-2.5 py-1 rounded-full font-medium">Fitness Tracking</span>
+                            <span class="bg-white/[.06] border border-white/[.08] text-white/50 text-[.7rem] px-2.5 py-1 rounded-full font-medium">Performance Assessment</span>
+                            <span class="bg-white/[.06] border border-white/[.08] text-white/50 text-[.7rem] px-2.5 py-1 rounded-full font-medium">Health &amp; Wellness</span>
                         </div>
                     </div>
-                    <p class="text-sm lg:text-base leading-relaxed text-blue-100">
-                        UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati. 
-                        Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
-                    </p>
-                    <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
-                        <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Fitness Tracking</span>
-                        <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Performance Assessment</span>
-                        <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Health & Wellness</span>
+
+                    <div>
+                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
+                        <div class="grid grid-cols-2 gap-4 lg:gap-6">
+                            <div class="space-y-3">
+                                <a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-book mr-2"></i>Lessons</a>
+                                <a href="./test.html"          class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-clipboard-check mr-2"></i>Tests</a>
+                                <a href="./progress.html"      class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-graph-up mr-2"></i>Progress</a>
+                            </div>
+                            <div class="space-y-3">
+                                <a href="./studentgrades.html"  class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-award mr-2"></i>Grades</a>
+                                <a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-person-circle mr-2"></i>Profile</a>
+                                <a href="./achievements.html"   class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-trophy mr-2"></i>Achievements</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
+                        <div class="space-y-4 lg:space-y-5">
+                            <div class="flex items-start gap-3">
+                                <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
+                                <p class="text-sm lg:text-base text-blue-100">
+                                    College of Human Kinetics<br>University of Makati<br>
+                                    3rd floor, Administration Building,<br>JP Rizal Ext., West Rembo, Taguig City
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
+                                <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">chk@umak.edu.ph</a>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
+                                <span class="text-blue-100 text-sm lg:text-base">+63 933 189 7230</span>
+                            </div>
+                            <div class="flex items-center gap-4 pt-2 justify-center lg:justify-start">
+                                <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110">
+                                    <i class="bi bi-facebook text-white text-lg"></i>
+                                </a>
+                                <a href="https://www.instagram.com" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110">
+                                    <i class="bi bi-instagram text-white text-lg"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Quick Links -->
-                <div>
-                    <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
-                    <div class="grid grid-cols-2 gap-4 lg:gap-6">
-                        <div class="space-y-3">
-                            <a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-book mr-2"></i>Lessons
-                            </a>
-                            <a href="./test.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-clipboard-check mr-2"></i>Tests
-                            </a>
-                            <a href="./progress.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-graph-up mr-2"></i>Progress
-                            </a>
-                        </div>
-                        <div class="space-y-3">
-                            <a href="./studentgrades.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-award mr-2"></i>Grades
-                            </a>
-                            <a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-person-circle mr-2"></i>Profile
-                            </a>
-                            <a href="./achievements.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-trophy mr-2"></i>Achievements
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Contact & Social -->
-                <div>
-                    <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
-                    <div class="space-y-4 lg:space-y-5">
-                        <div class="flex items-start gap-3">
-                            <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
-                            <p class="text-sm lg:text-base text-blue-100">
-                                College of Human Kinetics<br>
-                                University of Makati<br>
-                                3rd floor, Administration Building, University of Makati,<br>
-                                JP Rizal Ext., West Rembo, Taguig City
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
-                            <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">
-                                chk@umak.edu.ph
-                            </a>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
-                            <span class="text-sm lg:text-base text-blue-100">
-                                +63 933 189 7230
-                            </span>
-                        </div>
-                        <div class="flex items-center gap-4 pt-2 justify-center lg:justify-start">
-                            <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110">
-                                <i class="bi bi-facebook text-white text-lg"></i>
-                            </a>
-                            <a href="https://www.instagram.com" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110">
-                                <i class="bi bi-instagram text-white text-lg"></i>
-                            </a>
-                        </div>
-                    </div>
+                <div class="border-t border-white/10 mt-8 pt-6 text-center">
+                    <p class="text-xs lg:text-sm text-blue-200/70">© 2025 University of Makati — College of Human Kinetics. All Rights Reserved.</p>
                 </div>
             </div>
-
-            <!-- Bottom bar -->
-            <div class="border-t border-white/10 mt-8 pt-6 text-center">
-                <p class="text-xs lg:text-sm text-blue-200/70">
-                    © 2025 University of Makati — College of Human Kinetics. All Rights Reserved.
-                </p>
-            </div>
-        </div>
-    </footer>
+        </footer>
     </div>
+
     <script>
+        // Simple resize handler for mobile drawer (kept outside module for immediate effect)
         window.addEventListener('resize', function() {
-    const hamburger = document.getElementById('hamburger');
-    const mobileDrawer = document.getElementById('mobileDrawer');
-    const drawerOverlay = document.getElementById('drawerOverlay');
-    
-    // Check if we're in desktop view (1024px and above)
-    if (window.innerWidth >= 1024) {
-        // If mobile drawer is open, close it
-        if (hamburger && hamburger.classList.contains('active')) {
-            hamburger.classList.remove('active');
-        }
-        if (mobileDrawer && mobileDrawer.classList.contains('active')) {
-            mobileDrawer.classList.remove('active');
-        }
-        if (drawerOverlay && drawerOverlay.classList.contains('active')) {
-            drawerOverlay.classList.remove('active');
-        }
-        // Restore body overflow
-        document.body.style.overflow = '';
-    }
-});
-        </script>
+            const hamburger = document.getElementById('hamburger');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+            const drawerOverlay = document.getElementById('drawerOverlay');
+            if (window.innerWidth >= 1024) {
+                hamburger?.classList.remove('active');
+                mobileDrawer?.classList.remove('active');
+                drawerOverlay?.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, collection, query, where, getDocs, doc, getDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, collection, query, where, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
@@ -1006,806 +469,387 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let studentData = null;
-        let currentUser = null;
+        let studentData = null, currentUser = null;
+        let unsubscribeAuth = null, unsubscribeNotifListener = null;
 
-        // ========== NOTIFICATION SYSTEM ==========
-        
+        // ========== HELPER FUNCTIONS ==========
+        function formatFileSize(bytes) {
+            if (!bytes) return '';
+            const k = 1024, sizes = ['Bytes','KB','MB','GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
+        }
+
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const icons = {
+                'pdf':'bi bi-file-pdf-fill', 'doc':'bi bi-file-word-fill', 'docx':'bi bi-file-word-fill',
+                'ppt':'bi bi-file-ppt-fill', 'pptx':'bi bi-file-ppt-fill', 'xls':'bi bi-file-excel-fill',
+                'xlsx':'bi bi-file-excel-fill', 'jpg':'bi bi-file-image-fill', 'jpeg':'bi bi-file-image-fill',
+                'png':'bi bi-file-image-fill', 'gif':'bi bi-file-image-fill', 'mp4':'bi bi-file-play-fill',
+                'avi':'bi bi-file-play-fill', 'mov':'bi bi-file-play-fill', 'zip':'bi bi-file-zip-fill',
+                'rar':'bi bi-file-zip-fill'
+            };
+            return icons[ext] || 'bi bi-file-earmark-fill';
+        }
+
+        // ========== NOTIFICATIONS ==========
+
         async function checkUnreadNotifications() {
             try {
-                if (!studentData || !studentData.section) return;
-
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);                
-                const notificationsSnapshot = await getDocs(notificationsQuery);
-                
-                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-                
-                let unreadCount = 0;
-                notificationsSnapshot.forEach(doc => {
-                    if (!readNotifications.includes(doc.id)) {
-                        unreadCount++;
-                    }
+                if (!studentData?.section) return;
+                const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)));
+                const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`)||'[]');
+                let unread = 0; snap.forEach(d=>{if(!read.includes(d.id))unread++;});
+                ['navNotificationCount','navNotificationCountMobile'].forEach(id=>{
+                    const el=document.getElementById(id); if(!el) return;
+                    if(unread>0){el.textContent=unread;el.classList.remove('hidden');}else el.classList.add('hidden');
                 });
-                
-                const countBadge = document.getElementById('navNotificationCount');
-                const countBadgeMobile = document.getElementById('navNotificationCountMobile');
-                
-                if (unreadCount > 0) {
-                    if (countBadge) {
-                        countBadge.textContent = unreadCount;
-                        countBadge.classList.remove('hidden');
-                    }
-                    if (countBadgeMobile) {
-                        countBadgeMobile.textContent = unreadCount;
-                        countBadgeMobile.classList.remove('hidden');
-                    }
-                } else {
-                    if (countBadge) countBadge.classList.add('hidden');
-                    if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
-                }
-            } catch (error) {
-                console.error('Error checking unread notifications:', error);
-            }
+            } catch(e){console.error(e);}
         }
 
-        async function loadNotificationDropdown(isMobile = false) {
+        async function loadNotificationDropdown(isMobile=false) {
             try {
-                const activeBodyId = isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody';
-                const dropdownBody = document.getElementById(activeBodyId);
-                
-                if (!dropdownBody) return;
-
-                if (!studentData || !studentData.section) {
-                    dropdownBody.innerHTML = `
-                        <div class="notification-empty">
-                            <i class="bi bi-bell-slash"></i>
-                            <p>No section assigned</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);                
-                const notificationsSnapshot = await getDocs(notificationsQuery);
-                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-                
-                if (!notificationsSnapshot.empty) {
-                    const seenNotifications = new Set();
-                    const uniqueNotifications = [];
-                    
-                    notificationsSnapshot.forEach(doc => {
-                        const notification = doc.data();
-                        const contentKey = `${notification.title}|${notification.message}|${notification.createdAt?.toDate?.().getTime() || ''}`;
-                        
-                        if (!seenNotifications.has(contentKey)) {
-                            seenNotifications.add(contentKey);
-                            uniqueNotifications.push({ id: doc.id, ...notification });
-                        }
+                const bodyId=isMobile?'notificationDropdownBodyMobile':'notificationDropdownBody';
+                const body=document.getElementById(bodyId); if(!body) return;
+                if(!studentData?.section){body.innerHTML=`<div class="py-6 px-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl block mb-3"></i><p class="text-gray-600 text-sm">No section assigned</p></div>`;return;}
+                const snap=await getDocs(query(collection(db,'notifications'),where('section','==',studentData.section),where('studentEmail','==',studentData.email)));
+                const read=JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`)||'[]');
+                if(!snap.empty){
+                    const seen=new Set(); const unique=[];
+                    snap.forEach(d=>{const n=d.data();const k=`${n.title}|${n.message}|${n.createdAt?.toDate?.().getTime()||''}`;if(!seen.has(k)){seen.add(k);unique.push({id:d.id,...n});}});
+                    unique.sort((a,b)=>(b.createdAt?.toDate?.()||new Date(0))-(a.createdAt?.toDate?.()||new Date(0)));
+                    const unreadIds=unique.filter(n=>!read.includes(n.id)).map(n=>n.id);
+                    let html='';
+                    unique.slice(0,5).forEach(n=>{
+                        const d=n.createdAt?.toDate?.();
+                        const ds=d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'Recently';
+                        const isRead=read.includes(n.id);
+                        html+=`<div class="notification-item px-5 py-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors cursor-pointer ${isRead?'bg-gray-50':'bg-white'}" data-notification-id="${n.id}">
+                            <strong class="text-gray-900 text-sm font-semibold block mb-1">${n.title||'Notification'}</strong>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-1">${n.message||''}</p>
+                            <small class="text-gray-400 text-[11px] block">${ds}</small>
+                        </div>`;
                     });
-                    
-                    uniqueNotifications.sort((a, b) => {
-                        const dateA = a.createdAt?.toDate?.() || new Date(0);
-                        const dateB = b.createdAt?.toDate?.() || new Date(0);
-                        return dateB - dateA;
-                    });
-                    
-                    const unreadNotificationIds = [];
-                    uniqueNotifications.forEach(notification => {
-                        if (!readNotifications.includes(notification.id)) {
-                            unreadNotificationIds.push(notification.id);
-                        }
-                    });
-                    
-                    let html = '';
-                    uniqueNotifications.slice(0, 5).forEach(notification => {
-                        const createdDate = notification.createdAt?.toDate?.();
-                        const dateStr = createdDate ? createdDate.toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        }) : 'Recently';
-                        
-                        const isRead = readNotifications.includes(notification.id);
-                        
-                        html += `
-                            <div class="notification-item ${isRead ? 'bg-gray-50' : 'bg-white'}" data-notification-id="${notification.id}">
-                                <strong>${notification.title || 'Notification'}</strong>
-                                <p>${notification.message || ''}</p>
-                                <small>${dateStr}</small>
-                            </div>
-                        `;
-                    });
-                    
-                    dropdownBody.innerHTML = html;
-                    
-                    if (unreadNotificationIds.length > 0) {
-                        markNotificationsAsRead(unreadNotificationIds);
-                    }
-                    
+                    body.innerHTML=html;
+                    if(unreadIds.length>0) markNotificationsAsRead(unreadIds);
                 } else {
-                    dropdownBody.innerHTML = `
-                        <div class="notification-empty">
-                            <i class="bi bi-bell-slash"></i>
-                            <p>No notifications yet</p>
-                        </div>
-                    `;
+                    body.innerHTML=`<div class="py-6 px-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl block mb-3"></i><p class="text-gray-600 text-sm">No notifications yet</p></div>`;
                 }
-            } catch (error) {
-                console.error('Error loading notifications:', error);
+            } catch(e){console.error(e);}
+        }
+
+        function markNotificationsAsRead(ids){
+            if(!studentData?.email||!ids.length) return;
+            const read=JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`)||'[]');
+            localStorage.setItem(`readNotifications_${studentData.email}`,JSON.stringify([...new Set([...read,...ids])]));
+            updateNotificationBadgeAfterRead();
+        }
+        async function updateNotificationBadgeAfterRead(){
+            try{
+                if(!studentData?.section) return;
+                const snap=await getDocs(query(collection(db,'notifications'),where('section','==',studentData.section),where('studentEmail','==',studentData.email)));
+                const ids=new Set(); snap.forEach(d=>ids.add(d.id));
+                const read=JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`)||'[]');
+                let unread=0; ids.forEach(id=>{if(!read.includes(id))unread++;});
+                ['navNotificationCount','navNotificationCountMobile'].forEach(id=>{
+                    const el=document.getElementById(id); if(!el) return;
+                    if(unread>0){el.textContent=unread;el.classList.remove('hidden');}else el.classList.add('hidden');
+                });
+            } catch(e){console.error(e);}
+        }
+
+        function toggleNotificationDropdown(event) {
+            event?.stopPropagation();
+            const isMobile = window.innerWidth < 1024;
+            const dropdown = document.getElementById(isMobile ? 'notificationDropdownMobile' : 'notificationDropdown');
+            const hamburger = document.getElementById('hamburger');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+            const drawerOverlay = document.getElementById('drawerOverlay');
+            if (hamburger?.classList.contains('active')) {
+                hamburger.classList.remove('active'); mobileDrawer.classList.remove('active'); drawerOverlay.classList.remove('active'); document.body.style.overflow = '';
+            }
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                loadNotificationDropdown(isMobile);
+                document.getElementById('profileDropdown')?.classList.add('hidden');
+                document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+            } else {
+                dropdown.classList.add('hidden');
             }
         }
-
-        function markNotificationsAsRead(notificationIds) {
-            if (!studentData || !studentData.email || !notificationIds.length) return;
-            
-            const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-            const updatedReadNotifications = [...new Set([...readNotifications, ...notificationIds])];
-            
-            localStorage.setItem(`readNotifications_${studentData.email}`, JSON.stringify(updatedReadNotifications));
-            updateNotificationBadgeAfterRead(notificationIds);
-        }
-
-        async function updateNotificationBadgeAfterRead(markedAsReadIds) {
-            try {
-                if (!studentData || !studentData.section) return;
-                
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);                
-                const notificationsSnapshot = await getDocs(notificationsQuery);
-                const uniqueNotificationIds = new Set();
-                
-                notificationsSnapshot.forEach(doc => {
-                    uniqueNotificationIds.add(doc.id);
-                });
-                
-                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-                
-                let unreadCount = 0;
-                uniqueNotificationIds.forEach(notificationId => {
-                    if (!readNotifications.includes(notificationId)) {
-                        unreadCount++;
-                    }
-                });
-                
-                const countBadge = document.getElementById('navNotificationCount');
-                const countBadgeMobile = document.getElementById('navNotificationCountMobile');
-                
-                if (unreadCount > 0) {
-                    if (countBadge) {
-                        countBadge.textContent = unreadCount;
-                        countBadge.classList.remove('hidden');
-                    }
-                    if (countBadgeMobile) {
-                        countBadgeMobile.textContent = unreadCount;
-                        countBadgeMobile.classList.remove('hidden');
-                    }
-                } else {
-                    if (countBadge) countBadge.classList.add('hidden');
-                    if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
-                }
-            } catch (error) {
-                console.error('Error updating notification badge:', error);
-            }
-        }
-
- // In toggleNotificationDropdown function
-function toggleNotificationDropdown(event) {
-    event?.stopPropagation();
-    const isMobile = window.innerWidth < 1024;
-    const dropdown = isMobile ? 
-        document.getElementById('notificationDropdownMobile') : 
-        document.getElementById('notificationDropdown');
-    
-    // Close mobile drawer if open
-    if (hamburger && hamburger.classList.contains('active')) {
-        hamburger.classList.remove('active');
-        mobileDrawer.classList.remove('active');
-        drawerOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-    
-    if (dropdown.classList.contains('hidden')) {
-        dropdown.classList.remove('hidden');
-        loadNotificationDropdown(isMobile);
-        
-        const profileDropdown = document.getElementById('profileDropdown');
-        const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-        if (profileDropdown) profileDropdown.classList.add('hidden');
-        if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
-    } else {
-        dropdown.classList.add('hidden');
-    }
-}
 
         function closeNotificationDropdown() {
-            const notificationDropdown = document.getElementById('notificationDropdown');
-            const notificationDropdownMobile = document.getElementById('notificationDropdownMobile');
-            if (notificationDropdown) notificationDropdown.classList.add('hidden');
-            if (notificationDropdownMobile) notificationDropdownMobile.classList.add('hidden');
+            document.getElementById('notificationDropdown')?.classList.add('hidden');
+            document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
         }
 
- function setupNotificationListener() {
-    try {
-        if (!studentData || !studentData.section) return;
+        function setupNotificationListener() {
+            if (!studentData?.section) return;
+            if (unsubscribeNotifListener) unsubscribeNotifListener();
+            unsubscribeNotifListener = onSnapshot(
+                query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)),
+                () => checkUnreadNotifications(),
+                (e) => console.error(e)
+            );
+        }
 
-        const notificationsQuery = query(
-            collection(db, 'notifications'),
-            where('section', '==', studentData.section),
-            where('studentEmail', '==', studentData.email)
-        );
+        // ========== PROFILE ==========
 
-        unsubscribeNotifListener = onSnapshot(notificationsQuery, (snapshot) => {
-            // debug log removed
-            checkUnreadNotifications();
-        }, (error) => {
-            console.error('❌ Error in notification listener:', error);
-        });
-
-    } catch (error) {
-        console.error('Error setting up notification listener:', error);
-    }
-}
-        // ========== END NOTIFICATION SYSTEM ==========
-
-        // Update profile UI
         function updateProfileUI() {
             if (!currentUser || !studentData) return;
-            
-            const photoURL = currentUser?.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(studentData?.displayName || studentData?.firstName + ' ' + studentData?.lastName || 'User') + '&background=3b82f6&color=fff&size=128';
-            
-            // Desktop
-            const profileBtn = document.getElementById('profilePictureBtn');
-            if (profileBtn) profileBtn.src = photoURL;
-            
-            const dropdownPic = document.getElementById('profileDropdownPicture');
-            if (dropdownPic) dropdownPic.src = photoURL;
-            
-            const dropdownName = document.getElementById('profileDropdownName');
-            if (dropdownName) dropdownName.textContent = studentData?.displayName || `${studentData?.firstName || ''} ${studentData?.lastName || ''}`.trim() || 'Student';
-            
-            const dropdownEmail = document.getElementById('profileDropdownEmail');
-            if (dropdownEmail) dropdownEmail.textContent = studentData?.email || currentUser?.email || '';
-            
-            // Mobile
-            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-            if (profileBtnMobile) profileBtnMobile.src = photoURL;
-            
-            const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
-            if (dropdownPicMobile) dropdownPicMobile.src = photoURL;
-            
-            const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
-            if (dropdownNameMobile) dropdownNameMobile.textContent = studentData?.displayName || `${studentData?.firstName || ''} ${studentData?.lastName || ''}`.trim() || 'Student';
-            
-            const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
-            if (dropdownEmailMobile) dropdownEmailMobile.textContent = studentData?.email || currentUser?.email || '';
+            const photo = currentUser.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(studentData.displayName || `${studentData.firstName||''} ${studentData.lastName||''}`.trim() || 'User') + '&background=3b82f6&color=fff&size=128';
+            ['profilePictureBtn','profilePictureBtnMobile'].forEach(id=>{ const el=document.getElementById(id); if(el) el.src=photo; });
+            ['profileDropdownPicture','profileDropdownPictureMobile'].forEach(id=>{ const el=document.getElementById(id); if(el) el.src=photo; });
+            const name = studentData.displayName || `${studentData.firstName||''} ${studentData.lastName||''}`.trim() || 'Student';
+            const email = studentData.email || currentUser.email || '';
+            ['profileDropdownName','profileDropdownNameMobile'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=name; });
+            ['profileDropdownEmail','profileDropdownEmailMobile'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=email; });
         }
 
-  // In toggleProfileDropdown function
-function toggleProfileDropdown(event) {
-    event?.stopPropagation();
-    const isMobile = window.innerWidth < 1024;
-    const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
-    
-    // Close mobile drawer if open
-    if (hamburger && hamburger.classList.contains('active')) {
-        hamburger.classList.remove('active');
-        mobileDrawer.classList.remove('active');
-        drawerOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-    
-    if (dropdown.classList.contains('hidden')) {
-        dropdown.classList.remove('hidden');
-        closeNotificationDropdown();
-    } else {
-        dropdown.classList.add('hidden');
-    }
-}
+        function toggleProfileDropdown(event) {
+            event?.stopPropagation();
+            const isMobile = window.innerWidth < 1024;
+            const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
+            const hamburger = document.getElementById('hamburger');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+            const drawerOverlay = document.getElementById('drawerOverlay');
+            if (hamburger?.classList.contains('active')) {
+                hamburger.classList.remove('active'); mobileDrawer.classList.remove('active'); drawerOverlay.classList.remove('active'); document.body.style.overflow = '';
+            }
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                closeNotificationDropdown();
+            } else {
+                dropdown.classList.add('hidden');
+            }
+        }
 
         function closeProfileDropdown() {
-            const profileDropdown = document.getElementById('profileDropdown');
-            const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-            if (profileDropdown) profileDropdown.classList.add('hidden');
-            if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
+            document.getElementById('profileDropdown')?.classList.add('hidden');
+            document.getElementById('profileDropdownMobile')?.classList.add('hidden');
         }
 
-        // Hamburger Menu and Drawer functionality
+        // ========== HAMBURGER ==========
+
         const hamburger = document.getElementById('hamburger');
         const mobileDrawer = document.getElementById('mobileDrawer');
         const drawerOverlay = document.getElementById('drawerOverlay');
         const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-if (hamburger) {
-    hamburger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        
-        // Close profile dropdown if open
-        closeProfileDropdown();
-        // Close notification dropdown if open
-        closeNotificationDropdown();
-        
-        hamburger.classList.toggle('active');
-        mobileDrawer.classList.toggle('active');
-        drawerOverlay.classList.toggle('active');
-        document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-    });
-}
-// Close drawer when overlay is clicked
-if (drawerOverlay) {
-    drawerOverlay.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        mobileDrawer.classList.remove('active');
-        drawerOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-        
-        // Close profile and notification dropdowns if open
-        closeProfileDropdown();
-        closeNotificationDropdown();
-    });
-}
 
-        // Close drawer when nav link is clicked
-        mobileNavLinks.forEach(link => {
-            link.addEventListener('click', () => {
+        if (hamburger) {
+            hamburger.addEventListener('click', e => {
+                e.stopPropagation();
+                closeProfileDropdown();
+                closeNotificationDropdown();
+                hamburger.classList.toggle('active');
+                mobileDrawer.classList.toggle('active');
+                drawerOverlay.classList.toggle('active');
+                document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
+            });
+        }
+
+        if (drawerOverlay) {
+            drawerOverlay.addEventListener('click', () => {
                 hamburger.classList.remove('active');
                 mobileDrawer.classList.remove('active');
                 drawerOverlay.classList.remove('active');
                 document.body.style.overflow = '';
+                closeProfileDropdown();
+                closeNotificationDropdown();
             });
-        });
-
-        // Logout handler
-        window.handleLogout = async function() {
-            if (confirm('Are you sure you want to logout?')) {
-                try {
-                    await signOut(auth);
-                    window.location.href = '../login/index.html';
-                } catch (error) {
-                    console.error('Error logging out:', error);
-                    alert('Error logging out. Please try again.');
-                }
-            }
         }
 
-        // Load student data
+        mobileNavLinks.forEach(l => l.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            mobileDrawer.classList.remove('active');
+            drawerOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }));
+
+        // ========== LOGOUT ==========
+
+        window.handleLogout = function() { showLogoutConfirmPopup(); };
+
+        function showLogoutConfirmPopup() {
+            document.getElementById('logoutOverlay')?.remove();
+            const overlay = document.createElement('div');
+            overlay.id = 'logoutOverlay';
+            overlay.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-[99999] p-4';
+            overlay.innerHTML = `
+                <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center font-inter">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                        <svg width="32" height="32" viewBox="0 0 48 48" fill="none"><path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/><path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div class="text-xl font-semibold text-gray-900 mb-1">Log Out</div>
+                    <div class="text-sm text-gray-500 mb-6 leading-relaxed">Are you sure you want to log out of your account?</div>
+                    <div class="h-px bg-gray-200 -mx-8 mb-5"></div>
+                    <div class="flex gap-3">
+                        <button id="logoutCancelBtn" class="flex-1 py-3 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-medium cursor-pointer hover:bg-gray-50 transition-colors">Cancel</button>
+                        <button id="logoutConfirmBtn" class="flex-1 py-3 rounded-full border-0 bg-red-500 text-white text-sm font-medium cursor-pointer hover:bg-red-600 transition-colors">Log Out</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+            closeProfileDropdown();
+            document.getElementById('logoutCancelBtn').addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+            document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('logoutConfirmBtn');
+                btn.textContent = 'Logging out...'; btn.disabled = true; btn.style.opacity = '.7';
+                try { await signOut(auth); window.location.href = '../login/index.html'; } catch(e) { overlay.remove(); alert('Error logging out. Please try again.'); }
+            });
+        }
+
+        // ========== STUDENT DATA ==========
+
         async function loadStudentData(user) {
             try {
-                const studentsQuery = query(
-                    collection(db, 'students'),
-                    where('email', '==', user.email)
-                );
-                const studentsSnapshot = await getDocs(studentsQuery);
-                
-                if (!studentsSnapshot.empty) {
-                    studentsSnapshot.forEach((doc) => {
-                        studentData = doc.data();
-                    });
-                }
+                const snap = await getDocs(query(collection(db,'students'), where('email','==',user.email)));
+                if (!snap.empty) snap.forEach(d => { studentData = d.data(); });
                 return studentData;
-            } catch (error) {
-                console.error('Error loading student data:', error);
-                return null;
-            }
+            } catch(e){ console.error(e); return null; }
         }
 
-        // Load lessons
- // Load lessons with real-time listener
-function loadLessons() {
-    try {
-        if (!studentData || !studentData.section) return;
+        // ========== LESSONS ==========
 
-        const lessonsQuery = query(
-            collection(db, 'lessons'),
-            where('section', '==', studentData.section),
-            where('status', '==', 'published')
-        );
-
-        onSnapshot(lessonsQuery, (lessonsSnapshot) => {
-            if (lessonsSnapshot.empty) {
-                document.getElementById('noLessonsState').classList.remove('hidden');
-                document.getElementById('lessonsContainer').classList.add('hidden');
-            } else {
-                document.getElementById('noLessonsState').classList.add('hidden');
-                document.getElementById('lessonsContainer').classList.remove('hidden');
-
-                const container = document.getElementById('lessonsContainer');
-                let html = '';
-
-                lessonsSnapshot.forEach((doc) => {
-                    const lesson = doc.data();
-                    html += renderLessonCard(lesson);
-                });
-
-                container.innerHTML = html;
-            }
-        }, (error) => {
-            console.error('Error loading lessons:', error);
-        });
-
-    } catch (error) {
-        console.error('Error loading lessons:', error);
-    }
-}
-        // Render lesson card
         function renderLessonCard(lesson) {
             const createdDate = lesson.createdAt?.toDate?.() || new Date();
-            const dateStr = createdDate.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-            });
-            
-            const statusBadge = lesson.status === 'published' 
+            const dateStr = createdDate.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+            const statusBadge = lesson.status === 'published'
                 ? '<span class="status-badge status-published"><i class="bi bi-check-circle-fill"></i> Published</span>'
                 : '<span class="status-badge status-draft"><i class="bi bi-clock-fill"></i> Draft</span>';
-            
-            const randomId = 'lesson-' + Math.random().toString(36).substr(2, 9);
-            
+            const id = 'lesson-' + Math.random().toString(36).substr(2,9);
             const hasYouTube = lesson.youtubeVideoId && lesson.youtubeVideoId.trim() !== '';
-            
             return `
-                <div class="lesson-card" id="${randomId}">
-                    <div class="lesson-header" onclick="toggleLesson('${randomId}')">
-                        <div class="collapse-icon">
-                            <i class="bi bi-chevron-right text-white text-xl"></i>
-                        </div>
-                        <div class="lesson-icon">
-                            <i class="bi bi-book-fill text-white text-2xl"></i>
-                        </div>
+                <div class="lesson-card" id="${id}">
+                    <div class="lesson-header" onclick="window.toggleLesson('${id}')">
+                        <div class="collapse-icon"><i class="bi bi-chevron-right text-white text-xl"></i></div>
+                        <div class="lesson-icon"><i class="bi bi-book-fill text-white text-2xl"></i></div>
                         <div class="lesson-title-section">
-                            <h3 class="lesson-title">${lesson.title || 'Untitled Lesson'}</h3>
+                            <h3 class="lesson-title">${lesson.title||'Untitled Lesson'}</h3>
                             <div class="lesson-meta">
-                                <span class="lesson-meta-item">
-                                    <i class="bi bi-calendar3"></i>
-                                    ${dateStr}
-                                </span>
-                                <span class="lesson-meta-item">
-                                    <i class="bi bi-tag-fill"></i>
-                                    ${lesson.type || 'Lecture'}
-                                </span>
-                                <span class="lesson-meta-item">
-                                <i class="bi bi-person-fill"></i>
-                                ${lesson.professorName || 'Professor'}
-                            </span>
+                                <span class="lesson-meta-item"><i class="bi bi-calendar3"></i>${dateStr}</span>
+                                <span class="lesson-meta-item"><i class="bi bi-tag-fill"></i>${lesson.type||'Lecture'}</span>
+                                <span class="lesson-meta-item"><i class="bi bi-person-fill"></i>${lesson.professorName||'Professor'}</span>
                             </div>
                         </div>
                         ${statusBadge}
                     </div>
-                    
                     <div class="lesson-content-wrapper">
                         <div class="lesson-content-inner">
-                            ${lesson.description ? `
-                                <p class="lesson-description">${lesson.description}</p>
-                            ` : ''}
-                            
-${hasYouTube ? `
-    <div class="lesson-content-box" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left-color: #dc2626; border-radius: 12px; padding: 16px;">
-        <div class="flex items-center gap-2 mb-3">
-            <i class="bi bi-youtube text-red-600" style="font-size: 20px;"></i>
-            <span class="font-semibold text-gray-900 text-sm">Video Lesson</span>
-        </div>
-        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px;">
-            <iframe 
-                src="https://www.youtube.com/embed/${lesson.youtubeVideoId}" 
-                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 8px;"
-                allowfullscreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-            </iframe>
-        </div>
-    </div>
-` : ''}                            
-                            ${lesson.content ? `
-                                <div class="lesson-content-box">
-                                    <p class="lesson-content-text">${lesson.content.replace(/\n/g, '<br>')}</p>
-                                </div>
-                            ` : ''}
-                            
+                            ${lesson.description ? `<p class="lesson-description">${lesson.description}</p>` : ''}
+                            ${hasYouTube ? `
+                                <div class="lesson-content-box" style="background:linear-gradient(135deg,#fef2f2,#fee2e2);border-left-color:#dc2626;border-radius:12px;padding:16px;">
+                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                                        <i class="bi bi-youtube text-red-600" style="font-size:20px;"></i>
+                                        <span class="font-semibold text-gray-900 text-sm">Video Lesson</span>
+                                    </div>
+                                    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;">
+                                        <iframe src="https://www.youtube.com/embed/${lesson.youtubeVideoId}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:8px;" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>
+                                    </div>
+                                </div>` : ''}
+                            ${lesson.content ? `<div class="lesson-content-box"><p class="lesson-content-text">${lesson.content.replace(/\n/g,'<br>')}</p></div>` : ''}
                             ${lesson.materials && lesson.materials.length > 0 ? `
                                 <div class="materials-section">
-                                    <h4 class="materials-title">
-                                        <i class="bi bi-paperclip"></i>
-                                        Downloadable Materials (${lesson.materials.length})
-                                    </h4>
+                                    <h4 class="materials-title"><i class="bi bi-paperclip"></i>Downloadable Materials (${lesson.materials.length})</h4>
                                     <div>
-                                        ${lesson.materials.map((material, index) => {
-                                            const fileIcon = getFileIcon(material.name);
-                                            const fileSize = material.size ? formatFileSize(material.size) : '';
-                                            const downloadLink = material.data || material.url;
-                                            
-                                            return `
-                                                <a href="${downloadLink}" download="${material.name}" class="material-item" onclick="event.stopPropagation()">
-                                                    <div class="material-icon-box">
-                                                        <i class="${fileIcon} text-white text-lg"></i>
-                                                    </div>
-                                                    <div class="material-info">
-                                                        <span class="material-name">${material.name}</span>
-                                                        ${fileSize ? `<span class="material-size">${fileSize}</span>` : ''}
-                                                    </div>
-                                                    <i class="bi bi-download download-icon"></i>
-                                                </a>
-                                            `;
+                                        ${lesson.materials.map(m => {
+                                            const icon = getFileIcon(m.name);
+                                            const size = m.size ? formatFileSize(m.size) : '';
+                                            const link = m.data || m.url;
+                                            return `<a href="${link}" download="${m.name}" class="material-item" onclick="event.stopPropagation()">
+                                                <div class="material-icon-box"><i class="${icon} text-white text-lg"></i></div>
+                                                <div class="material-info">
+                                                    <span class="material-name">${m.name}</span>
+                                                    ${size ? `<span class="material-size">${size}</span>` : ''}
+                                                </div>
+                                                <i class="bi bi-download download-icon"></i>
+                                            </a>`;
                                         }).join('')}
                                     </div>
-                                </div>
-                            ` : ''}
+                                </div>` : ''}
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
-        // Helper functions for student view
-        function getFileIcon(filename) {
-            const ext = filename.split('.').pop().toLowerCase();
-            const iconMap = {
-                'pdf': 'bi bi-file-pdf-fill',
-                'doc': 'bi bi-file-word-fill',
-                'docx': 'bi bi-file-word-fill',
-                'ppt': 'bi bi-file-ppt-fill',
-                'pptx': 'bi bi-file-ppt-fill',
-                'xls': 'bi bi-file-excel-fill',
-                'xlsx': 'bi bi-file-excel-fill',
-                'jpg': 'bi bi-file-image-fill',
-                'jpeg': 'bi bi-file-image-fill',
-                'png': 'bi bi-file-image-fill',
-                'gif': 'bi bi-file-image-fill',
-                'mp4': 'bi bi-file-play-fill',
-                'avi': 'bi bi-file-play-fill',
-                'mov': 'bi bi-file-play-fill',
-                'zip': 'bi bi-file-zip-fill',
-                'rar': 'bi bi-file-zip-fill'
-            };
-            return iconMap[ext] || 'bi bi-file-earmark-fill';
+        function loadLessons() {
+            if (!studentData?.section) return;
+            onSnapshot(
+                query(collection(db,'lessons'), where('section','==',studentData.section), where('status','==','published')),
+                snap => {
+                    if (snap.empty) {
+                        document.getElementById('noLessonsState').classList.remove('hidden');
+                        document.getElementById('lessonsContainer').classList.add('hidden');
+                    } else {
+                        document.getElementById('noLessonsState').classList.add('hidden');
+                        document.getElementById('lessonsContainer').classList.remove('hidden');
+                        let html = '';
+                        snap.forEach(d => { html += renderLessonCard(d.data()); });
+                        document.getElementById('lessonsContainer').innerHTML = html;
+                    }
+                },
+                e => console.error('Error loading lessons:', e)
+            );
         }
 
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-        }
+        window.toggleLesson = function(id) {
+            document.getElementById(id)?.classList.toggle('expanded');
+        };
 
-        // Toggle lesson expand/collapse
-        window.toggleLesson = function(lessonId) {
-            const lessonCard = document.getElementById(lessonId);
-            if (lessonCard) {
-                lessonCard.classList.toggle('expanded');
-            }
-        }
+        // ========== EVENT LISTENERS ==========
 
-        // Setup event listeners
         function setupEventListeners() {
-            const notificationBtn = document.getElementById('notificationBellBtn');
-            const notificationBtnMobile = document.getElementById('notificationBellBtnMobile');
-            
-            if (notificationBtn) notificationBtn.addEventListener('click', toggleNotificationDropdown);
-            if (notificationBtnMobile) notificationBtnMobile.addEventListener('click', toggleNotificationDropdown);
-            
-            const closeNotificationBtn = document.getElementById('closeNotificationBtn');
-            const closeNotificationBtnMobile = document.getElementById('closeNotificationBtnMobile');
-            
-            if (closeNotificationBtn) {
-                closeNotificationBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
+            document.getElementById('notificationBellBtn')?.addEventListener('click', toggleNotificationDropdown);
+            document.getElementById('notificationBellBtnMobile')?.addEventListener('click', toggleNotificationDropdown);
+            document.getElementById('closeNotificationBtn')?.addEventListener('click', e => { e.stopPropagation(); closeNotificationDropdown(); });
+            document.getElementById('closeNotificationBtnMobile')?.addEventListener('click', e => { e.stopPropagation(); closeNotificationDropdown(); });
+            document.getElementById('profilePictureBtn')?.addEventListener('click', toggleProfileDropdown);
+            document.getElementById('profilePictureBtnMobile')?.addEventListener('click', toggleProfileDropdown);
+            document.addEventListener('click', event => {
+                if (!event.target.closest('#notificationBellBtn') && !event.target.closest('#notificationBellBtnMobile') && !event.target.closest('#notificationDropdown') && !event.target.closest('#notificationDropdownMobile'))
                     closeNotificationDropdown();
-                });
-            }
-            
-            if (closeNotificationBtnMobile) {
-                closeNotificationBtnMobile.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    closeNotificationDropdown();
-                });
-            }
-            
-            const profileBtn = document.getElementById('profilePictureBtn');
-            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-            
-            if (profileBtn) profileBtn.addEventListener('click', toggleProfileDropdown);
-            if (profileBtnMobile) profileBtnMobile.addEventListener('click', toggleProfileDropdown);
-            
-            document.addEventListener('click', (event) => {
-                if (!event.target.closest('#notificationBellBtn') && 
-                    !event.target.closest('#notificationBellBtnMobile') && 
-                    !event.target.closest('#notificationDropdown') && 
-                    !event.target.closest('#notificationDropdownMobile')) {
-                    closeNotificationDropdown();
-                }
-                
-                if (!event.target.closest('#profilePictureBtn') && 
-                    !event.target.closest('#profilePictureBtnMobile') && 
-                    !event.target.closest('#profileDropdown') && 
-                    !event.target.closest('#profileDropdownMobile')) {
+                if (!event.target.closest('#profilePictureBtn') && !event.target.closest('#profilePictureBtnMobile') && !event.target.closest('#profileDropdown') && !event.target.closest('#profileDropdownMobile'))
                     closeProfileDropdown();
-                }
             });
         }
 
-// Auth state change
-let unsubscribeAuth = null;
-let unsubscribeNotifListener = null;
+        // ========== AUTH INIT ==========
 
-const loadingTimeout = setTimeout(() => {
-    document.getElementById('loadingScreen').classList.add('hidden');
-    document.getElementById('mainContent').classList.remove('hidden');
-}, 1500);
-
-unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        try {
-            currentUser = user;
-            await loadStudentData(user);
-            updateProfileUI();
-            setupNotificationListener();
-            await checkUnreadNotifications();
-            loadLessons(); // no await — onSnapshot shows content itself
-            setupEventListeners();
-        } catch(e) {
-            console.error('Error initializing page:', e);
-        } finally {
-            clearTimeout(loadingTimeout);
+        const loadingTimeout = setTimeout(() => {
             document.getElementById('loadingScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
-        }
-    } else {
-        clearTimeout(loadingTimeout);
-        window.location.href = '../login/index.html';
-    }
-});
+        }, 1500);
 
-window.addEventListener('pagehide', () => {
-    if (unsubscribeAuth) unsubscribeAuth();
-    if (unsubscribeNotifListener) unsubscribeNotifListener();
-});
-window.addEventListener('beforeunload', () => {
-    if (unsubscribeNotifListener) unsubscribeNotifListener();
-});
+        unsubscribeAuth = onAuthStateChanged(auth, async user => {
+            if (user) {
+                try {
+                    currentUser = user;
+                    await loadStudentData(user);
+                    updateProfileUI();
+                    setupNotificationListener();
+                    await checkUnreadNotifications();
+                    loadLessons();
+                    setupEventListeners();
+                } catch (e) { console.error(e); }
+                finally {
+                    clearTimeout(loadingTimeout);
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('mainContent').classList.remove('hidden');
+                }
+            } else {
+                clearTimeout(loadingTimeout);
+                window.location.href = '../login/index.html';
+            }
+        });
 
-function showLogoutConfirmPopup() {
-    // Remove existing popup if any
-    const existing = document.getElementById('logoutOverlay');
-    if (existing) existing.remove();
+        window.addEventListener('pagehide', () => { if (unsubscribeAuth) unsubscribeAuth(); if (unsubscribeNotifListener) unsubscribeNotifListener(); });
+        window.addEventListener('beforeunload', () => { if (unsubscribeNotifListener) unsubscribeNotifListener(); });
 
-    const overlay = document.createElement('div');
-    overlay.id = 'logoutOverlay';
-    overlay.style.cssText = `
-        position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-        display: flex; align-items: center; justify-content: center;
-        z-index: 99999; padding: 1rem;
-        animation: fadeInLogout 0.2s ease;
-    `;
-
-    overlay.innerHTML = `
-        <style>
-            @keyframes fadeInLogout { from { opacity:0; } to { opacity:1; } }
-            @keyframes slideUpLogout { from { opacity:0; transform:translateY(24px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
-        </style>
-        <div style="
-            background:#fff;
-            border-radius:24px;
-            padding:2rem 1.5rem 1.5rem;
-            max-width:360px;
-            width:100%;
-            box-shadow:0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
-            animation:slideUpLogout 0.35s cubic-bezier(.4,0,.2,1);
-            text-align:center;
-            font-family:'Inter',sans-serif;
-        ">
-            <!-- Icon -->
-            <div style="
-                width:68px; height:68px;
-                background:#fce8e6;
-                border-radius:50%;
-                display:flex; align-items:center; justify-content:center;
-                margin:0 auto 1.25rem;
-            ">
-                <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
-                    <path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                    <path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-
-            <!-- Title -->
-            <div style="font-size:1.25rem; font-weight:600; color:#202124; margin-bottom:0.35rem; letter-spacing:-0.01em;">
-                Log Out
-            </div>
-
-            <!-- Subtitle -->
-            <div style="font-size:0.875rem; color:#5f6368; margin-bottom:1.5rem; line-height:1.5;">
-                Are you sure you want to log out of your account?
-            </div>
-
-            <!-- Divider -->
-            <div style="height:1px; background:#e8eaed; margin:0 -1.5rem 1.25rem;"></div>
-
-            <!-- Buttons -->
-            <div style="display:flex; gap:0.75rem;">
-                <button id="logoutCancelBtn" style="
-                    flex:1;
-                    padding:0.75rem 0.5rem;
-                    border-radius:100px;
-                    border:1.5px solid #dadce0;
-                    background:#fff;
-                    color:#3c4043;
-                    font-size:0.9375rem;
-                    font-weight:500;
-                    cursor:pointer;
-                    font-family:'Inter',sans-serif;
-                    transition:background 0.15s;
-                    min-height:48px;
-                ">Cancel</button>
-                <button id="logoutConfirmBtn" style="
-                    flex:1;
-                    padding:0.75rem 0.5rem;
-                    border-radius:100px;
-                    border:none;
-                    background:#ea4335;
-                    color:#fff;
-                    font-size:0.9375rem;
-                    font-weight:500;
-                    cursor:pointer;
-                    font-family:'Inter',sans-serif;
-                    transition:background 0.15s, box-shadow 0.15s;
-                    min-height:48px;
-                ">Log Out</button>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    // Close profile dropdowns first
-    const profileDropdown = document.getElementById('profileDropdown');
-    const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-    if (profileDropdown) profileDropdown.classList.add('hidden');
-    if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
-
-    // Cancel button
-    document.getElementById('logoutCancelBtn').addEventListener('click', () => {
-        overlay.remove();
-    });
-
-    // Click outside to close
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) overlay.remove();
-    });
-
-    // Confirm logout
-    document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
-        const confirmBtn = document.getElementById('logoutConfirmBtn');
-        confirmBtn.textContent = 'Logging out...';
-        confirmBtn.disabled = true;
-        confirmBtn.style.opacity = '0.7';
-
-        try {
-            await signOut(auth);
-            window.location.href = '../login/index.html';
-        } catch (error) {
-            console.error('Logout error:', error);
-            overlay.remove();
-            alert('Error logging out. Please try again.');
-        }
-    });
-}
-        // Make functions globally available
+        // Expose functions globally for onclick handlers
         window.toggleNotificationDropdown = toggleNotificationDropdown;
         window.closeNotificationDropdown = closeNotificationDropdown;
         window.toggleProfileDropdown = toggleProfileDropdown;
-        window.handleLogout = handleLogout;
     </script>
-
 </body>
 </html>

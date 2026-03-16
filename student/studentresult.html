@@ -6,1086 +6,285 @@
     <title>UMakFit - Test Result</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
-    @import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
-    
-    * {
-        -webkit-font-smoothing: antialiased;
-        box-sizing: border-box;
-        font-family: 'Inter', sans-serif;
-    }
-    
-    html, body {
-        margin: 0;
-        height: 100%;
-    }
-    
-    button:focus-visible {
-        outline: 2px solid #4a90e2 !important;
-    }
-    
-    a {
-        text-decoration: none;
-    }
-
-    body {
-        background: #f8fafc;
-        min-height: 100vh;
-    }
-
-    .font-manrope { 
-        font-family: 'Manrope', sans-serif; 
-    }
-
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-    }
-
-    .pulse-animation {
-        animation: pulse 2s infinite;
-    }
-
-    .slide-down {
-        animation: slideDown 0.3s ease;
-    }
-
-    /* Notification Styles */
-    .notification-bell-btn {
-        background: rgba(255, 255, 255, 0.2);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin: 0;
-    }
-
-    .notification-bell-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-        border-color: rgba(255, 255, 255, 0.5);
-        transform: scale(1.1);
-    }
-
-    .notification-bell-btn i {
-        font-size: 20px;
-    }
-
-    .notification-bell-badge {
-        position: absolute;
-        top: -4px;
-        right: -4px;
-        background: #ef4444;
-        color: white;
-        font-size: 10px;
-        font-weight: 700;
-        padding: 0.15rem 0.4rem;
-        border-radius: 10px;
-        min-width: 18px;
-        height: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        animation: pulse 2s infinite;
-    }
-
-    .notification-bell-container {
-        position: relative;
-        display: inline-block;
-    }
-
-    .notification-dropdown {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        margin-top: 0.5rem;
-        width: 24rem;
-        max-width: calc(100vw - 2rem);
-        background: white;
-        border-radius: 0.75rem;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        z-index: 9999;
-        max-height: 480px;
-        overflow-y: auto;
-        animation: slideDown 0.3s ease;
-    }
-
-    .notification-dropdown-header {
-        padding: 0.75rem 1rem;
-        border-bottom: 2px solid #e5e7eb;
-        background: linear-gradient(135deg, #f8fafc, #ffffff);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 0.75rem 0.75rem 0 0;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-    }
-
-    @media (min-width: 640px) {
-        .notification-dropdown-header {
-            padding: 1rem 1.25rem;
-        }
-    }
-
-    .notification-dropdown-body {
-        max-height: 360px;
-        overflow-y: auto;
-    }
-
-    .notification-item {
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid #f3f4f6;
-        transition: background-color 0.2s ease;
-        cursor: pointer;
-    }
-
-    .notification-item:hover {
-        background-color: #f9fafb;
-    }
-
-    .notification-item:last-child {
-        border-bottom: none;
-    }
-
-    .notification-item strong {
-        color: #111827;
-        font-size: 0.875rem;
-        display: block;
-        margin-bottom: 0.25rem;
-        font-weight: 600;
-    }
-
-    .notification-item p {
-        color: #6b7280;
-        font-size: 0.8125rem;
-        margin-bottom: 0.25rem;
-        line-height: 1.5;
-    }
-
-    .notification-item small {
-        color: #9ca3af;
-        font-size: 0.6875rem;
-        display: block;
-    }
-
-    .notification-dropdown-footer {
-        padding: 0.5rem 0.75rem;
-        border-top: 2px solid #e5e7eb;
-        background-color: #f9fafb;
-        border-radius: 0 0 0.75rem 0.75rem;
-        position: sticky;
-        bottom: 0;
-    }
-        /* Notification dropdown scrollbar */
-        #notificationDropdown::-webkit-scrollbar,
-        #notificationDropdownMobile::-webkit-scrollbar,
-        #notificationDropdownBody::-webkit-scrollbar,
-        #notificationDropdownBodyMobile::-webkit-scrollbar { width: 6px; }
-
-        #notificationDropdown::-webkit-scrollbar-track,
-        #notificationDropdownMobile::-webkit-scrollbar-track,
-        #notificationDropdownBody::-webkit-scrollbar-track,
-        #notificationDropdownBodyMobile::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-
-        #notificationDropdown::-webkit-scrollbar-thumb,
-        #notificationDropdownMobile::-webkit-scrollbar-thumb,
-        #notificationDropdownBody::-webkit-scrollbar-thumb,
-        #notificationDropdownBodyMobile::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
-
-        #notificationDropdown::-webkit-scrollbar-thumb:hover,
-        #notificationDropdownMobile::-webkit-scrollbar-thumb:hover,
-        #notificationDropdownBody::-webkit-scrollbar-thumb:hover,
-        #notificationDropdownBodyMobile::-webkit-scrollbar-thumb:hover { background: #2563eb; }
-    @media (min-width: 640px) {
-        .notification-dropdown-footer {
-            padding: 0.75rem 1rem;
-        }
-    }
-
-    .notification-empty {
-        padding: 1.5rem 2rem;
-        text-align: center;
-        color: #9ca3af;
-    }
-
-    .notification-empty i {
-        font-size: 3rem;
-        margin-bottom: 0.75rem;
-        display: block;
-    }
-
-    .notification-empty p {
-        color: #6b7280;
-        font-size: 0.875rem;
-    }
-
-    /* Main Content */
-    .main-content {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem;
-    }
-
-    /* Result Container */
-    .result-container {
-        background: white;
-        border-radius: 24px;
-        padding: 0;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        margin-bottom: 2rem;
-        overflow: hidden;
-        border: 1px solid #e2e8f0;
-    }
-
-    /* Hero Section with Score */
-    .hero-section {
-        background: white;
-        padding: 3rem 2rem;
-        text-align: center;
-        position: relative;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .hero-section::before {
-        display: none;
-    }
-
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.8; }
-    }
-
-    .hero-content {
-        position: relative;
-        z-index: 1;
-    }
-
-    .completion-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: #f0fdf4;
-        padding: 10px 24px;
-        border-radius: 50px;
-        margin-bottom: 1.5rem;
-        border: 1px solid #86efac;
-    }
-
-    .completion-badge span {
-        font-family: "Inter", Helvetica;
-        font-weight: 600;
-        color: #059669;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .score-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 2rem;
-        margin: 2rem 0;
-    }
-
-    .score-details {
-        text-align: left;
-    }
-
-    #scoreRating {
-        margin-top: 0.75rem;
-    }
-
-    .test-title {
-        font-family: "Inter", Helvetica;
-        font-weight: 800;
-        color: #1e293b;
-        font-size: 2rem;
-        margin-bottom: 1rem;
-    }
-
-    .score-rating {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 24px;
-        border-radius: 50px;
-        font-family: "Inter", Helvetica;
-        font-weight: 700;
-        font-size: 16px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        
-        border: 2px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .rating-excellent {
-        background: #f0fdf4;
-        color: #059669;
-        border: 2px solid #86efac;
-    }
-
-    .rating-good {
-        background: #eff6ff;
-        color: #2563eb;
-        border: 2px solid #93c5fd;
-    }
-
-    .rating-fair {
-        background: #fffbeb;
-        color: #d97706;
-        border: 2px solid #fcd34d;
-    }
-
-    .rating-needs-improvement {
-        background: #fef2f2;
-        color: #dc2626;
-        border: 2px solid #fca5a5;
-    }
-
-    .stat-badge {
-        background: #f8fafc;
-        padding: 16px 24px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-    }
-
-    .stat-badge-value {
-        font-family: "Inter", Helvetica;
-        font-weight: 700;
-        color: #1e293b;
-        font-size: 18px;
-    }
-
-    /* Content Section */
-    .content-section {
-        padding: 3rem 2rem;
-    }
-
-    /* Details Grid */
-    .details-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .detail-card {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        border-radius: 16px;
-        padding: 1.5rem;
-        border-left: 4px solid #667eea;
-        transition: all 0.3s;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .detail-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .detail-icon {
-        font-size: 24px;
-        margin-bottom: 0.5rem;
-    }
-
-    .detail-label {
-        font-family: "Inter", Helvetica;
-        font-weight: 700;
-        color: #64748b;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.5rem;
-    }
-
-    .detail-value {
-        font-family: "Inter", Helvetica;
-        font-weight: 700;
-        color: #1e293b;
-        font-size: 18px;
-        word-break: break-word;
-    }
-
-    /* Recommendation Section */
-    .recommendation-section {
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        border: 2px solid #bae6fd;
-        box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
-    }
-
-    .recommendation-title {
-        font-family: "Inter", Helvetica;
-        font-weight: 700;
-        color: #0c4a6e;
-        font-size: 20px;
-        margin: 0;
-    }
-
-    .recommendation-text {
-        font-family: "Inter", Helvetica;
-        font-weight: 500;
-        color: #075985;
-        font-size: 15px;
-        line-height: 1.8;
-        margin: 0;
-    }
-
-    .loading-recommendation {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: #0c4a6e;
-    }
-
-    .loading-spinner {
-        width: 20px;
-        height: 20px;
-        border: 3px solid #e0f2fe;
-        border-top: 3px solid #0ea5e9;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-    /* Recommendation Header */
-.recommendation-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 1rem;
-}
-
-.recommendation-icon {
-    font-size: 24px;
-}
-
-/* Stat Badges */
-.stat-badges {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 1rem;
-}
-
-.stat-badge-label {
-    font-family: "Inter", Helvetica;
-    font-weight: 600;
-    color: #64748b;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-}
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    /* Action Buttons */
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .btn-action {
-        padding: 16px 36px;
-        border-radius: 12px;
-        border: none;
-        font-family: "Inter", Helvetica;
-        font-weight: 700;
-        font-size: 15px;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        text-decoration: none;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .btn-primary {
-        background: #1e293b;
-        color: white;
-        box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25);
-    }
-
-    .btn-primary:hover {
-        background: #334155;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(30, 41, 59, 0.35);
-        color: white;
-    }
-
-    .btn-secondary {
-        background: white;
-        color: #1e293b;
-        border: 2px solid #e2e8f0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .btn-secondary:hover {
-        background: #f8fafc;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        color: #1e293b;
-    }
-
-    /* Loading Screen */
-    .loading {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        flex-direction: column;
-        gap: 24px;
-    }
-
-    .spinner {
-        border: 5px solid #f1f5f9;
-        border-top: 5px solid #3b82f6;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        animation: spin 1s linear infinite;
-    }
-
-    .loading-text {
-        font-family: "Inter", sans-serif;
-        font-weight: 600;
-        color: #1e293b;
-        font-size: 18px;
-    }
-
-    /* Hamburger Menu Styles */
-    .hamburger {
-        display: none;
-        flex-direction: column;
-        gap: 4px;
-        cursor: pointer;
-        z-index: 60;
-    }
-
-    .hamburger span {
-        width: 25px;
-        height: 3px;
-        background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%);
-        border-radius: 2px;
-        transition: all 0.3s ease;
-    }
-
-    .hamburger.active span:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 5px);
-    }
-
-    .hamburger.active span:nth-child(2) {
-        opacity: 0;
-    }
-
-    .hamburger.active span:nth-child(3) {
-        transform: rotate(-45deg) translate(7px, -6px);
-    }
-
-    /* Mobile Drawer */
-    .mobile-drawer {
-        position: fixed;
-        top: 0;
-        right: -100%;
-        width: 280px;
-        height: 100vh;
-        background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);
-        z-index: 55;
-        transition: right 0.3s ease;
-        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-        overflow-y: auto;
-    }
-
-    .mobile-drawer.active {
-        right: 0;
-    }
-
-    .drawer-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 50;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .drawer-overlay.active {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .main-content {
-            padding: 1rem;
-        }
-
-        .hero-section {
-            padding: 2rem 1rem;
-        }
-
-        .score-wrapper {
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .score-details {
-            text-align: center;
-        }
-
-        .test-title {
-            font-size: 1.5rem;
-        }
-
-        .stat-badges {
-            justify-content: center;
-        }
-
-        .details-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-        }
-
-        .btn-action {
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .notification-dropdown {
-            width: calc(100vw - 2rem);
-            right: 0;
-            left: auto;
-        }
-    }
-
-    @media (max-width: 1023px) {
-        .hamburger {
-            display: flex;
-        }
-    }
+        * { -webkit-font-smoothing: antialiased; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        html, body { margin: 0; height: 100%; }
+        .font-manrope { font-family: 'Manrope', sans-serif; }
+        a { text-decoration: none; }
+
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+        @keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.1); } }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+
+        .spinner { border:5px solid #f1f5f9; border-top:5px solid #3b82f6; border-radius:50%; width:60px; height:60px; animation:spin 1s linear infinite; }
+        .loading-spinner { width:20px; height:20px; border:3px solid #e0f2fe; border-top:3px solid #0ea5e9; border-radius:50%; animation:spin 1s linear infinite; }
+        .slide-down { animation:slideDown 0.3s ease; }
+        .notification-badge { position:absolute; top:-4px; right:-4px; background:#ef4444; color:white; font-size:10px; font-weight:700; padding:.15rem .4rem; border-radius:10px; min-width:18px; height:18px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,.3); animation:pulse 2s infinite; }
+
+        .notif-scroll::-webkit-scrollbar { width:6px; }
+        .notif-scroll::-webkit-scrollbar-track { background:#f1f1f1; border-radius:10px; }
+        .notif-scroll::-webkit-scrollbar-thumb { background:#3b82f6; border-radius:10px; }
+        .notif-scroll::-webkit-scrollbar-thumb:hover { background:#2563eb; }
+
+        .rating-excellent         { background:#f0fdf4; color:#059669; border:2px solid #86efac; }
+        .rating-good              { background:#eff6ff; color:#2563eb; border:2px solid #93c5fd; }
+        .rating-fair              { background:#fffbeb; color:#d97706; border:2px solid #fcd34d; }
+        .rating-needs-improvement { background:#fef2f2; color:#dc2626; border:2px solid #fca5a5; }
+
+        .norm-applied-badge { display:inline-flex; align-items:center; gap:6px; background:#fef3d4; border:1px solid #c8a84b; color:#92400e; border-radius:20px; padding:4px 12px; font-size:11px; font-weight:700; margin-top:8px; }
+
+        .hamburger { display:none; flex-direction:column; gap:4px; cursor:pointer; z-index:60; }
+        .hamburger span { width:25px; height:3px; background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%); border-radius:2px; transition:all .3s ease; }
+        .hamburger.active span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+        .hamburger.active span:nth-child(2) { opacity:0; }
+        .hamburger.active span:nth-child(3) { transform:rotate(-45deg) translate(7px,-6px); }
+        @media (max-width:1023px) { .hamburger { display:flex; } }
+
+        .mobile-drawer { position:fixed; top:0; right:-100%; width:280px; height:100vh; background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%); z-index:55; transition:right .3s ease; box-shadow:-5px 0 15px rgba(0,0,0,.3); overflow-y:auto; }
+        .mobile-drawer.active { right:0; }
+        .drawer-overlay { position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,.5); z-index:50; opacity:0; visibility:hidden; transition:opacity .3s ease,visibility .3s ease; }
+        .drawer-overlay.active { opacity:1; visibility:visible; }
+
+        .detail-card { transition:all .3s; }
+        .detail-card:hover { transform:translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,.1); }
+        .btn-action { transition:all .3s; }
+        .btn-action:hover { transform:translateY(-2px); }
     </style>
 </head>
-<body>
-    <!-- Loading Screen -->
-<div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
-    <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
-    <div class="spinner"></div>
-    <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Test Result...</div>
-</div>
+<body class="bg-slate-50 min-h-screen">
 
-    <div id="mainContent" style="display: none;">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
+        <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
+        <div class="spinner"></div>
+        <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Test Result...</div>
+    </div>
+
+    <div id="mainContent" style="display:none;">
+
         <!-- Navigation -->
-        <nav class="shadow-lg" style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%);">
+        <nav class="shadow-lg" style="background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%);">
             <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
                 <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-                    <!-- Logo -->
                     <a href="./studentDashboard.html" class="flex items-center gap-2 sm:gap-3">
-                        <img src="UMakfit Logo (2).png" 
-                             alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
-                        <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                        <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain">
+                        <span class="text-xl sm:text-2xl md:text-3xl font-extrabold font-manrope"
+                              style="background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
                             UMakFit
                         </span>
                     </a>
-                    
-                    <!-- Desktop Navigation -->
+
+                    <!-- Desktop Nav -->
                     <div class="hidden lg:flex items-center gap-2 flex-wrap">
-                        <a href="./studentDashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-speedometer2"></i> 
-                            <span class="hidden xl:inline">Dashboard</span>
-                        </a>
-                        <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
-                            <i class="bi bi-clipboard-check"></i> 
-                            <span class="hidden xl:inline">Test</span>
-                        </a>
-                        <a href="./studentlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-book"></i> 
-                            <span class="hidden xl:inline">Lesson</span>
-                        </a>
-                        <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                    <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
-                </a>
-                        <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-graph-up"></i> 
-                            <span class="hidden xl:inline">Progress</span>
-                        </a>
-                        <a href="./achievements.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-trophy"></i> 
-                            <span class="hidden xl:inline">Achievements</span>
-                        </a>
-                        
-                        <!-- Notification Bell - Desktop -->
+                        <a href="./studentDashboard.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-speedometer2"></i><span class="hidden xl:inline">Dashboard</span></a>
+                        <a href="./test.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"><i class="bi bi-clipboard-check"></i><span class="hidden xl:inline">Test</span></a>
+                        <a href="./studentlesson.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-book"></i><span class="hidden xl:inline">Lesson</span></a>
+                        <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span></a>
+                        <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-graph-up"></i><span class="hidden xl:inline">Progress</span></a>
+                        <a href="./achievements.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all"><i class="bi bi-trophy"></i><span class="hidden xl:inline">Achievements</span></a>
                         <div class="relative">
-                            <button id="notificationBellBtn" class="notification-bell-btn">
+                            <button id="notificationBellBtn" class="relative w-9 h-9 xl:w-10 xl:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
                                 <i class="bi bi-bell-fill text-base xl:text-lg"></i>
-                                <span id="navNotificationCount" class="notification-bell-badge hidden">0</span>
+                                <span id="navNotificationCount" class="notification-badge hidden">0</span>
                             </button>
-                            
-                            <!-- Notification Dropdown - Desktop -->
-                            <div id="notificationDropdown" class="notification-dropdown hidden">
-                                <div class="notification-dropdown-header">
-                                    <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
-                                        <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                                    </h6>
-                                    <button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600 p-1 transition-colors">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
+                            <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl z-[9999] max-h-[480px] overflow-y-auto notif-scroll slide-down">
+                                <div class="sticky top-0 z-10 px-4 py-3 border-b-2 border-gray-200 bg-gradient-to-r from-slate-50 to-white flex justify-between items-center rounded-t-xl">
+                                    <h6 class="font-bold text-gray-900 text-sm flex items-center gap-2"><i class="bi bi-bell-fill text-blue-500"></i> Notifications</h6>
+                                    <button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button>
                                 </div>
-                                <div id="notificationDropdownBody" class="notification-dropdown-body">
-                                    <div class="notification-empty">
-                                        <i class="bi bi-bell-slash"></i>
-                                        <p>No notifications yet</p>
-                                    </div>
+                                <div id="notificationDropdownBody" class="max-h-[360px] overflow-y-auto notif-scroll">
+                                    <div class="py-6 px-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl block mb-3"></i><p class="text-gray-500 text-sm">No notifications yet</p></div>
                                 </div>
-                                <div class="notification-dropdown-footer">
-                                    <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
-                                        View All Notifications
-                                    </button>
+                                <div class="sticky bottom-0 px-3 py-2 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl">
+                                    <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg font-semibold text-xs hover:from-blue-600 hover:to-blue-700 transition-all">View All Notifications</button>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Profile Dropdown -->
                         <div class="relative">
-                            <img src="" alt="Profile" id="profilePictureBtn"
-                                 class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
-                            
+                            <img src="" alt="Profile" id="profilePictureBtn" class="w-9 h-9 xl:w-10 xl:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 hover:scale-105 transition-all object-cover">
                             <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
                                 <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                                    <img src="" alt="Profile" id="profileDropdownPicture" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-[3px] border-blue-500 object-cover">
                                     <h6 id="profileDropdownName" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
                                     <p id="profileDropdownEmail" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
                                 </div>
                                 <div class="p-2">
-                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-                                    </a>
+                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors"><i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i><span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span></a>
                                     <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
-                                        <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
-                                        <span class="font-medium text-sm sm:text-base">Logout</span>
-                                    </div>
+                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500"><i class="bi bi-box-arrow-right text-lg sm:text-xl"></i><span class="font-medium text-sm sm:text-base">Logout</span></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Mobile Right Icons -->
                     <div class="flex lg:hidden items-center gap-2 sm:gap-3">
-                        <!-- Mobile Notification Bell -->
                         <div class="relative">
-                            <button id="notificationBellBtnMobile" class="notification-bell-btn">
-                                <i class="bi bi-bell-fill text-base sm:text-lg"></i>
-                                <span id="navNotificationCountMobile" class="notification-bell-badge hidden">0</span>
+                            <button id="notificationBellBtnMobile" class="relative w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
+                                <i class="bi bi-bell-fill text-base"></i>
+                                <span id="navNotificationCountMobile" class="notification-badge hidden">0</span>
                             </button>
-                            
-                            <!-- Mobile Notification Dropdown -->
-                            <div id="notificationDropdownMobile" class="notification-dropdown hidden fixed right-2 left-2 top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
-                                <div class="notification-dropdown-header">
-                                    <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
-                                        <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                                    </h6>
-                                    <button id="closeNotificationBtnMobile" class="text-gray-400 hover:text-gray-600 p-1 transition-colors">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
+                            <div id="notificationDropdownMobile" class="hidden fixed right-2 left-2 top-20 max-h-[calc(100vh-6rem)] overflow-y-auto notif-scroll bg-white rounded-xl shadow-2xl z-[9999] slide-down">
+                                <div class="sticky top-0 z-10 px-4 py-3 border-b-2 border-gray-200 bg-gradient-to-r from-slate-50 to-white flex justify-between items-center rounded-t-xl">
+                                    <h6 class="font-bold text-gray-900 text-sm flex items-center gap-2"><i class="bi bi-bell-fill text-blue-500"></i> Notifications</h6>
+                                    <button id="closeNotificationBtnMobile" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button>
                                 </div>
-                                <div id="notificationDropdownBodyMobile" class="notification-dropdown-body">
-                                    <div class="notification-empty">
-                                        <i class="bi bi-bell-slash"></i>
-                                        <p>No notifications yet</p>
-                                    </div>
+                                <div id="notificationDropdownBodyMobile" class="max-h-[360px] overflow-y-auto notif-scroll">
+                                    <div class="py-6 px-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl block mb-3"></i><p class="text-gray-500 text-sm">No notifications yet</p></div>
                                 </div>
-                                <div class="notification-dropdown-footer">
-                                    <button onclick="window.location.href='./notifications.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
-                                        View All Notifications
-                                    </button>
+                                <div class="sticky bottom-0 px-3 py-2 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl">
+                                    <button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg font-semibold text-xs hover:from-blue-600 hover:to-blue-700 transition-all">View All Notifications</button>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Mobile Profile -->
                         <div class="relative">
-                            <img src="" alt="Profile" id="profilePictureBtnMobile"
-                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
-                            
-                            <!-- Mobile Profile Dropdown -->
+                            <img src="" alt="Profile" id="profilePictureBtnMobile" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 cursor-pointer hover:border-white/60 object-cover">
                             <div id="profileDropdownMobile" class="hidden fixed right-2 top-20 w-64 sm:w-72 bg-white rounded-xl shadow-2xl z-[9999] slide-down">
                                 <div class="p-4 sm:p-6 border-b-2 border-gray-200 text-center">
-                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-3 border-blue-500 object-cover">
+                                    <img src="" alt="Profile" id="profileDropdownPictureMobile" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-[3px] border-blue-500 object-cover">
                                     <h6 id="profileDropdownNameMobile" class="font-bold text-gray-900 text-base sm:text-lg">Loading...</h6>
                                     <p id="profileDropdownEmailMobile" class="text-xs sm:text-sm text-gray-500 mt-1 truncate px-2">Loading...</p>
                                 </div>
                                 <div class="p-2">
-                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i>
-                                        <span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span>
-                                    </a>
+                                    <a href="./studentProfile.html" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-100 transition-colors"><i class="bi bi-person-circle text-blue-500 text-lg sm:text-xl"></i><span class="font-medium text-gray-700 text-sm sm:text-base">View Profile</span></a>
                                     <div class="h-px bg-gray-200 my-1 sm:my-2"></div>
-                                   <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500">
-                                    <i class="bi bi-box-arrow-right text-lg sm:text-xl"></i>
-                                    <span class="font-medium text-sm sm:text-base">Logout</span>
-                                </div>
+                                    <div onclick="handleLogout()" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-red-50 transition-colors cursor-pointer text-red-500"><i class="bi bi-box-arrow-right text-lg sm:text-xl"></i><span class="font-medium text-sm sm:text-base">Logout</span></div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Hamburger Menu Button -->
-                        <div class="hamburger" id="hamburger">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
+                        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <!-- Mobile Drawer Overlay -->
         <div class="drawer-overlay" id="drawerOverlay"></div>
-
-        <!-- Mobile Drawer -->
         <div class="mobile-drawer" id="mobileDrawer">
             <div class="p-6 pt-8">
-                <!-- Drawer Header -->
-               <div class="flex items-center gap-3 mt-4 mb-8 pb-6" style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                    <img src="UMakfit Logo (2).png" 
-                        alt="UMak Logo" class="h-12 w-auto object-contain">
-                    <span class="text-2xl font-extrabold font-manrope" style="background: linear-gradient(135deg, #EAD38A 0%, #C5A046 50%, #8B6D2D 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                        UMakFIT
-                    </span>
+                <div class="flex items-center gap-3 mt-4 mb-8 pb-6 border-b border-white/20">
+                    <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
+                    <span class="text-2xl font-extrabold font-manrope" style="background:linear-gradient(135deg,#EAD38A 0%,#C5A046 50%,#8B6D2D 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">UMakFIT</span>
                 </div>
-
-                <!-- Navigation Links -->
                 <nav class="space-y-2">
-                    <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-speedometer2 mr-3"></i>Dashboard
-                    </a>
-                    <a href="./test.html" class="mobile-nav-link block text-white bg-white/10 font-semibold py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-clipboard-check mr-3"></i>Test
-                    </a>
-                    <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-book mr-3"></i>Lessons
-                    </a>
-                        <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                    <i class="bi bi-activity mr-3"></i>Performance
-                </a>
-                    <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-graph-up mr-3"></i>Progress
-                    </a>
-                    <a href="./achievements.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-trophy mr-3"></i>Achievements
-                    </a>
+                    <a href="./studentDashboard.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-speedometer2 mr-3"></i>Dashboard</a>
+                    <a href="./test.html" class="mobile-nav-link block text-white bg-white/10 font-semibold py-3 px-4 rounded-lg transition-all"><i class="bi bi-clipboard-check mr-3"></i>Test</a>
+                    <a href="./studentlesson.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-book mr-3"></i>Lessons</a>
+                    <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-activity mr-3"></i>Performance</a>
+                    <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-graph-up mr-3"></i>Progress</a>
+                    <a href="./achievements.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all"><i class="bi bi-trophy mr-3"></i>Achievements</a>
                 </nav>
             </div>
         </div>
 
-        <div class="main-content">
-            <div class="result-container">
-                <!-- Hero Section with Score -->
-                <div class="hero-section">
-                    <div class="hero-content">
-                        <div class="completion-badge">
-                            <i class="bi bi-check-circle-fill"></i>
-                            <span>Test Completed</span>
+        <!-- Main Content -->
+        <div class="max-w-[1200px] mx-auto px-4 sm:px-8 py-8">
+            <div class="bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden mb-8">
+
+                <!-- Hero Section -->
+                <div class="bg-white px-6 sm:px-8 py-10 sm:py-12 text-center border-b border-slate-200">
+                    <div class="inline-flex items-center gap-2 bg-green-50 border border-green-300 text-green-700 font-semibold text-xs uppercase tracking-widest px-6 py-2.5 rounded-full mb-6">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Test Completed</span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 my-6">
+                        <div class="text-center sm:text-left">
+                            <h1 id="testName" class="text-3xl sm:text-4xl font-extrabold text-slate-800 mb-3">--</h1>
+                            <div id="scoreRating" class="mt-3"></div>
                         </div>
-                        
-                        <div class="score-wrapper">
-                            <div class="score-details">
-                                <h1 class="test-title" id="testName">--</h1>
-                                <div id="scoreRating"></div>
-                            </div>
+                    </div>
+                    <div id="statBadges" class="flex flex-wrap gap-4 justify-center mt-4">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl px-6 py-4">
+                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Result</div>
+                            <div id="testResult" class="text-lg font-bold text-slate-800">--</div>
                         </div>
-                        
-                        <div class="stat-badges" id="statBadges">
-                            <div class="stat-badge">
-                                <div class="stat-badge-label">Result</div>
-                                <div class="stat-badge-value" id="testResult">--</div>
-                            </div>
-                            <div class="stat-badge">
-                                <div class="stat-badge-label">Completed</div>
-                                <div class="stat-badge-value" id="completedDate">--</div>
-                            </div>
-                            <!-- Duration badge will be added dynamically if timerValue exists -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl px-6 py-4">
+                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Completed</div>
+                            <div id="completedDate" class="text-lg font-bold text-slate-800">--</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Content Section -->
-                <div class="content-section">
-                    <div class="recommendation-section" id="recommendationSection">
-                        <div class="recommendation-header">
-                            <span class="recommendation-icon">💡</span>
-                            <h3 class="recommendation-title">Personalized Recommendations</h3>
+                <div class="px-6 sm:px-8 py-10">
+                    <div id="recommendationSection" class="bg-gradient-to-br from-sky-50 to-blue-50 border-2 border-sky-200 rounded-2xl p-6 sm:p-8 mb-8 shadow-sm">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-2xl">💡</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-sky-900">Personalized Recommendations</h3>
                         </div>
                         <div id="recommendationContent">
-                            <div class="loading-recommendation">
-                                <div class="loading-spinner"></div>
-                                <span>Generating personalized recommendations for you...</span>
+                            <div class="flex items-center gap-3 text-sky-800">
+                                <div class="loading-spinner shrink-0"></div>
+                                <span class="text-sm font-medium">Generating personalized recommendations for you...</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="action-buttons" id="mainActionButtons">
-                        <button onclick="goToTests()" class="btn-action btn-primary">
+                    <div id="mainActionButtons" class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="window.location.href='./test.html'"
+                                class="btn-action inline-flex items-center justify-center gap-2.5 px-9 py-4 rounded-xl bg-slate-800 text-white font-bold text-sm uppercase tracking-wide shadow-lg cursor-pointer border-0 hover:bg-slate-700 hover:shadow-xl">
                             <i class="bi bi-clipboard-check"></i> View All Tests
                         </button>
-                        <a href="./progress.html" class="btn-action btn-secondary">
+                        <a href="./progress.html"
+                           class="btn-action inline-flex items-center justify-center gap-2.5 px-9 py-4 rounded-xl bg-white text-slate-800 font-bold text-sm uppercase tracking-wide border-2 border-slate-200 shadow-sm hover:bg-slate-50 hover:shadow-md">
                             <i class="bi bi-graph-up"></i> Track My Progress
                         </a>
                     </div>
                 </div>
             </div>
         </div>
+
         <!-- Footer -->
-    <footer style="background: linear-gradient(135deg, #0D1B2A 0%, #1A2B3C 50%, #2C4A5E 100%); border-top: 1px solid rgba(255,255,255,0.07); padding: clamp(3rem,6vw,5rem) clamp(1.5rem,5vw,4rem) 2rem; margin-top: 3rem;">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
-                <!-- About UmakFit & College of Human Kinetics -->
-                <div>
-                    <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                        <img src="UMakfit Logo (2).png" 
-                             alt="UMak Logo" class="h-12 w-auto object-contain">
-                        <div>
-                            <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6>
-                            <p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p>
+        <footer style="background:linear-gradient(135deg,#0D1B2A 0%,#1A2B3C 50%,#2C4A5E 100%);border-top:1px solid rgba(255,255,255,0.07);" class="mt-12 px-6 sm:px-10 lg:px-16 pt-12 pb-8">
+            <div class="container mx-auto max-w-7xl">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
+                    <div>
+                        <div class="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                            <img src="UMakfit Logo (2).png" alt="UMak Logo" class="h-12 w-auto object-contain">
+                            <div><h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-1">UMakFit</h6><p class="text-xs lg:text-sm text-blue-200 font-medium">College of Human Kinetics</p></div>
+                        </div>
+                        <p class="text-sm lg:text-base leading-relaxed text-blue-100">UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati.</p>
+                    </div>
+                    <div>
+                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
+                        <div class="grid grid-cols-2 gap-4 lg:gap-6">
+                            <div class="space-y-3">
+                                <a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-book mr-2"></i>Lessons</a>
+                                <a href="./test.html" class="block text-blue-100 hover:text-yellow-300 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-clipboard-check mr-2"></i>Tests</a>
+                                <a href="./progress.html" class="block text-blue-100 hover:text-yellow-300 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-graph-up mr-2"></i>Progress</a>
+                            </div>
+                            <div class="space-y-3">
+                                <a href="./studentgrades.html" class="block text-blue-100 hover:text-yellow-300 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-award mr-2"></i>Grades</a>
+                                <a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-person-circle mr-2"></i>Profile</a>
+                                <a href="./achievements.html" class="block text-blue-100 hover:text-yellow-300 transition-all duration-200 text-sm lg:text-base"><i class="bi bi-trophy mr-2"></i>Achievements</a>
+                            </div>
                         </div>
                     </div>
-                    <p class="text-sm lg:text-base leading-relaxed text-blue-100">
-                        UMakFit is the official fitness assessment and tracking platform of the College of Human Kinetics at University of Makati. 
-                        Our mission is to promote health, wellness, and physical fitness through comprehensive assessment and personalized tracking.
-                    </p>
-                    <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
-                        <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Fitness Tracking</span>
-                        <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Performance Assessment</span>
-                        <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.7rem; padding:4px 10px; border-radius:100px; font-weight:500;">Health & Wellness</span>
-                    </div>
-                </div>
-
-                <!-- Quick Links -->
-                <div>
-                    <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Quick Links</h6>
-                    <div class="grid grid-cols-2 gap-4 lg:gap-6">
-                        <div class="space-y-3">
-                            <a href="./studentlesson.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-book mr-2"></i>Lessons
-                            </a>
-                            <a href="./test.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-clipboard-check mr-2"></i>Tests
-                            </a>
-                            <a href="./progress.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-graph-up mr-2"></i>Progress
-                            </a>
-                        </div>
-                        <div class="space-y-3">
-                            <a href="./studentgrades.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-award mr-2"></i>Grades
-                            </a>
-                            <a href="./studentProfile.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-person-circle mr-2"></i>Profile
-                            </a>
-                            <a href="./achievements.html" class="block text-blue-100 hover:text-yellow-300 hover:translate-x-1 transition-all duration-200 text-sm lg:text-base">
-                                <i class="bi bi-trophy mr-2"></i>Achievements
-                            </a>
+                    <div>
+                        <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
+                        <div class="space-y-4 lg:space-y-5">
+                            <div class="flex items-start gap-3"><i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i><p class="text-sm lg:text-base text-blue-100">College of Human Kinetics<br>University of Makati<br>3rd floor, Administration Building,<br>JP Rizal Ext., West Rembo, Taguig City</p></div>
+                            <div class="flex items-center gap-3"><i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i><a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">chk@umak.edu.ph</a></div>
+                            <div class="flex items-center gap-3"><i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i><span class="text-blue-100 text-sm lg:text-base">+63 933 189 7230</span></div>
+                            <div class="flex items-center gap-4 pt-2 justify-center lg:justify-start">
+                                <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110"><i class="bi bi-facebook text-white text-lg"></i></a>
+                                <a href="https://www.instagram.com" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110"><i class="bi bi-instagram text-white text-lg"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Contact & Social -->
-                <div>
-                    <h6 class="text-yellow-400 font-bold text-lg lg:text-xl mb-4 lg:mb-6">Get In Touch</h6>
-                    <div class="space-y-4 lg:space-y-5">
-                        <div class="flex items-start gap-3">
-                            <i class="bi bi-geo-alt-fill text-yellow-400 text-lg lg:text-xl mt-1"></i>
-                            <p class="text-sm lg:text-base text-blue-100">
-                                College of Human Kinetics<br>
-                                University of Makati<br>
-                                3rd floor, Administration Building, University of Makati,<br>
-                                JP Rizal Ext., West Rembo, Taguig City
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <i class="bi bi-envelope-fill text-yellow-400 text-lg lg:text-xl"></i>
-                            <a href="mailto:chk@umak.edu.ph" class="text-blue-100 hover:text-yellow-300 transition-colors text-sm lg:text-base">
-                                chk@umak.edu.ph
-                            </a>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <i class="bi bi-telephone-fill text-yellow-400 text-lg lg:text-xl"></i>
-                            <span class="text-sm lg:text-base text-blue-100">
-                                +63 933 189 7230
-                            </span>
-                        </div>
-                        <div class="flex items-center gap-4 pt-2 justify-center lg:justify-start">
-                            <a href="https://www.facebook.com/profile.php?id=61577064971920" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110">
-                                <i class="bi bi-facebook text-white text-lg"></i>
-                            </a>
-                            <a href="https://www.instagram.com" target="_blank" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-lg transition-all hover:scale-110">
-                                <i class="bi bi-instagram text-white text-lg"></i>
-                            </a>
-                        </div>
-                    </div>
+                <div class="border-t border-white/10 mt-8 pt-6 text-center">
+                    <p class="text-xs lg:text-sm text-blue-200/70">© 2025 University of Makati — College of Human Kinetics. All Rights Reserved.</p>
                 </div>
             </div>
-
-            <!-- Bottom bar -->
-            <div class="border-t border-white/10 mt-8 pt-6 text-center">
-                <p class="text-xs lg:text-sm text-blue-200/70">
-                    © 2025 University of Makati — College of Human Kinetics. All Rights Reserved.
-                </p>
-            </div>
-        </div>
-    </footer>
+        </footer>
     </div>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, getDoc, collection, query, where, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getNormCategory, resolveTestKey, resolveAgeGroup, resolveGender, extractNumericResult } from './normLookup.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAgaLunqEf2gs6dSpF_sz1hV5XQ5Wm52jo",
@@ -1100,1586 +299,643 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Global variables
+        // ========== STATE ==========
         let currentUser = null;
         let studentData = null;
+        let _notifUnsub = null;
+        let normCache = new Map(); // ✅ Same norm cache as dashboard
 
-        // ========== NOTIFICATION SYSTEM ==========
-        
-        async function checkUnreadNotifications() {
-            try {
-                if (!studentData || !studentData.section) return;
+        // ========== HELPERS (mirrored from dashboard) ==========
 
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);                
-                const notificationsSnapshot = await getDocs(notificationsQuery);
-                
-                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-                
-                let unreadCount = 0;
-                notificationsSnapshot.forEach(doc => {
-                    if (!readNotifications.includes(doc.id)) {
-                        unreadCount++;
-                    }
-                });
-                
-                const countBadge = document.getElementById('navNotificationCount');
-                const countBadgeMobile = document.getElementById('navNotificationCountMobile');
-                
-                if (unreadCount > 0) {
-                    if (countBadge) {
-                        countBadge.textContent = unreadCount;
-                        countBadge.classList.remove('hidden');
-                    }
-                    if (countBadgeMobile) {
-                        countBadgeMobile.textContent = unreadCount;
-                        countBadgeMobile.classList.remove('hidden');
-                    }
-                } else {
-                    if (countBadge) countBadge.classList.add('hidden');
-                    if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
-                }
-            } catch (error) {
-                console.error('Error checking unread notifications:', error);
+        function _studentAge() {
+            if (!studentData) return 20;
+            if (studentData.birthday) {
+                try {
+                    const bd = studentData.birthday.toDate ? studentData.birthday.toDate() : new Date(studentData.birthday);
+                    const now = new Date();
+                    let age = now.getFullYear() - bd.getFullYear();
+                    if (now.getMonth() < bd.getMonth() || (now.getMonth() === bd.getMonth() && now.getDate() < bd.getDate())) age--;
+                    if (!isNaN(age) && age > 0) return age;
+                } catch(_) {}
             }
+            return parseInt(studentData?.age) || 20;
+        }
+
+        function _genderKey() {
+            const g = (studentData?.gender || '').toString().toLowerCase();
+            return g.startsWith('f') ? 'female' : 'male';
+        }
+
+        function _ageGroup() {
+            const age = _studentAge();
+            if (age <= 18) return '15-18';
+            if (age <= 22) return '19-22';
+            if (age <= 26) return '23-26';
+            return '27-30';
+        }
+
+        function mapNormCategoryToScore(cat) {
+            return { Excellent:100, Good:90, Average:80, 'Below Average':70, Poor:60 }[cat] ?? 75;
+        }
+
+        function getRatingFromCategory(cat) {
+            return {
+                Excellent:       { text:'Excellent',     class:'rating-excellent' },
+                Good:            { text:'Good',           class:'rating-good' },
+                Average:         { text:'Average',        class:'rating-fair' },
+                'Below Average': { text:'Below Average',  class:'rating-needs-improvement' },
+                Poor:            { text:'Poor',           class:'rating-needs-improvement' },
+            }[cat] ?? { text:'Needs Improvement', class:'rating-needs-improvement' };
+        }
+
+        function calculateScoreFallback(testName, result, testTarget) {
+            const n = (testName || '').toLowerCase();
+            const val = extractNumericResult(result);
+            if (n.includes('skinfold')) return 100;
+            if (!testTarget || testTarget <= 0) return 75;
+            if (n.includes('bmi')) {
+                if (val >= 18.5 && val <= 24.9) return 100;
+                if ((val >= 17 && val < 18.5) || (val >= 25 && val < 27)) return 85;
+                if ((val >= 16 && val < 17) || (val >= 27 && val < 30)) return 70;
+                return 60;
+            }
+            const isLower = n.includes('step test') || n.includes('3-minute');
+            const pct = isLower ? (testTarget / val) * 100 : (val / testTarget) * 100;
+            if (pct >= 100) return 100; if (pct >= 90) return 95; if (pct >= 80) return 90;
+            if (pct >= 70) return 85; if (pct >= 60) return 80;
+            return Math.max(50, Math.round(pct));
+        }
+
+        // ========== UNIFIED NORM LOOKUP WITH CACHE (same as dashboard) ==========
+
+        async function resolveNormCategory(testName, result, scheduledTestId) {
+            const testKey = resolveTestKey(testName);
+            if (!testKey) return null;
+            const gender = _genderKey();
+            const ageGroup = _ageGroup();
+            const value = extractNumericResult(result);
+            const cacheKey = `${studentData?.email}|${testKey}|${gender}|${ageGroup}|${scheduledTestId || 'none'}`;
+            if (normCache.has(cacheKey)) return normCache.get(cacheKey);
+
+            function applyThresholds(nd, value) {
+                const lib = nd.lowerIsBetter ?? false;
+                const order = ['Excellent','Good','Average','Below Average'];
+                for (const cat of order) {
+                    const t = nd.thresholds[cat];
+                    if (t == null) continue;
+                    if (lib && value <= t) return cat;
+                    if (!lib && value >= t) return cat;
+                }
+                return 'Poor';
+            }
+
+            // 1. Student-specific norms
+            if (studentData?.email) {
+                try {
+                    const snap = await getDoc(doc(db,'studentNorms',studentData.email,'tests',testKey));
+                    if (snap.exists()) {
+                        const r = { category: applyThresholds(snap.data(), value), source:'student', normDoc: snap.data() };
+                        normCache.set(cacheKey, r); return r;
+                    }
+                } catch(_) {}
+            }
+
+            // 2. Test-level norms (scheduledTestNorms subcollection)
+            if (scheduledTestId) {
+                try {
+                    const snap = await getDoc(doc(db,'scheduledTestNorms',scheduledTestId,'tests',testKey));
+                    if (snap.exists()) {
+                        const r = { category: applyThresholds(snap.data(), value), source:'test', normDoc: snap.data() };
+                        normCache.set(cacheKey, r); return r;
+                    }
+                } catch(_) {}
+            }
+
+            // 3. Test-level inline customNorms
+            if (scheduledTestId) {
+                try {
+                    const snap = await getDoc(doc(db,'scheduledTests',scheduledTestId));
+                    if (snap.exists() && snap.data().customNorms?.thresholds) {
+                        const r = { category: applyThresholds(snap.data().customNorms, value), source:'test', normDoc: snap.data().customNorms };
+                        normCache.set(cacheKey, r); return r;
+                    }
+                } catch(_) {}
+            }
+
+            // 4. Firestore default norms
+            try {
+                const snap = await getDoc(doc(db,'fitnessNorms',`${testKey}_${gender}_${ageGroup}`));
+                if (snap.exists()) {
+                    const r = { category: applyThresholds(snap.data(), value), source:'default', normDoc: snap.data() };
+                    normCache.set(cacheKey, r); return r;
+                }
+            } catch(_) {}
+
+            // 5. normLookup.js fallback
+            try {
+                const fb = await getNormCategory(db, {
+                    testName, result,
+                    studentEmail: studentData?.email || '',
+                    gender: studentData?.gender || 'male',
+                    age: _studentAge()
+                });
+                if (fb) {
+                    const r = { category: fb.category, source:'fallback', normDoc: fb.normDoc };
+                    normCache.set(cacheKey, r); return r;
+                }
+            } catch(_) {}
+
+            return null;
+        }
+
+        async function getNextThresholdInfo(testName, currentCategory, scheduledTestId) {
+            const testKey = resolveTestKey(testName);
+            if (!testKey) return null;
+            const NEXT = { Poor:'Below Average', 'Below Average':'Average', Average:'Good', Good:'Excellent', Excellent:null };
+            const nextCat = NEXT[currentCategory];
+            if (!nextCat) return null;
+            const gender = _genderKey();
+            const ageGroup = _ageGroup();
+
+            // Try all norm sources in same priority order — reuse cache if possible
+            const cacheKey = `${studentData?.email}|${testKey}|${gender}|${ageGroup}|${scheduledTestId || 'none'}`;
+            const cached = normCache.get(cacheKey);
+            if (cached?.normDoc?.thresholds?.[nextCat] != null) {
+                return {
+                    nextCategory: nextCat,
+                    threshold: cached.normDoc.thresholds[nextCat],
+                    lowerIsBetter: cached.normDoc.lowerIsBetter ?? false,
+                    unit: cached.normDoc.unit || 'reps'
+                };
+            }
+
+            // Fallback: fetch each source for next threshold
+            const sources = [];
+            if (studentData?.email) sources.push(() => getDoc(doc(db,'studentNorms',studentData.email,'tests',testKey)));
+            if (scheduledTestId)    sources.push(() => getDoc(doc(db,'scheduledTestNorms',scheduledTestId,'tests',testKey)));
+            sources.push(() => getDoc(doc(db,'fitnessNorms',`${testKey}_${gender}_${ageGroup}`)));
+
+            for (const fetcher of sources) {
+                try {
+                    const snap = await fetcher();
+                    if (snap.exists()) {
+                        const nd = snap.data();
+                        const t = nd.thresholds?.[nextCat];
+                        if (t != null) return { nextCategory: nextCat, threshold: t, lowerIsBetter: nd.lowerIsBetter ?? false, unit: nd.unit || 'reps' };
+                    }
+                } catch(_) {}
+            }
+            return null;
+        }
+
+        // ========== NOTIFICATIONS (parallel fetch pattern from dashboard) ==========
+
+        async function fetchNotifications() {
+            if (!studentData?.section || !studentData?.email) return [];
+            try {
+                const snap = await getDocs(query(
+                    collection(db,'notifications'),
+                    where('section','==',studentData.section),
+                    where('studentEmail','==',studentData.email)
+                ));
+                return snap.docs.map(d => ({ id:d.id, ...d.data() }));
+            } catch(e) { return []; }
+        }
+
+        async function checkUnreadNotifications() {
+            const notifications = await fetchNotifications();
+            const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData?.email}`) || '[]');
+            const unread = notifications.filter(n => !read.includes(n.id)).length;
+            ['navNotificationCount','navNotificationCountMobile'].forEach(id => {
+                const el = document.getElementById(id); if (!el) return;
+                if (unread > 0) { el.textContent = unread; el.classList.remove('hidden'); } else el.classList.add('hidden');
+            });
         }
 
         async function loadNotificationDropdown(isMobile = false) {
-            try {
-                const activeBodyId = isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody';
-                const dropdownBody = document.getElementById(activeBodyId);
-                
-                if (!dropdownBody) return;
-
-                if (!studentData || !studentData.section) {
-                    dropdownBody.innerHTML = `
-                        <div class="notification-empty">
-                            <i class="bi bi-bell-slash"></i>
-                            <p>No section assigned</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);                
-                const notificationsSnapshot = await getDocs(notificationsQuery);
-                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-                
-                if (!notificationsSnapshot.empty) {
-                    const seenNotifications = new Set();
-                    const uniqueNotifications = [];
-                    
-                    notificationsSnapshot.forEach(doc => {
-                        const notification = doc.data();
-                        const contentKey = `${notification.title}|${notification.message}|${notification.createdAt?.toDate?.().getTime() || ''}`;
-                        
-                        if (!seenNotifications.has(contentKey)) {
-                            seenNotifications.add(contentKey);
-                            uniqueNotifications.push({ id: doc.id, ...notification });
-                        }
-                    });
-                    
-                    uniqueNotifications.sort((a, b) => {
-                        const dateA = a.createdAt?.toDate?.() || new Date(0);
-                        const dateB = b.createdAt?.toDate?.() || new Date(0);
-                        return dateB - dateA;
-                    });
-                    
-                    const unreadNotificationIds = [];
-                    uniqueNotifications.forEach(notification => {
-                        if (!readNotifications.includes(notification.id)) {
-                            unreadNotificationIds.push(notification.id);
-                        }
-                    });
-                    
-                    let html = '';
-                    uniqueNotifications.slice(0, 5).forEach(notification => {
-                        const createdDate = notification.createdAt?.toDate?.();
-                        const dateStr = createdDate ? createdDate.toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        }) : 'Recently';
-                        
-                        const isRead = readNotifications.includes(notification.id);
-                        
-                        html += `
-                            <div class="notification-item ${isRead ? 'bg-gray-50' : 'bg-white'}" data-notification-id="${notification.id}">
-                                <strong>${notification.title || 'Notification'}</strong>
-                                <p>${notification.message || ''}</p>
-                                <small>${dateStr}</small>
-                            </div>
-                        `;
-                    });
-                    
-                    dropdownBody.innerHTML = html;
-                    
-                    if (unreadNotificationIds.length > 0) {
-                        markNotificationsAsRead(unreadNotificationIds);
-                    }
-                    
-                } else {
-                    dropdownBody.innerHTML = `
-                        <div class="notification-empty">
-                            <i class="bi bi-bell-slash"></i>
-                            <p>No notifications yet</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Error loading notifications:', error);
+            const bodyId = isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody';
+            const body = document.getElementById(bodyId); if (!body) return;
+            const notifications = await fetchNotifications();
+            const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData?.email}`) || '[]');
+            if (!notifications.length) {
+                body.innerHTML = `<div class="py-6 px-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl block mb-3"></i><p class="text-gray-500 text-sm">No notifications yet</p></div>`;
+                return;
+            }
+            const seen = new Set(); const unique = [];
+            notifications.forEach(n => {
+                const k = `${n.title}|${n.message}|${n.createdAt?.toDate?.().getTime()||''}`;
+                if (!seen.has(k)) { seen.add(k); unique.push(n); }
+            });
+            unique.sort((a,b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)));
+            const unreadIds = unique.filter(n => !read.includes(n.id)).map(n => n.id);
+            body.innerHTML = unique.slice(0,5).map(n => {
+                const d = n.createdAt?.toDate?.();
+                const dateStr = d ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Recently';
+                return `<div class="px-5 py-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors ${read.includes(n.id)?'bg-gray-50':'bg-white'}">
+                    <strong class="text-gray-900 text-sm font-semibold block mb-1">${n.title||'Notification'}</strong>
+                    <p class="text-gray-500 text-xs leading-relaxed mb-1">${n.message||''}</p>
+                    <small class="text-gray-400 text-[11px] block">${dateStr}</small>
+                </div>`;
+            }).join('');
+            if (unreadIds.length) {
+                const merged = [...new Set([...read,...unreadIds])];
+                localStorage.setItem(`readNotifications_${studentData.email}`, JSON.stringify(merged));
+                checkUnreadNotifications();
             }
         }
 
-        function markNotificationsAsRead(notificationIds) {
-            if (!studentData || !studentData.email || !notificationIds.length) return;
-            
-            const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-            const updatedReadNotifications = [...new Set([...readNotifications, ...notificationIds])];
-            
-            localStorage.setItem(`readNotifications_${studentData.email}`, JSON.stringify(updatedReadNotifications));
-            updateNotificationBadgeAfterRead(notificationIds);
-        }
-
-        async function updateNotificationBadgeAfterRead(markedAsReadIds) {
-            try {
-                if (!studentData || !studentData.section) return;
-                
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email)
-);                
-                const notificationsSnapshot = await getDocs(notificationsQuery);
-                const uniqueNotificationIds = new Set();
-                
-                notificationsSnapshot.forEach(doc => {
-                    uniqueNotificationIds.add(doc.id);
-                });
-                
-                const readNotifications = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
-                
-                let unreadCount = 0;
-                uniqueNotificationIds.forEach(notificationId => {
-                    if (!readNotifications.includes(notificationId)) {
-                        unreadCount++;
-                    }
-                });
-                
-                const countBadge = document.getElementById('navNotificationCount');
-                const countBadgeMobile = document.getElementById('navNotificationCountMobile');
-                
-                if (unreadCount > 0) {
-                    if (countBadge) {
-                        countBadge.textContent = unreadCount;
-                        countBadge.classList.remove('hidden');
-                    }
-                    if (countBadgeMobile) {
-                        countBadgeMobile.textContent = unreadCount;
-                        countBadgeMobile.classList.remove('hidden');
-                    }
-                } else {
-                    if (countBadge) countBadge.classList.add('hidden');
-                    if (countBadgeMobile) countBadgeMobile.classList.add('hidden');
-                }
-            } catch (error) {
-                console.error('Error updating notification badge:', error);
-            }
+        function setupNotificationListener() {
+            if (!studentData?.section || !studentData?.email) return;
+            if (_notifUnsub) { _notifUnsub(); _notifUnsub = null; }
+            _notifUnsub = onSnapshot(
+                query(collection(db,'notifications'),
+                    where('section','==',studentData.section),
+                    where('studentEmail','==',studentData.email)),
+                () => checkUnreadNotifications(),
+                e => console.error(e)
+            );
         }
 
         function toggleNotificationDropdown(event) {
             event?.stopPropagation();
             const isMobile = window.innerWidth < 1024;
-            const dropdown = isMobile ? 
-                document.getElementById('notificationDropdownMobile') : 
-                document.getElementById('notificationDropdown');
-            
+            const dropdown = document.getElementById(isMobile ? 'notificationDropdownMobile' : 'notificationDropdown');
             if (dropdown.classList.contains('hidden')) {
                 dropdown.classList.remove('hidden');
                 loadNotificationDropdown(isMobile);
-                
-                const profileDropdown = document.getElementById('profileDropdown');
-                const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-                if (profileDropdown) profileDropdown.classList.add('hidden');
-                if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
-            } else {
-                dropdown.classList.add('hidden');
-            }
+                document.getElementById('profileDropdown')?.classList.add('hidden');
+                document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+            } else dropdown.classList.add('hidden');
         }
 
         function closeNotificationDropdown() {
-            const notificationDropdown = document.getElementById('notificationDropdown');
-            const notificationDropdownMobile = document.getElementById('notificationDropdownMobile');
-            if (notificationDropdown) notificationDropdown.classList.add('hidden');
-            if (notificationDropdownMobile) notificationDropdownMobile.classList.add('hidden');
+            document.getElementById('notificationDropdown')?.classList.add('hidden');
+            document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
         }
 
- let unsubscribeNotificationListener = null;
+        // ========== AI RECOMMENDATION ==========
 
-function setupNotificationListener() {
-    try {
-        if (!studentData || !studentData.section) return;
-        const notificationsQuery = query(
-            collection(db, 'notifications'),
-            where('section', '==', studentData.section),
-            where('studentEmail', '==', studentData.email)
-        );
-        unsubscribeNotificationListener = onSnapshot(notificationsQuery, (snapshot) => {
-            // debug log removed
-            checkUnreadNotifications();
-        }, (error) => {
-            console.error('❌ Error in notification listener:', error);
-        });
-    } catch (error) {
-        console.error('Error setting up notification listener:', error);
-    }
-}
-
-// Clean up on page leave
-window.addEventListener('pagehide', () => {
-    if (unsubscribeNotificationListener) {
-        unsubscribeNotificationListener();
-        unsubscribeNotificationListener = null;
-    }
-});
-window.addEventListener('beforeunload', () => {
-    if (unsubscribeNotificationListener) {
-        unsubscribeNotificationListener();
-        unsubscribeNotificationListener = null;
-    }
-});
-
-        // ========== END NOTIFICATION SYSTEM ==========
-
-        // ===== NORM-BASED CLASSIFICATION HELPERS (PUSH-UP, CURL-UP, SIT-AND-REACH, STEP TEST) =====
-
-        function getStudentAgeForNorms() {
-            if (!studentData) return null;
-            if (studentData.birthday) {
+        async function generateRecommendation(testName, result, category) {
+            if (!['Average','Below Average','Poor'].includes(category)) return null;
+            for (let attempt = 1; attempt <= 3; attempt++) {
                 try {
-                    let birthDate;
-                    if (studentData.birthday.toDate) {
-                        birthDate = studentData.birthday.toDate();
-                    } else {
-                        birthDate = new Date(studentData.birthday);
-                    }
-                    const today = new Date();
-                    let age = today.getFullYear() - birthDate.getFullYear();
-                    const m = today.getMonth() - birthDate.getMonth();
-                    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                        age--;
-                    }
-                    if (!isNaN(age)) return age;
-                } catch (e) {
-                    console.warn('Unable to compute age from birthday:', e);
-                }
-            }
-            if (typeof studentData.age === 'number') return studentData.age;
-            if (typeof studentData.age === 'string') {
-                const m = studentData.age.match(/(\d+)/);
-                if (m) return parseInt(m[1], 10);
-            }
-            return null;
-        }
-
-        function getAgeGroup(age) {
-            if (age == null) return null;
-            if (age <= 18) return '15-18';
-            if (age <= 22) return '19-22';
-            if (age <= 26) return '23-26';
-            if (age <= 30) return '27-30';
-            // Clamp to closest available group if out of range
-            if (age < 15) return '15-18';
-            return '27-30';
-        }
-
-        function getGenderKey() {
-            const g = (studentData?.gender || '').toString().toLowerCase();
-            if (g.startsWith('m')) return 'male';
-            if (g.startsWith('f')) return 'female';
-            return 'male';
-        }
-
-        function extractNumericResult(result) {
-            if (typeof result === 'object' && result !== null) {
-                return result.value || result.result || result.score || result.count || 0;
-            }
-            if (typeof result === 'string') {
-                const match = result.match(/(\d+\.?\d*)/);
-                if (match) return parseFloat(match[1]);
-                const parsed = parseFloat(result);
-                return isNaN(parsed) ? 0 : parsed;
-            }
-            const parsed = parseFloat(result);
-            return isNaN(parsed) ? 0 : parsed;
-        }
-
-        function mapNormCategoryToScore(category) {
-            switch (category) {
-                case 'Excellent': return 100;
-                case 'Good': return 90;
-                case 'Average': return 80;
-                case 'Below Average': return 70;
-                case 'Poor': return 60;
-                default: return 75;
-            }
-        }
-
-        function getPushUpNormCategory(ageGroup, genderKey, reps) {
-            if (genderKey === 'male') {
-                if (ageGroup === '15-18') {
-                    if (reps >= 40) return 'Excellent';
-                    if (reps >= 31) return 'Good';
-                    if (reps >= 21) return 'Average';
-                    if (reps >= 11) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '19-22') {
-                    if (reps >= 38) return 'Excellent';
-                    if (reps >= 28) return 'Good';
-                    if (reps >= 18) return 'Average';
-                    if (reps >= 9) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '23-26') {
-                    if (reps >= 35) return 'Excellent';
-                    if (reps >= 25) return 'Good';
-                    if (reps >= 16) return 'Average';
-                    if (reps >= 8) return 'Below Average';
-                    return 'Poor';
-                }
-                // 27-30
-                if (reps >= 32) return 'Excellent';
-                if (reps >= 23) return 'Good';
-                if (reps >= 14) return 'Average';
-                if (reps >= 6) return 'Below Average';
-                return 'Poor';
-            } else {
-                if (ageGroup === '15-18') {
-                    if (reps >= 25) return 'Excellent';
-                    if (reps >= 19) return 'Good';
-                    if (reps >= 13) return 'Average';
-                    if (reps >= 7) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '19-22') {
-                    if (reps >= 23) return 'Excellent';
-                    if (reps >= 17) return 'Good';
-                    if (reps >= 11) return 'Average';
-                    if (reps >= 6) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '23-26') {
-                    if (reps >= 20) return 'Excellent';
-                    if (reps >= 15) return 'Good';
-                    if (reps >= 9) return 'Average';
-                    if (reps >= 5) return 'Below Average';
-                    return 'Poor';
-                }
-                // 27-30
-                if (reps >= 18) return 'Excellent';
-                if (reps >= 13) return 'Good';
-                if (reps >= 8) return 'Average';
-                if (reps >= 4) return 'Below Average';
-                return 'Poor';
-            }
-        }
-
-        function getCurlUpNormCategory(ageGroup, genderKey, reps) {
-            if (genderKey === 'male') {
-                if (ageGroup === '15-18') {
-                    if (reps >= 50) return 'Excellent';
-                    if (reps >= 41) return 'Good';
-                    if (reps >= 31) return 'Average';
-                    if (reps >= 21) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '19-22') {
-                    if (reps >= 47) return 'Excellent';
-                    if (reps >= 38) return 'Good';
-                    if (reps >= 28) return 'Average';
-                    if (reps >= 19) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '23-26') {
-                    if (reps >= 44) return 'Excellent';
-                    if (reps >= 35) return 'Good';
-                    if (reps >= 25) return 'Average';
-                    if (reps >= 17) return 'Below Average';
-                    return 'Poor';
-                }
-                // 27-30
-                if (reps >= 40) return 'Excellent';
-                if (reps >= 32) return 'Good';
-                if (reps >= 22) return 'Average';
-                if (reps >= 15) return 'Below Average';
-                return 'Poor';
-            } else {
-                if (ageGroup === '15-18') {
-                    if (reps >= 45) return 'Excellent';
-                    if (reps >= 36) return 'Good';
-                    if (reps >= 26) return 'Average';
-                    if (reps >= 16) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '19-22') {
-                    if (reps >= 42) return 'Excellent';
-                    if (reps >= 34) return 'Good';
-                    if (reps >= 24) return 'Average';
-                    if (reps >= 15) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '23-26') {
-                    if (reps >= 39) return 'Excellent';
-                    if (reps >= 31) return 'Good';
-                    if (reps >= 21) return 'Average';
-                    if (reps >= 13) return 'Below Average';
-                    return 'Poor';
-                }
-                // 27-30
-                if (reps >= 36) return 'Excellent';
-                if (reps >= 28) return 'Good';
-                if (reps >= 19) return 'Average';
-                if (reps >= 11) return 'Below Average';
-                return 'Poor';
-            }
-        }
-
-        function getSitAndReachNormCategory(ageGroup, genderKey, distanceCm) {
-            const v = distanceCm;
-            if (genderKey === 'male') {
-                if (ageGroup === '15-18') {
-                    if (v >= 38.0) return 'Excellent';
-                    if (v >= 33.0) return 'Good';
-                    if (v >= 26.0) return 'Average';
-                    if (v >= 18.0) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '19-22') {
-                    if (v >= 37.0) return 'Excellent';
-                    if (v >= 32.0) return 'Good';
-                    if (v >= 25.0) return 'Average';
-                    if (v >= 17.0) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '23-26') {
-                    if (v >= 35.5) return 'Excellent';
-                    if (v >= 30.5) return 'Good';
-                    if (v >= 23.5) return 'Average';
-                    if (v >= 15.5) return 'Below Average';
-                    return 'Poor';
-                }
-                // 27-30
-                if (v >= 34.0) return 'Excellent';
-                if (v >= 29.0) return 'Good';
-                if (v >= 22.0) return 'Average';
-                if (v >= 14.0) return 'Below Average';
-                return 'Poor';
-            } else {
-                if (ageGroup === '15-18') {
-                    if (v >= 39.0) return 'Excellent';
-                    if (v >= 34.0) return 'Good';
-                    if (v >= 27.0) return 'Average';
-                    if (v >= 19.0) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '19-22') {
-                    if (v >= 38.0) return 'Excellent';
-                    if (v >= 33.0) return 'Good';
-                    if (v >= 26.0) return 'Average';
-                    if (v >= 18.0) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '23-26') {
-                    if (v >= 37.0) return 'Excellent';
-                    if (v >= 32.0) return 'Good';
-                    if (v >= 25.0) return 'Average';
-                    if (v >= 17.0) return 'Below Average';
-                    return 'Poor';
-                }
-                // 27-30
-                if (v >= 36.0) return 'Excellent';
-                if (v >= 31.0) return 'Good';
-                if (v >= 24.0) return 'Average';
-                if (v >= 16.0) return 'Below Average';
-                return 'Poor';
-            }
-        }
-
-        function getStepTestNormCategory(ageGroup, genderKey, heartRate) {
-            const hr = heartRate;
-            if (genderKey === 'male') {
-                if (ageGroup === '15-18') {
-                    if (hr <= 84) return 'Excellent';
-                    if (hr <= 97) return 'Good';
-                    if (hr <= 108) return 'Average';
-                    if (hr <= 118) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '19-22') {
-                    if (hr <= 79) return 'Excellent';
-                    if (hr <= 89) return 'Good';
-                    if (hr <= 105) return 'Average';
-                    if (hr <= 116) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '23-26') {
-                    if (hr <= 80) return 'Excellent';
-                    if (hr <= 90) return 'Good';
-                    if (hr <= 106) return 'Average';
-                    if (hr <= 117) return 'Below Average';
-                    return 'Poor';
-                }
-                // 27-30
-                if (hr <= 81) return 'Excellent';
-                if (hr <= 91) return 'Good';
-                if (hr <= 107) return 'Average';
-                if (hr <= 118) return 'Below Average';
-                return 'Poor';
-            } else {
-                if (ageGroup === '15-18') {
-                    if (hr <= 89) return 'Excellent';
-                    if (hr <= 103) return 'Good';
-                    if (hr <= 113) return 'Average';
-                    if (hr <= 124) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '19-22') {
-                    if (hr <= 85) return 'Excellent';
-                    if (hr <= 98) return 'Good';
-                    if (hr <= 109) return 'Average';
-                    if (hr <= 118) return 'Below Average';
-                    return 'Poor';
-                }
-                if (ageGroup === '23-26') {
-                    if (hr <= 86) return 'Excellent';
-                    if (hr <= 99) return 'Good';
-                    if (hr <= 110) return 'Average';
-                    if (hr <= 119) return 'Below Average';
-                    return 'Poor';
-                }
-                // 27-30
-                if (hr <= 88) return 'Excellent';
-                if (hr <= 101) return 'Good';
-                if (hr <= 112) return 'Average';
-                if (hr <= 121) return 'Below Average';
-                return 'Poor';
-            }
-        }
-
-        function isNormBasedTest(testName) {
-            const n = testName.toLowerCase();
-            return n.includes('push-up') ||
-                   n.includes('pushup') ||
-                   n.includes('curl-up') ||
-                   n.includes('curl up') ||
-                   n.includes('sit-and-reach') ||
-                   n.includes('sit and reach') ||
-                   n.includes('step test') ||
-                   n.includes('3-minute');
-        }
-
-        function getNormCategoryForResult(testName, result) {
-            if (!studentData || !testName) return null;
-            if (!isNormBasedTest(testName)) return null;
-
-            const age = getStudentAgeForNorms();
-            const ageGroup = getAgeGroup(age);
-            const genderKey = getGenderKey();
-            if (!ageGroup) return null;
-
-            const numericValue = extractNumericResult(result);
-            const normalized = testName.toLowerCase();
-
-            if (normalized.includes('push-up') || normalized.includes('pushup')) {
-                return getPushUpNormCategory(ageGroup, genderKey, numericValue);
-            }
-            if (normalized.includes('curl-up') || normalized.includes('curl up')) {
-                return getCurlUpNormCategory(ageGroup, genderKey, numericValue);
-            }
-            if (normalized.includes('sit-and-reach') || normalized.includes('sit and reach')) {
-                return getSitAndReachNormCategory(ageGroup, genderKey, numericValue);
-            }
-            if (normalized.includes('step test') || normalized.includes('3-minute')) {
-                return getStepTestNormCategory(ageGroup, genderKey, numericValue);
-            }
-            return null;
-        }
-
-        function calculateScore(testName, result, testTarget = null) {
-            const normalized = testName.toLowerCase();
-
-            // Skinfold test is handled separately and already categorical
-            if (normalized.includes('skinfold')) {
-                return 100;
-            }
-
-            // Use norm tables for the four main tests and convert to a 0–100 score
-            const normCategory = getNormCategoryForResult(testName, result);
-            if (normCategory) {
-                return mapNormCategoryToScore(normCategory);
-            }
-
-            // Fallback: keep existing percentage-based logic for other tests
-            let numericValue = extractNumericResult(result);
-
-            // debug log removed
-
-            if (!testTarget || testTarget <= 0) {
-                return 75;
-            }
-
-            // REPETITION / DURATION / DISTANCE tests with explicit target
-            if (normalized.includes('push-up') || normalized.includes('pushup') || 
-                normalized.includes('sit-up') || normalized.includes('situp') ||
-                normalized.includes('curl-up') || normalized.includes('curl up') ||
-                normalized.includes('plank') ||
-                normalized.includes('grip') ||
-                normalized.includes('sit-and-reach') ||
-                normalized.includes('sit and reach')) {
-                
-                if (numericValue >= testTarget) return 100;
-                const percentage = (numericValue / testTarget) * 100;
-                if (percentage >= 90) return 95;
-                if (percentage >= 80) return 90;
-                if (percentage >= 70) return 85;
-                if (percentage >= 60) return 80;
-                if (percentage >= 50) return 75;
-                return Math.max(50, Math.round(percentage));
-            }
-
-            // 1-MILE RUN (seconds - LOWER IS BETTER)
-            if (normalized.includes('mile') || normalized.includes('run')) {
-                if (numericValue <= testTarget) return 100;
-                const percentage = (testTarget / numericValue) * 100;
-                if (percentage >= 90) return 95;
-                if (percentage >= 80) return 90;
-                if (percentage >= 70) return 85;
-                if (percentage >= 60) return 80;
-                if (percentage >= 50) return 75;
-                return Math.max(50, Math.round(percentage));
-            }
-
-            // STEP TEST (heart rate - LOWER IS BETTER) – when no norms available
-            if (normalized.includes('step test') || normalized.includes('3-minute')) {
-                if (numericValue <= testTarget) return 100;
-                const percentage = (testTarget / numericValue) * 100;
-                if (percentage >= 90) return 95;
-                if (percentage >= 80) return 90;
-                if (percentage >= 70) return 85;
-                if (percentage >= 60) return 80;
-                if (percentage >= 50) return 75;
-                return Math.max(50, Math.round(percentage));
-            }
-
-            // BMI (kept as score-based)
-            if (normalized.includes('bmi')) {
-                const bmi = numericValue;
-                if (bmi >= 18.5 && bmi <= 24.9) return 100;
-                if (bmi >= 17.0 && bmi < 18.5) return 85;
-                if (bmi >= 25.0 && bmi < 27.0) return 85;
-                if (bmi >= 16.0 && bmi < 17.0) return 70;
-                if (bmi >= 27.0 && bmi < 30.0) return 70;
-                return 60;
-            }
-
-            return 75;
-        }
-
-        function getRatingFromCategory(category) {
-            switch (category) {
-                case 'Excellent': return { text: 'Excellent', class: 'rating-excellent' };
-                case 'Good': return { text: 'Good', class: 'rating-good' };
-                case 'Average': return { text: 'Average', class: 'rating-fair' };
-                case 'Below Average': return { text: 'Below Average', class: 'rating-needs-improvement' };
-                case 'Poor': return { text: 'Poor', class: 'rating-needs-improvement' };
-                default: return { text: 'Needs Improvement', class: 'rating-needs-improvement' };
-            }
-        }
-
-            function getNextThreshold(testName, currentCategory, ageGroup, genderKey) {
-            const next = {
-                'Poor': 'Below Average',
-                'Below Average': 'Average',
-                'Average': 'Good',
-                'Good': 'Excellent',
-                'Excellent': null
-            };
-            const nextCat = next[currentCategory];
-            if (!nextCat) return null;
-
-            const normalized = testName.toLowerCase();
-
-            const thresholds = {
-                pushup: {
-                    male: { '15-18': { 'Below Average': 11, 'Average': 21, 'Good': 31, 'Excellent': 40 }, '19-22': { 'Below Average': 9, 'Average': 18, 'Good': 28, 'Excellent': 38 }, '23-26': { 'Below Average': 8, 'Average': 16, 'Good': 25, 'Excellent': 35 }, '27-30': { 'Below Average': 6, 'Average': 14, 'Good': 23, 'Excellent': 32 } },
-                    female: { '15-18': { 'Below Average': 7, 'Average': 13, 'Good': 19, 'Excellent': 25 }, '19-22': { 'Below Average': 6, 'Average': 11, 'Good': 17, 'Excellent': 23 }, '23-26': { 'Below Average': 5, 'Average': 9, 'Good': 15, 'Excellent': 20 }, '27-30': { 'Below Average': 4, 'Average': 8, 'Good': 13, 'Excellent': 18 } }
-                },
-                curlup: {
-                    male: { '15-18': { 'Below Average': 21, 'Average': 31, 'Good': 41, 'Excellent': 50 }, '19-22': { 'Below Average': 19, 'Average': 28, 'Good': 38, 'Excellent': 47 }, '23-26': { 'Below Average': 17, 'Average': 25, 'Good': 35, 'Excellent': 44 }, '27-30': { 'Below Average': 15, 'Average': 22, 'Good': 32, 'Excellent': 40 } },
-                    female: { '15-18': { 'Below Average': 16, 'Average': 26, 'Good': 36, 'Excellent': 45 }, '19-22': { 'Below Average': 15, 'Average': 24, 'Good': 34, 'Excellent': 42 }, '23-26': { 'Below Average': 13, 'Average': 21, 'Good': 31, 'Excellent': 39 }, '27-30': { 'Below Average': 11, 'Average': 19, 'Good': 28, 'Excellent': 36 } }
-                },
-                sitreach: {
-                    male: { '15-18': { 'Below Average': 18, 'Average': 26, 'Good': 33, 'Excellent': 38 }, '19-22': { 'Below Average': 17, 'Average': 25, 'Good': 32, 'Excellent': 37 }, '23-26': { 'Below Average': 15.5, 'Average': 23.5, 'Good': 30.5, 'Excellent': 35.5 }, '27-30': { 'Below Average': 14, 'Average': 22, 'Good': 29, 'Excellent': 34 } },
-                    female: { '15-18': { 'Below Average': 19, 'Average': 27, 'Good': 34, 'Excellent': 39 }, '19-22': { 'Below Average': 18, 'Average': 26, 'Good': 33, 'Excellent': 38 }, '23-26': { 'Below Average': 17, 'Average': 25, 'Good': 32, 'Excellent': 37 }, '27-30': { 'Below Average': 16, 'Average': 24, 'Good': 31, 'Excellent': 36 } }
-                },
-                steptest: {
-                    male: { '15-18': { 'Below Average': 118, 'Average': 108, 'Good': 97, 'Excellent': 84 }, '19-22': { 'Below Average': 116, 'Average': 105, 'Good': 89, 'Excellent': 79 }, '23-26': { 'Below Average': 117, 'Average': 106, 'Good': 90, 'Excellent': 80 }, '27-30': { 'Below Average': 118, 'Average': 107, 'Good': 91, 'Excellent': 81 } },
-                    female: { '15-18': { 'Below Average': 124, 'Average': 113, 'Good': 103, 'Excellent': 89 }, '19-22': { 'Below Average': 118, 'Average': 109, 'Good': 98, 'Excellent': 85 }, '23-26': { 'Below Average': 119, 'Average': 110, 'Good': 99, 'Excellent': 86 }, '27-30': { 'Below Average': 121, 'Average': 112, 'Good': 101, 'Excellent': 88 } }
-                }
-            };
-
-            let testKey = null;
-            if (normalized.includes('push-up') || normalized.includes('pushup')) testKey = 'pushup';
-            else if (normalized.includes('curl-up') || normalized.includes('curl up')) testKey = 'curlup';
-            else if (normalized.includes('sit-and-reach') || normalized.includes('sit and reach')) testKey = 'sitreach';
-            else if (normalized.includes('step test') || normalized.includes('3-minute')) testKey = 'steptest';
-            if (!testKey) return null;
-
-            const val = thresholds[testKey]?.[genderKey]?.[ageGroup]?.[nextCat];
-            if (val == null) return null;
-
-            const isLowerBetter = testKey === 'steptest';
-            const unit = testKey === 'sitreach' ? ' cm' : testKey === 'steptest' ? ' bpm' : ' reps';
-            const direction = isLowerBetter ? '≤' : '≥';
-
-            return { nextCategory: nextCat, threshold: val, unit, direction };
-        }
-const RECOMMENDATION_CACHE = new Map();
-const CACHE_DURATION = 1000 * 60 * 60; 
-
-async function generateRecommendation(testName, result, category, timerValue) {
-    if (category === 'Excellent' || category === 'Good') {
-        return null;
-    }
-
-    // debug log removed
-
-    const maxRetries = 3;
-    const baseDelay = 3000;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-            // debug log removed
-
-            const response = await fetch('https://umakfit-ai.jmotea-a12241914.workers.dev', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ testName, result, category })
-            });
-
-            if (response.status === 429) {
-                const waitTime = baseDelay * attempt;
-                if (attempt < maxRetries) {
-                    await new Promise(resolve => setTimeout(resolve, waitTime));
-                    continue;
-                }
-                throw new Error('Rate limit exceeded. Please try again in a few moments.');
-            }
-
-            if (!response.ok) {
-                const err = await response.json().catch(() => ({ error: `Server error: ${response.status}` }));
-                throw new Error(err.error || `Server error: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            if (data.error) {
-                console.warn('⚠️ Server reported error:', data.error);
-                throw new Error(data.error);
-            }
-
-            if (!data.recommendation) {
-                const debugInfo = data.debug ? ` | Debug: ${data.debug}` : '';
-                throw new Error('Empty recommendation from server' + debugInfo);
-            }
-
-            // debug log removed
-            return data.recommendation;
-
-        } catch (error) {
-            console.error(`❌ Attempt ${attempt} failed:`, error.message);
-
-            if (attempt === maxRetries) {
-                throw error;
-            }
-
-            const waitTime = baseDelay * Math.pow(2, attempt - 1);
-            // debug log removed
-            await new Promise(resolve => setTimeout(resolve, waitTime));
-        }
-    }
-
-    throw new Error('Failed after multiple attempts');
-}
-
-        function showConfirmPopup(title, message, confirmText, cancelText, onConfirm, onCancel) {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
-        position:fixed; inset:0; background:rgba(0,0,0,0.5);
-        display:flex; align-items:center; justify-content:center;
-        z-index:99999; padding:1rem;
-        animation:fadeInOverlay 0.2s ease;
-    `;
-
-    overlay.innerHTML = `
-        <style>
-            @keyframes fadeInOverlay { from{opacity:0} to{opacity:1} }
-            @keyframes slideUpCard { from{opacity:0;transform:translateY(20px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
-            .confirm-card {
-                background:#fff; border-radius:28px;
-                padding:2rem 2rem 1.75rem; max-width:400px; width:100%;
-                box-shadow:0 8px 40px rgba(60,64,67,0.18),0 2px 8px rgba(60,64,67,0.10);
-                animation:slideUpCard 0.3s cubic-bezier(.4,0,.2,1);
-                font-family:'Google Sans','Inter',sans-serif;
-            }
-            .confirm-icon-wrap {
-                width:56px; height:56px; border-radius:50%;
-                display:flex; align-items:center; justify-content:center;
-                margin-bottom:1rem; font-size:1.75rem;
-                background:#e8f0fe;
-            }
-            .confirm-title {
-                font-size:1.25rem; font-weight:600;
-                color:#202124; margin-bottom:0.5rem;
-            }
-            .confirm-message {
-                font-size:0.9rem; color:#5f6368;
-                line-height:1.6; margin-bottom:1.75rem;
-            }
-            .confirm-divider { height:1px; background:#e8eaed; margin:0 -2rem 1.25rem; }
-            .confirm-actions { display:flex; gap:0.75rem; justify-content:flex-end; }
-            .confirm-btn {
-                padding:0.625rem 1.25rem; border-radius:100px;
-                font-size:0.875rem; font-weight:500; cursor:pointer;
-                font-family:'Google Sans','Inter',sans-serif;
-                transition:all 0.15s; border:none;
-            }
-            .confirm-btn-secondary {
-                background:#fff; color:#3c4043;
-                border:1px solid #dadce0;
-            }
-            .confirm-btn-secondary:hover { background:#f8f9fa; }
-            .confirm-btn-primary {
-                background:#1a73e8; color:#fff;
-            }
-            .confirm-btn-primary:hover { background:#1557b0; box-shadow:0 2px 8px rgba(26,115,232,0.35); }
-        </style>
-        <div class="confirm-card">
-            <div class="confirm-icon-wrap">ℹ️</div>
-            <div class="confirm-title">${title}</div>
-            <div class="confirm-message">${message}</div>
-            <div class="confirm-divider"></div>
-            <div class="confirm-actions">
-                ${cancelText ? `<button class="confirm-btn confirm-btn-secondary" id="confirmCancelBtn">${cancelText}</button>` : ''}
-                <button class="confirm-btn confirm-btn-primary" id="confirmOkBtn">${confirmText}</button>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    document.getElementById('confirmOkBtn').addEventListener('click', () => {
-        overlay.remove();
-        if (onConfirm) onConfirm();
-    });
-
-    const cancelBtn = document.getElementById('confirmCancelBtn');
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => {
-            overlay.remove();
-            if (onCancel) onCancel();
-        });
-    }
-
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-            overlay.remove();
-            if (onCancel) onCancel();
-        }
-    });
-}
-
-function showErrorPopup(message, onClose) {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
-        position:fixed; inset:0; background:rgba(0,0,0,0.5);
-        display:flex; align-items:center; justify-content:center;
-        z-index:99999; padding:1rem;
-    `;
-
-    overlay.innerHTML = `
-        <div style="
-            background:#fff; border-radius:28px; padding:2.25rem 2rem 1.75rem;
-            max-width:380px; width:100%;
-            box-shadow:0 8px 40px rgba(60,64,67,0.18);
-            text-align:center; font-family:'Google Sans','Inter',sans-serif;
-            animation:slideUpCard 0.3s ease;
-        ">
-            <div style="
-                width:60px; height:60px; background:#fce8e6;
-                border-radius:50%; display:flex; align-items:center;
-                justify-content:center; margin:0 auto 1rem;
-            ">
-                <svg width="32" height="32" viewBox="0 0 48 48">
-                    <line x1="14" y1="14" x2="34" y2="34" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                    <line x1="34" y1="14" x2="14" y2="34" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div style="font-size:1.125rem; font-weight:600; color:#202124; margin-bottom:0.5rem;">Something went wrong</div>
-            <div style="font-size:0.875rem; color:#5f6368; margin-bottom:1.5rem; line-height:1.6;">${message}</div>
-            <div style="height:1px; background:#e8eaed; margin:0 -2rem 1.25rem;"></div>
-            <button id="errorCloseBtn" style="
-                padding:0.625rem 1.5rem; border-radius:100px;
-                border:1px solid #dadce0; background:#fff; color:#3c4043;
-                font-size:0.875rem; font-weight:500; cursor:pointer;
-                font-family:'Google Sans','Inter',sans-serif;
-            ">OK</button>
-        </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    document.getElementById('errorCloseBtn').addEventListener('click', () => {
-        overlay.remove();
-        if (onClose) onClose();
-    });
-}
-
-        async function loadStudentData(user) {
-            try {
-                const studentsQuery = query(
-                    collection(db, 'students'),
-                    where('email', '==', user.email)
-                );
-                const studentsSnapshot = await getDocs(studentsQuery);
-                
-                if (!studentsSnapshot.empty) {
-                    studentsSnapshot.forEach((doc) => {
-                        studentData = doc.data();
+                    const res = await fetch('https://umakfit-ai.jmotea-a12241914.workers.dev', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ testName, result, category })
                     });
+                    if (res.status === 429) {
+                        if (attempt < 3) { await new Promise(r => setTimeout(r, 3000 * attempt)); continue; }
+                        throw new Error('Rate limit exceeded.');
+                    }
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({ error:`Server error: ${res.status}` }));
+                        throw new Error(err.error || `Server error: ${res.status}`);
+                    }
+                    const data = await res.json();
+                    if (data.error) throw new Error(data.error);
+                    if (!data.recommendation) throw new Error('Empty recommendation');
+                    return data.recommendation;
+                } catch(e) {
+                    if (attempt === 3) throw e;
+                    await new Promise(r => setTimeout(r, 3000 * Math.pow(2, attempt - 1)));
                 }
-                return studentData;
-            } catch (error) {
-                console.error('Error loading student data:', error);
-                return null;
             }
         }
+
+        // ========== LOAD TEST RESULT (parallel Firestore reads) ==========
 
         async function loadTestResult() {
             const urlParams = new URLSearchParams(window.location.search);
             const resultId = urlParams.get('resultId');
-            const testId = urlParams.get('testId');
-
-            if (!resultId) {
-                showErrorPopup('No result found.', () => { window.location.href = './test.html'; });
-                return;
-            }
+            const testId   = urlParams.get('testId');
+            if (!resultId) { showErrorPopup('No result found.', () => window.location.href = './test.html'); return; }
 
             try {
-                const resultDoc = await getDoc(doc(db, 'testResults', resultId));
-                
-                if (resultDoc.exists()) {
-                    const data = resultDoc.data();
-                    
-                    // Determine norm-based category for main fitness tests
-                    const normCategory = data.testName ? getNormCategoryForResult(data.testName, data.result) : null;
-                    const score = normCategory ? mapNormCategoryToScore(normCategory) : calculateScore(data.testName, data.result, data.testTarget);
-                    const scoreRatingEl = document.getElementById('scoreRating');
+                // ✅ Fetch result doc and scheduled test doc in parallel
+                const [resultDoc, scheduledTestDoc] = await Promise.all([
+                    getDoc(doc(db,'testResults',resultId)),
+                    testId ? getDoc(doc(db,'scheduledTests',testId)) : Promise.resolve(null)
+                ]);
 
-                    if (normCategory) {
-                    const rating = getRatingFromCategory(normCategory);
-                    const age = getStudentAgeForNorms();
-                    const ageGroup = getAgeGroup(age);
-                    const genderKey = getGenderKey();
-                    const nextInfo = getNextThreshold(data.testName, normCategory, ageGroup, genderKey);
+                if (!resultDoc.exists()) { showErrorPopup('Result not found.', () => window.location.href = './test.html'); return; }
 
-                    const numericValue = extractNumericResult(data.result);
-                    const normalized = data.testName.toLowerCase();
-                    const isLowerBetter = normalized.includes('step test') || normalized.includes('3-minute');
-                    const unit = normalized.includes('sit-and-reach') || normalized.includes('sit and reach') ? ' cm'
-                            : isLowerBetter ? ' bpm'
-                            : ' reps';
+                const data = resultDoc.data();
+                const scheduledTestId = data.testId || data.scheduledTestId || testId || null;
 
-                    let nextHint = '';
-                    if (nextInfo) {
-                        const gap = isLowerBetter
-                            ? numericValue - nextInfo.threshold
-                            : nextInfo.threshold - numericValue;
-                        const gapText = isLowerBetter
-                            ? `Lower your heart rate by <strong>${Math.ceil(gap)} bpm</strong>`
-                            : `Improve by <strong>${Math.ceil(gap)}${unit}</strong>`;
+                // ✅ Fetch norm category and attempt count in parallel
+                const [normResult, attemptSnap] = await Promise.all([
+                    resolveNormCategory(data.testName, data.result, scheduledTestId),
+                    testId ? getDocs(query(collection(db,'testResults'), where('testId','==',testId), where('studentId','==',data.studentId))) : Promise.resolve(null)
+                ]);
 
-                        nextHint = `
-                            <div style="
-                                margin-top: 10px;
-                                display: inline-flex;
-                                align-items: center;
-                                gap: 6px;
-                                background: #f0f9ff;
-                                border: 1px solid #bae6fd;
-                                border-radius: 50px;
-                                padding: 6px 14px;
-                                font-size: 12px;
-                                font-weight: 600;
-                                color: #0369a1;
-                            ">
-                                <i class="bi bi-arrow-up-circle-fill" style="color: #0ea5e9;"></i>
-                                ${gapText} to reach <strong style="color:#0c4a6e;">${nextInfo.nextCategory}</strong>
-                            </div>`;
-                    }
+                const normCategory = normResult?.category ?? null;
+                const normSource   = normResult?.source ?? 'fallback';
+                const score = normCategory
+                    ? mapNormCategoryToScore(normCategory)
+                    : calculateScoreFallback(data.testName, data.result, data.testTarget);
 
-                    if (scoreRatingEl) scoreRatingEl.innerHTML = `
-                    <span class="score-rating ${rating.class}">
+                // ========== POPULATE UI ==========
+                document.getElementById('testName').textContent = data.testName;
+                document.getElementById('testResult').textContent = data.result;
+                document.getElementById('completedDate').textContent =
+                    data.submittedAt ? new Date(data.submittedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '--';
+
+                // Rating badge
+                const scoreRatingEl = document.getElementById('scoreRating');
+                const displayCategory = normCategory || (score >= 90 ? 'Excellent' : score >= 80 ? 'Good' : score >= 70 ? 'Average' : 'Below Average');
+                const rating = getRatingFromCategory(displayCategory);
+                const sourceBadge = normSource === 'student'
+                    ? `<div class="mt-2"><span class="norm-applied-badge"><i class="bi bi-sliders"></i> Student-specific norms applied</span></div>`
+                    : normSource === 'test'
+                    ? `<div class="mt-2"><span class="norm-applied-badge"><i class="bi bi-sliders"></i> Test-level norms applied</span></div>`
+                    : '';
+                scoreRatingEl.innerHTML = `
+                    <span class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-base uppercase tracking-wide shadow-md ${rating.class}">
                         <i class="bi bi-star-fill"></i> ${rating.text}
-                    </span>
-                `;
+                    </span>${sourceBadge}`;
 
-                // Insert improvement hint after the stat badges
-                const statBadges = document.getElementById('statBadges');
-                if (statBadges) {
-                    const existingHint = document.getElementById('resultHintRow');
-                    if (existingHint) existingHint.remove();
-
-                    const hintRow = document.createElement('div');
-                    hintRow.id = 'resultHintRow';
-                    hintRow.style.cssText = `
-                        display: flex;
-                        justify-content: center;
-                        margin-top: 1rem;
-                    `;
-
-                    hintRow.innerHTML = nextHint ? `
-                        <div style="
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 8px;
-                            background: #f0f9ff;
-                            border: 1px solid #bae6fd;
-                            border-radius: 12px;
-                            padding: 10px 20px;
-                            font-size: 13px;
-                            font-weight: 600;
-                            color: #0369a1;
-                        ">
-                            <i class="bi bi-arrow-up-circle-fill" style="color: #0ea5e9; font-size: 15px;"></i>
-                            ${isLowerBetter
-                                ? `Lower your heart rate by <strong style="color:#0c4a6e;">${Math.ceil(numericValue - nextInfo.threshold)} bpm</strong> to reach <strong style="color:#0c4a6e;">${nextInfo.nextCategory}</strong>`
-                                : `Improve by <strong style="color:#0c4a6e;">${Math.ceil(nextInfo.threshold - numericValue)}${unit}</strong> to reach <strong style="color:#0c4a6e;">${nextInfo.nextCategory}</strong>`
-                            }
-                        </div>
-                    ` : '';
-
-                    statBadges.insertAdjacentElement('afterend', hintRow);
-                }
-                } else {
-                    const numericRating = score >= 90 ? 'Excellent' :
-                                        score >= 80 ? 'Good' :
-                                        score >= 70 ? 'Fair' : 'Needs Improvement';
-                    const ratingMeta = getRatingFromCategory(numericRating);
-                    if (scoreRatingEl) scoreRatingEl.innerHTML = `<span class="score-rating ${ratingMeta.class}"><i class="bi bi-star-fill"></i> ${ratingMeta.text}</span>`;
-                }
-
-                    document.getElementById('testName').textContent = data.testName;
-                    document.getElementById('testResult').textContent = data.result;
-                    document.getElementById('completedDate').textContent = new Date(data.submittedAt).toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric',
-                        year: 'numeric'
-                    });
-                        if (data.testName && data.testName.toLowerCase().includes('skinfold') && data.result) {
-                const classMatch = data.result.match(/\(([^)]+)\)/);
-                if (classMatch) {
-                    const classLabel = classMatch[1];
-                    const classColors = {
-                        'Essential Fat': '#6366f1', 'Athletic': '#10b981',
-                        'Fitness': '#3b82f6', 'Average': '#f59e0b',
-                        'Overfat': '#f97316', 'Obese': '#ef4444'
-                    };
-                    const color = classColors[classLabel] || '#374151';
-                    document.getElementById('scoreRating').innerHTML += `
-                        <div style="margin-top:8px;">
-                            <span style="display:inline-block; padding:8px 20px; border-radius:50px; background:white;
-                                        border:2px solid ${color}; color:${color}; font-weight:700; font-size:14px;">
-                                📊 Body Fat Category: ${classLabel}
-                            </span>
-                        </div>
-                    `;
-                }
-            }
-                    // Only show duration if timerValue exists
-                    const isStepTest = data.testName && (data.testName.toLowerCase().includes('step test') || data.testName.toLowerCase().includes('3-minute'));
-                    if (isStepTest && data.timerValue && data.timerValue.trim() !== '' && !/^[0:\.]+$/.test(data.timerValue.trim())) {
-                        const statBadges = document.getElementById('statBadges');
-                        const durationBadge = document.createElement('div');
-                        durationBadge.className = 'stat-badge';
-                        durationBadge.innerHTML = `
-                            <div class="stat-badge-label">Duration</div>
-                            <div class="stat-badge-value">${data.timerValue}</div>
-                        `;
-                        statBadges.appendChild(durationBadge);
+                // Skinfold body fat badge
+                if (data.testName?.toLowerCase().includes('skinfold') && data.result) {
+                    const classMatch = String(data.result).match(/\(([^)]+)\)/);
+                    if (classMatch) {
+                        const classLabel = classMatch[1];
+                        const classColors = { 'Essential Fat':'#6366f1', Athletic:'#10b981', Fitness:'#3b82f6', Average:'#f59e0b', Overfat:'#f97316', Obese:'#ef4444' };
+                        const color = classColors[classLabel] || '#374151';
+                        scoreRatingEl.innerHTML += `<div class="mt-2"><span style="display:inline-block;padding:8px 20px;border-radius:50px;background:white;border:2px solid ${color};color:${color};font-weight:700;font-size:14px;">📊 Body Fat Category: ${classLabel}</span></div>`;
                     }
-                    
-                    document.getElementById('loadingScreen').style.display = 'none';
-                    document.getElementById('mainContent').style.display = 'block';
-                    
-                   const displayCategory = normCategory || 'Average';
-                    const shouldGenerate = ['Average', 'Below Average', 'Poor'].includes(displayCategory);
-                    if (shouldGenerate) {
+                }
+
+                // Step test duration badge
+                const isStepTest = (data.testName||'').toLowerCase().includes('step test') || (data.testName||'').toLowerCase().includes('3-minute');
+                if (isStepTest && data.timerValue?.trim() && !/^[0:\.]+$/.test(data.timerValue.trim())) {
+                    const div = document.createElement('div');
+                    div.className = 'bg-slate-50 border border-slate-200 rounded-xl px-6 py-4';
+                    div.innerHTML = `<div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Duration</div><div class="text-lg font-bold text-slate-800">${data.timerValue}</div>`;
+                    document.getElementById('statBadges').appendChild(div);
+                }
+
+                // ✅ Fetch next threshold in background (non-blocking for UI reveal)
+                getNextThresholdInfo(data.testName, displayCategory, scheduledTestId).then(nextInfo => {
+                    if (!nextInfo) return;
+                    const statBadges = document.getElementById('statBadges');
+                    document.getElementById('resultHintRow')?.remove();
+                    const gap = nextInfo.lowerIsBetter
+                        ? extractNumericResult(data.result) - nextInfo.threshold
+                        : nextInfo.threshold - extractNumericResult(data.result);
+                    if (gap > 0) {
+                        const hintRow = document.createElement('div');
+                        hintRow.id = 'resultHintRow';
+                        hintRow.className = 'flex justify-center mt-4 w-full';
+                        hintRow.innerHTML = `
+                            <div class="inline-flex items-center gap-2 bg-sky-50 border border-sky-200 rounded-xl px-5 py-2.5 text-sm font-semibold text-sky-700">
+                                <i class="bi bi-arrow-up-circle-fill text-sky-400 text-base"></i>
+                                ${nextInfo.lowerIsBetter
+                                    ? `Lower your heart rate by <strong class="text-sky-900 mx-1">${Math.ceil(gap)} ${nextInfo.unit}</strong> to reach <strong class="text-sky-900 ml-1">${nextInfo.nextCategory}</strong>`
+                                    : `Improve by <strong class="text-sky-900 mx-1">${Math.ceil(gap)} ${nextInfo.unit}</strong> to reach <strong class="text-sky-900 ml-1">${nextInfo.nextCategory}</strong>`
+                                }
+                            </div>`;
+                        statBadges.insertAdjacentElement('afterend', hintRow);
+                    }
+                }).catch(() => {});
+
+                // ✅ Show page now — don't block on AI recommendation or retry check
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+
+                // ✅ AI Recommendation (background, non-blocking)
+                if (['Average','Below Average','Poor'].includes(displayCategory)) {
+                    document.getElementById('recommendationContent').innerHTML = `
+                        <div class="flex items-center gap-3 text-sky-800">
+                            <div class="loading-spinner shrink-0"></div>
+                            <span class="text-sm font-medium">Generating personalized recommendations for you...</span>
+                        </div>`;
+                    generateRecommendation(data.testName, data.result, displayCategory).then(rec => {
+                        document.getElementById('recommendationContent').innerHTML = rec
+                            ? `<p class="text-sky-800 font-medium text-sm sm:text-base leading-relaxed">${rec}</p>`
+                            : '';
+                        if (!rec) document.getElementById('recommendationSection').style.display = 'none';
+                    }).catch(err => {
                         document.getElementById('recommendationContent').innerHTML = `
-                            <div class="loading-recommendation">
-                                <div class="loading-spinner"></div>
-                                <span>Generating personalized recommendations for you...</span>
-                            </div>
-                        `;
-                        
-                        try {
-                            const recommendation = await generateRecommendation(
-                                data.testName,
-                                data.result,
-                                displayCategory,
-                                data.timerValue
-                            );
-                            
-                            if (recommendation) {
-                                document.getElementById('recommendationContent').innerHTML = `
-                                    <p class="recommendation-text">${recommendation}</p>
-                                `;
-                            } else {
-                                document.getElementById('recommendationSection').style.display = 'none';
-                            }
-                        } catch (error) {
-                            console.error('Failed to generate recommendation:', error);
-                            document.getElementById('recommendationContent').innerHTML = `
-                                <div style="color: #dc2626; text-align: center; padding: 1rem;">
-                                    <i class="bi bi-exclamation-triangle" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
-                                    <p style="font-weight: 600;">Unable to generate AI recommendation</p>
-                                    <p style="font-size: 0.875rem; margin-top: 0.5rem;">Error: ${error.message}</p>
-                                    <button onclick="location.reload()" 
-                                            style="margin-top: 1rem; padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; cursor: pointer;">
-                                        Try Again
-                                    </button>
-                                </div>
-                            `;
-                        }
-                    } else {
-                        document.getElementById('recommendationSection').style.display = 'none';
-                    }
-                    
-                    
-
-                    if (testId && score < 100) {
-                        const testDoc = await getDoc(doc(db, 'scheduledTests', testId));
-                        
-                        if (testDoc.exists()) {
-                            const testData = testDoc.data();
-                            const attemptsAllowed = testData.attemptsAllowed || 1;
-                            
-                            const resultsQuery = query(
-                                collection(db, 'testResults'),
-                                where('testId', '==', testId),
-                                where('studentId', '==', data.studentId)
-                            );
-                            
-                            const resultsSnapshot = await getDocs(resultsQuery);
-                            const currentAttempts = resultsSnapshot.size;
-                            
-                            if (currentAttempts < attemptsAllowed) {
-                                const retrySection = document.createElement('div');
-                                retrySection.style.cssText = `
-                                    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-                                    border-radius: 16px;
-                                    padding: 2rem;
-                                    margin: 2rem 0;
-                                    text-align: center;
-                                    border: 3px solid #f59e0b;
-                                `;
-                                
-                                retrySection.innerHTML = `
-                                    <h3 style="font-family: 'Inter', Helvetica; font-weight: 700; color: #92400e; font-size: 20px; margin-bottom: 1rem;">
-                                        🔄 Want to Improve Your Score?
-                                    </h3>
-                                    <p style="font-family: 'Inter', Helvetica; font-weight: 500; color: #78350f; font-size: 15px; margin-bottom: 1.5rem;">
-                                        You have used <strong>${currentAttempts}</strong> out of <strong>${attemptsAllowed}</strong> attempts.<br>
-                                        You can take this test again to try for a higher score!
-                                    </p>
-                                    <button onclick="retryTest('${testId}')" 
-                                            style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); 
-                                                   color: white; 
-                                                   padding: 12px 32px; 
-                                                   border: none; 
-                                                   border-radius: 12px; 
-                                                   font-family: 'Inter', Helvetica; 
-                                                   font-weight: 700; 
-                                                   font-size: 15px; 
-                                                   cursor: pointer; 
-                                                   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-                                                   transition: all 0.3s;">
-                                        🎯 Take Attempt ${currentAttempts + 1}/${attemptsAllowed}
-                                    </button>
-                                `;
-                                
-                                const actionButtons = document.querySelector('.action-buttons');
-                                actionButtons.parentNode.insertBefore(retrySection, actionButtons);
-                            }
-                        }
-                    }
-                    
-                   } else {
-                    showErrorPopup('Result not found.', () => { window.location.href = './test.html'; });
+                            <div class="text-red-600 text-center py-4">
+                                <i class="bi bi-exclamation-triangle text-4xl block mb-2"></i>
+                                <p class="font-semibold">Unable to generate AI recommendation</p>
+                                <p class="text-sm mt-1">${err.message}</p>
+                                <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors">Try Again</button>
+                            </div>`;
+                    });
+                } else {
+                    document.getElementById('recommendationSection').style.display = 'none';
                 }
-            } catch (error) {
-                console.error('Error loading result:', error);
-                showErrorPopup('Error loading result. Please try again.', () => { window.location.href = './test.html'; });
+
+                // ✅ Retry section (uses pre-fetched scheduledTestDoc and attemptSnap)
+                if (testId && scheduledTestDoc?.exists() && score < 100 && attemptSnap) {
+                    const tData = scheduledTestDoc.data();
+                    const attemptsAllowed = tData.attemptsAllowed || 1;
+                    const currentAttempts = attemptSnap.size;
+                    if (currentAttempts < attemptsAllowed) {
+                        const retrySection = document.createElement('div');
+                        retrySection.className = 'bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-6 sm:p-8 text-center border-2 border-amber-400 my-6 shadow-sm';
+                        retrySection.innerHTML = `
+                            <h3 class="text-xl font-bold text-amber-900 mb-3">🔄 Want to Improve Your Score?</h3>
+                            <p class="text-amber-800 font-medium text-sm sm:text-base mb-5">
+                                You have used <strong>${currentAttempts}</strong> out of <strong>${attemptsAllowed}</strong> attempts.<br>
+                                You can take this test again to try for a higher score!
+                            </p>
+                            <button onclick="retryTest('${testId}')"
+                                    class="bg-gradient-to-r from-amber-400 to-amber-500 text-white px-8 py-3 rounded-xl font-bold text-sm cursor-pointer border-0 hover:from-amber-500 hover:to-amber-600 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
+                                🎯 Take Attempt ${currentAttempts + 1}/${attemptsAllowed}
+                            </button>`;
+                        document.getElementById('mainActionButtons').parentNode.insertBefore(retrySection, document.getElementById('mainActionButtons'));
+                    }
+                }
+
+            } catch(error) {
+                console.error('loadTestResult error:', error);
+                showErrorPopup('Error loading result. Please try again.', () => window.location.href = './test.html');
             }
         }
 
-        window.handleLogout = async function() {
-            if (confirm('Are you sure you want to logout?')) {
-                try {
-                    await signOut(auth);
-                    window.location.href = '../login/index.html';
-                     } catch (error) {
-                    console.error('Error logging out:', error);
-                    showErrorPopup('Error logging out. Please try again.', null);
+        // ========== STUDENT DATA (parallel email + UID) ==========
+
+        async function loadStudentData(user) {
+            try {
+                const [emailSnap] = await Promise.all([
+                    getDocs(query(collection(db,'students'), where('email','==',user.email)))
+                ]);
+                if (!emailSnap.empty) {
+                    emailSnap.forEach(d => { studentData = { ...d.data(), studentId: d.id }; });
+                } else {
+                    studentData = { displayName: user.displayName || user.email.split('@')[0], email: user.email, section: null };
                 }
-            }
-        };
-
-        window.retryTest = function(testId) {
-    showConfirmPopup(
-        '🔄 Retry Test',
-        'Do you want to take this test again to improve your score?',
-        'Retry Test',
-        'Back to Tests',
-        () => { window.location.href = `./testdetails.html?testId=${testId}`; },
-        () => { window.location.href = './test.html'; }
-    );
-};
-
-        window.goToTests = function() {
-    window.location.href = './test.html';
-};
-
-        // Profile dropdown functions
-        window.toggleProfileDropdown = function() {
-            const isMobile = window.innerWidth < 1024;
-            const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
-            
-            dropdown.classList.toggle('hidden');
-            if (!dropdown.classList.contains('hidden')) {
-                setTimeout(() => {
-                    document.addEventListener('click', closeProfileOnClickOutside);
-                }, 100);
-            } else {
-                document.removeEventListener('click', closeProfileOnClickOutside);
-            }
-        };
-
-        function closeProfileOnClickOutside(event) {
-            const isMobile = window.innerWidth < 1024;
-            const dropdown = document.getElementById(isMobile ? 'profileDropdownMobile' : 'profileDropdown');
-            const profileBtn = document.getElementById('profilePictureBtn');
-            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-            
-            if (!dropdown.contains(event.target) && !profileBtn?.contains(event.target) && !profileBtnMobile?.contains(event.target)) {
-                dropdown.classList.add('hidden');
-                document.removeEventListener('click', closeProfileOnClickOutside);
-            }
+            } catch(e) { studentData = { displayName: user.displayName || 'Student', email: user.email, section: null }; }
+            return studentData;
         }
 
         function updateProfileUI() {
             if (!currentUser) return;
-            
-            const photoURL = currentUser.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(currentUser.displayName || 'User') + '&background=3b82f6&color=fff&size=128';
-            
-            const profileBtn = document.getElementById('profilePictureBtn');
-            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-            if (profileBtn) profileBtn.src = photoURL;
-            if (profileBtnMobile) profileBtnMobile.src = photoURL;
-            
-            const dropdownPic = document.getElementById('profileDropdownPicture');
-            const dropdownPicMobile = document.getElementById('profileDropdownPictureMobile');
-            if (dropdownPic) dropdownPic.src = photoURL;
-            if (dropdownPicMobile) dropdownPicMobile.src = photoURL;
-            
-            const dropdownName = document.getElementById('profileDropdownName');
-            const dropdownNameMobile = document.getElementById('profileDropdownNameMobile');
-            if (dropdownName) dropdownName.textContent = currentUser.displayName || 'Student';
-            if (dropdownNameMobile) dropdownNameMobile.textContent = currentUser.displayName || 'Student';
-            
-            const dropdownEmail = document.getElementById('profileDropdownEmail');
-            const dropdownEmailMobile = document.getElementById('profileDropdownEmailMobile');
-            if (dropdownEmail) dropdownEmail.textContent = currentUser.email || '';
-            if (dropdownEmailMobile) dropdownEmailMobile.textContent = currentUser.email || '';
+            const photo = currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName||'User')}&background=3b82f6&color=fff&size=128`;
+            ['profilePictureBtn','profilePictureBtnMobile','profileDropdownPicture','profileDropdownPictureMobile'].forEach(id => { const el=document.getElementById(id); if(el) el.src=photo; });
+            ['profileDropdownName','profileDropdownNameMobile'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=currentUser.displayName||'Student'; });
+            ['profileDropdownEmail','profileDropdownEmailMobile'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=currentUser.email||''; });
         }
 
-        // Setup event listeners
-        function setupEventListeners() {
-            const notificationBtn = document.getElementById('notificationBellBtn');
-            const notificationBtnMobile = document.getElementById('notificationBellBtnMobile');
-            
-            if (notificationBtn) notificationBtn.addEventListener('click', toggleNotificationDropdown);
-            if (notificationBtnMobile) notificationBtnMobile.addEventListener('click', toggleNotificationDropdown);
-            
-            const closeNotificationBtn = document.getElementById('closeNotificationBtn');
-            const closeNotificationBtnMobile = document.getElementById('closeNotificationBtnMobile');
-            
-            if (closeNotificationBtn) {
-                closeNotificationBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    closeNotificationDropdown();
-                });
-            }
-            
-            if (closeNotificationBtnMobile) {
-                closeNotificationBtnMobile.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    closeNotificationDropdown();
-                });
-            }
-                
-            const profileBtn = document.getElementById('profilePictureBtn');
-            const profileBtnMobile = document.getElementById('profilePictureBtnMobile');
-            
-            if (profileBtn) profileBtn.addEventListener('click', toggleProfileDropdown);
-            if (profileBtnMobile) profileBtnMobile.addEventListener('click', toggleProfileDropdown);
-            
-            document.addEventListener('click', (event) => {
-                if (!event.target.closest('#notificationBellBtn') && 
-                    !event.target.closest('#notificationBellBtnMobile') && 
-                    !event.target.closest('#notificationDropdown') && 
-                    !event.target.closest('#notificationDropdownMobile')) {
-                    closeNotificationDropdown();
-                }
-                
-                if (!event.target.closest('#profilePictureBtn') && 
-                    !event.target.closest('#profilePictureBtnMobile') && 
-                    !event.target.closest('#profileDropdown') && 
-                    !event.target.closest('#profileDropdownMobile')) {
-                    const profileDropdown = document.getElementById('profileDropdown');
-                    const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-                    if (profileDropdown) profileDropdown.classList.add('hidden');
-                    if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
-                }
-            });
-        }
+        // ========== POPUPS ==========
 
-        // Hamburger Menu and Drawer functionality
-        const hamburger = document.getElementById('hamburger');
-        const mobileDrawer = document.getElementById('mobileDrawer');
-        const drawerOverlay = document.getElementById('drawerOverlay');
-        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+        window.retryTest = id => showConfirmPopup(
+            '🔄 Retry Test',
+            'Do you want to take this test again to improve your score?',
+            'Retry Test', 'Back to Tests',
+            () => window.location.href = `./testdetails.html?testId=${id}`,
+            () => window.location.href = './test.html'
+        );
 
-        if (hamburger) {
-        hamburger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            hamburger.classList.toggle('active');
-            mobileDrawer.classList.toggle('active');
-            drawerOverlay.classList.toggle('active');
-            document.body.style.overflow = mobileDrawer.classList.contains('active') ? 'hidden' : '';
-
-            // Close profile and notification dropdowns
+        window.handleLogout = function() {
+            const existing = document.getElementById('logoutOverlay'); if (existing) existing.remove();
+            const overlay = document.createElement('div');
+            overlay.id = 'logoutOverlay';
+            overlay.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-[99999] p-4';
+            overlay.innerHTML = `
+                <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                        <svg width="32" height="32" viewBox="0 0 48 48" fill="none"><path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/><path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div class="text-xl font-semibold text-gray-900 mb-1">Log Out</div>
+                    <div class="text-sm text-gray-500 mb-6 leading-relaxed">Are you sure you want to log out of your account?</div>
+                    <div class="h-px bg-gray-200 -mx-8 mb-5"></div>
+                    <div class="flex gap-3">
+                        <button id="logoutCancelBtn" class="flex-1 py-3 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-medium cursor-pointer hover:bg-gray-50 transition-colors">Cancel</button>
+                        <button id="logoutConfirmBtn" class="flex-1 py-3 rounded-full border-0 bg-red-500 text-white text-sm font-medium cursor-pointer hover:bg-red-600 transition-colors">Log Out</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
             document.getElementById('profileDropdown')?.classList.add('hidden');
             document.getElementById('profileDropdownMobile')?.classList.add('hidden');
-            document.getElementById('notificationDropdown')?.classList.add('hidden');
-            document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
-        });
-    }
+            document.getElementById('logoutCancelBtn').addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', e => { if (e.target===overlay) overlay.remove(); });
+            document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('logoutConfirmBtn');
+                btn.textContent='Logging out...'; btn.disabled=true; btn.style.opacity='.7';
+                try { await signOut(auth); window.location.href='../login/index.html'; }
+                catch(e) { overlay.remove(); alert('Error logging out. Please try again.'); }
+            });
+        };
 
-        if (drawerOverlay) {
-            drawerOverlay.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                mobileDrawer.classList.remove('active');
-                drawerOverlay.classList.remove('active');
+        function showConfirmPopup(title, message, confirmText, cancelText, onConfirm, onCancel) {
+            const overlay = document.createElement('div');
+            overlay.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-[99999] p-4';
+            overlay.innerHTML = `
+                <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
+                    <div class="text-xl font-semibold text-gray-900 mb-2">${title}</div>
+                    <div class="text-sm text-gray-500 leading-relaxed mb-7">${message}</div>
+                    <div class="h-px bg-gray-200 -mx-8 mb-5"></div>
+                    <div class="flex gap-3 justify-end">
+                        ${cancelText ? `<button id="cPopCancel" class="px-5 py-2.5 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-medium cursor-pointer hover:bg-gray-50 transition-colors">${cancelText}</button>` : ''}
+                        <button id="cPopOk" class="px-5 py-2.5 rounded-full border-0 bg-blue-500 text-white text-sm font-medium cursor-pointer hover:bg-blue-600 transition-colors">${confirmText}</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+            document.getElementById('cPopOk').addEventListener('click', () => { overlay.remove(); onConfirm?.(); });
+            document.getElementById('cPopCancel')?.addEventListener('click', () => { overlay.remove(); onCancel?.(); });
+            overlay.addEventListener('click', e => { if (e.target===overlay) { overlay.remove(); onCancel?.(); } });
+        }
+
+        function showErrorPopup(message, onClose) {
+            const overlay = document.createElement('div');
+            overlay.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-[99999] p-4';
+            overlay.innerHTML = `
+                <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
+                    <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg width="28" height="28" viewBox="0 0 48 48"><line x1="14" y1="14" x2="34" y2="34" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/><line x1="34" y1="14" x2="14" y2="34" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div class="text-lg font-semibold text-gray-900 mb-2">Something went wrong</div>
+                    <div class="text-sm text-gray-500 leading-relaxed mb-6">${message}</div>
+                    <div class="h-px bg-gray-200 -mx-8 mb-5"></div>
+                    <button id="errClose" class="px-6 py-2.5 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-medium cursor-pointer hover:bg-gray-50 transition-colors">OK</button>
+                </div>`;
+            document.body.appendChild(overlay);
+            document.getElementById('errClose').addEventListener('click', () => { overlay.remove(); onClose?.(); });
+        }
+
+        window.toggleProfileDropdown = function() {
+            const mob = window.innerWidth < 1024;
+            document.getElementById(mob ? 'profileDropdownMobile' : 'profileDropdown')?.classList.toggle('hidden');
+            closeNotificationDropdown();
+        };
+
+        // ========== EVENT LISTENERS ==========
+
+        function setupEventListeners() {
+            document.getElementById('notificationBellBtn')?.addEventListener('click', toggleNotificationDropdown);
+            document.getElementById('notificationBellBtnMobile')?.addEventListener('click', toggleNotificationDropdown);
+            document.getElementById('closeNotificationBtn')?.addEventListener('click', e => { e.stopPropagation(); closeNotificationDropdown(); });
+            document.getElementById('closeNotificationBtnMobile')?.addEventListener('click', e => { e.stopPropagation(); closeNotificationDropdown(); });
+            document.getElementById('profilePictureBtn')?.addEventListener('click', window.toggleProfileDropdown);
+            document.getElementById('profilePictureBtnMobile')?.addEventListener('click', window.toggleProfileDropdown);
+
+            document.addEventListener('click', event => {
+                if (!event.target.closest('#notificationBellBtn') && !event.target.closest('#notificationBellBtnMobile') &&
+                    !event.target.closest('#notificationDropdown') && !event.target.closest('#notificationDropdownMobile')) closeNotificationDropdown();
+                if (!event.target.closest('#profilePictureBtn') && !event.target.closest('#profilePictureBtnMobile') &&
+                    !event.target.closest('#profileDropdown') && !event.target.closest('#profileDropdownMobile')) {
+                    document.getElementById('profileDropdown')?.classList.add('hidden');
+                    document.getElementById('profileDropdownMobile')?.classList.add('hidden');
+                }
+            });
+
+            const hamburger = document.getElementById('hamburger');
+            const drawer    = document.getElementById('mobileDrawer');
+            const overlay   = document.getElementById('drawerOverlay');
+            hamburger?.addEventListener('click', e => {
+                e.stopPropagation();
+                hamburger.classList.toggle('active'); drawer.classList.toggle('active'); overlay.classList.toggle('active');
+                document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : '';
+            });
+            overlay?.addEventListener('click', () => {
+                hamburger.classList.remove('active'); drawer.classList.remove('active'); overlay.classList.remove('active');
                 document.body.style.overflow = '';
             });
+            document.querySelectorAll('.mobile-nav-link').forEach(l => l.addEventListener('click', () => {
+                hamburger.classList.remove('active'); drawer.classList.remove('active'); overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }));
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    hamburger?.classList.remove('active'); drawer?.classList.remove('active'); overlay?.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
         }
 
-        mobileNavLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            mobileDrawer.classList.remove('active');
-            drawerOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    });
+        // ========== AUTH STATE ==========
 
-    // Close drawer when resizing back to desktop
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 1024) {
-            hamburger?.classList.remove('active');
-            mobileDrawer?.classList.remove('active');
-            drawerOverlay?.classList.remove('active');
-            document.body.style.overflow = '';
-            document.getElementById('profileDropdown')?.classList.add('hidden');
-            document.getElementById('profileDropdownMobile')?.classList.add('hidden');
-            document.getElementById('notificationDropdown')?.classList.add('hidden');
-            document.getElementById('notificationDropdownMobile')?.classList.add('hidden');
-        }
-    });
-const loadingTimeout = setTimeout(() => {
-    document.getElementById('loadingScreen').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'block';
-}, 1500);
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, async user => {
             if (user) {
                 currentUser = user;
-                await loadStudentData(user);
-                setupNotificationListener();
-                await checkUnreadNotifications();
-                updateProfileUI();
-                await loadTestResult();
                 setupEventListeners();
+                updateProfileUI();
+
+                // ✅ Load student data and setup notification listener in parallel
+                await loadStudentData(user);
+                updateProfileUI(); // re-update with student name if available
+
+                // ✅ Fire notification setup + unread check in parallel, non-blocking
+                setupNotificationListener();
+                checkUnreadNotifications(); // fire-and-forget
+
+                // ✅ Load test result (shows page when ready)
+                await loadTestResult();
             } else {
                 window.location.href = '../login/index.html';
             }
         });
-                window.handleLogout = function() {
-    showLogoutConfirmPopup();
-};
 
-function showLogoutConfirmPopup() {
-    // Remove existing popup if any
-    const existing = document.getElementById('logoutOverlay');
-    if (existing) existing.remove();
+        window.addEventListener('pagehide', () => {
+            if (_notifUnsub) { _notifUnsub(); _notifUnsub = null; }
+        });
 
-    const overlay = document.createElement('div');
-    overlay.id = 'logoutOverlay';
-    overlay.style.cssText = `
-        position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-        display: flex; align-items: center; justify-content: center;
-        z-index: 99999; padding: 1rem;
-        animation: fadeInLogout 0.2s ease;
-    `;
-
-    overlay.innerHTML = `
-        <style>
-            @keyframes fadeInLogout { from { opacity:0; } to { opacity:1; } }
-            @keyframes slideUpLogout { from { opacity:0; transform:translateY(24px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
-        </style>
-        <div style="
-            background:#fff;
-            border-radius:24px;
-            padding:2rem 1.5rem 1.5rem;
-            max-width:360px;
-            width:100%;
-            box-shadow:0 8px 40px rgba(60,64,67,0.18), 0 2px 8px rgba(60,64,67,0.10);
-            animation:slideUpLogout 0.35s cubic-bezier(.4,0,.2,1);
-            text-align:center;
-            font-family:'Inter',sans-serif;
-        ">
-            <!-- Icon -->
-            <div style="
-                width:68px; height:68px;
-                background:#fce8e6;
-                border-radius:50%;
-                display:flex; align-items:center; justify-content:center;
-                margin:0 auto 1.25rem;
-            ">
-                <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
-                    <path d="M20 8H10C8.9 8 8 8.9 8 10V38C8 39.1 8.9 40 10 40H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                    <path d="M32 16L40 24L32 32" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M40 24H20" stroke="#ea4335" stroke-width="3.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-
-            <!-- Title -->
-            <div style="font-size:1.25rem; font-weight:600; color:#202124; margin-bottom:0.35rem; letter-spacing:-0.01em;">
-                Log Out
-            </div>
-
-            <!-- Subtitle -->
-            <div style="font-size:0.875rem; color:#5f6368; margin-bottom:1.5rem; line-height:1.5;">
-                Are you sure you want to log out of your account?
-            </div>
-
-            <!-- Divider -->
-            <div style="height:1px; background:#e8eaed; margin:0 -1.5rem 1.25rem;"></div>
-
-            <!-- Buttons -->
-            <div style="display:flex; gap:0.75rem;">
-                <button id="logoutCancelBtn" style="
-                    flex:1;
-                    padding:0.75rem 0.5rem;
-                    border-radius:100px;
-                    border:1.5px solid #dadce0;
-                    background:#fff;
-                    color:#3c4043;
-                    font-size:0.9375rem;
-                    font-weight:500;
-                    cursor:pointer;
-                    font-family:'Inter',sans-serif;
-                    transition:background 0.15s;
-                    min-height:48px;
-                ">Cancel</button>
-                <button id="logoutConfirmBtn" style="
-                    flex:1;
-                    padding:0.75rem 0.5rem;
-                    border-radius:100px;
-                    border:none;
-                    background:#ea4335;
-                    color:#fff;
-                    font-size:0.9375rem;
-                    font-weight:500;
-                    cursor:pointer;
-                    font-family:'Inter',sans-serif;
-                    transition:background 0.15s, box-shadow 0.15s;
-                    min-height:48px;
-                ">Log Out</button>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    // Close profile dropdowns first
-    const profileDropdown = document.getElementById('profileDropdown');
-    const profileDropdownMobile = document.getElementById('profileDropdownMobile');
-    if (profileDropdown) profileDropdown.classList.add('hidden');
-    if (profileDropdownMobile) profileDropdownMobile.classList.add('hidden');
-
-    // Cancel button
-    document.getElementById('logoutCancelBtn').addEventListener('click', () => {
-        overlay.remove();
-    });
-
-    // Click outside to close
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) overlay.remove();
-    });
-
-    // Confirm logout
-    document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
-        const confirmBtn = document.getElementById('logoutConfirmBtn');
-        confirmBtn.textContent = 'Logging out...';
-        confirmBtn.disabled = true;
-        confirmBtn.style.opacity = '0.7';
-
-        try {
-            await signOut(auth);
-            window.location.href = '../login/index.html';
-        } catch (error) {
-            console.error('Logout error:', error);
-            overlay.remove();
-            alert('Error logging out. Please try again.');
-        }
-    });
-}
-        // Make functions globally available
         window.toggleNotificationDropdown = toggleNotificationDropdown;
-        window.closeNotificationDropdown = closeNotificationDropdown;
+        window.closeNotificationDropdown  = closeNotificationDropdown;
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    
 </body>
 </html>
