@@ -924,43 +924,52 @@
 
         // ========== PROCESS STATS ==========
 
-        async function processAndUpdateStats(testResults) {
-            try {
-                const seenTestIds = new Set();
-                const uniqueResults = [];
-                testResults.forEach(r => {
-                    if (!seenTestIds.has(r.testId || r.id)) {
-                        seenTestIds.add(r.testId || r.id);
-                        uniqueResults.push(r);
-                    }
-                });
-
-                // Batch norm lookups in parallel
-                const normCats = await batchGetNormCategories(uniqueResults);
-
-                const categoryScores = { 'Excellent':5, 'Good':4, 'Average':3, 'Below Average':2, 'Poor':1 };
-                let totalScore = 0, bestCategory = '--', bestScore = 0;
-
-                normCats.forEach(cat => {
-                    if (!cat) return;
-                    const s = categoryScores[cat] || 3;
-                    totalScore += s;
-                    if (s > bestScore) { bestScore = s; bestCategory = cat; }
-                });
-
-                const validCount = normCats.filter(Boolean).length;
-                const avgScore = validCount > 0 ? Math.round((totalScore / validCount) * 10) / 10 : 0;
-
-                document.getElementById('testsDone').textContent = seenTestIds.size;
-                document.getElementById('avgScore').textContent = avgScore > 0 ? avgScore.toFixed(1) : '--';
-                document.getElementById('bestScore').textContent = bestCategory;
-                document.getElementById('bestScoreTest')?.classList.add('hidden');
-            } catch (_) {
-                document.getElementById('testsDone').textContent = '0';
-                document.getElementById('avgScore').textContent = '--';
-                document.getElementById('bestScore').textContent = '--';
+ // Replace the processAndUpdateStats function with this updated version
+async function processAndUpdateStats(testResults) {
+    try {
+        const seenTestIds = new Set();
+        const uniqueResults = [];
+        testResults.forEach(r => {
+            if (!seenTestIds.has(r.testId || r.id)) {
+                seenTestIds.add(r.testId || r.id);
+                uniqueResults.push(r);
             }
-        }
+        });
+
+        // Batch norm lookups in parallel
+        const normCats = await batchGetNormCategories(uniqueResults);
+
+        const categoryScores = { 'Excellent':5, 'Good':4, 'Average':3, 'Below Average':2, 'Poor':1 };
+        let totalScore = 0, bestCategory = '--', bestScore = 0;
+
+        normCats.forEach(cat => {
+            if (!cat) return;
+            const s = categoryScores[cat] || 3;
+            totalScore += s;
+            if (s > bestScore) { bestScore = s; bestCategory = cat; }
+        });
+
+        const validCount = normCats.filter(Boolean).length;
+        const avgScore = validCount > 0 ? (totalScore / validCount) : 0;
+        
+        // Convert numeric average to descriptive label
+        let avgLabel = '--';
+        if (avgScore >= 4.5) avgLabel = 'Excellent';
+        else if (avgScore >= 3.5) avgLabel = 'Good';
+        else if (avgScore >= 2.5) avgLabel = 'Average';
+        else if (avgScore >= 1.5) avgLabel = 'Below Average';
+        else if (avgScore > 0) avgLabel = 'Poor';
+
+        document.getElementById('testsDone').textContent = seenTestIds.size;
+        document.getElementById('avgScore').textContent = avgLabel;
+        document.getElementById('bestScore').textContent = bestCategory;
+        document.getElementById('bestScoreTest')?.classList.add('hidden');
+    } catch (_) {
+        document.getElementById('testsDone').textContent = '0';
+        document.getElementById('avgScore').textContent = '--';
+        document.getElementById('bestScore').textContent = '--';
+    }
+}
 
         // ========== PROCESS PERFORMANCE SUMMARY ==========
 
