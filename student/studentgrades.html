@@ -466,7 +466,7 @@
             const gender = _genderKey();
             const ageGroup = _ageGroup();
             const value = extractNumericResult(result);
-            const cacheKey = `${studentData?.email}|${testKey}|${gender}|${ageGroup}|${testId || 'none'}`;
+            const cacheKey = `${studentData?.email}|${testKey}|${gender}|${ageGroup}|${testId || 'none'}|${value}`;
             if (normCache.has(cacheKey)) return normCache.get(cacheKey);
 
             // 1. Student-specific norms
@@ -599,21 +599,29 @@
 
         // ========== PROCESS & RENDER (sync after prefetch) ==========
 
-        function processAndRender(rawResults, assignedCount) {
-            // Deduplicate: keep one result per testId (prefer completed)
-            const testGroups = {};
-            rawResults.forEach(result => {
-                const testId = result.testId || result.id;
-                const normCat = getNormCategorySync(result.testName, result.result || result.resultData, result.testId);
-                const category = getCategoryForTest(result.testName);
-                const dateObj = toDate(result.submittedAt) || new Date();
+        const NORM_RANK = { Excellent:5, Good:4, Average:3, 'Below Average':2, Poor:1 };
+function processAndRender(rawResults, assignedCount) {
+    // Deduplicate: keep only the best-performing attempt per testId
+    const testGroups = {};
+    rawResults.forEach(result => {
+    const testId = result.testId || result.scheduledTestId || result.testName;
+    const normCat = getNormCategorySync(result.testName, result.result || result.resultData, result.testId);
+    const category = getCategoryForTest(result.testName);
+    const dateObj = toDate(result.submittedAt) || new Date();
 
-                if (!testGroups[testId]) {
-                    testGroups[testId] = { ...result, normCategory: normCat, category, submittedAt: dateObj };
-                } else if (result.status === 'completed' && testGroups[testId].status !== 'completed') {
-                    testGroups[testId] = { ...result, normCategory: normCat, category, submittedAt: dateObj };
-                }
-            });
+    if (!testGroups[testId]) {
+        testGroups[testId] = { ...result, normCategory: normCat, category, submittedAt: dateObj };
+    } else {
+        const existingRank = NORM_RANK[testGroups[testId].normCategory] ?? 0;
+        const newRank = NORM_RANK[normCat] ?? 0;
+        // Always keep the highest-ranked attempt; if tied, keep the most recent
+        if (newRank > existingRank) {
+            testGroups[testId] = { ...result, normCategory: normCat, category, submittedAt: dateObj };
+        } else if (newRank === existingRank && dateObj > (testGroups[testId].submittedAt || new Date(0))) {
+            testGroups[testId] = { ...result, normCategory: normCat, category, submittedAt: dateObj };
+        }
+    }
+});
 
             const testResults = Object.values(testGroups);
 
