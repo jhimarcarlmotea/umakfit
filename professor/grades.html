@@ -454,13 +454,14 @@
     let assignedSections=[];
     let currentFinalGrades=[],filteredFinalGrades=[];
 
-    // ─── CACHES ───
-    const _defaultNormCache=new Map(); // normKey→data|null
-    const _studentNormCache=new Map(); // `email|testKey`→data|MISS
-    const _classifyCache=new Map();    // full key→category
+    // Caches
+    const _defaultNormCache=new Map();
+    const _studentNormCache=new Map();
+    const _classifyCache=new Map();
     const NORM_MISS=Symbol('miss');
 
     const CATEGORY_ORDER={'Excellent':5,'Good':4,'Average':3,'Below Average':2,'Poor':1};
+    const SKINFOLD_CATS = new Set(['Lean', 'Essential Fat', 'Athletic', 'Fitness', 'Overfat', 'Obese']);
 
     function _studentAge(s){
         if(!s)return 20;
@@ -469,54 +470,193 @@
     }
     function _ageGroup(a){return a<=18?'15-18':a<=22?'19-22':a<=26?'23-26':'27-30';}
     function _genderKey(g){return(g||'').toString().toLowerCase().startsWith('f')?'female':'male';}
-    function getCategoryClass(c){return{Excellent:'category-excellent',Good:'category-good',Average:'category-average','Below Average':'category-below-average',Poor:'category-poor',Athletic:'category-good',Fitness:'category-good','Essential Fat':'category-average',Lean:'category-excellent',Overfat:'category-below-average',Obese:'category-poor','No Grades':'category-default'}[c]||'category-default';}
-    function getCategoryIcon(c){return{Excellent:'⭐',Good:'👍',Average:'📊','Below Average':'📉',Poor:'⚠️',Athletic:'💪',Fitness:'🏃',Lean:'⭐','Essential Fat':'📊',Overfat:'📉',Obese:'⚠️'}[c]||'—';}
+    
+    function getCategoryClass(c){
+        if(SKINFOLD_CATS.has(c)){
+            const map={
+                'Lean':'category-excellent','Essential Fat':'category-average',
+                'Athletic':'category-good','Fitness':'category-good',
+                'Overfat':'category-below-average','Obese':'category-poor'
+            };
+            return map[c]||'category-default';
+        }
+        return{
+            Excellent:'category-excellent',Good:'category-good',
+            Average:'category-average','Below Average':'category-below-average',
+            Poor:'category-poor'
+        }[c]||'category-default';
+    }
+    
+    function getCategoryIcon(c){
+        if(SKINFOLD_CATS.has(c)){
+            const map={
+                'Lean':'⚡','Essential Fat':'⚖️','Athletic':'💪',
+                'Fitness':'🏃','Overfat':'📈','Obese':'⚠️'
+            };
+            return map[c]||'•';
+        }
+        return{Excellent:'⭐',Good:'👍',Average:'📊','Below Average':'📉',Poor:'⚠️'}[c]||'—';
+    }
+    
     function renderCategoryBadge(cat){
         if(!cat||cat==='No Grades')return'<span class="category-badge category-default">— No Grades</span>';
         return`<span class="category-badge ${getCategoryClass(cat)}">${getCategoryIcon(cat)} ${esc(cat)}</span>`;
     }
+
     function getOverallCategory(cats){
-        if(!cats||!cats.length)return'Average';
-        const avg=cats.reduce((s,c)=>s+(CATEGORY_ORDER[c]||3),0)/cats.length;
-        return avg>=4.5?'Excellent':avg>=3.5?'Good':avg>=2.5?'Average':avg>=1.5?'Below Average':'Poor';
+        if(!cats || !cats.length) return 'No Grades';
+        const weights = { 'Excellent':5, 'Good':4, 'Average':3, 'Below Average':2, 'Poor':1 };
+        let total = 0;
+        cats.forEach(c => total += weights[c] || 3);
+        const avg = total / cats.length;
+        if (avg >= 4.5) return 'Excellent';
+        if (avg >= 3.5) return 'Good';
+        if (avg >= 2.5) return 'Average';
+        if (avg >= 1.5) return 'Below Average';
+        return 'Poor';
     }
-    function _applyThresholds(nd,value){
-        if(!nd)return null;
-        const lib=nd.lowerIsBetter??false;
-        for(const cat of['Excellent','Good','Average','Below Average']){const t=nd.thresholds?.[cat];if(t==null)continue;if(lib?value<=t:value>=t)return cat;}
-        return'Poor';
-    }
-    async function classifyResult(testName,rawResult,testId,studentEmail,studentGender,studentAge){
-        if(!testName)return'Average';
-        const testKey=resolveTestKey(testName);if(!testKey)return'Average';
-        const gender=_genderKey(studentGender),ageGroup=_ageGroup(studentAge);
-        const value=typeof rawResult==='number'?rawResult:extractNumericResult(rawResult);
-        const ck=`${studentEmail}|${testKey}|${gender}|${ageGroup}|${testId||'none'}`;
-        if(_classifyCache.has(ck))return _classifyCache.get(ck);
-        const set=cat=>{_classifyCache.set(ck,cat);return cat;};
-        // 1. Student override
-        if(studentEmail){
-            const snk=`${studentEmail}|${testKey}`;
-            if(!_studentNormCache.has(snk)){try{const s=await getDoc(doc(db,'studentNorms',studentEmail,'tests',testKey));_studentNormCache.set(snk,s.exists()?s.data():NORM_MISS);}catch(_){_studentNormCache.set(snk,NORM_MISS);}}
-            const snd=_studentNormCache.get(snk);if(snd!==NORM_MISS){return set(_applyThresholds(snd,value));}
+
+    function _applyThresholds(thresholds, lowerIsBetter, value) {
+        if (!thresholds) return null;
+        if (lowerIsBetter) {
+            if (value <= thresholds.Excellent) return 'Excellent';
+            if (value <= thresholds.Good) return 'Good';
+            if (value <= thresholds.Average) return 'Average';
+            if (value <= thresholds['Below Average']) return 'Below Average';
+            return 'Poor';
+        } else {
+            if (value >= thresholds.Excellent) return 'Excellent';
+            if (value >= thresholds.Good) return 'Good';
+            if (value >= thresholds.Average) return 'Average';
+            if (value >= thresholds['Below Average']) return 'Below Average';
+            return 'Poor';
         }
-        // 2. Test-level norms
-        if(testId){try{const s=await getDoc(doc(db,'scheduledTestNorms',testId,'tests',testKey));if(s.exists())return set(_applyThresholds(s.data(),value));}catch(_){}}
-        // 3. Default fitnessNorms (shared cache)
-        const nk=`${testKey}_${gender}_${ageGroup}`;
-        if(!_defaultNormCache.has(nk)){try{const s=await getDoc(doc(db,'fitnessNorms',nk));_defaultNormCache.set(nk,s.exists()?s.data():null);}catch(_){_defaultNormCache.set(nk,null);}}
-        const cached=_defaultNormCache.get(nk);if(cached)return set(_applyThresholds(cached,value));
-        // 4. Fallback
-        try{const r=await getNormCategory(db,{testName,result:rawResult,studentEmail:studentEmail||'',gender:studentGender||'male',age:studentAge});if(r?.category)return set(r.category);}catch(_){}
+    }
+
+ async function classifyResult(testName, rawResult, testId, studentEmail, studentGender, studentAge) {
+    if(!testName) return 'Average';
+    const testKey = resolveTestKey(testName); 
+    if(!testKey) return 'Average';
+    
+    const gender = _genderKey(studentGender);
+    const ageGroup = _ageGroup(studentAge);
+    const value = typeof rawResult === 'number' ? rawResult : extractNumericResult(rawResult);
+    
+    // SAFE CACHE KEY GENERATION - handle undefined/null values
+    const safeEmail = studentEmail || 'no-email';
+    const safeTestId = testId || 'no-testid';
+    const ck = `${safeEmail}|${testKey}|${gender}|${ageGroup}|${safeTestId}`;
+    
+    if(_classifyCache.has(ck)) return _classifyCache.get(ck);
+    
+    const set = cat => { _classifyCache.set(ck, cat); return cat; };
+    
+    console.log(`🔍 Classifying: ${testName} (${testKey}) - Value: ${value} - Student: ${safeEmail}`);
+    
+    // Check if this is a skinfold test
+    const isSkinfoldTest = testName.toLowerCase().includes('skinfold') || 
+                          testName.toLowerCase().includes('body fat') || 
+                          testName.toLowerCase().includes('caliper') ||
+                          testName.toLowerCase().includes('body composition');
+    
+    if (isSkinfoldTest) {
+        // For skinfold, we need to parse the category from the result string
+        const resultStr = String(rawResult || '').toLowerCase();
+        if (resultStr.includes('lean')) return set('Lean');
+        if (resultStr.includes('essential')) return set('Essential Fat');
+        if (resultStr.includes('athletic')) return set('Athletic');
+        if (resultStr.includes('fitness')) return set('Fitness');
+        if (resultStr.includes('overfat')) return set('Overfat');
+        if (resultStr.includes('obese')) return set('Obese');
+        
+        // If no category in string, try to parse as body fat percentage
+        if (!isNaN(value)) {
+            if (gender === 'female') {
+                if (value < 14) return set('Essential Fat');
+                if (value < 21) return set('Athletic');
+                if (value < 25) return set('Fitness');
+                if (value < 32) return set('Average');
+                if (value < 39) return set('Overfat');
+                return set('Obese');
+            } else {
+                if (value < 6) return set('Essential Fat');
+                if (value < 14) return set('Athletic');
+                if (value < 18) return set('Fitness');
+                if (value < 25) return set('Average');
+                if (value < 30) return set('Overfat');
+                return set('Obese');
+            }
+        }
         return set('Average');
     }
+    
+    // 1. Student-specific norms - with safe email check
+    if (safeEmail !== 'no-email') {
+        const snk = `${safeEmail}|${testKey}`;
+        if (!_studentNormCache.has(snk)) {
+            try {
+                const s = await getDoc(doc(db, 'studentNorms', safeEmail, 'tests', testKey));
+                _studentNormCache.set(snk, s.exists() ? s.data() : NORM_MISS);
+            } catch(_) { _studentNormCache.set(snk, NORM_MISS); }
+        }
+        const snd = _studentNormCache.get(snk);
+        if (snd !== NORM_MISS && snd.thresholds) {
+            const cat = _applyThresholds(snd.thresholds, snd.lowerIsBetter || false, value);
+            if (cat) return set(cat);
+        }
+    }
+    
+    // 2. Test-level norms - with safe testId check
+    if (safeTestId !== 'no-testid') {
+        try {
+            const s = await getDoc(doc(db, 'scheduledTestNorms', safeTestId, 'tests', testKey));
+            if (s.exists() && s.data().thresholds) {
+                const cat = _applyThresholds(s.data().thresholds, s.data().lowerIsBetter || false, value);
+                if (cat) return set(cat);
+            }
+            const testDoc = await getDoc(doc(db, 'scheduledTests', safeTestId));
+            if (testDoc.exists() && testDoc.data().customNorms?.thresholds) {
+                const cat = _applyThresholds(
+                    testDoc.data().customNorms.thresholds, 
+                    testDoc.data().customNorms.lowerIsBetter || false, 
+                    value
+                );
+                if (cat) return set(cat);
+            }
+        } catch(_) {}
+    }
+    
+    // 3. Default fitnessNorms
+    const nk = `${testKey}_${gender}_${ageGroup}`;
+    if (!_defaultNormCache.has(nk)) {
+        try {
+            const s = await getDoc(doc(db, 'fitnessNorms', nk));
+            _defaultNormCache.set(nk, s.exists() ? s.data() : null);
+        } catch(_) { _defaultNormCache.set(nk, null); }
+    }
+    const cached = _defaultNormCache.get(nk);
+    if (cached && cached.thresholds) {
+        const cat = _applyThresholds(cached.thresholds, cached.lowerIsBetter || false, value);
+        if (cat) return set(cat);
+    }
+    
+    return set('Average');
+}
     function extractDisplayResult(d){
-        if(d.result!=null){if(typeof d.result==='string'||typeof d.result==='number')return String(d.result);if(typeof d.result==='object')return String(d.result.value||d.result.repetitions||d.result.time||d.result.distance||'-');}
-        if(d.resultData){if(typeof d.resultData==='object')return String(d.resultData.value||d.resultData.repetitions||d.resultData.time||'-');return String(d.resultData);}
-        if(d.repetitions!=null)return String(d.repetitions);return'-';
+        if(d.result != null){
+            if(typeof d.result === 'string' || typeof d.result === 'number') return String(d.result);
+            if(typeof d.result === 'object') return String(d.result.value || d.result.repetitions || d.result.time || d.result.distance || '-');
+        }
+        if(d.resultData){
+            if(typeof d.resultData === 'object') return String(d.resultData.value || d.resultData.repetitions || d.resultData.time || '-');
+            return String(d.resultData);
+        }
+        if(d.repetitions != null) return String(d.repetitions);
+        return '-';
     }
 
     const _loadingTimeout=setTimeout(()=>{document.getElementById('loadingScreen').style.display='none';document.getElementById('mainContent').style.display='block';},1500);
+    
     let _authUnsub=onAuthStateChanged(auth,async user=>{
         if(!user){clearTimeout(_loadingTimeout);window.location.href='/login/index.html';return;}
         try{
@@ -524,12 +664,14 @@
             clearTimeout(_loadingTimeout);
             document.getElementById('loadingScreen').style.display='none';
             document.getElementById('mainContent').style.display='block';
-            await loadProfessorData(user);setupUI(user);
+            await loadProfessorData(user);
+            setupUI(user);
             await loadAssignedSections();
             await loadGrades();
             buildFinalGrades();
         }catch(err){console.error(err);window.showAlert('Error loading grades: '+err.message,'error');}
     });
+    
     function _cleanup(){if(_authUnsub){try{_authUnsub();}catch(_){}_authUnsub=null;}}
     window.addEventListener('pagehide',_cleanup);window.addEventListener('beforeunload',_cleanup);
 
@@ -541,12 +683,18 @@
         if(!q2.empty){currentProfessor={id:q2.docs[0].id,...q2.docs[0].data()};return;}
         currentProfessor={name:user.displayName||'Professor',email:user.email};
     }
+    
     function setupUI(user){
         const dn=user.displayName||currentProfessor.fullName||currentProfessor.name||'Professor';
-        const email=currentProfessor.email||user.email;const init=dn.charAt(0).toUpperCase();const photo=user.photoURL||null;
-        document.getElementById('headerName').textContent=dn;document.getElementById('dropdownName').textContent=dn;document.getElementById('dropdownEmail').textContent=email;
+        const email=currentProfessor.email||user.email;
+        const init=dn.charAt(0).toUpperCase();
+        const photo=user.photoURL||null;
+        document.getElementById('headerName').textContent=dn;
+        document.getElementById('dropdownName').textContent=dn;
+        document.getElementById('dropdownEmail').textContent=email;
         const setAv=(el,src,i)=>{if(!el)return;el.innerHTML=src?`<img src="${esc(src)}" class="w-full h-full object-cover rounded-full" alt="">`:esc(i);};
-        setAv(document.getElementById('profileAvatarSmall'),photo,init);setAv(document.getElementById('profileDropdownAvatar'),photo,init);
+        setAv(document.getElementById('profileAvatarSmall'),photo,init);
+        setAv(document.getElementById('profileDropdownAvatar'),photo,init);
     }
 
     async function loadAssignedSections(){
@@ -559,107 +707,185 @@
         fq.push(getDocs(query(collection(db,'sections'),where('professorEmail','==',profEmail))));
         const results=await Promise.all(fq);
         results.forEach(snap=>snap.forEach(d=>{const n=d.data().name;if(!n||addedNames.has(n))return;addedNames.add(n);assignedSections.push({id:d.id,section:n});}));
+        
         if(!assignedSections.length){
-            const nv=new Set();['fullName','name','displayName'].forEach(f=>{if(currentProfessor[f])nv.add(currentProfessor[f].toUpperCase().trim());});
+            const nv=new Set();
+            ['fullName','name','displayName'].forEach(f=>{if(currentProfessor[f])nv.add(currentProfessor[f].toUpperCase().trim());});
             if(currentUser.displayName)nv.add(currentUser.displayName.toUpperCase().trim());
-            nv.add(profEmail.split('@')[0].toUpperCase().trim());nv.delete('');
-            const nt=new Set();nv.forEach(n=>n.split(/[\s,\.]+/).forEach(w=>{if(w.length>=3)nt.add(w);}));
+            nv.add(profEmail.split('@')[0].toUpperCase().trim());
+            nv.delete('');
+            const nt=new Set();
+            nv.forEach(n=>n.split(/[\s,\.]+/).forEach(w=>{if(w.length>=3)nt.add(w);}));
             const secSnap=await getDocs(collection(db,'sections'));
             secSnap.forEach(d=>{const data=d.data();const dbProf=(data.professor||'').toString().trim().toUpperCase();if(!data.name||addedNames.has(data.name))return;let m=false;for(const v of nv){if(v.length>=3&&(dbProf===v||dbProf.includes(v)||v.includes(dbProf))){m=true;break;}}if(!m){const dw=dbProf.split(/[\s,\.]+/).filter(w=>w.length>=3);for(const w of dw){if(nt.has(w)){m=true;break;}}}if(m){addedNames.add(data.name);assignedSections.push({id:d.id,section:data.name});}});
         }
-        const sel=document.getElementById('filterSection');sel.innerHTML='<option value="">All Sections</option>';
+        
+        const sel=document.getElementById('filterSection');
+        sel.innerHTML='<option value="">All Sections</option>';
         assignedSections.forEach(s=>{const o=document.createElement('option');o.value=s.section;o.textContent=s.section;sel.appendChild(o);});
     }
 
     async function loadGrades(){
         if(!assignedSections.length)return;
         const sectionNames=assignedSections.map(s=>s.section);
-        // 1. Load students in batched IN query
+        
+        // Load students
         const studentsMap=new Map();
-        const sc30=[];for(let i=0;i<sectionNames.length;i+=30)sc30.push(sectionNames.slice(i,i+30));
+        const sc30=[];
+        for(let i=0;i<sectionNames.length;i+=30)sc30.push(sectionNames.slice(i,i+30));
         await Promise.all(sc30.map(chunk=>getDocs(query(collection(db,'students'),where('section','in',chunk))).then(snap=>snap.forEach(d=>{const sd=d.data();if(sd.email)studentsMap.set(sd.email,sd);})).catch(()=>{})));
         if(!studentsMap.size){try{const all=await getDocs(collection(db,'students'));all.forEach(d=>{const sd=d.data();if(sd.email)studentsMap.set(sd.email,sd);});}catch(e){console.error(e);}}
-        // 2. Load testResults in batched IN query (max 10 per call)
-        const allDocs=[];const sc10=[];for(let i=0;i<sectionNames.length;i+=10)sc10.push(sectionNames.slice(i,i+10));
+        
+        // Load test results
+        const allDocs=[];
+        const sc10=[];
+        for(let i=0;i<sectionNames.length;i+=10)sc10.push(sectionNames.slice(i,i+10));
         await Promise.all(sc10.map(chunk=>getDocs(query(collection(db,'testResults'),where('section','in',chunk),where('status','==','completed'))).then(snap=>snap.forEach(d=>allDocs.push(d))).catch(e=>console.error('testResults batch error:',e))));
-        // 3. Deduplicate
-        const seen=new Set();const unique=allDocs.filter(d=>{if(seen.has(d.id))return false;seen.add(d.id);return true;});
-        // 4. Classify best per student+test
-       // 4. Classify ALL attempts per student+test (keep all, mark best later)
-        const allAttempts=[];
-        const bestPerTest=new Map(); // mk → best entry (for overall calculation)
+        
+        // Deduplicate
+        const seen=new Set();
+        const unique=allDocs.filter(d=>{if(seen.has(d.id))return false;seen.add(d.id);return true;});
+        
+        // Group by student+testId
+        const attemptsByStudentTest = new Map();
+        
         for(const ds of unique){
-            const data=ds.data();const se=data.studentEmail||'';if(!se)continue;
-            const testId=data.testId||ds.id;const testName=data.testName||'Unknown Activity';
-            const mk=`${se}_${testId}`;const student=studentsMap.get(se);
-            const sa=_studentAge(student);const sg=student?.gender||data.gender||'male';
-            const isSkinfold=(testName||'').toLowerCase().includes('skinfold');
-            let cat;
-            if(isSkinfold){
-                // Skinfold: use body composition categories from result string or stored value
-                const stored=data.score||data.category;
-                const BODY_CATS=new Set(['Lean','Essential Fat','Athletic','Fitness','Average','Overfat','Obese']);
-                if(stored&&BODY_CATS.has(stored)){cat=stored;}
-                else{
-                    // Try to extract from result string
-                    const rawStr=String(data.result||data.resultData||'').toLowerCase();
-                    if(rawStr.includes('lean'))cat='Lean';
-                    else if(rawStr.includes('essential'))cat='Essential Fat';
-                    else if(rawStr.includes('athletic'))cat='Athletic';
-                    else if(rawStr.includes('fitness'))cat='Fitness';
-                    else if(rawStr.includes('overfat'))cat='Overfat';
-                    else if(rawStr.includes('obese'))cat='Obese';
-                    else{
-                        // Classify by body fat % and gender
-                        const pct=parseFloat(String(data.result||data.resultData||''));
-                        const isFemale=sg==='female';
-                        if(!isNaN(pct)){
-                            if(isFemale){cat=pct<14?'Essential Fat':pct<21?'Athletic':pct<25?'Fitness':pct<32?'Average':pct<39?'Overfat':'Obese';}
-                            else{cat=pct<6?'Essential Fat':pct<14?'Athletic':pct<18?'Fitness':pct<25?'Average':pct<30?'Overfat':'Obese';}
-                        }else{cat='Average';}
-                    }
-                }
-            }else{
-                const stored=data.score||data.category;
-                cat=stored&&['Excellent','Good','Average','Below Average','Poor'].includes(stored)?stored:await classifyResult(testName,data.result??data.resultData??data.repetitions??data,testId,se,sg,sa);
-            }
+            const data=ds.data();
+            const se=data.studentEmail||'';
+            if(!se)continue;
+            const testId=data.testId||ds.id;
+            const testName=data.testName||'Unknown Activity';
+            const key = `${se}_${testId}`;
+            const student=studentsMap.get(se);
+            const sa=_studentAge(student);
+            const sg=student?.gender||data.gender||'male';
+            let attemptNum = data.attemptNumber || 1;
+            
+  // In the loadGrades function, find this section:
+let cat;
+
+// Check if we have a stored score/category
+const stored = data.score || data.category;
+const VALID_CATS = ['Excellent','Good','Average','Below Average','Poor'];
+
+if (stored && VALID_CATS.includes(stored)) {
+    cat = stored;
+} else {
+    // SAFELY PASS ALL PARAMETERS
+    cat = await classifyResult(
+        testName || 'Unknown Activity', 
+        data.result ?? data.resultData ?? data.repetitions ?? data, 
+        testId || ds.id, 
+        se || 'unknown-email',  // Provide default if undefined
+        student?.gender || data.gender || 'male', 
+        sa || 20
+    );
+}
+            
             let sd2=new Date();
             if(data.submittedAt){if(typeof data.submittedAt.toDate==='function')sd2=data.submittedAt.toDate();else if(data.submittedAt.seconds)sd2=new Date(data.submittedAt.seconds*1000);else if(typeof data.submittedAt==='string')sd2=new Date(data.submittedAt);}
-            const entry={id:ds.id,studentName:data.studentName||'Unknown',section:data.section||'',testName,result:extractDisplayResult(data),category:cat,date:sd2.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),dateObject:sd2,studentEmail:se,isSkinfold};
-            allAttempts.push(entry);
-            // Track best per test (for overall — skip skinfold)
-            if(!isSkinfold){
-                const cs=CATEGORY_ORDER[cat]||3;
-                const ex=bestPerTest.get(mk);
-                if(!ex||cs>(CATEGORY_ORDER[ex.category]||0))bestPerTest.set(mk,entry);
-            }
+            
+            const entry={
+                id:ds.id,
+                studentName:data.studentName||'Unknown',
+                section:data.section||'',
+                testId: testId,
+                testName,
+                result:extractDisplayResult(data),
+                category:cat,
+                date:sd2.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),
+                dateObject:sd2,
+                studentEmail:se,
+                isSkinfold: SKINFOLD_CATS.has(cat) || testName.toLowerCase().includes('skinfold'),
+                attemptNum
+            };
+            
+            if(!attemptsByStudentTest.has(key)) attemptsByStudentTest.set(key, []);
+            attemptsByStudentTest.get(key).push(entry);
         }
-        // Store ALL attempts; _bestGrades used for overall category calculation only
-        window._rawGrades=allAttempts.sort((a,b)=>b.dateObject-a.dateObject);
-        window._bestGrades=Array.from(bestPerTest.values());
+        
+        // Determine best attempt per student+test (for non-skinfold only)
+        const bestPerTest=new Map();
+        const allAttempts = [];
+        
+        for(const [key, attempts] of attemptsByStudentTest.entries()){
+            attempts.sort((a, b) => a.attemptNum - b.attemptNum);
+            allAttempts.push(...attempts);
+            
+            // Skip skinfold for best calculation
+            if(attempts[0].isSkinfold) continue;
+            
+            // Find best attempt based on category order
+            let best = attempts[0];
+            let bestScore = CATEGORY_ORDER[best.category] || 0;
+            
+            for(let i=1; i<attempts.length; i++){
+                const score = CATEGORY_ORDER[attempts[i].category] || 0;
+                if(score > bestScore){
+                    best = attempts[i];
+                    bestScore = score;
+                }
+            }
+            bestPerTest.set(key, best);
+        }
+        
+        window._rawGrades = allAttempts.sort((a,b)=>b.dateObject-a.dateObject);
+        window._bestGrades = Array.from(bestPerTest.values());
     }
 
     function buildFinalGrades(){
         const map={};
         const allRaw=window._rawGrades||[];
         const bestOnly=window._bestGrades||[];
-        // Build instances from ALL attempts (for activity history display)
+        
+        // Group by student
         allRaw.forEach(g=>{
-            const key=g.studentEmail||`${g.studentName}_${g.section}`.toLowerCase();
-            if(!map[key])map[key]={key,name:g.studentName,section:g.section,email:g.studentEmail,categories:[],instances:[]};
-            map[key].instances.push({name:g.testName,date:g.date,dateObject:g.dateObject,result:g.result,category:g.category,isSkinfold:g.isSkinfold});
+            const key=g.studentEmail || `${g.studentName}_${g.section}`.toLowerCase();
+            if(!map[key])map[key]={key,name:g.studentName,section:g.section,email:g.studentEmail,categories:[],instances:[],uniqueTests:new Set()};
+            
+            map[key].instances.push({
+                name:g.testName,
+                date:g.date,
+                dateObject:g.dateObject,
+                result:g.result,
+                category:g.category,
+                isSkinfold:g.isSkinfold,
+                attemptNum:g.attemptNum,
+                testId:g.testId
+            });
+            
+            // Track unique tests by testId
+            if(g.testId) {
+                map[key].uniqueTests.add(g.testId);
+            } else {
+                map[key].uniqueTests.add(`${g.testName}_${g.section}`);
+            }
         });
-        // Build overall category from BEST non-skinfold attempts only
+        
+        // Build overall category from BEST non-skinfold attempts
         bestOnly.forEach(g=>{
             const key=g.studentEmail||`${g.studentName}_${g.section}`.toLowerCase();
-            if(!map[key])map[key]={key,name:g.studentName,section:g.section,email:g.studentEmail,categories:[],instances:[]};
+            if(!map[key])map[key]={key,name:g.studentName,section:g.section,email:g.studentEmail,categories:[],instances:[],uniqueTests:new Set()};
             map[key].categories.push(g.category);
         });
+        
         currentFinalGrades=Object.values(map).map(s=>{
-            const overall=s.categories.length?getOverallCategory(s.categories):'No Grades';
-            return{...s,overallCategory:overall,overallScore:CATEGORY_ORDER[overall]||0,totalActivities:s.instances.length};
+            const overall=s.categories.length ? getOverallCategory(s.categories) : 'No Grades';
+            const totalUniqueTests = s.uniqueTests.size;
+            
+            console.log(`Student ${s.name}: ${s.instances.length} total attempts, ${totalUniqueTests} unique tests`);
+            
+            return {
+                ...s, 
+                overallCategory:overall,
+                overallScore:CATEGORY_ORDER[overall]||0,
+                totalActivities: totalUniqueTests
+            };
         }).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
-        filteredFinalGrades=[...currentFinalGrades];renderTable(filteredFinalGrades);updateStats(filteredFinalGrades);
+        
+        filteredFinalGrades=[...currentFinalGrades];
+        renderTable(filteredFinalGrades);
+        updateStats(filteredFinalGrades);
     }
 
     function renderTable(grades){
@@ -691,69 +917,171 @@
         document.getElementById('statTotal').textContent=total;document.getElementById('statExcellent').textContent=exc;document.getElementById('statGood').textContent=gd;document.getElementById('statMostCommon').textContent=mc;
     }
 
-    window.showDetail=function(key){
-        const g=currentFinalGrades.find(x=>x.key===key);if(!g)return;
-        const SKINFOLD_CATS=new Set(['Lean','Essential Fat','Athletic','Fitness','Overfat','Obese']);
-        document.getElementById('detailAvatar').textContent=(g.name||'?').charAt(0).toUpperCase();
-        document.getElementById('detailStudentName').textContent=g.name||'Student';
-        document.getElementById('detailStudentSection').textContent=`Section: ${g.section} • ${g.email||''}`;
-        document.getElementById('detailTotalAct').textContent=g.totalActivities;
-        document.getElementById('detailAvgCategory').innerHTML=renderCategoryBadge(g.overallCategory);
-        const cc={Excellent:'linear-gradient(135deg,#0e8a5f,#0a6646)',Good:'linear-gradient(135deg,#2d6fc4,#1e4d8c)',Average:'linear-gradient(135deg,#b07e16,#8a6010)','Below Average':'linear-gradient(135deg,#ea580c,#c2410c)',Poor:'linear-gradient(135deg,#c0392b,#922b21)','No Grades':'linear-gradient(135deg,#64748b,#475569)'};
-        document.getElementById('detailStatusCard').style.background=cc[g.overallCategory]||cc.Average;
-        document.getElementById('detailStatusText').textContent=g.overallCategory;
-        // Build best-per-test map (excluding skinfold from "best" logic for non-skinfold tests)
-        const bestMap={};
-        g.instances.forEach(act=>{
-            const isSkinfold=act.isSkinfold||((act.name||'').toLowerCase().includes('skinfold'))||SKINFOLD_CATS.has(act.category);
-            if(isSkinfold)return; // skinfold never gets "best" star
-            const mk=act.name;
-            if(!bestMap[mk]){bestMap[mk]={...act};}
-            else{
-                const ps=CATEGORY_ORDER[bestMap[mk].category]||0;
-                const cs=CATEGORY_ORDER[act.category]||0;
-                if(cs>ps)bestMap[mk]={...act};
+    window.showDetail = function(key) {
+        const g = currentFinalGrades.find(x => x.key === key);
+        if (!g) return;
+        
+        // Update modal header
+        document.getElementById('detailAvatar').textContent = (g.name || '?').charAt(0).toUpperCase();
+        document.getElementById('detailStudentName').textContent = g.name || 'Student';
+        document.getElementById('detailStudentSection').textContent = `Section: ${g.section} • ${g.email || ''}`;
+        document.getElementById('detailTotalAct').textContent = g.totalActivities;
+        document.getElementById('detailAvgCategory').innerHTML = renderCategoryBadge(g.overallCategory);
+        
+        // Update status card
+        const cc = {
+            Excellent: 'linear-gradient(135deg,#0e8a5f,#0a6646)',
+            Good: 'linear-gradient(135deg,#2d6fc4,#1e4d8c)',
+            Average: 'linear-gradient(135deg,#b07e16,#8a6010)',
+            'Below Average': 'linear-gradient(135deg,#ea580c,#c2410c)',
+            Poor: 'linear-gradient(135deg,#c0392b,#922b21)',
+            'No Grades': 'linear-gradient(135deg,#64748b,#475569)'
+        };
+        document.getElementById('detailStatusCard').style.background = cc[g.overallCategory] || cc.Average;
+        document.getElementById('detailStatusText').textContent = g.overallCategory;
+        
+        // Group instances by testId
+        const instancesByTestId = {};
+        g.instances.forEach(act => {
+            const testId = act.testId || act.name;
+            if (!instancesByTestId[testId]) instancesByTestId[testId] = [];
+            instancesByTestId[testId].push(act);
+        });
+        
+        // Sort each test's attempts by attempt number
+        Object.values(instancesByTestId).forEach(attempts => {
+            attempts.sort((a, b) => (a.attemptNum || 1) - (b.attemptNum || 1));
+        });
+        
+        // Flatten back to array
+        const sortedInstances = [];
+        Object.entries(instancesByTestId).forEach(([testId, attempts]) => {
+            sortedInstances.push(...attempts);
+            sortedInstances.push({ isSpacer: true, testId });
+        });
+        if (sortedInstances.length > 0 && sortedInstances[sortedInstances.length - 1].isSpacer) {
+            sortedInstances.pop();
+        }
+        
+        // Build best-per-test map
+        const bestMap = {};
+        g.instances.forEach(act => {
+            const isSkinfold = act.isSkinfold || SKINFOLD_CATS.has(act.category);
+            if (isSkinfold) return;
+            
+            const testId = act.testId || act.name;
+            if (!bestMap[testId]) {
+                bestMap[testId] = { ...act };
+            } else {
+                const ps = CATEGORY_ORDER[bestMap[testId].category] || 0;
+                const cs = CATEGORY_ORDER[act.category] || 0;
+                if (cs > ps) bestMap[testId] = { ...act };
             }
         });
-        // Mark best attempts in full list
-        const sorted=[...g.instances].sort((a,b)=>new Date(b.date)-new Date(a.date));
-        const attemptCount={};
-        const sortedWithAttempt=sorted.map(act=>{
-            const mk=act.name;
-            if(!attemptCount[mk])attemptCount[mk]=0;
-            attemptCount[mk]++;
-            const attemptNum=attemptCount[mk];
-            const isSkinfold=(act.name||'').toLowerCase().includes('skinfold')||SKINFOLD_CATS.has(act.category);
-           const isBest=!act.isSkinfold&&bestMap[mk]&&bestMap[mk].dateObject&&act.dateObject&&bestMap[mk].dateObject.getTime()===act.dateObject.getTime()&&bestMap[mk].result===act.result;
-            return{...act,attemptNum,isSkinfold,isBest};
+        
+        // Render the table
+        let currentTestName = '';
+        let tableHtml = '';
+        
+        sortedInstances.forEach(act => {
+            if (act.isSpacer) {
+                tableHtml += `
+                    <tr style="background: #f8fafc;">
+                        <td colspan="4" style="padding: 8px 14px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="height: 1px; flex: 1; background: linear-gradient(90deg, transparent, #cbd5e1, transparent);"></div>
+                                <span style="font-size: 11px; color: #64748b; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">Next Test</span>
+                                <div style="height: 1px; flex: 1; background: linear-gradient(90deg, transparent, #cbd5e1, transparent);"></div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const isSkinfold = act.isSkinfold || SKINFOLD_CATS.has(act.category);
+            const testId = act.testId || act.name;
+            const isBest = !isSkinfold && bestMap[testId] && 
+                          bestMap[testId].dateObject && act.dateObject && 
+                          bestMap[testId].dateObject.getTime() === act.dateObject.getTime() && 
+                          bestMap[testId].result === act.result;
+            
+            currentTestName = act.name;
+            
+            tableHtml += `
+                <tr style="${isBest ? 'background:#f0fdf4;' : ''}">
+                    <td style="color:#64748b; vertical-align: top; padding: 16px 14px;">
+                        ${esc(act.date || '—')}
+                    </td>
+                    <td style="font-weight:600; color:#0a1628; vertical-align: top; padding: 16px 14px;">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <span style="font-size: 14px;">${esc(act.name)}</span>
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #f1f5f9; border-radius: 12px; font-size: 11px; color: #475569;">
+                                    <i class="fas fa-redo-alt" style="font-size: 9px;"></i>
+                                    Take ${act.attemptNum || 1}
+                                </span>
+                                ${isBest ? `
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #d1fae5; border-radius: 12px; font-size: 11px; color: #065f46; font-weight: 600;">
+                                        <i class="fas fa-star" style="font-size: 9px;"></i>
+                                        Best Attempt
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-family: monospace; vertical-align: top; padding: 16px 14px;">
+                        <span style="display: inline-block; padding: 4px 8px; background: #f8fafc; border-radius: 6px; font-size: 13px;">
+                            ${esc(String(act.result ?? '—'))}
+                        </span>
+                    </td>
+                    <td style="vertical-align: top; padding: 16px 14px;">
+                        ${renderCategoryBadge(act.category)}
+                    </td>
+                </tr>
+            `;
         });
-        document.getElementById('detailTableBody').innerHTML=sortedWithAttempt.map(act=>`
-            <tr style="${act.isBest?'background:#f0fdf4;':''}">
-                <td style="color:#64748b;">${esc(act.date||'—')}</td>
-                <td style="font-weight:600;color:#0a1628;">${esc(act.name)}<br><small style="color:#94a3b8;font-weight:400;">Attempt ${act.attemptNum}</small></td>
-                <td style="font-family:monospace;">${esc(String(act.result??'—'))}</td>
-                <td>${renderCategoryBadge(act.category)}${act.isBest&&!act.isSkinfold?'<br><small style="color:#059669;font-weight:700;font-size:10px;">★ Best</small>':''}</td>
-            </tr>`).join('');
+        
+        if (!tableHtml) {
+            tableHtml = `
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+                        <i class="fas fa-clipboard-list" style="font-size: 32px; margin-bottom: 12px; opacity: 0.5;"></i>
+                        <div style="font-size: 14px;">No activity history available</div>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        document.getElementById('detailTableBody').innerHTML = tableHtml;
         document.getElementById('studentDetailModal').classList.add('open');
     };
 
-   window.applyFilters=function(){
+    window.applyFilters=function(){
         const sec=document.getElementById('filterSection').value,cf=document.getElementById('filterCategory').value,sort=document.getElementById('sortBy').value;
         let filtered=[...currentFinalGrades];
-        if(sec)filtered=filtered.filter(g=>g.section===sec);if(cf)filtered=filtered.filter(g=>g.overallCategory===cf);
+        if(sec)filtered=filtered.filter(g=>g.section===sec);
+        if(cf)filtered=filtered.filter(g=>g.overallCategory===cf);
+        
         if(sort==='best')filtered.sort((a,b)=>b.overallScore-a.overallScore);
         else if(sort==='worst')filtered.sort((a,b)=>a.overallScore-b.overallScore);
         else if(sort==='name-desc')filtered.sort((a,b)=>(b.name||'').localeCompare(a.name||''));
         else filtered.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
-        filteredFinalGrades=filtered;renderTable(filtered);updateStats(filtered);
+        
+        filteredFinalGrades=filtered;
+        renderTable(filtered);
+        updateStats(filtered);
     };
 
     window.recalculateGrades=async function(){
         document.getElementById('tableLoading').style.display='flex';
         document.getElementById('tableWrapper').classList.add('hidden');
         document.getElementById('tableEmpty').classList.add('hidden');
-        _classifyCache.clear();_defaultNormCache.clear();_studentNormCache.clear();
-        await loadGrades();buildFinalGrades();
+        _classifyCache.clear();
+        _defaultNormCache.clear();
+        _studentNormCache.clear();
+        await loadGrades();
+        buildFinalGrades();
         window.showAlert(`Recalculated grades for ${currentFinalGrades.length} students.`,'success','Done');
     };
 
@@ -776,6 +1104,7 @@
         overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
         document.getElementById('logoutConfirmBtn').onclick=async()=>{const btn=document.getElementById('logoutConfirmBtn');btn.textContent='Logging out...';btn.disabled=true;btn.style.opacity='0.7';try{_cleanup();await signOut(auth);window.location.href='/login/index.html';}catch(err){console.error(err);overlay.remove();alert('Error logging out.');}};
     }
+    
     window.handleLogout=async function(e){if(e){e.preventDefault();e.stopPropagation();}showLogoutConfirmPopup();};
 </script>
 </body>
