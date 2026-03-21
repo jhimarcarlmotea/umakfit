@@ -66,10 +66,10 @@
 </head>
 <body class="bg-gray-50">
     <!-- Loading Screen -->
-    <div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
-        <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
-        <div class="spinner"></div>
-        <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Performance...</div>
+    <div id="loadingScreen" class="loading">
+        <div class="loading-logo">UMakFit</div>
+        <div class="loading-sub">Student Portal</div>
+        <div class="loading-spinner"></div>
     </div>
 
     <div id="mainContent" class="hidden">
@@ -957,9 +957,49 @@ function processAndRender(rawResults, assignedCount) {
                 const btn = document.getElementById('logoutConfirmBtn');
                 btn.textContent = 'Logging out...'; btn.disabled = true; btn.style.opacity = '0.7';
                 try { await signOut(auth); window.location.href = '../login/index.html'; }
-                catch (_) { overlay.remove(); alert('Error logging out. Please try again.'); }
+                catch (_) { overlay.remove(); showErrorPopup('Error logging out. Please try again.', 'Logout Failed'); }
             });
         };
+
+        // Generic popup (replaces browser alert)
+        function showErrorPopup(message, title = 'Error', onOk = null) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:1rem;';
+
+            const card = document.createElement('div');
+            card.style.cssText = 'background:#fff;border-radius:16px;max-width:420px;width:100%;box-shadow:0 8px 30px rgba(0,0,0,0.25);overflow:hidden;font-family:Inter,sans-serif;';
+            card.innerHTML = `
+                <div style="background:#dc2626;color:#fff;padding:14px 16px;font-weight:700;display:flex;justify-content:space-between;align-items:center;">
+                    <span>${title}</span>
+                    <button aria-label="Close" style="border:0;background:transparent;color:#fff;font-size:20px;cursor:pointer;line-height:1;">&times;</button>
+                </div>
+                <div style="padding:14px 16px;color:#111827;font-size:14.5px;white-space:pre-wrap;" class="errPopupMsg"></div>
+                <div style="padding:0 16px 16px;display:flex;justify-content:flex-end;">
+                    <button style="padding:9px 14px;border-radius:10px;border:1px solid #dc2626;background:#fff;color:#dc2626;font-weight:600;cursor:pointer;">OK</button>
+                </div>
+            `;
+            card.querySelector('.errPopupMsg').textContent = message;
+
+            const closeBtn = card.querySelector('button[aria-label="Close"]');
+            const okBtn = card.querySelector('button:last-of-type');
+            const close = () => overlay.remove();
+
+            closeBtn.addEventListener('click', close);
+            okBtn.addEventListener('click', async () => {
+                close();
+                if (typeof onOk === 'function') {
+                    try { await onOk(); } catch (e) { console.error('onOk error:', e); }
+                }
+            });
+            // If onOk is provided (e.g., restriction), require clicking OK (no outside-close).
+            overlay.addEventListener('click', (e) => {
+                if (e.target !== overlay) return;
+                if (typeof onOk !== 'function') close();
+            });
+
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+        }
     </script>
 </body>
 </html>

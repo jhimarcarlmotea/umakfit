@@ -41,14 +41,48 @@
         .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.5); z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
         .drawer-overlay.active { opacity: 1; visibility: visible; }
         @media (max-width: 1023px) { .hamburger { display: flex; } }
+
+        /* ─── LOADING (Dean-style, consistent) ─── */
+        .loading {
+            position: fixed;
+            inset: 0;
+            background: #0a1628;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            z-index: 9999;
+        }
+        .loading-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: #c8a84b;
+            letter-spacing: 2px;
+        }
+        .loading-sub {
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        .loading-spinner {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 3px solid rgba(200,168,75,0.2);
+            border-top-color: #c8a84b;
+            animation: spin 0.9s linear infinite;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
 
-<div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
-    <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
-    <div class="spinner"></div>
-    <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Achievements...</div>
+<div id="loadingScreen" class="loading">
+    <div class="loading-logo">UMakFit</div>
+    <div class="loading-sub">Student Portal</div>
+    <div class="loading-spinner"></div>
 </div>
 
 <div id="confettiContainer" class="fixed inset-0 pointer-events-none z-40"></div>
@@ -911,7 +945,7 @@ window.handleLogout = function() {
         const btn = document.getElementById('logoutConfirmBtn');
         btn.textContent = 'Logging out...'; btn.disabled = true; btn.style.opacity = '0.7';
         try { await signOut(auth); window.location.href = '../login/index.html'; }
-        catch (_) { overlay.remove(); alert('Error logging out. Please try again.'); }
+        catch (_) { overlay.remove(); showErrorPopup('Error logging out. Please try again.', 'Logout Failed'); }
     });
 };
 
@@ -935,9 +969,12 @@ unsubscribeAuth = onAuthStateChanged(auth, async user => {
                 ]);
                 if (studSnap.empty && userDoc.exists() && userDoc.data().role === 'professor') {
                     clearTimeout(loadingTimeout);
-                    alert('Access Denied: This page is for students only');
+                    showErrorPopup(
+                        'Access Denied: This page is for students only',
+                        'Access Denied',
+                        () => { window.location.href = '../login/index.html'; }
+                    );
                     await signOut(auth);
-                    window.location.href = '../login/index.html';
                     return;
                 }
             } catch (_) {}
@@ -959,6 +996,46 @@ unsubscribeAuth = onAuthStateChanged(auth, async user => {
         window.location.href = '../login/index.html';
     }
 });
+
+// Generic popup (replaces browser alert)
+function showErrorPopup(message, title = 'Error', onOk = null) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:1rem;';
+
+    const card = document.createElement('div');
+    card.style.cssText = 'background:#fff;border-radius:16px;max-width:420px;width:100%;box-shadow:0 8px 30px rgba(0,0,0,0.25);overflow:hidden;font-family:Inter,sans-serif;';
+    card.innerHTML = `
+        <div style="background:#dc2626;color:#fff;padding:14px 16px;font-weight:700;display:flex;justify-content:space-between;align-items:center;">
+            <span>${title}</span>
+            <button aria-label="Close" style="border:0;background:transparent;color:#fff;font-size:20px;cursor:pointer;line-height:1;">&times;</button>
+        </div>
+        <div style="padding:14px 16px;color:#111827;font-size:14.5px;white-space:pre-wrap;" class="errPopupMsg"></div>
+        <div style="padding:0 16px 16px;display:flex;justify-content:flex-end;">
+            <button style="padding:9px 14px;border-radius:10px;border:1px solid #dc2626;background:#fff;color:#dc2626;font-weight:600;cursor:pointer;">OK</button>
+        </div>
+    `;
+    card.querySelector('.errPopupMsg').textContent = message;
+
+    const closeBtn = card.querySelector('button[aria-label="Close"]');
+    const okBtn = card.querySelector('button:last-of-type');
+    const close = () => overlay.remove();
+
+    closeBtn.addEventListener('click', close);
+    okBtn.addEventListener('click', async () => {
+        close();
+        if (typeof onOk === 'function') {
+            try { await onOk(); } catch (e) { console.error('onOk error:', e); }
+        }
+    });
+    // If onOk is provided (e.g., restriction), require clicking OK (no outside-close).
+    overlay.addEventListener('click', (e) => {
+        if (e.target !== overlay) return;
+        if (typeof onOk !== 'function') close();
+    });
+
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+}
 
 window.addEventListener('pagehide', () => { if (unsubscribeAuth) unsubscribeAuth(); });
 window.addEventListener('beforeunload', () => { if (unsubscribeAuth) unsubscribeAuth(); });
