@@ -557,39 +557,7 @@
         font-weight: 600;
     }
 
-    /* ─── LOADING (Dean-style, consistent) ─── */
-    .loading {
-        position: fixed;
-        inset: 0;
-        background: #0a1628;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 24px;
-        z-index: 9999;
-    }
-    .loading-logo {
-        font-family: 'Playfair Display', serif;
-        font-size: 32px;
-        font-weight: 800;
-        color: #c8a84b;
-        letter-spacing: 2px;
-    }
-    .loading-sub {
-        color: rgba(255,255,255,0.5);
-        font-size: 14px;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-    }
-    .loading-spinner {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        border: 3px solid rgba(200,168,75,0.2);
-        border-top-color: #c8a84b;
-        animation: spin 0.9s linear infinite;
-    }
+    
 
     .btn-text-one-start {
         position: absolute;
@@ -634,21 +602,7 @@
         transition: none;
     }
 
-    /* Loading Screen */
-    .loading {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.98);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        flex-direction: column;
-        gap: 20px;
-    }
+    .loading-logo-text { font-family: 'Manrope', sans-serif; }
 
     .spinner {
         border: 4px solid #e5e7eb;
@@ -893,10 +847,10 @@
 </head>
 <body>
      <!-- Loading Screen -->
-<div id="loadingScreen" class="loading">
-    <div class="loading-logo">UMakFit</div>
-    <div class="loading-sub">Student Portal</div>
-    <div class="loading-spinner"></div>
+<div id="loadingScreen" style="position:fixed;inset:0;background:rgba(255,255,255,0.98);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;">
+    <img src="UMakfit Logo (2).png" alt="UMakFit Logo" style="height:10rem;width:auto;object-fit:contain;margin-bottom:1rem;animation:pulse 2s infinite;">
+    <div class="spinner"></div>
+    <div style="margin-top:1.25rem;color:#4b5563;font-weight:500;font-size:0.9rem;">Loading Test Details...</div>
 </div>
 
     <div id="mainContent" style="display: none;">
@@ -928,8 +882,7 @@
                             <span class="hidden xl:inline">Lesson</span>
                         </a>
                         <a href="./studentgrades.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
-                            <i class="bi bi-award"></i> 
-                            <span class="hidden xl:inline">Grades</span>
+                            <i class="bi bi-activity"></i><span class="hidden xl:inline">Performance</span>
                         </a>
                         <a href="./progress.html" class="px-3 xl:px-4 py-2.5 xl:py-3 bg-white/20 text-white rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-white/30 transition-all">
                             <i class="bi bi-graph-up"></i> 
@@ -942,32 +895,14 @@
                         
                         <!-- Notification Bell - Desktop -->
                         <div class="relative">
-                            <button id="notificationBellBtn" class="notification-bell-btn">
+                          <button id="notificationBellBtn" class="w-9 h-9 xl:w-10 xl:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
                                 <i class="bi bi-bell-fill text-base xl:text-lg"></i>
-                                <span id="navNotificationCount" class="notification-bell-badge hidden">0</span>
+                                <span id="navNotificationCount" class="notification-badge hidden">0</span>
                             </button>
-                            
-                            <!-- Notification Dropdown - Desktop -->
                             <div id="notificationDropdown" class="notification-dropdown hidden">
-                                <div class="notification-dropdown-header">
-                                    <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
-                                        <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                                    </h6>
-                                    <button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600 p-1 transition-colors">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-                                </div>
-                                <div id="notificationDropdownBody" class="notification-dropdown-body">
-                                    <div class="notification-empty">
-                                        <i class="bi bi-bell-slash"></i>
-                                        <p>No notifications yet</p>
-                                    </div>
-                                </div>
-                                <div class="notification-dropdown-footer">
-                                    <button onclick="window.location.href='./notifications.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
-                                        View All Notifications
-                                    </button>
-                                </div>
+                                <div class="notification-dropdown-header"><h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2"><i class="bi bi-bell-fill text-blue-500"></i> Notifications</h6><button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button></div>
+                                <div id="notificationDropdownBody" class="notification-dropdown-body"><div class="notification-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet</p></div></div>
+                                <div class="notification-dropdown-footer"><button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">View All Notifications</button></div>
                             </div>
                         </div>
                         
@@ -1001,32 +936,14 @@
                     <div class="flex lg:hidden items-center gap-2 sm:gap-3">
                         <!-- Mobile Notification Bell -->
                         <div class="relative">
-                            <button id="notificationBellBtnMobile" class="notification-bell-btn">
+                            <button id="notificationBellBtnMobile" class="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 border-2 border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all">
                                 <i class="bi bi-bell-fill text-base sm:text-lg"></i>
-                                <span id="navNotificationCountMobile" class="notification-bell-badge hidden">0</span>
+                                <span id="navNotificationCountMobile" class="notification-badge hidden">0</span>
                             </button>
-                            
-                            <!-- Mobile Notification Dropdown -->
                             <div id="notificationDropdownMobile" class="notification-dropdown hidden fixed right-2 left-2 top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
-                                <div class="notification-dropdown-header">
-                                    <h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
-                                        <i class="bi bi-bell-fill text-blue-500"></i> Notifications
-                                    </h6>
-                                    <button id="closeNotificationBtnMobile" class="text-gray-400 hover:text-gray-600 p-1 transition-colors">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-                                </div>
-                                <div id="notificationDropdownBodyMobile" class="notification-dropdown-body">
-                                    <div class="notification-empty">
-                                        <i class="bi bi-bell-slash"></i>
-                                        <p>No notifications yet</p>
-                                    </div>
-                                </div>
-                                <div class="notification-dropdown-footer">
-                                    <button onclick="window.location.href='./notifications.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">
-                                        View All Notifications
-                                    </button>
-                                </div>
+                                <div class="notification-dropdown-header"><h6 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2"><i class="bi bi-bell-fill text-blue-500"></i> Notifications</h6><button id="closeNotificationBtnMobile" class="text-gray-400 hover:text-gray-600 p-1 transition-colors"><i class="bi bi-x-lg"></i></button></div>
+                                <div id="notificationDropdownBodyMobile" class="notification-dropdown-body"><div class="notification-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet</p></div></div>
+                                <div class="notification-dropdown-footer"><button onclick="window.location.href='./notification.html'" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:shadow-lg transition-all">View All Notifications</button></div>
                             </div>
                         </div>
                         
@@ -1093,7 +1010,7 @@
                         <i class="bi bi-book mr-3"></i>Lessons
                     </a>
                     <a href="./studentgrades.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
-                        <i class="bi bi-award mr-3"></i>Grades
+                        <i class="bi bi-activity mr-3"></i>Performance
                     </a>
                     <a href="./progress.html" class="mobile-nav-link block text-white/80 hover:text-white hover:bg-white/10 font-medium py-3 px-4 rounded-lg transition-all">
                         <i class="bi bi-graph-up mr-3"></i>Progress
@@ -1234,7 +1151,7 @@
             </div>
         </div>
     </footer>
-
+ </div> 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';

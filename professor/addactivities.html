@@ -1713,7 +1713,9 @@ function renderStudentListForTest(filterText='') {
     if (filterText) { const fl=filterText.toLowerCase(); toShow=toShow.filter(s=>(s.displayName||'').toLowerCase().includes(fl)||(s.studentNumber||'').toLowerCase().includes(fl)||(s.email||'').toLowerCase().includes(fl)); }
     if (!toShow.length) { container.innerHTML='<p class="text-center text-text-muted py-5">No students found</p>'; return; }
     container.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px;">${toShow.map(s => {
-        const hasCustomNorm = window._studentCustomNorms?.has(s.email) && window._studentCustomNorms.get(s.email).size > 0;
+        const currentTestKey = resolveTestKey(window._currentManagingTestName || '');
+        const studentNorms = window._studentCustomNorms?.get(s.email);
+        const hasCustomNorm = !!(currentTestKey && studentNorms?.has(currentTestKey));
         const normBadge = hasCustomNorm ? `<span title="Has custom norms" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;background:#d1fae5;color:#065f46;border:1px solid #a7f3d0;margin-left:4px;">🎛 Custom</span>` : '';
         const safeEmail = s.email.replace(/'/g,"\\'");
         const safeName  = (s.displayName||s.name||s.email).replace(/'/g,"\\'");
@@ -1888,11 +1890,21 @@ window.scheduleTest = async function() {
 
 // ── Delete Test ───────────────────────────────────────────────────
 window.deleteTest = testId => {
-    showConfirmModal('Delete this test? This cannot be undone.', async () => {
+    showConfirmModal('Delete this test? This cannot be undone. All student results for this test will also be deleted.', async () => {
         try {
+            // 1. Archive the scheduled test doc
             await setDoc(doc(db,'deletedTests',testId),{deletedAt:serverTimestamp(),testId});
+            
+            // 2. Delete all testResults linked to this testId
+            const resultsSnap = await getDocs(query(collection(db,'testResults'), where('testId','==',testId)));
+            const deleteBatch = [];
+            resultsSnap.forEach(d => deleteBatch.push(deleteDoc(doc(db,'testResults',d.id))));
+            await Promise.all(deleteBatch);
+            
+            // 3. Delete the scheduled test itself
             await deleteDoc(doc(db,'scheduledTests',testId));
-            showSuccessModal('Test deleted.');
+            
+            showSuccessModal(`Test and ${resultsSnap.size} result(s) deleted.`);
             await loadScheduledTests(window.currentUser.email, window.currentUser.uid);
         } catch(e) { showErrorModal('Error: '+e.message); }
     });
@@ -2054,10 +2066,79 @@ function readScheduleNorms() {
             sel.disabled = false;
             sel.closest('.form-group').style.display = '';
         };
-
 window.loadStudentNormForKey = async function() {
     const testKey=document.getElementById('snTestKeySelect').value, studentEmail=document.getElementById('snStudentEmailHidden').value, panel=document.getElementById('snThresholdPanel');
     if (!testKey) { panel.classList.add('hidden'); return; }
+
+    // ── Check if student has completed their profile first ──
+    let profileComplete = false;
+    try {
+        const studSnap = await getDocs(query(collection(db,'students'), where('email','==',studentEmail)));
+        if (!studSnap.empty) {
+            const sd = studSnap.docs[0].data();
+            // Profile is complete if they have gender, age/birthday, and a real name
+            const hasGender   = !!(sd.gender && sd.gender.trim() !== '');
+            const hasAge      = !!(sd.age || sd.birthday);
+            const hasName     = !!(sd.firstName && sd.lastName && sd.firstName.trim() !== '' && sd.lastName.trim() !== '');
+            profileComplete   = hasGender && hasAge && hasName;
+        }
+    } catch(_) {}
+
+    // Remove any existing banners
+    document.getElementById('snLockBanner')?.remove();
+    document.getElementById('snProfileBanner')?.remove();
+
+    const inputs  = ['snExcellent','snGood','snAverage','snBelowAverage'];
+    const saveBtn = document.querySelector('#studentNormModal .modal-footer button:last-child');
+    const resetBtn= document.querySelector('#studentNormModal .modal-footer button:nth-child(2)');
+
+    if (!profileComplete) {
+        // Show profile warning and lock everything
+        panel.classList.remove('hidden');
+
+        const lb=FALLBACK_NORMS[testKey]?.lowerIsBetter??false;
+        document.getElementById('snLowerIsBetter').value=lb?'1':'0';
+        lb ? document.getElementById('snLowerTag').classList.remove('hidden') : document.getElementById('snLowerTag').classList.add('hidden');
+
+        // Still load norm values so they can see them (read-only)
+        let norm=null, source='fallback';
+        try { const snap=await getDoc(doc(db,'studentNorms',studentEmail,'tests',testKey)); if(snap.exists()){norm=snap.data();source='student';} } catch(_){}
+        if (!norm) { const def=await getDefaultThresholds(testKey,'male','19-22'); if(def){norm=def;source=def.source||'fallback';} }
+        if (norm?.thresholds) {
+            document.getElementById('snExcellent').value=norm.thresholds.Excellent??'';
+            document.getElementById('snGood').value=norm.thresholds.Good??'';
+            document.getElementById('snAverage').value=norm.thresholds.Average??'';
+            document.getElementById('snBelowAverage').value=norm.thresholds['Below Average']??'';
+        }
+        const badge=document.getElementById('snSourceBadge'); badge.textContent=source; badge.className=`norm-source-badge norm-source-${source==='db'?'db':source==='student'?'custom':'fallback'}`;
+        const hb=document.getElementById('snCurrentBadge'); hb.textContent=source==='student'?'🎛 Custom':'default'; hb.className=`norm-source-badge ${source==='student'?'norm-source-custom':'norm-source-fallback'}`;
+
+        // Lock inputs
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            el.disabled = true;
+            el.style.background = '#f3f4f6';
+            el.style.color = '#9ca3af';
+            el.style.cursor = 'not-allowed';
+        });
+        if (saveBtn)  { saveBtn.disabled  = true;  saveBtn.style.opacity  = '0.5'; saveBtn.style.cursor  = 'not-allowed'; }
+        if (resetBtn) { resetBtn.disabled = true;  resetBtn.style.opacity = '0.5'; resetBtn.style.cursor = 'not-allowed'; }
+
+        // Insert profile warning banner
+        const profileBanner = document.createElement('div');
+        profileBanner.id = 'snProfileBanner';
+        profileBanner.style.cssText = 'display:flex;align-items:center;gap:10px;background:#fef3c7;border:1.5px solid #f59e0b;border-radius:10px;padding:10px 14px;margin-bottom:12px;';
+        profileBanner.innerHTML = `
+            <i class="fas fa-user-times" style="color:#d97706;font-size:16px;flex-shrink:0;"></i>
+            <div>
+                <div style="font-weight:700;color:#92400e;font-size:13px;">Profile Incomplete</div>
+                <div style="font-size:12px;color:#b45309;margin-top:2px;">This student hasn't completed their profile yet (missing gender, age, or name). Norms can only be set after the student completes their profile.</div>
+            </div>`;
+        panel.insertBefore(profileBanner, panel.firstChild);
+        return;
+    }
+
+    // ── Profile is complete — proceed normally ──
     const lb=FALLBACK_NORMS[testKey]?.lowerIsBetter??false;
     document.getElementById('snLowerIsBetter').value=lb?'1':'0';
     lb ? document.getElementById('snLowerTag').classList.remove('hidden') : document.getElementById('snLowerTag').classList.add('hidden');
@@ -2069,30 +2150,20 @@ window.loadStudentNormForKey = async function() {
     const hb=document.getElementById('snCurrentBadge'); hb.textContent=source==='student'?'🎛 Custom':'default'; hb.className=`norm-source-badge ${source==='student'?'norm-source-custom':'norm-source-fallback'}`;
     panel.classList.remove('hidden');
 
-    // ── Check if student already has test results for this test key ──
-    // ── Check if student has COMPLETED results for the CURRENT scheduled test only ──
-        const currentTestId = document.getElementById('currentTestId').value;
-        let hasResults = false;
-        try {
-            if (currentTestId) {
-        const resultsSnap = await getDocs(query(
-            collection(db, 'testResults'),
-            where('studentEmail', '==', studentEmail),
-            where('testId', '==', currentTestId),
-            where('status', '==', 'completed')
-        ));
-        hasResults = !resultsSnap.empty;
-    }
-
+    // ── Check if student already completed this specific scheduled test ──
+    const currentTestId = document.getElementById('currentTestId').value;
+    let hasResults = false;
+    try {
+        if (currentTestId) {
+            const resultsSnap = await getDocs(query(
+                collection(db, 'testResults'),
+                where('studentEmail', '==', studentEmail),
+                where('testId', '==', currentTestId),
+                where('status', '==', 'completed')
+            ));
+            hasResults = !resultsSnap.empty;
+        }
     } catch(_) {}
-
-    // Lock or unlock the norm inputs based on whether results exist
-    const inputs = ['snExcellent','snGood','snAverage','snBelowAverage'];
-    const saveBtn = document.querySelector('#studentNormModal .modal-footer button:last-child');
-    const resetBtn = document.querySelector('#studentNormModal .modal-footer button:nth-child(2)');
-
-    // Remove any existing lock banner
-    document.getElementById('snLockBanner')?.remove();
 
     if (hasResults) {
         inputs.forEach(id => {
@@ -2102,10 +2173,9 @@ window.loadStudentNormForKey = async function() {
             el.style.color = '#9ca3af';
             el.style.cursor = 'not-allowed';
         });
-        if (saveBtn) { saveBtn.disabled = true; saveBtn.style.opacity = '0.5'; saveBtn.style.cursor = 'not-allowed'; }
-        if (resetBtn) { resetBtn.disabled = true; resetBtn.style.opacity = '0.5'; resetBtn.style.cursor = 'not-allowed'; }
+        if (saveBtn)  { saveBtn.disabled  = true;  saveBtn.style.opacity  = '0.5'; saveBtn.style.cursor  = 'not-allowed'; }
+        if (resetBtn) { resetBtn.disabled = true;  resetBtn.style.opacity = '0.5'; resetBtn.style.cursor = 'not-allowed'; }
 
-        // Insert lock banner above the norm panel
         const lockBanner = document.createElement('div');
         lockBanner.id = 'snLockBanner';
         lockBanner.style.cssText = 'display:flex;align-items:center;gap:10px;background:#fef3c7;border:1.5px solid #f59e0b;border-radius:10px;padding:10px 14px;margin-bottom:12px;';
@@ -2124,7 +2194,7 @@ window.loadStudentNormForKey = async function() {
             el.style.color = '';
             el.style.cursor = '';
         });
-        if (saveBtn) { saveBtn.disabled = false; saveBtn.style.opacity = ''; saveBtn.style.cursor = ''; }
+        if (saveBtn)  { saveBtn.disabled  = false; saveBtn.style.opacity  = ''; saveBtn.style.cursor  = ''; }
         if (resetBtn) { resetBtn.disabled = false; resetBtn.style.opacity = ''; resetBtn.style.cursor = ''; }
     }
 };
@@ -2135,19 +2205,14 @@ window.saveStudentNormOverride = async function() {
           lb=document.getElementById('snLowerIsBetter').value==='1';
     if (!testKey) { showWarningModal('Please select a test type first.',()=>{},()=>{}); return; }
 
-    // Double-check: block save if student already has results
-    // Double-check: block save only if student completed THIS specific scheduled test
-    const currentTestId = document.getElementById('currentTestId').value;
+    // ── Block if student hasn't completed their profile ──
     try {
-        if (currentTestId) {
-            const resultsSnap = await getDocs(query(
-                collection(db, 'testResults'),
-                where('studentEmail', '==', studentEmail),
-                where('testId', '==', currentTestId),
-                where('status', '==', 'completed')
-            ));
-            if (!resultsSnap.empty) {
-                showErrorModal('❌ Cannot edit norms — this student has already completed this test.');
+        const studSnap = await getDocs(query(collection(db,'students'), where('email','==',studentEmail)));
+        if (!studSnap.empty) {
+            const sd = studSnap.docs[0].data();
+            const profileComplete = !!(sd.gender?.trim()) && !!(sd.age || sd.birthday) && !!(sd.firstName?.trim()) && !!(sd.lastName?.trim());
+            if (!profileComplete) {
+                showErrorModal('❌ Cannot set norms — this student has not completed their profile yet.');
                 return;
             }
         }
@@ -2196,9 +2261,19 @@ window.clearStudentNorm = function() {
     showConfirmModal(`Remove custom norms for ${studentName} — ${testKey}?`, async () => {
         try {
             await deleteStudentNorm(db, studentEmail, testKey);
-            window._studentCustomNorms.get(studentEmail)?.delete(testKey);
+            
+            // Clear from in-memory map
+            if (window._studentCustomNorms.has(studentEmail)) {
+                window._studentCustomNorms.get(studentEmail).delete(testKey);
+                // If no more custom norms for this student, remove the entry entirely
+                if (window._studentCustomNorms.get(studentEmail).size === 0) {
+                    window._studentCustomNorms.delete(studentEmail);
+                }
+            }
+            
             window.closeStudentNormModal();
             showSuccessModal('Norms reset to default for this student.');
+            // Re-render with current search filter so badge and button color update immediately
             renderStudentListForTest(document.getElementById('studentSearchBox').value);
         } catch(err) { showErrorModal('Error: '+err.message); }
     }, ()=>{});

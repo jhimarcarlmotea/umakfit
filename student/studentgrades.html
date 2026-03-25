@@ -62,15 +62,16 @@
 
         @media (max-width: 768px) { #testResultsContainer { -webkit-overflow-scrolling: touch; } .notification-dropdown { width: calc(100vw - 2rem); right: 0; left: auto; } }
         @media (max-width: 1023px) { .hamburger { display: flex; } }
+        
     </style>
 </head>
 <body class="bg-gray-50">
     <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading">
-        <div class="loading-logo">UMakFit</div>
-        <div class="loading-sub">Student Portal</div>
-        <div class="loading-spinner"></div>
-    </div>
+<div id="loadingScreen" class="fixed inset-0 bg-white/98 flex flex-col items-center justify-center z-50">
+    <img src="UMakfit Logo (2).png" alt="UMakFit Logo" class="h-40 sm:h-48 w-auto object-contain mb-4 animate-pulse">
+    <div class="spinner"></div>
+    <div class="mt-5 text-gray-600 font-medium text-sm md:text-base">Loading Performance...</div>
+</div>
 
     <div id="mainContent" class="hidden">
         <!-- Navigation -->
@@ -742,23 +743,40 @@ function processAndRender(rawResults, assignedCount) {
         // ========== LIVE LISTENERS (post-initial-render) ==========
 
         function setupLiveListeners() {
-            if (!studentData?.section || studentData.section === 'Not Assigned') return;
+        if (!studentData?.section || studentData.section === 'Not Assigned') return;
 
-            // Listen for new test results
-            const resultsQuery = query(
-                collection(db, 'testResults'),
-                where('studentEmail', '==', studentData.email),
-                where('status', 'in', ['completed', 'overdue', 'late'])
-            );
-            registerListener(onSnapshot(resultsQuery, async snap => {
-                const updatedResults = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                // Re-prefetch norms for any new results not yet cached
-                await prefetchNormDocs(updatedResults);
-                const updatedAssigned = await fetchAssignedTests(studentData.section, studentData.email);
-                totalAssignedTests = updatedAssigned;
-                document.getElementById('totalTests').textContent = `/${updatedAssigned}`;
-                processAndRender(updatedResults, updatedAssigned);
-            }, () => {}));
+        // Listen for scheduled tests changes (handles professor adding/deleting tests in real-time)
+        const scheduledTestsQuery = query(
+            collection(db, 'scheduledTests'),
+            where('section', '==', studentData.section),
+            where('isVisible', '==', true),
+            where('isActive', '==', true)
+        );
+        registerListener(onSnapshot(scheduledTestsQuery, async () => {
+            const updatedAssigned = await fetchAssignedTests(studentData.section, studentData.email);
+            totalAssignedTests = updatedAssigned;
+            document.getElementById('totalTests').textContent = `/${updatedAssigned}`;
+            document.getElementById('completionRate').textContent =
+                updatedAssigned > 0
+                    ? Math.round((parseInt(document.getElementById('completedTests').textContent) / updatedAssigned) * 100) + '%'
+                    : '0%';
+        }, () => {}));
+
+        // Listen for new test results
+        const resultsQuery = query(
+            collection(db, 'testResults'),
+            where('studentEmail', '==', studentData.email),
+            where('status', 'in', ['completed', 'overdue', 'late'])
+        );
+        registerListener(onSnapshot(resultsQuery, async snap => {
+            const updatedResults = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            // Re-prefetch norms for any new results not yet cached
+            await prefetchNormDocs(updatedResults);
+            const updatedAssigned = await fetchAssignedTests(studentData.section, studentData.email);
+            totalAssignedTests = updatedAssigned;
+            document.getElementById('totalTests').textContent = `/${updatedAssigned}`;
+            processAndRender(updatedResults, updatedAssigned);
+        }, () => {}));
 
             // Listen for notifications (lightweight — just update badge)
             const notifQuery = query(
