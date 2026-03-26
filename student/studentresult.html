@@ -207,6 +207,20 @@
                     </div>
                 </div>
 
+                <!-- Video Result Section -->
+                <div id="videoResultSection" class="px-6 sm:px-8 py-6" style="display:none;">
+                    <div class="max-w-3xl mx-auto">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="bi bi-camera-video text-blue-600"></i>
+                            <h3 class="text-base sm:text-lg font-extrabold text-slate-800">Submitted Video</h3>
+                        </div>
+                        <video id="submittedVideoPlayer"
+                               controls
+                               playsinline
+                               class="w-full rounded-2xl border-2 border-slate-200 bg-black/5"></video>
+                    </div>
+                </div>
+
                 <!-- Content Section -->
                 <div class="px-6 sm:px-8 py-10">
                     <div id="recommendationSection" class="bg-gradient-to-br from-sky-50 to-blue-50 border-2 border-sky-200 rounded-2xl p-6 sm:p-8 mb-8 shadow-sm">
@@ -642,6 +656,19 @@
                 document.getElementById('testResult').textContent = data.result;
                 document.getElementById('completedDate').textContent =
                     data.submittedAt ? new Date(data.submittedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '--';
+
+                // Video section
+                const videoUrl = data.videoUrl || '';
+                const videoSectionEl = document.getElementById('videoResultSection');
+                const videoPlayerEl = document.getElementById('submittedVideoPlayer');
+                if (videoSectionEl && videoPlayerEl && videoUrl) {
+                    videoPlayerEl.src = videoUrl;
+                    videoSectionEl.style.display = 'block';
+                    // Ensure the player refreshes the source.
+                    videoPlayerEl.load();
+                } else if (videoSectionEl) {
+                    videoSectionEl.style.display = 'none';
+                }
 
                 // Rating badge
                 const scoreRatingEl = document.getElementById('scoreRating');

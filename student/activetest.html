@@ -251,6 +251,80 @@
                 <div class="max-w-2xl mx-auto mb-12" id="inputSection"></div>
                 <textarea id="notesField" class="hidden"></textarea>
 
+                <!-- Video Submission Section (Required) -->
+                <div class="max-w-2xl mx-auto mb-12" id="videoCaptureSection">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                            <div>
+                                <h3 class="text-lg font-extrabold text-slate-800">Video Proof <span class="text-red-500">*</span></h3>
+                                <p class="text-sm text-slate-500 mt-1 leading-relaxed">
+                                    Choose camera recording or upload a video. You cannot submit without a video.
+                                </p>
+                            </div>
+                            <span id="videoStatusPill" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                No video yet
+                            </span>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <button type="button" id="videoModeCameraBtn"
+                                    class="px-4 py-2 rounded-xl text-sm font-bold border border-slate-200 bg-white text-slate-800 hover:bg-slate-50 transition-all"
+                                    style="box-shadow:0 8px 20px rgba(15,23,42,.04);">
+                                <i class="bi bi-camera-video mr-2"></i> Camera Record
+                            </button>
+                            <button type="button" id="videoModeUploadBtn"
+                                    class="px-4 py-2 rounded-xl text-sm font-bold border border-slate-200 bg-slate-50 text-slate-700 hover:bg-white transition-all">
+                                <i class="bi bi-upload mr-2"></i> Upload Video
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div>
+                                <video id="videoPreviewEl"
+                                       class="w-full rounded-xl border-2 border-slate-200 bg-black/5"
+                                       controls
+                                       playsinline></video>
+                                <div id="videoPreviewEmptyHint" class="mt-2 text-xs text-slate-500">
+                                    Preview will appear here after recording/upload.
+                                </div>
+                            </div>
+
+                            <div>
+                                <div id="videoModeCameraSection" class="block">
+                                    <div class="flex flex-wrap gap-3">
+                                        <button type="button" id="recordStartBtn"
+                                                class="flex-1 sm:flex-none px-5 py-3 rounded-xl border-0 bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-widest cursor-pointer hover:bg-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                            <i class="bi bi-play-circle mr-2"></i> Start Recording
+                                        </button>
+                                        <button type="button" id="recordStopBtn" disabled
+                                                class="flex-1 sm:flex-none px-5 py-3 rounded-xl border-2 border-emerald-200 bg-white text-emerald-700 font-extrabold text-xs uppercase tracking-widest cursor-pointer hover:bg-emerald-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                            <i class="bi bi-stop-circle mr-2"></i> Stop
+                                        </button>
+                                        <button type="button" id="recordClearBtn"
+                                                class="px-5 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-extrabold text-xs uppercase tracking-widest cursor-pointer hover:bg-slate-50 transition-all">
+                                            <i class="bi bi-x-circle mr-2"></i> Clear
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-3 leading-relaxed">
+                                        Tip: Record the full movement. Keep the camera steady for clearer review.
+                                    </p>
+                                </div>
+
+                                <div id="videoModeUploadSection" class="hidden">
+                                    <label class="block text-sm font-bold text-slate-800 mb-2">
+                                        Upload a video file
+                                    </label>
+                                    <input id="videoFileInput" type="file" accept="video/*"
+                                           class="block w-full text-sm text-slate-700 border border-slate-200 bg-white rounded-xl px-3 py-2"/>
+                                    <p class="text-xs text-slate-500 mt-3 leading-relaxed">
+                                        Supported examples: mp4, webm. Make sure your video is clear and includes your movements.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Submit Section -->
                 <div class="text-center pt-10 border-t-[3px] border-gray-200 flex flex-col-reverse sm:flex-row gap-4 justify-center items-center">
                     <button onclick="window.history.back()" class="btn-timer inline-flex items-center justify-center gap-2 px-14 py-4 min-w-[280px] sm:min-w-0 rounded-full border-none font-semibold text-[13px] text-white uppercase tracking-widest cursor-pointer shadow-lg" style="background:linear-gradient(to top,#4b5563,#6b7280,#9ca3af);box-shadow:0 15px 30px rgba(107,114,128,.4);">
@@ -339,6 +413,270 @@
         const STEP_TEST_BPM = 90;
         const METRONOME_MS = 60000 / STEP_TEST_BPM;
         const STEP_TEST_DURATION = 180;
+
+        // ========== VIDEO CAPTURE / UPLOAD ==========
+        // Video is required for submission.
+        let testNeedsTimer = false; // updated inside setupTestInputs()
+
+        let selectedVideoBlob = null;
+        let selectedVideoObjectUrl = null;
+
+        let videoMode = 'camera'; // 'camera' | 'upload'
+        let isAutoVideoEnabled = false; // auto record for tests with timer
+
+        let cameraStream = null;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isRecordingVideo = false;
+        let pendingVideoFinalize = false;
+
+        // TODO: Fill these in with your Cloudinary values.
+        // Use an *unsigned* upload preset for browser uploads.
+        const CLOUDINARY_CLOUD_NAME = 'dub54pdis';
+        const CLOUDINARY_UPLOAD_PRESET = 'umakfit_unsigned';
+
+        function setVideoStatusPill(text, tone = 'neutral') {
+            const pill = document.getElementById('videoStatusPill');
+            if (!pill) return;
+            const tones = {
+                neutral: { bg: 'bg-slate-100', fg: 'text-slate-700', bd: 'border-slate-200' },
+                ready: { bg: 'bg-emerald-50', fg: 'text-emerald-800', bd: 'border-emerald-200' },
+                uploading: { bg: 'bg-blue-50', fg: 'text-blue-800', bd: 'border-blue-200' },
+                error: { bg: 'bg-red-50', fg: 'text-red-800', bd: 'border-red-200' },
+            };
+            const t = tones[tone] || tones.neutral;
+            pill.className = `inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${t.bg} ${t.fg} border ${t.bd}`;
+            pill.textContent = text;
+        }
+
+        function setVideoPreviewEmptyHintVisible(visible) {
+            const hint = document.getElementById('videoPreviewEmptyHint');
+            if (!hint) return;
+            hint.style.display = visible ? 'block' : 'none';
+        }
+
+        function clearSelectedVideo() {
+            try {
+                selectedVideoBlob = null;
+                if (selectedVideoObjectUrl) {
+                    try { URL.revokeObjectURL(selectedVideoObjectUrl); } catch (_) {}
+                }
+                selectedVideoObjectUrl = null;
+
+                const el = document.getElementById('videoPreviewEl');
+                if (el) {
+                    el.pause();
+                    el.removeAttribute('src');
+                    el.load();
+                    el.controls = true;
+                }
+
+                setVideoPreviewEmptyHintVisible(true);
+                setVideoStatusPill('No video yet', 'neutral');
+            } catch (e) {
+                // Never block page load due to video UI issues.
+                console.warn('clearSelectedVideo failed:', e);
+            }
+        }
+
+        function cleanupCamera() {
+            if (cameraStream) {
+                try {
+                    cameraStream.getTracks().forEach(t => t.stop());
+                } catch (_) {}
+            }
+            cameraStream = null;
+        }
+
+        async function startCameraRecording() {
+            if (isRecordingVideo) return;
+            if (videoMode !== 'camera') return;
+
+            clearSelectedVideo();
+
+            const previewEl = document.getElementById('videoPreviewEl');
+            if (!previewEl) return;
+
+            setVideoStatusPill('Requesting camera...', 'neutral');
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            } catch (e) {
+                setVideoStatusPill('Camera access denied', 'error');
+                showErrorPopup('Cannot access camera. Please allow camera permission or upload a video file instead.', 'Camera Error');
+                return;
+            }
+
+            recordedChunks = [];
+
+            const preferredMimeTypes = [
+                'video/webm;codecs=vp9',
+                'video/webm;codecs=vp8',
+                'video/webm',
+            ];
+            const mimeType = preferredMimeTypes.find(t => (window.MediaRecorder && window.MediaRecorder.isTypeSupported && window.MediaRecorder.isTypeSupported(t))) || '';
+
+            try {
+                mediaRecorder = new MediaRecorder(cameraStream, mimeType ? { mimeType } : undefined);
+            } catch (e) {
+                cleanupCamera();
+                setVideoStatusPill('Recording not supported', 'error');
+                showErrorPopup('Your browser does not support in-page camera recording. Please use Upload Video.', 'Recording Unsupported');
+                return;
+            }
+
+            mediaRecorder.ondataavailable = e => {
+                if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                cleanupCamera();
+                isRecordingVideo = false;
+                if (pendingVideoFinalize) {
+                    pendingVideoFinalize = false;
+                    const submitBtn = document.getElementById('submitBtn');
+                    if (submitBtn) submitBtn.disabled = false;
+                }
+                const stopBtn = document.getElementById('recordStopBtn');
+                const startBtn = document.getElementById('recordStartBtn');
+                if (startBtn) startBtn.disabled = false;
+                if (stopBtn) stopBtn.disabled = true;
+
+                const blobType = mediaRecorder?.mimeType || 'video/webm';
+                const blob = new Blob(recordedChunks, { type: blobType });
+                selectedVideoBlob = blob;
+                selectedVideoObjectUrl = URL.createObjectURL(blob);
+
+                previewEl.srcObject = null;
+                previewEl.src = selectedVideoObjectUrl;
+                previewEl.controls = true;
+                setVideoPreviewEmptyHintVisible(false);
+                setVideoStatusPill('Video ready', 'ready');
+            };
+
+            isRecordingVideo = true;
+            const startBtn = document.getElementById('recordStartBtn');
+            const stopBtn = document.getElementById('recordStopBtn');
+            if (startBtn) startBtn.disabled = true;
+            if (stopBtn) stopBtn.disabled = false;
+
+            previewEl.srcObject = cameraStream;
+            previewEl.muted = true;
+            previewEl.controls = false;
+
+            try {
+                mediaRecorder.start();
+                setVideoStatusPill('Recording...', 'neutral');
+            } catch (e) {
+                cleanupCamera();
+                isRecordingVideo = false;
+                setVideoStatusPill('Recording failed', 'error');
+                showErrorPopup('Failed to start recording. Please try again or upload a video file instead.', 'Recording Failed');
+            }
+        }
+
+        function stopCameraRecording() {
+            if (!isRecordingVideo) return;
+            try { mediaRecorder?.stop(); } catch (_) {}
+        }
+
+        async function handleVideoFile(file) {
+            if (!file) return;
+            if (!file.type || !file.type.startsWith('video/')) {
+                showErrorPopup('Please select a valid video file.', 'Invalid File');
+                return;
+            }
+
+            clearSelectedVideo();
+            selectedVideoBlob = file;
+            selectedVideoObjectUrl = URL.createObjectURL(file);
+
+            const previewEl = document.getElementById('videoPreviewEl');
+            if (previewEl) {
+                previewEl.pause();
+                previewEl.srcObject = null;
+                previewEl.src = selectedVideoObjectUrl;
+                previewEl.controls = true;
+            }
+
+            setVideoPreviewEmptyHintVisible(false);
+            setVideoStatusPill('Video ready', 'ready');
+        }
+
+        function setVideoMode(mode) {
+            videoMode = mode === 'upload' ? 'upload' : 'camera';
+
+            const cameraBtn = document.getElementById('videoModeCameraBtn');
+            const uploadBtn = document.getElementById('videoModeUploadBtn');
+            const cameraSection = document.getElementById('videoModeCameraSection');
+            const uploadSection = document.getElementById('videoModeUploadSection');
+
+            const cameraActive = videoMode === 'camera';
+            if (cameraBtn) cameraBtn.className = cameraActive
+                ? 'px-4 py-2 rounded-xl text-sm font-bold border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition-all'
+                : 'px-4 py-2 rounded-xl text-sm font-bold border border-slate-200 bg-white text-slate-800 hover:bg-slate-50 transition-all';
+
+            if (uploadBtn) uploadBtn.className = !cameraActive
+                ? 'px-4 py-2 rounded-xl text-sm font-bold border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition-all'
+                : 'px-4 py-2 rounded-xl text-sm font-bold border border-slate-200 bg-slate-50 text-slate-700 hover:bg-white transition-all';
+
+            if (cameraSection) cameraSection.style.display = cameraActive ? 'block' : 'none';
+            if (uploadSection) uploadSection.style.display = cameraActive ? 'none' : 'block';
+
+            // If switching away from camera, stop camera stream.
+            if (videoMode !== 'camera') stopCameraRecording();
+            clearSelectedVideo(); // require re-selection after changing mode
+        }
+
+        function ensureCloudinaryConfig() {
+            if (!CLOUDINARY_CLOUD_NAME || CLOUDINARY_CLOUD_NAME === 'YOUR_CLOUD_NAME') {
+                throw new Error('Cloudinary config missing: set CLOUDINARY_CLOUD_NAME.');
+            }
+            if (!CLOUDINARY_UPLOAD_PRESET || CLOUDINARY_UPLOAD_PRESET === 'YOUR_UNSIGNED_UPLOAD_PRESET') {
+                throw new Error('Cloudinary config missing: set CLOUDINARY_UPLOAD_PRESET (unsigned upload preset).');
+            }
+        }
+
+        async function uploadVideoToCloudinary(blob, { filename, folder } = {}) {
+            ensureCloudinaryConfig();
+
+            const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`;
+            const formData = new FormData();
+            formData.append('file', blob, filename || 'video.webm');
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            formData.append('resource_type', 'video');
+            if (folder) formData.append('folder', folder);
+
+            setVideoStatusPill('Uploading video...', 'uploading');
+
+            const res = await fetch(url, { method: 'POST', body: formData });
+            const json = await res.json().catch(() => null);
+            if (!res.ok) {
+                const msg = json?.error?.message || `Cloudinary upload failed (${res.status})`;
+                throw new Error(msg);
+            }
+
+            if (!json?.secure_url) throw new Error('Cloudinary upload succeeded but no secure_url was returned.');
+            return { secure_url: json.secure_url, public_id: json.public_id };
+        }
+
+        function maybeAutoStartVideoRecording() {
+            if (!isAutoVideoEnabled) return;
+            if (videoMode !== 'camera') return;
+            if (isRecordingVideo) return;
+            // Auto-start only when a timer test is running.
+            // (User can still manually record using the buttons.)
+            startCameraRecording().catch(() => {});
+        }
+
+        function maybeAutoStopVideoRecording() {
+            if (!isAutoVideoEnabled) return;
+            if (videoMode !== 'camera') return;
+            pendingVideoFinalize = true;
+            setVideoStatusPill('Finalizing video...', 'uploading');
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) submitBtn.disabled = true;
+            stopCameraRecording();
+        }
 
         // ========== HELPERS (mirrored from dashboard) ==========
 
@@ -596,6 +934,8 @@
             if (!isRunning) {
                 window.activeTestId = await createActiveTestDocument();
                 isRunning = true; isPaused = false; startTime = Date.now() - elapsedTime;
+                // Auto-start camera recording for timer-based tests (camera mode only).
+                maybeAutoStartVideoRecording();
                 if (isStepTest()) {
                     document.getElementById('minutes').textContent = '03';
                     document.getElementById('seconds').textContent = '00';
@@ -626,11 +966,14 @@
         window.stopTimer = async function() {
             if (isRunning || isPaused) {
                 isRunning = false; isPaused = false; clearInterval(timerInterval); stopMetronome();
+                // Stop auto-recording when the timer test is finished.
+                maybeAutoStopVideoRecording();
                 document.getElementById('startBtn').style.display = 'none';
                 document.getElementById('pauseBtn').style.display = 'none';
                 document.getElementById('stopBtn').style.display = 'none';
                 document.getElementById('resetBtn').style.display = 'inline-flex';
-                document.getElementById('submitBtn').disabled = false;
+                const submitBtn = document.getElementById('submitBtn');
+                if (submitBtn) submitBtn.disabled = pendingVideoFinalize;
                 updateStatus('completed', 'Test Completed');
                 // ✅ Fire-and-forget in parallel — no need to await sequentially
                 Promise.all([
@@ -670,6 +1013,9 @@
             document.getElementById('resetConfirmBtn').addEventListener('click', () => {
                 overlay.remove();
                 clearInterval(timerInterval); stopMetronome(); isRunning = false; isPaused = false; elapsedTime = 0;
+                // Stop any ongoing recording and require a fresh video for the new attempt.
+                stopCameraRecording();
+                clearSelectedVideo();
                 document.getElementById('minutes').textContent = '00';
                 document.getElementById('seconds').textContent = '00';
                 document.getElementById('milliseconds').textContent = '00';
@@ -721,6 +1067,9 @@
             inputSection.parentNode.insertBefore(section, inputSection);
             const hrInput = document.getElementById('heartRateInput');
             if (hrInput) { hrInput.disabled = true; hrInput.placeholder = 'Wait for the 1-min timer to finish...'; hrInput.style.opacity = '.5'; hrInput.style.cursor = 'not-allowed'; }
+            // Keep submit disabled until the recovery timer ends.
+            const bpSubmitBtn = document.getElementById('submitBtn');
+            if (bpSubmitBtn) bpSubmitBtn.disabled = true;
             function resetBPTimer() {
                 clearInterval(bpInterval); bpInterval = null; bpDone = false; bpRunning = false;
                 document.getElementById('bpCountdown').textContent = '1:00';
@@ -743,6 +1092,7 @@
                         document.getElementById('bpDoneMsg').style.display = 'block';
                         document.getElementById('bpCountdown').style.color = '#059669';
                         if (hrInput) { hrInput.disabled = false; hrInput.placeholder = 'Enter your 60-second heart rate'; hrInput.style.opacity = '1'; hrInput.style.cursor = 'text'; hrInput.focus(); }
+                        if (bpSubmitBtn) bpSubmitBtn.disabled = false;
                     }
                 }, 1000);
             });
@@ -763,6 +1113,10 @@
             const n = testName.toLowerCase();
             const needsTimer = n.includes('plank') || n.includes('step test') || n.includes('3-minute') || n.includes('mile') || n.includes('run') || n.includes('1-mile');
             const isStepTestType = n.includes('step test') || n.includes('3-minute');
+            testNeedsTimer = needsTimer;
+            isAutoVideoEnabled = needsTimer;
+            // Require a fresh video for each test attempt/page load.
+            try { clearSelectedVideo(); } catch (_) {}
             timerSection.style.display = needsTimer ? 'block' : 'none';
             document.getElementById('metronomeSection').style.display = (needsTimer && isStepTestType) ? 'block' : 'none';
 
@@ -903,6 +1257,11 @@
         window.submitTest = async function() {
             if (!currentTest || !studentData) { showErrorPopup('Missing required data. Please reload the page and try again.'); return; }
 
+            if (!selectedVideoBlob) {
+                showErrorPopup('Video is required. Please record with camera or upload a video before submitting.', 'Video Required');
+                return;
+            }
+
             let resultValue = '', rawResult = '';
             const n = currentTest.testName.toLowerCase();
 
@@ -961,6 +1320,15 @@
 
                 const currentAttempts = attSnap.size;
                 const isFirst = currentAttempts === 0;
+                const attemptNumber = currentAttempts + 1;
+
+                // ✅ Upload video first (so professor can review immediately after submit)
+                const safeEmail = String(studentData.email || '').replace(/[^a-zA-Z0-9_-]/g, '_');
+                const mime = selectedVideoBlob.type || '';
+                const ext = mime.includes('mp4') ? 'mp4' : 'webm';
+                const filename = `umakfit_${safeEmail}_${currentTest.id}_attempt_${attemptNumber}.${ext}`;
+                const folder = `umakfit/testResults/${currentTest.id}/${safeEmail}`;
+                const videoUpload = await uploadVideoToCloudinary(selectedVideoBlob, { filename, folder });
 
                 // ✅ Write result, then fire student/test counter updates in parallel
                 const docRef = await addDoc(collection(db,'testResults'), {
@@ -976,10 +1344,14 @@
                     score: calculatedScore,
                     timerValue,
                     notes,
-                    attemptNumber: currentAttempts + 1,
+                    attemptNumber,
                     attemptsAllowed: currentTest.attemptsAllowed || 1,
                     timestamp: serverTimestamp(),
                     submittedAt: new Date().toISOString(),
+                    videoProvider: 'cloudinary',
+                    videoUrl: videoUpload.secure_url,
+                    videoPublicId: videoUpload.public_id,
+                    videoMimeType: mime || null,
                     status: 'completed'
                 });
 
@@ -992,6 +1364,7 @@
                 showSuccessPopup(calculatedScore, currentAttempts + 1, currentTest.attemptsAllowed || 1, docRef.id, currentTest.id);
             } catch(error) {
                 console.error('Error submitting test:', error);
+                try { setVideoStatusPill('Submission failed', 'error'); } catch (_) {}
                 showErrorPopup('Error submitting test. Please try again.', 'Submission Failed');
                 document.getElementById('submitBtn').disabled = false;
                 document.getElementById('submitBtn').innerHTML = `<span class="btn-text-one"><i class="bi bi-check-circle-fill"></i> Submit Test Results</span><span class="btn-text-two"><i class="bi bi-send-fill"></i> Submit Now!</span>`;
@@ -1233,6 +1606,23 @@
                         loadTestData()
                     ]);
 
+                    // ========== VIDEO UI SETUP ==========
+                    try {
+                        // Default mode: camera. Users can switch to upload any time.
+                        setVideoMode('camera');
+                        document.getElementById('videoModeCameraBtn')?.addEventListener('click', () => setVideoMode('camera'));
+                        document.getElementById('videoModeUploadBtn')?.addEventListener('click', () => setVideoMode('upload'));
+                        document.getElementById('recordStartBtn')?.addEventListener('click', () => startCameraRecording());
+                        document.getElementById('recordStopBtn')?.addEventListener('click', () => stopCameraRecording());
+                        document.getElementById('recordClearBtn')?.addEventListener('click', () => clearSelectedVideo());
+                        document.getElementById('videoFileInput')?.addEventListener('change', async (e) => {
+                            const f = e?.target?.files?.[0];
+                            if (f) await handleVideoFile(f);
+                        });
+                    } catch (e) {
+                        console.warn('Video UI setup failed:', e);
+                    }
+
                     // ✅ Setup notifications and check unread in parallel after student data ready
                     setupNotificationListener();
                     checkUnreadNotifications(); // fire-and-forget
@@ -1266,6 +1656,8 @@
             if (unsubscribeTestDeletion) unsubscribeTestDeletion();
             if (_notifUnsub) { _notifUnsub(); _notifUnsub = null; }
             clearInterval(timerInterval); stopMetronome();
+            try { stopCameraRecording(); } catch (_) {}
+            try { cleanupCamera(); } catch (_) {}
         });
 
         window.toggleNotificationDropdown = toggleNotificationDropdown;

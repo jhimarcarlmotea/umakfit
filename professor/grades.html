@@ -692,7 +692,7 @@
             let sd2=new Date();
             if(data.submittedAt){if(typeof data.submittedAt.toDate==='function')sd2=data.submittedAt.toDate();else if(data.submittedAt.seconds)sd2=new Date(data.submittedAt.seconds*1000);else if(typeof data.submittedAt==='string')sd2=new Date(data.submittedAt);}
             const attemptNum = data.attemptNumber || 1;
-            const entry={id:ds.id,studentName:data.studentName||'Unknown',section:data.section||'',testId,testName,result:extractDisplayResult(data),category:cat,date:sd2.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),dateObject:sd2,studentEmail:se,isSkinfold,attemptNum};
+            const entry={id:ds.id,studentName:data.studentName||'Unknown',section:data.section||'',testId,testName,result:extractDisplayResult(data),category:cat,date:sd2.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),dateObject:sd2,studentEmail:se,isSkinfold,attemptNum,videoUrl:data.videoUrl||data.videoURL||''};
             // Only add if not already present
             if(!allAttempts.some(a=>a.id===ds.id)){
                 allAttempts.push(entry);
@@ -723,7 +723,7 @@
                 i.result===g.result
             );
             if(!alreadyExists){
-                map[key].instances.push({name:g.testName,date:g.date,dateObject:g.dateObject,result:g.result,category:g.category,isSkinfold:g.isSkinfold,id:g.id,attemptNum:g.attemptNum,testId:g.testId});
+                map[key].instances.push({name:g.testName,date:g.date,dateObject:g.dateObject,result:g.result,category:g.category,isSkinfold:g.isSkinfold,id:g.id,attemptNum:g.attemptNum,testId:g.testId,videoUrl:g.videoUrl||''});
             }
             if(g.testId) {
                 map[key].uniqueTests.add(g.testId);
@@ -914,6 +914,7 @@
                         <span style="display: inline-block; padding: 4px 8px; background: #f8fafc; border-radius: 6px; font-size: 13px;">
                             ${esc(String(act.result ?? '—'))}
                         </span>
+                        ${act.videoUrl ? `<div style="margin-top:8px;"><a href="${esc(act.videoUrl)}" target="_blank" rel="noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:14px;background:#eff6ff;color:#1d4ed8;font-weight:700;font-size:12px;text-decoration:none;"><i class="fas fa-video" style="font-size:11px;"></i> Watch Video</a></div>` : ''}
                     </td>
                     <td style="vertical-align: top; padding: 16px 14px;">
                         ${renderCategoryBadge(act.category)}
