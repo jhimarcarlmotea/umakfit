@@ -1748,85 +1748,150 @@ Object.values(bestPerStudentTest).forEach(t => {
     }
 
     window.filterRankings = function() {
-        const search=(document.getElementById('searchRankings')?.value||'').toLowerCase();
-        const type=document.getElementById('assessmentTypeFilter')?.value||'all';
-        const college=document.getElementById('collegeFilter')?.value||'all';
-        filteredRankings=sectionRankings.filter(s => {
-            const ms=s.name.toLowerCase().includes(search)||s.professor.toLowerCase().includes(search);
-            const mc=college==='all'||s.college===college;
-            let mt=true;
-            if(type==='pre') mt=s.preTestCount>0;
-            else if(type==='post') mt=s.postTestCount>0;
-            else if(type==='improvement') mt=s.improvement!==0;
-            return ms&&mc&&mt;
-        });
-        if(type==='pre') filteredRankings.sort((a,b)=>b.preTestAvg-a.preTestAvg);
-        else if(type==='post') filteredRankings.sort((a,b)=>b.postTestAvg-a.postTestAvg);
-        else if(type==='improvement') filteredRankings.sort((a,b)=>b.improvement-a.improvement);
-        else filteredRankings.sort((a,b)=>b.avgScore-a.avgScore);
-        renderSectionRankingTable();
-    };
+    const search=(document.getElementById('searchRankings')?.value||'').toLowerCase();
+    const type=document.getElementById('assessmentTypeFilter')?.value||'all';
+    const college=document.getElementById('collegeFilter')?.value||'all';
+    filteredRankings=sectionRankings.filter(s => {
+        const ms=s.name.toLowerCase().includes(search)||s.professor.toLowerCase().includes(search);
+        const mc=college==='all'||s.college===college;
+        let mt=true;
+        if(type==='pre') mt=s.preTestCount>0;
+        else if(type==='post') mt=s.postTestCount>0;
+        else if(type==='improvement') mt=s.improvement!==0;
+        return ms&&mc&&mt;
+    });
+    if(type==='pre') filteredRankings.sort((a,b)=>b.preTestAvg-a.preTestAvg);
+    else if(type==='post') filteredRankings.sort((a,b)=>b.postTestAvg-a.postTestAvg);
+    else if(type==='improvement') filteredRankings.sort((a,b)=>b.improvement-a.improvement);
+    else filteredRankings.sort((a,b)=>b.avgScore-a.avgScore);
+    window.sectionRankingCurrentPage = 1; // reset on filter
+    renderSectionRankingTable();
+};
 function renderSectionRankingTable() {
     const tbody = document.getElementById('sectionRankingTableBody'); if (!tbody) return;
     if (!filteredRankings.length) {
         tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div style="font-size:48px;color:#c5cfe0;margin-bottom:16px;"><i class="fas fa-layer-group"></i></div><div style="font-size:17px;font-weight:600;color:#0a1628;margin-bottom:8px;">No Sections Found</div><div style="font-size:14px;color:#8a98ae;">No sections are registered in the system yet.</div></div></td></tr>`;
+        renderSectionRankingPagination();
         return;
     }
 
-    let rankCounter = 0;
+    const pageSize = 10;
+    const totalPages = Math.ceil(filteredRankings.length / pageSize);
+    if (window.sectionRankingCurrentPage === undefined) window.sectionRankingCurrentPage = 1;
+    if (window.sectionRankingCurrentPage > totalPages) window.sectionRankingCurrentPage = 1;
+    const start = (window.sectionRankingCurrentPage - 1) * pageSize;
+    const pageItems = filteredRankings.slice(start, start + pageSize);
 
-tbody.innerHTML = filteredRankings.map(s => {
-    const hasData = s.hasData;
-    if (hasData) rankCounter++;
+    // Count ranks only for sections WITH data up to current page start
+    let rankCounter = filteredRankings.slice(0, start).filter(s => s.hasData).length;
 
-    const rankDisplay = hasData ? rankCounter : '—';
-    const rankCls = hasData ? (rankCounter <= 3 ? `rank-${rankCounter}` : 'rank-other') : 'rank-other';
+    tbody.innerHTML = pageItems.map(s => {
+        const hasData = s.hasData;
+        if (hasData) rankCounter++;
 
-    // Tests Taken cell
-    const testsTakenCell = hasData
-        ? `<span style="font-weight:600;font-family:'DM Mono',monospace;">${s.totalTests || 0}</span>`
-        : '<span style="color:#8a98ae;">—</span>';
+        const rankDisplay = hasData ? rankCounter : '—';
+        const rankCls = hasData ? (rankCounter <= 3 ? `rank-${rankCounter}` : 'rank-other') : 'rank-other';
 
-    // Avg Performance cell
-    let avgPerfCell = '<span style="color:#8a98ae;font-size:12px;">No result yet</span>';
-    if (hasData && s.avgScore > 0) {
-        const rt = getScoreRating(s.avgScore);
-        avgPerfCell = `<span class="score-pill ${rt.cls}">${rt.text}</span>`;
+        const testsTakenCell = hasData
+            ? `<span style="font-weight:600;font-family:'DM Mono',monospace;">${s.totalTests || 0}</span>`
+            : '<span style="color:#8a98ae;">—</span>';
+
+        let avgPerfCell = '<span style="color:#8a98ae;font-size:12px;">No result yet</span>';
+        if (hasData && s.avgScore > 0) {
+            const rt = getScoreRating(s.avgScore);
+            avgPerfCell = `<span class="score-pill ${rt.cls}">${rt.text}</span>`;
+        }
+
+        let topCatCell = '<span style="color:#8a98ae;">—</span>';
+        if (hasData && s.preScores.length > 0) {
+            const best = Math.max(...s.allScores);
+            const rt = getScoreRating(best);
+            topCatCell = `<span class="score-pill ${rt.cls}" style="font-size:10px;">${rt.text}</span>`;
+        }
+
+        return `<tr style="${!hasData ? 'opacity:0.65;' : ''}">
+            <td data-label="Rank"><div class="rank-num ${rankCls}">${rankDisplay}</div></td>
+            <td data-label="Section">
+                <span style="font-weight:600;color:#0a1628;">${s.name}</span>
+                ${!hasData ? '<span style="margin-left:6px;font-size:10px;background:#f1f5f9;color:#94a3b8;padding:2px 7px;border-radius:10px;font-weight:600;">No data yet</span>' : ''}
+            </td>
+            <td data-label="College"><span style="font-size:13px;">${s.college}</span></td>
+            <td data-label="Professor"><span style="font-size:13px;">${s.professor || 'Unassigned'}</span></td>
+            <td data-label="Students">${s.studentCount}</td>
+            <td data-label="Tests Taken">${testsTakenCell}</td>
+            <td data-label="Avg Performance">${avgPerfCell}</td>
+            <td data-label="Top Category">${topCatCell}</td>
+            <td data-label="Actions">
+                <div class="tbl-actions">
+                    <button class="tbl-btn tbl-btn-view" onclick="viewSectionDetails('${s.name.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="tbl-btn tbl-btn-deact" onclick="deleteSection('${s.name.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+
+    renderSectionRankingPagination();
+}
+
+function renderSectionRankingPagination() {
+    let el = document.getElementById('sectionRankingPagination');
+    if (!el) {
+        const wrapper = document.querySelector('#sectionRankingTableBody')?.closest('.overflow-x-auto');
+        if (!wrapper) return;
+        el = document.createElement('div');
+        el.id = 'sectionRankingPagination';
+        wrapper.parentElement.appendChild(el);
     }
 
-    // Top Category — best single test category
-    let topCatCell = '<span style="color:#8a98ae;">—</span>';
-    if (hasData && s.preScores.length > 0) {
-        const best = Math.max(...s.allScores);
-        const rt = getScoreRating(best);
-        topCatCell = `<span class="score-pill ${rt.cls}" style="font-size:10px;">${rt.text}</span>`;
+    const pageSize = 10;
+    const totalPages = Math.ceil(filteredRankings.length / pageSize);
+    const cur = window.sectionRankingCurrentPage || 1;
+
+    if (filteredRankings.length === 0) { el.innerHTML = ''; return; }
+
+    const start = (cur - 1) * pageSize + 1;
+    const end = Math.min(cur * pageSize, filteredRankings.length);
+
+    let pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= cur - 2 && i <= cur + 2)) {
+            pages.push(i);
+        } else if (pages[pages.length - 1] !== '...') {
+            pages.push('...');
+        }
     }
 
-    return `<tr style="${!hasData ? 'opacity:0.65;' : ''}">
-        <td data-label="Rank"><div class="rank-num ${rankCls}">${rankDisplay}</div></td>
-        <td data-label="Section">
-            <span style="font-weight:600;color:#0a1628;">${s.name}</span>
-            ${!hasData ? '<span style="margin-left:6px;font-size:10px;background:#f1f5f9;color:#94a3b8;padding:2px 7px;border-radius:10px;font-weight:600;">No data yet</span>' : ''}
-        </td>
-        <td data-label="College"><span style="font-size:13px;">${s.college}</span></td>
-        <td data-label="Professor"><span style="font-size:13px;">${s.professor || 'Unassigned'}</span></td>
-        <td data-label="Students">${s.studentCount}</td>
-        <td data-label="Tests Taken">${testsTakenCell}</td>
-        <td data-label="Avg Performance">${avgPerfCell}</td>
-        <td data-label="Top Category">${topCatCell}</td>
-        <td data-label="Actions">
-            <div class="tbl-actions">
-                <button class="tbl-btn tbl-btn-view" onclick="viewSectionDetails('${s.name.replace(/'/g, "\\'")}')">
-                    <i class="fas fa-eye"></i> View
+    el.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:between;gap:8px;padding:14px 20px;border-top:1px solid #e1e6ef;background:#fafbfd;flex-wrap:wrap;">
+            <div style="font-size:13px;color:#8a98ae;flex:1;min-width:150px;">
+                Showing <strong style="color:#0a1628;">${start}–${end}</strong> of <strong style="color:#0a1628;">${filteredRankings.length}</strong> sections
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                <button onclick="goToSectionRankingPage(${cur - 1})" ${cur === 1 ? 'disabled' : ''} style="width:34px;height:34px;border-radius:8px;border:1px solid #e1e6ef;background:${cur === 1 ? '#f4f6fa' : '#fff'};color:${cur === 1 ? '#c5cfe0' : '#4a5a72'};cursor:${cur === 1 ? 'not-allowed' : 'pointer'};font-family:'DM Sans',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">
+                    <i class="fas fa-chevron-left"></i>
                 </button>
-                <button class="tbl-btn tbl-btn-deact" onclick="deleteSection('${s.name.replace(/'/g, "\\'")}')">
-                    <i class="fas fa-trash"></i> Delete
+                ${pages.map(p => p === '...'
+                    ? `<span style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#8a98ae;font-size:13px;">…</span>`
+                    : `<button onclick="goToSectionRankingPage(${p})" style="width:34px;height:34px;border-radius:8px;border:1px solid ${p === cur ? '#2d6fc4' : '#e1e6ef'};background:${p === cur ? '#2d6fc4' : '#fff'};color:${p === cur ? '#fff' : '#4a5a72'};cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:${p === cur ? '700' : '500'};display:flex;align-items:center;justify-content:center;transition:all 0.15s;">${p}</button>`
+                ).join('')}
+                <button onclick="goToSectionRankingPage(${cur + 1})" ${cur === totalPages ? 'disabled' : ''} style="width:34px;height:34px;border-radius:8px;border:1px solid #e1e6ef;background:${cur === totalPages ? '#f4f6fa' : '#fff'};color:${cur === totalPages ? '#c5cfe0' : '#4a5a72'};cursor:${cur === totalPages ? 'not-allowed' : 'pointer'};font-family:'DM Sans',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">
+                    <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
-        </td>
-    </tr>`;
-}).join('');
+        </div>`;
 }
+
+window.goToSectionRankingPage = function(page) {
+    const pageSize = 10;
+    const totalPages = Math.ceil(filteredRankings.length / pageSize);
+    if (page < 1 || page > totalPages) return;
+    window.sectionRankingCurrentPage = page;
+    renderSectionRankingTable();
+};
 
    function updateRankingSummaryStats() {
     document.getElementById('totalSectionsRanked').textContent = sectionRankings.length;
@@ -2382,32 +2447,30 @@ const withData = studentRankings.filter(s => s.hasData)
     const sec = document.getElementById('studentSectionFilter')?.value || 'all';
     const type = document.getElementById('studentTestTypeFilter')?.value || 'all';
 
-    // When "all sections" — show ALL students from ALL sections
     filteredStudentRankings = studentRankings.filter(s => {
         const ms = !search || s.name.toLowerCase().includes(search) || s.id.toLowerCase().includes(search);
-        // Section filter: 'all' shows everyone, specific section filters by exact match
         const msc = sec === 'all' || s.section === sec;
         let mt = true;
         if (type === 'pre') mt = s.preScores && s.preScores.length > 0;
         else if (type === 'post') mt = s.postScores && s.postScores.length > 0;
         return ms && msc && mt;
     });
-const withData = filteredStudentRankings.filter(s => s.hasData)
-    .sort((a, b) => {
-        if (b.testsTaken !== a.testsTaken) return b.testsTaken - a.testsTaken;
-        if (b.avgScore !== a.avgScore) return b.avgScore - a.avgScore;
-        return a.name.localeCompare(b.name);
-    });
+    const withData = filteredStudentRankings.filter(s => s.hasData)
+        .sort((a, b) => {
+            if (b.testsTaken !== a.testsTaken) return b.testsTaken - a.testsTaken;
+            if (b.avgScore !== a.avgScore) return b.avgScore - a.avgScore;
+            return a.name.localeCompare(b.name);
+        });
     const withoutData = filteredStudentRankings.filter(s => !s.hasData)
         .sort((a, b) => a.name.localeCompare(b.name));
 
     filteredStudentRankings = [...withData, ...withoutData];
-
+    window.studentRankingCurrentPage = 1; // reset on filter
     renderStudentRankingTable();
     updateStudentRankingSummaryStats();
 };
 
-    function renderStudentRankingTable() {
+   function renderStudentRankingTable() {
     const tbody = document.getElementById('studentRankingTableBody');
     if (!tbody) return;
     if (!filteredStudentRankings.length) {
@@ -2415,52 +2478,118 @@ const withData = filteredStudentRankings.filter(s => s.hasData)
             <div style="font-size:48px;color:#c5cfe0;margin-bottom:16px;"><i class="fas fa-user-graduate"></i></div>
             <div style="font-size:17px;font-weight:600;color:#0a1628;margin-bottom:8px;">No Students Found</div>
             </div></td></tr>`;
+        renderStudentRankingPagination();
         return;
     }
- 
-    let rankCounter = 0;
-tbody.innerHTML = filteredStudentRankings.map(s => {
-    const hasData = s.hasData;
-    if (hasData) rankCounter++;
-    const rankDisplay = hasData ? rankCounter : '—';
-    const rc = hasData ? (rankCounter <= 3 ? `rank-${rankCounter}` : 'rank-other') : 'rank-other';
-// Avg Performance — always use overallCategory (deduped), identical to modal
-    let avgPerfDisplay = '<span style="color:#8a98ae;font-size:12px;">No result yet</span>';
-    if (hasData && s.overallCategory) {
-        const cls = getCategoryClass(s.overallCategory);
-        avgPerfDisplay = `<span class="score-pill ${cls}">${s.overallCategory}</span>`;
+
+    const pageSize = 10;
+    const totalPages = Math.ceil(filteredStudentRankings.length / pageSize);
+    if (window.studentRankingCurrentPage === undefined) window.studentRankingCurrentPage = 1;
+    if (window.studentRankingCurrentPage > totalPages) window.studentRankingCurrentPage = 1;
+    const start = (window.studentRankingCurrentPage - 1) * pageSize;
+    const pageItems = filteredStudentRankings.slice(start, start + pageSize);
+
+    let rankCounter = filteredStudentRankings.slice(0, start).filter(s => s.hasData).length;
+
+    tbody.innerHTML = pageItems.map(s => {
+        const hasData = s.hasData;
+        if (hasData) rankCounter++;
+        const rankDisplay = hasData ? rankCounter : '—';
+        const rc = hasData ? (rankCounter <= 3 ? `rank-${rankCounter}` : 'rank-other') : 'rank-other';
+
+        let avgPerfDisplay = '<span style="color:#8a98ae;font-size:12px;">No result yet</span>';
+        if (hasData && s.overallCategory) {
+            const cls = getCategoryClass(s.overallCategory);
+            avgPerfDisplay = `<span class="score-pill ${cls}">${s.overallCategory}</span>`;
+        }
+
+        let topCatDisplay = '<span style="color:#8a98ae;">—</span>';
+        if (hasData && s.bestTestCategory) {
+            const cls = getCategoryClass(s.bestTestCategory);
+            const testLabel = s.bestTestName
+                ? `<div style="font-size:10px;color:#8a98ae;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">${s.bestTestName}</div>`
+                : '';
+            topCatDisplay = `<div><span class="score-pill ${cls}" style="font-size:10px;">${s.bestTestCategory}</span>${testLabel}</div>`;
+        }
+        return `<tr style="${!hasData ? 'opacity:0.65;' : ''}">
+            <td data-label="Rank"><div class="rank-num ${rc}" style="${!hasData ? 'background:#f4f6fa;color:#4a5a72;border:1px solid #e1e6ef;' : ''}">${rankDisplay}</div></td>
+            <td data-label="Student Name">
+                <span style="font-weight:600;color:#0a1628;">${s.name}</span>
+                ${!hasData ? '<span style="margin-left:6px;font-size:10px;background:#f1f5f9;color:#94a3b8;padding:2px 7px;border-radius:10px;font-weight:600;">No result yet</span>' : ''}
+            </td>
+            <td data-label="Section"><span style="font-size:13px;">${s.section}</span></td>
+            <td data-label="Student ID"><span style="font-family:'DM Mono',monospace;font-size:12px;color:#8a98ae;">${s.id}</span></td>
+            <td data-label="Tests Taken">${hasData ? s.testsTaken : '—'}</td>
+            <td data-label="Avg Performance">${avgPerfDisplay}</td>
+            <td data-label="Top Category">${topCatDisplay}</td>
+            <td data-label="Actions">
+                <div class="tbl-actions">
+                    <button class="tbl-btn tbl-btn-view" onclick="viewStudentDetails('${s.id.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+
+    renderStudentRankingPagination();
+}
+
+function renderStudentRankingPagination() {
+    let el = document.getElementById('studentRankingPagination');
+    if (!el) {
+        const wrapper = document.querySelector('#studentRankingTableBody')?.closest('.overflow-x-auto');
+        if (!wrapper) return;
+        el = document.createElement('div');
+        el.id = 'studentRankingPagination';
+        wrapper.parentElement.appendChild(el);
     }
 
-    // Top Category — best individual test name + its category
-    let topCatDisplay = '<span style="color:#8a98ae;">—</span>';
-    if (hasData && s.bestTestCategory) {
-        const cls = getCategoryClass(s.bestTestCategory);
-        const testLabel = s.bestTestName
-            ? `<div style="font-size:10px;color:#8a98ae;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">${s.bestTestName}</div>`
-            : '';
-        topCatDisplay = `<div><span class="score-pill ${cls}" style="font-size:10px;">${s.bestTestCategory}</span>${testLabel}</div>`;
+    const pageSize = 10;
+    const totalPages = Math.ceil(filteredStudentRankings.length / pageSize);
+    const cur = window.studentRankingCurrentPage || 1;
+
+    if (filteredStudentRankings.length === 0) { el.innerHTML = ''; return; }
+
+    const start = (cur - 1) * pageSize + 1;
+    const end = Math.min(cur * pageSize, filteredStudentRankings.length);
+
+    let pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= cur - 2 && i <= cur + 2)) {
+            pages.push(i);
+        } else if (pages[pages.length - 1] !== '...') {
+            pages.push('...');
+        }
     }
-    return `<tr style="${!hasData ? 'opacity:0.65;' : ''}">
-        <td data-label="Rank"><div class="rank-num ${rc}" style="${!hasData ? 'background:#f4f6fa;color:#4a5a72;border:1px solid #e1e6ef;' : ''}">${rankDisplay}</div></td>
-        <td data-label="Student Name">
-            <span style="font-weight:600;color:#0a1628;">${s.name}</span>
-            ${!hasData ? '<span style="margin-left:6px;font-size:10px;background:#f1f5f9;color:#94a3b8;padding:2px 7px;border-radius:10px;font-weight:600;">No result yet</span>' : ''}
-        </td>
-        <td data-label="Section"><span style="font-size:13px;">${s.section}</span></td>
-        <td data-label="Student ID"><span style="font-family:'DM Mono',monospace;font-size:12px;color:#8a98ae;">${s.id}</span></td>
-        <td data-label="Tests Taken">${hasData ? s.testsTaken : '—'}</td>
-        <td data-label="Avg Performance">${avgPerfDisplay}</td>
-        <td data-label="Top Category">${topCatDisplay}</td>
-        <td data-label="Actions">
-            <div class="tbl-actions">
-                <button class="tbl-btn tbl-btn-view" onclick="viewStudentDetails('${s.id.replace(/'/g, "\\'")}')">
-                    <i class="fas fa-eye"></i> View
+
+    el.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:between;gap:8px;padding:14px 20px;border-top:1px solid #e1e6ef;background:#fafbfd;flex-wrap:wrap;">
+            <div style="font-size:13px;color:#8a98ae;flex:1;min-width:150px;">
+                Showing <strong style="color:#0a1628;">${start}–${end}</strong> of <strong style="color:#0a1628;">${filteredStudentRankings.length}</strong> students
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                <button onclick="goToStudentRankingPage(${cur - 1})" ${cur === 1 ? 'disabled' : ''} style="width:34px;height:34px;border-radius:8px;border:1px solid #e1e6ef;background:${cur === 1 ? '#f4f6fa' : '#fff'};color:${cur === 1 ? '#c5cfe0' : '#4a5a72'};cursor:${cur === 1 ? 'not-allowed' : 'pointer'};font-family:'DM Sans',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                ${pages.map(p => p === '...'
+                    ? `<span style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#8a98ae;font-size:13px;">…</span>`
+                    : `<button onclick="goToStudentRankingPage(${p})" style="width:34px;height:34px;border-radius:8px;border:1px solid ${p === cur ? '#2d6fc4' : '#e1e6ef'};background:${p === cur ? '#2d6fc4' : '#fff'};color:${p === cur ? '#fff' : '#4a5a72'};cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:${p === cur ? '700' : '500'};display:flex;align-items:center;justify-content:center;transition:all 0.15s;">${p}</button>`
+                ).join('')}
+                <button onclick="goToStudentRankingPage(${cur + 1})" ${cur === totalPages ? 'disabled' : ''} style="width:34px;height:34px;border-radius:8px;border:1px solid #e1e6ef;background:${cur === totalPages ? '#f4f6fa' : '#fff'};color:${cur === totalPages ? '#c5cfe0' : '#4a5a72'};cursor:${cur === totalPages ? 'not-allowed' : 'pointer'};font-family:'DM Sans',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">
+                    <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
-        </td>
-    </tr>`;
-}).join('');
+        </div>`;
 }
+
+window.goToStudentRankingPage = function(page) {
+    const pageSize = 10;
+    const totalPages = Math.ceil(filteredStudentRankings.length / pageSize);
+    if (page < 1 || page > totalPages) return;
+    window.studentRankingCurrentPage = page;
+    renderStudentRankingTable();
+};
 
 
 
@@ -2934,18 +3063,92 @@ populateSectionFilters();
         } catch(e) { preAssessments=[]; renderPreAssessmentsTable(); console.error(e); }
     }
 
-    function renderPreAssessmentsTable(data) {
-        const rows=data!==undefined?data:preAssessments;
-        const tbody=document.getElementById('preAssessmentsTableBody'); if(!tbody) return;
-        if(!rows.length) { tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div style="font-size:48px;color:#c5cfe0;margin-bottom:16px;"><i class="fas fa-clipboard"></i></div><div style="font-size:17px;font-weight:600;color:#0a1628;margin-bottom:8px;">No Records</div><div style="font-size:14px;color:#8a98ae;">No pre-assessment data found.</div></div></td></tr>`; return; }
-        tbody.innerHTML=rows.map(a => {
-            const bmi=parseFloat(a.bmi)||0; const cat=resolveBMICat(a.category,bmi); const date=parseBMIDate(a);
-            const name=(a._fullName||(a.studentName||a.name||a.displayName||'Unknown')).replace(/\b\w/g,c=>c.toUpperCase());
-            const section=a.section||a.assignedSection||'N/A';
-            const umakId=a.umakId||(a.studentId||'').replace(/^student_/i,'')||'';
-            return `<tr><td data-label="Student"><div style="font-weight:600;color:#0a1628;">${name}</div>${umakId?`<div style="font-size:11px;color:#8a98ae;font-family:'DM Mono',monospace;">${umakId}</div>`:''}</td><td data-label="Section">${section}</td><td data-label="Height (cm)">${a.height||'N/A'}</td><td data-label="Weight (kg)">${a.weight||'N/A'}</td><td data-label="BMI"><strong style="font-family:'DM Mono',monospace;">${bmi>0?bmi.toFixed(2):'N/A'}</strong></td><td data-label="Category"><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td><td data-label="Date" style="font-size:12px;">${date}</td><td data-label="Actions"><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewBMIDetails('${a.id}','pre')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
-        }).join('');
+function renderPreAssessmentsTable(data) {
+    const rows = data !== undefined ? data : preAssessments;
+    const tbody = document.getElementById('preAssessmentsTableBody'); if (!tbody) return;
+    if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div style="font-size:48px;color:#c5cfe0;margin-bottom:16px;"><i class="fas fa-clipboard"></i></div><div style="font-size:17px;font-weight:600;color:#0a1628;margin-bottom:8px;">No Records</div><div style="font-size:14px;color:#8a98ae;">No pre-assessment data found.</div></div></td></tr>`;
+        renderPreAssessmentPagination(rows);
+        return;
     }
+
+    const pageSize = 10;
+    const totalPages = Math.ceil(rows.length / pageSize);
+    if (window.preAssessmentCurrentPage === undefined) window.preAssessmentCurrentPage = 1;
+    if (window.preAssessmentCurrentPage > totalPages) window.preAssessmentCurrentPage = 1;
+    const start = (window.preAssessmentCurrentPage - 1) * pageSize;
+    const pageItems = rows.slice(start, start + pageSize);
+
+    tbody.innerHTML = pageItems.map(a => {
+        const bmi = parseFloat(a.bmi) || 0; const cat = resolveBMICat(a.category, bmi); const date = parseBMIDate(a);
+        const name = (a._fullName || (a.studentName || a.name || a.displayName || 'Unknown')).replace(/\b\w/g, c => c.toUpperCase());
+        const section = a.section || a.assignedSection || 'N/A';
+        const umakId = a.umakId || (a.studentId || '').replace(/^student_/i, '') || '';
+        return `<tr><td data-label="Student"><div style="font-weight:600;color:#0a1628;">${name}</div>${umakId ? `<div style="font-size:11px;color:#8a98ae;font-family:'DM Mono',monospace;">${umakId}</div>` : ''}</td><td data-label="Section">${section}</td><td data-label="Height (cm)">${a.height || 'N/A'}</td><td data-label="Weight (kg)">${a.weight || 'N/A'}</td><td data-label="BMI"><strong style="font-family:'DM Mono',monospace;">${bmi > 0 ? bmi.toFixed(2) : 'N/A'}</strong></td><td data-label="Category"><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td><td data-label="Date" style="font-size:12px;">${date}</td><td data-label="Actions"><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewBMIDetails('${a.id}','pre')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
+    }).join('');
+
+    renderPreAssessmentPagination(rows);
+}
+
+function renderPreAssessmentPagination(rows) {
+    let el = document.getElementById('preAssessmentPagination');
+    if (!el) {
+        const wrapper = document.querySelector('#preAssessmentsTableBody')?.closest('.overflow-x-auto');
+        if (!wrapper) return;
+        el = document.createElement('div');
+        el.id = 'preAssessmentPagination';
+        wrapper.parentElement.appendChild(el);
+    }
+
+    const pageSize = 10;
+    const totalPages = Math.ceil(rows.length / pageSize);
+    const cur = window.preAssessmentCurrentPage || 1;
+
+    if (rows.length === 0) { el.innerHTML = ''; return; }
+
+    const start = (cur - 1) * pageSize + 1;
+    const end = Math.min(cur * pageSize, rows.length);
+
+    let pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= cur - 2 && i <= cur + 2)) {
+            pages.push(i);
+        } else if (pages[pages.length - 1] !== '...') {
+            pages.push('...');
+        }
+    }
+
+    // Store current filtered rows for pagination navigation
+    window._preAssessmentFilteredRows = rows;
+
+    el.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:between;gap:8px;padding:14px 20px;border-top:1px solid #e1e6ef;background:#fafbfd;flex-wrap:wrap;">
+            <div style="font-size:13px;color:#8a98ae;flex:1;min-width:150px;">
+                Showing <strong style="color:#0a1628;">${start}–${end}</strong> of <strong style="color:#0a1628;">${rows.length}</strong> records
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                <button onclick="goToPreAssessmentPage(${cur - 1})" ${cur === 1 ? 'disabled' : ''} style="width:34px;height:34px;border-radius:8px;border:1px solid #e1e6ef;background:${cur === 1 ? '#f4f6fa' : '#fff'};color:${cur === 1 ? '#c5cfe0' : '#4a5a72'};cursor:${cur === 1 ? 'not-allowed' : 'pointer'};font-family:'DM Sans',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                ${pages.map(p => p === '...'
+                    ? `<span style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#8a98ae;font-size:13px;">…</span>`
+                    : `<button onclick="goToPreAssessmentPage(${p})" style="width:34px;height:34px;border-radius:8px;border:1px solid ${p === cur ? '#2d6fc4' : '#e1e6ef'};background:${p === cur ? '#2d6fc4' : '#fff'};color:${p === cur ? '#fff' : '#4a5a72'};cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:${p === cur ? '700' : '500'};display:flex;align-items:center;justify-content:center;transition:all 0.15s;">${p}</button>`
+                ).join('')}
+                <button onclick="goToPreAssessmentPage(${cur + 1})" ${cur === totalPages ? 'disabled' : ''} style="width:34px;height:34px;border-radius:8px;border:1px solid #e1e6ef;background:${cur === totalPages ? '#f4f6fa' : '#fff'};color:${cur === totalPages ? '#c5cfe0' : '#4a5a72'};cursor:${cur === totalPages ? 'not-allowed' : 'pointer'};font-family:'DM Sans',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>`;
+}
+
+window.goToPreAssessmentPage = function(page) {
+    const rows = window._preAssessmentFilteredRows || preAssessments;
+    const pageSize = 10;
+    const totalPages = Math.ceil(rows.length / pageSize);
+    if (page < 1 || page > totalPages) return;
+    window.preAssessmentCurrentPage = page;
+    renderPreAssessmentsTable(rows);
+};
 
     async function loadPostAssessments() {
         try {
@@ -2973,19 +3176,92 @@ populateSectionFilters();
     }
 
     function renderPostAssessmentsTable(data) {
-        const rows=data!==undefined?data:postAssessments;
-        const tbody=document.getElementById('postAssessmentsTableBody'); if(!tbody) return;
-        if(!rows.length) { tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div style="font-size:48px;color:#c5cfe0;margin-bottom:16px;"><i class="fas fa-chart-line"></i></div><div style="font-size:17px;font-weight:600;color:#0a1628;margin-bottom:8px;">No Records</div><div style="font-size:14px;color:#8a98ae;">No post-assessment data found.</div></div></td></tr>`; return; }
-        tbody.innerHTML=rows.map(a => {
-            const bmi=parseFloat(a.bmi)||0; const cat=resolveBMICat(a.category,bmi); const date=parseBMIDate(a);
-            const name=(a._fullName||(a.studentName||a.name||a.displayName||'Unknown')).replace(/\b\w/g,c=>c.toUpperCase());
-            const section=a.section||a.assignedSection||'N/A';
-            const umakId=a.umakId||(a.studentId||'').replace(/^student_/i,'')||'';
-            let bmiChangeHtml='<span style="color:#8a98ae;">—</span>';
-            if(typeof a._bmiChange==='number') { const ch=a._bmiChange; const icon=ch<0?'arrow-down':ch>0?'arrow-up':'minus'; const color=ch<0?'#0e8a5f':ch>0?'#c0392b':'#8a98ae'; bmiChangeHtml=`<span style="color:${color};font-weight:600;"><i class="fas fa-${icon}" style="margin-right:3px;"></i>${ch>0?'+':''}${ch.toFixed(2)}</span>`; }
-            return `<tr><td data-label="Student"><div style="font-weight:600;color:#0a1628;">${name}</div>${umakId?`<div style="font-size:11px;color:#8a98ae;font-family:'DM Mono',monospace;">${umakId}</div>`:''}</td><td data-label="Section">${section}</td><td data-label="Height (cm)">${a.height||'N/A'}</td><td data-label="Weight (kg)">${a.weight||'N/A'}</td><td data-label="BMI"><strong style="font-family:'DM Mono',monospace;">${bmi>0?bmi.toFixed(2):'N/A'}</strong></td><td data-label="Category"><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td><td data-label="Improvement">${bmiChangeHtml}</td><td data-label="Date" style="font-size:12px;">${date}</td><td data-label="Actions"><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewBMIDetails('${a.id}','post')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
-        }).join('');
+    const rows = data !== undefined ? data : postAssessments;
+    const tbody = document.getElementById('postAssessmentsTableBody'); if (!tbody) return;
+    if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div style="font-size:48px;color:#c5cfe0;margin-bottom:16px;"><i class="fas fa-chart-line"></i></div><div style="font-size:17px;font-weight:600;color:#0a1628;margin-bottom:8px;">No Records</div><div style="font-size:14px;color:#8a98ae;">No post-assessment data found.</div></div></td></tr>`;
+        renderPostAssessmentPagination(rows);
+        return;
     }
+
+    const pageSize = 10;
+    const totalPages = Math.ceil(rows.length / pageSize);
+    if (window.postAssessmentCurrentPage === undefined) window.postAssessmentCurrentPage = 1;
+    if (window.postAssessmentCurrentPage > totalPages) window.postAssessmentCurrentPage = 1;
+    const start = (window.postAssessmentCurrentPage - 1) * pageSize;
+    const pageItems = rows.slice(start, start + pageSize);
+
+    tbody.innerHTML = pageItems.map(a => {
+        const bmi = parseFloat(a.bmi) || 0; const cat = resolveBMICat(a.category, bmi); const date = parseBMIDate(a);
+        const name = (a._fullName || (a.studentName || a.name || a.displayName || 'Unknown')).replace(/\b\w/g, c => c.toUpperCase());
+        const section = a.section || a.assignedSection || 'N/A';
+        const umakId = a.umakId || (a.studentId || '').replace(/^student_/i, '') || '';
+        let bmiChangeHtml = '<span style="color:#8a98ae;">—</span>';
+        if (typeof a._bmiChange === 'number') { const ch = a._bmiChange; const icon = ch < 0 ? 'arrow-down' : ch > 0 ? 'arrow-up' : 'minus'; const color = ch < 0 ? '#0e8a5f' : ch > 0 ? '#c0392b' : '#8a98ae'; bmiChangeHtml = `<span style="color:${color};font-weight:600;"><i class="fas fa-${icon}" style="margin-right:3px;"></i>${ch > 0 ? '+' : ''}${ch.toFixed(2)}</span>`; }
+        return `<tr><td data-label="Student"><div style="font-weight:600;color:#0a1628;">${name}</div>${umakId ? `<div style="font-size:11px;color:#8a98ae;font-family:'DM Mono',monospace;">${umakId}</div>` : ''}</td><td data-label="Section">${section}</td><td data-label="Height (cm)">${a.height || 'N/A'}</td><td data-label="Weight (kg)">${a.weight || 'N/A'}</td><td data-label="BMI"><strong style="font-family:'DM Mono',monospace;">${bmi > 0 ? bmi.toFixed(2) : 'N/A'}</strong></td><td data-label="Category"><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td><td data-label="Improvement">${bmiChangeHtml}</td><td data-label="Date" style="font-size:12px;">${date}</td><td data-label="Actions"><div class="tbl-actions"><button class="tbl-btn tbl-btn-view" onclick="viewBMIDetails('${a.id}','post')"><i class="fas fa-eye"></i> View</button></div></td></tr>`;
+    }).join('');
+
+    renderPostAssessmentPagination(rows);
+}
+
+function renderPostAssessmentPagination(rows) {
+    let el = document.getElementById('postAssessmentPagination');
+    if (!el) {
+        const wrapper = document.querySelector('#postAssessmentsTableBody')?.closest('.overflow-x-auto');
+        if (!wrapper) return;
+        el = document.createElement('div');
+        el.id = 'postAssessmentPagination';
+        wrapper.parentElement.appendChild(el);
+    }
+
+    const pageSize = 10;
+    const totalPages = Math.ceil(rows.length / pageSize);
+    const cur = window.postAssessmentCurrentPage || 1;
+
+    if (rows.length === 0) { el.innerHTML = ''; return; }
+
+    const start = (cur - 1) * pageSize + 1;
+    const end = Math.min(cur * pageSize, rows.length);
+
+    let pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= cur - 2 && i <= cur + 2)) {
+            pages.push(i);
+        } else if (pages[pages.length - 1] !== '...') {
+            pages.push('...');
+        }
+    }
+
+    window._postAssessmentFilteredRows = rows;
+
+    el.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:between;gap:8px;padding:14px 20px;border-top:1px solid #e1e6ef;background:#fafbfd;flex-wrap:wrap;">
+            <div style="font-size:13px;color:#8a98ae;flex:1;min-width:150px;">
+                Showing <strong style="color:#0a1628;">${start}–${end}</strong> of <strong style="color:#0a1628;">${rows.length}</strong> records
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                <button onclick="goToPostAssessmentPage(${cur - 1})" ${cur === 1 ? 'disabled' : ''} style="width:34px;height:34px;border-radius:8px;border:1px solid #e1e6ef;background:${cur === 1 ? '#f4f6fa' : '#fff'};color:${cur === 1 ? '#c5cfe0' : '#4a5a72'};cursor:${cur === 1 ? 'not-allowed' : 'pointer'};font-family:'DM Sans',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                ${pages.map(p => p === '...'
+                    ? `<span style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#8a98ae;font-size:13px;">…</span>`
+                    : `<button onclick="goToPostAssessmentPage(${p})" style="width:34px;height:34px;border-radius:8px;border:1px solid ${p === cur ? '#2d6fc4' : '#e1e6ef'};background:${p === cur ? '#2d6fc4' : '#fff'};color:${p === cur ? '#fff' : '#4a5a72'};cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:${p === cur ? '700' : '500'};display:flex;align-items:center;justify-content:center;transition:all 0.15s;">${p}</button>`
+                ).join('')}
+                <button onclick="goToPostAssessmentPage(${cur + 1})" ${cur === totalPages ? 'disabled' : ''} style="width:34px;height:34px;border-radius:8px;border:1px solid #e1e6ef;background:${cur === totalPages ? '#f4f6fa' : '#fff'};color:${cur === totalPages ? '#c5cfe0' : '#4a5a72'};cursor:${cur === totalPages ? 'not-allowed' : 'pointer'};font-family:'DM Sans',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>`;
+}
+
+window.goToPostAssessmentPage = function(page) {
+    const rows = window._postAssessmentFilteredRows || postAssessments;
+    const pageSize = 10;
+    const totalPages = Math.ceil(rows.length / pageSize);
+    if (page < 1 || page > totalPages) return;
+    window.postAssessmentCurrentPage = page;
+    renderPostAssessmentsTable(rows);
+};
 
     window.refreshPreAssessments = function() { loadPreAssessments(); };
     window.refreshPostAssessments = function() { loadPostAssessments(); };
@@ -3009,17 +3285,18 @@ populateSectionFilters();
     const search = (document.getElementById('searchPreAssessments')?.value || '').toLowerCase().trim();
     const cat = document.getElementById('preAssessmentFilter')?.value || 'all';
     const sec = document.getElementById('preSectionFilter')?.value || 'all';
- 
+
     const filtered = preAssessments.filter(a => {
         const name = (a._fullName || a.studentName || a.name || a.displayName || '').toLowerCase();
         const asec = (a.section || a.assignedSection || '').trim();
         const id = (a.umakId || (a.studentId || '').replace(/^student_/i, '') || '').toLowerCase();
- 
+
         const ms = !search || name.includes(search) || asec.toLowerCase().includes(search) || id.includes(search);
         const mc = cat === 'all' || resolveBMICat(a.category, a.bmi) === cat;
         const msc = sec === 'all' || asec === sec;
         return ms && mc && msc;
     });
+    window.preAssessmentCurrentPage = 1; // reset on filter
     renderPreAssessmentsTable(filtered);
 };
  
@@ -3027,17 +3304,18 @@ window.filterPostAssessments = function() {
     const search = (document.getElementById('searchPostAssessments')?.value || '').toLowerCase().trim();
     const cat = document.getElementById('postAssessmentFilter')?.value || 'all';
     const sec = document.getElementById('postSectionFilter')?.value || 'all';
- 
+
     const filtered = postAssessments.filter(a => {
         const name = (a._fullName || a.studentName || a.name || a.displayName || '').toLowerCase();
         const asec = (a.section || a.assignedSection || '').trim();
         const id = (a.umakId || (a.studentId || '').replace(/^student_/i, '') || '').toLowerCase();
- 
+
         const ms = !search || name.includes(search) || asec.toLowerCase().includes(search) || id.includes(search);
         const mc = cat === 'all' || resolveBMICat(a.category, a.bmi) === cat;
         const msc = sec === 'all' || asec === sec;
         return ms && mc && msc;
     });
+    window.postAssessmentCurrentPage = 1; // reset on filter
     renderPostAssessmentsTable(filtered);
 };
 
