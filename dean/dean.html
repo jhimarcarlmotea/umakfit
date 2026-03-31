@@ -348,7 +348,78 @@
                     <i class="fas fa-sync-alt"></i> Refresh Dashboard
                 </button>
             </div>
+            <!-- ═══ PERFORMANCE OVERVIEW ═══ -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-7">
 
+    <!-- Overall System Performance -->
+    <div class="bg-white rounded-2xl border border-border shadow-sm p-6">
+        <div class="flex items-center gap-2.5 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white text-[13px]"><i class="fas fa-chart-pie"></i></div>
+            <div class="text-[14px] font-bold text-navy">Overall Performance</div>
+        </div>
+        <div class="text-center py-2">
+            <div id="dashOverallPerf" class="text-[28px] font-bold font-mono text-text-primary mb-1">—</div>
+            <div class="text-[12px] text-text-muted">system-wide average</div>
+        </div>
+        <div class="mt-4 space-y-2.5" id="dashPerfBars"></div>
+    </div>
+
+    <!-- BMI Health Status -->
+    <div class="bg-white rounded-2xl border border-border shadow-sm p-6">
+        <div class="flex items-center gap-2.5 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-success to-[#059669] flex items-center justify-center text-white text-[13px]"><i class="fas fa-heartbeat"></i></div>
+            <div class="text-[14px] font-bold text-navy">BMI Health Status</div>
+        </div>
+        <div class="space-y-2.5" id="dashBMIBars">
+            <div class="text-[13px] text-text-muted text-center py-4">Loading…</div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-border flex items-center justify-between">
+            <span class="text-[12px] text-text-muted">Normal weight students</span>
+            <span id="dashNormalPct" class="text-[14px] font-bold text-success">—%</span>
+        </div>
+    </div>
+
+    <!-- Assessment Progress -->
+    <div class="bg-white rounded-2xl border border-border shadow-sm p-6">
+        <div class="flex items-center gap-2.5 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#8b6914] to-accent flex items-center justify-center text-white text-[13px]"><i class="fas fa-tasks"></i></div>
+            <div class="text-[14px] font-bold text-navy">Assessment Progress</div>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-[12px] text-text-muted font-semibold uppercase tracking-[0.5px]">Pre-Assessment</span>
+                    <span id="dashPreCount" class="text-[13px] font-bold text-navy">—</span>
+                </div>
+                <div style="height:8px;background:#e1e6ef;border-radius:4px;overflow:hidden;">
+                    <div id="dashPreBar" style="height:100%;width:0%;background:linear-gradient(90deg,#2d6fc4,#1e4d8c);border-radius:4px;transition:width 0.6s ease;"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-[12px] text-text-muted font-semibold uppercase tracking-[0.5px]">Post-Assessment</span>
+                    <span id="dashPostCount" class="text-[13px] font-bold text-navy">—</span>
+                </div>
+                <div style="height:8px;background:#e1e6ef;border-radius:4px;overflow:hidden;">
+                    <div id="dashPostBar" style="height:100%;width:0%;background:linear-gradient(90deg,#0e8a5f,#059669);border-radius:4px;transition:width 0.6s ease;"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-[12px] text-text-muted font-semibold uppercase tracking-[0.5px]">Fitness Tests Taken</span>
+                    <span id="dashTestCount" class="text-[13px] font-bold text-navy">—</span>
+                </div>
+                <div style="height:8px;background:#e1e6ef;border-radius:4px;overflow:hidden;">
+                    <div id="dashTestBar" style="height:100%;width:0%;background:linear-gradient(90deg,#c8a84b,#9a7a28);border-radius:4px;transition:width 0.6s ease;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-border flex items-center justify-between">
+            <span class="text-[12px] text-text-muted">Post vs Pre rate</span>
+            <span id="dashCompletionRate" class="text-[14px] font-bold text-accent">—%</span>
+        </div>
+    </div>
+</div>
             <!-- Top Sections -->
             <div class="bg-white rounded-2xl border border-border shadow-sm mb-7 overflow-hidden">
                 <div class="px-6 py-4 border-b border-border flex items-center justify-between flex-wrap gap-3">
@@ -361,9 +432,8 @@
                     </a>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="custom-table">
-                        <thead><tr><th>Rank</th><th>Section</th><th>Professor</th><th>College</th><th>Students</th><th>Performance</th><th>Improvement</th></tr></thead>
-                        <tbody id="topSectionsTableBody">
+                <table class="custom-table">
+                    <thead><tr><th>Rank</th><th>Section</th><th>Professor</th><th>College</th><th>Students</th><th>Performance</th></tr></thead>                        <tbody id="topSectionsTableBody">
                             <tr><td colspan="7"><div class="py-16 text-center"><div class="text-4xl text-border-strong mb-4"><i class="fas fa-spinner fa-spin"></i></div><div class="text-sm text-text-muted">Loading section rankings…</div></div></td></tr>
                         </tbody>
                     </table>
@@ -463,12 +533,7 @@
                         Section Rankings
                     </div>
                     <div class="flex items-center gap-2.5 flex-wrap">
-                        <select class="px-3.5 py-2 border border-border rounded-lg text-[13px] text-text-primary bg-surface cursor-pointer focus:outline-none focus:border-blue font-sans" id="assessmentTypeFilter" onchange="filterRankings()">
-                            <option value="all">All Assessments</option>
-                            <option value="pre">Pre-Assessment</option>
-                            <option value="post">Post-Assessment</option>
-                            <option value="improvement">By Improvement</option>
-                        </select>
+                        
                         <select class="px-3.5 py-2 border border-border rounded-lg text-[13px] text-text-primary bg-surface cursor-pointer focus:outline-none focus:border-blue font-sans" id="collegeFilter" onchange="filterRankings()">
                             <option value="all">All Colleges</option>
                         </select>
@@ -480,8 +545,9 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="custom-table">
-<thead><tr><th>Rank</th><th>Section</th><th>College</th><th>Professor</th><th>Students</th><th>Tests Taken</th><th>Avg Performance</th><th>Top Category</th><th>Actions</th></tr></thead>                        <tbody id="sectionRankingTableBody">
-                            <tr><td colspan="11"><div class="py-16 text-center"><div class="text-4xl text-border-strong mb-4"><i class="fas fa-spinner fa-spin"></i></div><div class="text-sm text-text-muted">Loading rankings…</div></div></td></tr>
+                    <thead><tr><th>Rank</th><th>Section</th><th>College</th><th>Professor</th><th>Students</th><th>Tests Taken</th><th>Avg Performance</th><th>Actions</th></tr></thead>
+                        <tbody id="sectionRankingTableBody">
+                            <tr><td colspan="8"><div class="py-16 text-center"><div class="text-4xl text-border-strong mb-4"><i class="fas fa-spinner fa-spin"></i></div><div class="text-sm text-text-muted">Loading rankings…</div></div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -564,11 +630,7 @@
                         <select class="px-3.5 py-2 border border-border rounded-lg text-[13px] text-text-primary bg-surface cursor-pointer focus:outline-none focus:border-blue font-sans" id="studentSectionFilter" onchange="filterStudentRankings()">
                             <option value="all">All Sections</option>
                         </select>
-                        <select class="px-3.5 py-2 border border-border rounded-lg text-[13px] text-text-primary bg-surface cursor-pointer focus:outline-none focus:border-blue font-sans" id="studentTestTypeFilter" onchange="filterStudentRankings()">
-                            <option value="all">All Tests</option>
-                            <option value="pre">Pre-Test Only</option>
-                            <option value="post">Post-Test Only</option>
-                        </select>
+                       
                         <div class="relative flex items-center">
                             <i class="fas fa-search absolute left-3 text-text-muted text-[13px] pointer-events-none"></i>
                             <input type="text" class="pl-9 pr-3.5 py-2 border border-border rounded-lg text-[13px] text-text-primary bg-surface w-[220px] focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/10 focus:bg-white transition-all font-sans" id="searchStudentRankings" placeholder="Search student name…" onkeyup="filterStudentRankings()">
@@ -1293,7 +1355,123 @@ const CATEGORY_ORDER = { 'Excellent': 5, 'Good': 4, 'Average': 3, 'Below Average
             document.getElementById('profileInfoCreated').textContent = dateStr;
         }
     }
+            function renderDashboardOverview({ uw, nm, ow, ob, preCount, postCount }) {
+  
+        const perStudentTests = new Map(); // studentKey → Map(testKey → best attempt)
+        testResults.forEach(t => {
+            if (!t.score || t.score <= 0) return;
+            const studentKey = t.studentId || t.studentEmail || t.umakId || t.email || t.id;
+            const testKey = t.testId || t.scheduledTestId || t.testName;
+            if (!studentKey || !testKey) return;
+            if (!perStudentTests.has(studentKey)) perStudentTests.set(studentKey, new Map());
+            const stuMap = perStudentTests.get(studentKey);
+            const existing = stuMap.get(testKey);
+            const existingRank = existing ? (NORM_RANK_MAP[existing.category] || existing.score || 0) : -1;
+            const currentRank = NORM_RANK_MAP[t.category] || t.score || 0;
+            if (!existing || currentRank > existingRank) stuMap.set(testKey, t);
+        });
 
+        // For each student compute avgScore then map to category — same as loadStudentRankings
+        function dashRankToCat(avg) {
+            if (avg >= 4.5) return 'Excellent';
+            if (avg >= 3.5) return 'Good';
+            if (avg >= 2.5) return 'Average';
+            if (avg >= 1.5) return 'Below Average';
+            return 'Poor';
+        }
+
+        const cats = { Excellent:0, Good:0, Average:0, 'Below Average':0, Poor:0 };
+        const perStudentAvgs = [];
+        perStudentTests.forEach(stuMap => {
+            const scores = Array.from(stuMap.values()).map(t => t.score).filter(s => s > 0);
+            if (!scores.length) return;
+            const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+            perStudentAvgs.push(avg);
+            const cat = dashRankToCat(avg);
+            if (cats[cat] !== undefined) cats[cat]++;
+        });
+        const totalTests = Object.values(cats).reduce((a,b)=>a+b, 0);
+
+    const perfConfig = [
+        { label:'Excellent',     color:'#0e8a5f', bg:'#d4f0e6' },
+        { label:'Good',          color:'#1a6fa8', bg:'#d6eaf8' },
+        { label:'Average',       color:'#b07e16', bg:'#fef3d4' },
+        { label:'Below Average', color:'#c0392b', bg:'#fce8e6' },
+        { label:'Poor',          color:'#c0392b', bg:'#fce8e6' },
+    ];
+
+    
+        
+        const avgScore = perStudentAvgs.length
+            ? perStudentAvgs.reduce((a, b) => a + b, 0) / perStudentAvgs.length
+            : 0;
+        document.getElementById('dashOverallPerf').textContent =
+            avgScore > 0 ? getScoreRating(avgScore).text : '—';
+
+    // Performance breakdown bars
+    const perfBarsEl = document.getElementById('dashPerfBars');
+    if (perfBarsEl) {
+        perfBarsEl.innerHTML = perfConfig.map(cfg => {
+            const count = cats[cfg.label] || 0;
+            const pct   = totalTests > 0 ? Math.round((count/totalTests)*100) : 0;
+            return `
+                <div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                        <span style="font-size:11px;font-weight:600;color:${cfg.color};">${cfg.label}</span>
+                        <span style="font-size:11px;font-weight:700;color:#0a1628;">${count} <span style="color:#8a98ae;font-weight:400;">(${pct}%)</span></span>
+                    </div>
+                    <div style="height:6px;background:#e1e6ef;border-radius:3px;overflow:hidden;">
+                        <div style="height:100%;width:${pct}%;background:${cfg.color};border-radius:3px;transition:width 0.6s ease;"></div>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    // ── BMI bars ──
+    const totalBMI = uw + nm + ow + ob;
+    const bmiConfig = [
+        { label:'Normal',      count: nm, color:'#0e8a5f', bg:'#d4f0e6' },
+        { label:'Overweight',  count: ow, color:'#b07e16', bg:'#fef3d4' },
+        { label:'Underweight', count: uw, color:'#1a6fa8', bg:'#d6eaf8' },
+        { label:'Obese',       count: ob, color:'#c0392b', bg:'#fce8e6' },
+    ];
+    const bmiEl = document.getElementById('dashBMIBars');
+    if (bmiEl) {
+        bmiEl.innerHTML = bmiConfig.map(cfg => {
+            const pct = totalBMI > 0 ? Math.round((cfg.count/totalBMI)*100) : 0;
+            return `
+                <div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                        <span style="font-size:11px;font-weight:600;color:${cfg.color};">${cfg.label}</span>
+                        <span style="font-size:11px;font-weight:700;color:#0a1628;">${cfg.count} <span style="color:#8a98ae;font-weight:400;">(${pct}%)</span></span>
+                    </div>
+                    <div style="height:6px;background:#e1e6ef;border-radius:3px;overflow:hidden;">
+                        <div style="height:100%;width:${pct}%;background:${cfg.color};border-radius:3px;transition:width 0.6s ease;"></div>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+    const normalPct = totalBMI > 0 ? Math.round((nm/totalBMI)*100) : 0;
+    const normalEl = document.getElementById('dashNormalPct');
+    if (normalEl) normalEl.textContent = normalPct + '%';
+
+    // ── Assessment progress bars ──
+    const maxAssess = Math.max(preCount, postCount, 1);
+    const prePct  = Math.round((preCount/maxAssess)*100);
+    const postPct = Math.round((postCount/maxAssess)*100);
+    const testPct = Math.min(100, Math.round((totalTests / Math.max(totalTests,1))*100));
+
+    document.getElementById('dashPreCount').textContent  = preCount;
+    document.getElementById('dashPostCount').textContent = postCount;
+    document.getElementById('dashTestCount').textContent = totalTests;
+    document.getElementById('dashPreBar').style.width    = prePct  + '%';
+    document.getElementById('dashPostBar').style.width   = postPct + '%';
+    document.getElementById('dashTestBar').style.width   = Math.min(100, Math.round((totalTests/Math.max(preCount,1))*100)) + '%';
+
+    const rate = preCount > 0 ? Math.round((postCount/preCount)*100) : 0;
+    const rateEl = document.getElementById('dashCompletionRate');
+    if (rateEl) rateEl.textContent = rate + '%';
+}
     function getInitial(email) { return email ? email.charAt(0).toUpperCase() : 'D'; }
 
     async function updateProfileDisplay(userData) {
@@ -1708,6 +1886,7 @@ function _resolveNormCategory({ testName, result, testId, studentEmail, genderKe
             document.getElementById('normalCount').textContent = nm;
             document.getElementById('overweightCount').textContent = ow;
             document.getElementById('obeseCount').textContent = ob;
+            renderDashboardOverview({ uw, nm, ow, ob, preCount, postCount });
         } catch(e) { console.error(e); }
     }
     window.refreshDashboardData = async function() { await loadTestResults(); await loadDashboardStats(); await loadTopSections(); };
@@ -1938,12 +2117,7 @@ function renderSectionRankingTable() {
             avgPerfCell = `<span class="score-pill ${rt.cls}">${rt.text}</span>`;
         }
 
-        let topCatCell = '<span style="color:#8a98ae;">—</span>';
-        if (hasData && s.preScores.length > 0) {
-            const best = Math.max(...s.allScores);
-            const rt = getScoreRating(best);
-            topCatCell = `<span class="score-pill ${rt.cls}" style="font-size:10px;">${rt.text}</span>`;
-        }
+        
 
         return `<tr style="${!hasData ? 'opacity:0.65;' : ''}">
             <td data-label="Rank"><div class="rank-num ${rankCls}">${rankDisplay}</div></td>
@@ -1956,7 +2130,7 @@ function renderSectionRankingTable() {
             <td data-label="Students">${s.studentCount}</td>
             <td data-label="Tests Taken">${testsTakenCell}</td>
             <td data-label="Avg Performance">${avgPerfCell}</td>
-            <td data-label="Top Category">${topCatCell}</td>
+           
             <td data-label="Actions">
                 <div class="tbl-actions">
                     <button class="tbl-btn tbl-btn-view" onclick="viewSectionDetails('${s.name.replace(/'/g, "\\'")}')">
@@ -2060,8 +2234,7 @@ async function loadTopSections() {
         const rank = i + 1;
         const rc = rank <= 3 ? `rank-${rank}` : 'rank-other';
         const rt = getScoreRating(s.avgScore);
-        const ic = s.improvement > 0 ? 'trend-up' : s.improvement < 0 ? 'trend-down' : 'trend-neutral';
-        const ii = s.improvement > 0 ? 'arrow-up' : s.improvement < 0 ? 'arrow-down' : 'minus';
+    
         return `<tr>
             <td data-label="Rank"><div class="rank-num ${rc}">${rank}</div></td>
             <td data-label="Section"><span style="font-weight:600;color:#0a1628;">${s.name}</span></td>
@@ -2069,7 +2242,6 @@ async function loadTopSections() {
             <td data-label="College">${s.college}</td>
             <td data-label="Students">${s.studentCount}</td>
             <td data-label="Performance"><span class="score-pill ${rt.cls}">${rt.text}</span></td>
-            <td data-label="Improvement"><span class="${ic}"><i class="fas fa-${ii}" style="margin-right:3px;"></i>${s.improvement > 0 ? '+' : ''}${s.improvement.toFixed(1)}</span></td>
         </tr>`;
     }).join('');
 }
