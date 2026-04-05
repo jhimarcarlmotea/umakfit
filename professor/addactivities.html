@@ -189,6 +189,10 @@
         .logout-btn-confirm { background:#ea4335; color:#fff; }
         .logout-btn-confirm:disabled { opacity:0.7; cursor:not-allowed; }
 
+            @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
      /* ── MOBILE ── */
 @media (max-width: 768px) {
     .table-responsive { overflow-x:unset; border:none !important; background:transparent !important; border-radius:0; }
@@ -469,8 +473,14 @@
                             <tr><th>Test Name</th><th>Section</th><th>Date</th><th>Deadline</th><th>Progress</th><th>Attempts</th><th>Status</th><th>Action</th></tr>
                         </thead>
                         <tbody id="scheduleTableBody">
-                            <tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No Scheduled Tests</div></div></td></tr>
-                        </tbody>
+                        <tr><td colspan="8">
+                            <div style="display:flex;flex-direction:column;gap:10px;padding:20px;">
+                                <div style="height:48px;background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);background-size:200% 100%;border-radius:8px;animation:shimmer 1.2s infinite;"></div>
+                                <div style="height:48px;background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);background-size:200% 100%;border-radius:8px;animation:shimmer 1.2s infinite;"></div>
+                                <div style="height:48px;background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);background-size:200% 100%;border-radius:8px;animation:shimmer 1.2s infinite;"></div>
+                            </div>
+                        </td></tr>
+                    </tbody>
                     </table>
                 </div>
             </div>
@@ -592,7 +602,20 @@
             <button class="modal-close-btn" onclick="closeScheduleTestModal()"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-body">
-            <!-- Video URL -->
+            
+            <!-- Test Type -->
+            <div class="form-group">
+                <label class="form-label">Test Type <span class="text-danger">*</span></label>
+                    <select class="form-select" id="testType" required onchange="updateAttemptsDisplay();">
+                    <option value="">Select Test Type</option>
+                    <option value="3-Minute Step Test">3-Minute Step Test</option>
+                    <option value="Curl-Up Test">Curl-Up Test</option>
+                    <option value="Push-Up Test">Push-Up Test</option>
+                    <option value="Sit-and-Reach">Sit-and-Reach Test</option>
+                    <option value="Skinfold Caliper">Skinfold Caliper Measurements</option>
+                </select>
+            </div>
+                <!-- Video URL -->
             <div class="form-group">
                 <label class="form-label"><i class="fab fa-youtube text-red-500 mr-1"></i> Instruction Video URL (Optional)</label>
                 <div class="flex gap-2 mb-2">
@@ -623,19 +646,6 @@
                 </div>
                 <input type="hidden" id="videoURLFinal">
             </div>
-            <!-- Test Type -->
-            <div class="form-group">
-                <label class="form-label">Test Type <span class="text-danger">*</span></label>
-                    <select class="form-select" id="testType" required onchange="updateAttemptsDisplay();">
-                    <option value="">Select Test Type</option>
-                    <option value="3-Minute Step Test">3-Minute Step Test</option>
-                    <option value="Curl-Up Test">Curl-Up Test</option>
-                    <option value="Push-Up Test">Push-Up Test</option>
-                    <option value="Sit-and-Reach">Sit-and-Reach Test</option>
-                    <option value="Skinfold Caliper">Skinfold Caliper Measurements</option>
-                </select>
-            </div>
-           
            
             <!-- Section -->
             <div class="form-group">
@@ -963,12 +973,59 @@ function applyPresetVideo() {
     function showEditVideoPreview(l,u)  { document.getElementById('editVideoPreviewLabel').textContent=l+' — '+u; document.getElementById('editVideoPreview').classList.remove('hidden'); }
     function clearEditVideoURL()        { document.getElementById('editVideoURLFinal').value=''; document.getElementById('editVideoURL').value=''; document.getElementById('editVideoPresetSelect').value=''; document.getElementById('editVideoPreview').classList.add('hidden'); document.getElementById('editVideoPreviewLabel').textContent=''; closeEditCustomURLInput(); }
 
-    function updateAttemptsDisplay() {
-        const t = (document.getElementById('testType').value||'').toLowerCase();
-        const one = t.includes('skinfold')||t.includes('step test')||t.includes('3-minute');
-        document.getElementById('attemptsAllowed').value = one?1:2;
-        document.getElementById('attemptsDisplay').value = one?'1 Attempt':'2 Attempts';
+    // REPLACE the existing updateAttemptsDisplay function with this:
+function updateAttemptsDisplay() {
+    const t = (document.getElementById('testType').value || '').toLowerCase();
+    const one = t.includes('skinfold') || t.includes('step test') || t.includes('3-minute');
+    document.getElementById('attemptsAllowed').value = one ? 1 : 2;
+    document.getElementById('attemptsDisplay').value = one ? '1 Attempt' : '2 Attempts';
+
+    // Filter video presets to match selected test type
+    const presetMap = {
+        'push-up test': 'Push-Up Test',
+        'curl-up test': 'Curl-Up Test',
+        '3-minute step test': 'Step Test',
+        'sit-and-reach': 'Sit-and-Reach Test',
+        'skinfold caliper': 'Skinfold Caliper',
+    };
+
+    const selectedTest = document.getElementById('testType').value;
+    const presetSelect = document.getElementById('videoPresetSelect');
+    const matchLabel = presetMap[selectedTest.toLowerCase()] || '';
+
+    // Reset and rebuild options
+    presetSelect.innerHTML = '<option value="">— Select a preset video —</option>';
+    const allPresets = [
+        { value: 'https://www.youtube.com/watch?v=hX45cEWKUO0', label: 'Push-Up Test' },
+        { value: 'https://www.youtube.com/watch?v=gVTvCaScQx4', label: 'Curl-Up Test' },
+        { value: 'https://www.youtube.com/watch?v=RE2zONJbfYI', label: '3-Minute Step Test' },
+        { value: 'https://www.youtube.com/watch?v=vOH16gNAFxE', label: 'Sit-and-Reach Test' },
+        { value: 'https://www.youtube.com/watch?v=2243TPIBOI8', label: 'Skinfold Caliper' },
+    ];
+
+    if (!selectedTest) {
+        // No test selected — show all
+        allPresets.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.value;
+            opt.textContent = p.label;
+            presetSelect.appendChild(opt);
+        });
+    } else {
+        // Show only matching preset
+        const matched = allPresets.find(p => p.label.toLowerCase().includes(matchLabel.toLowerCase().split(' ')[0]));
+        if (matched) {
+            const opt = document.createElement('option');
+            opt.value = matched.value;
+            opt.textContent = matched.label;
+            presetSelect.appendChild(opt);
+            // Auto-select it and show preview
+            presetSelect.value = matched.value;
+            document.getElementById('videoURLFinal').value = matched.value;
+            showVideoPreview(matched.label, matched.value);
+        }
     }
+}
     function generateReports()    { showInfoModal('Report generation feature coming soon!'); }
     function filterResultsTable() { window.resultsCurrentPage=1; if(window.renderStudentResultsTableGlobal) window.renderStudentResultsTableGlobal(); }
     function clearResultFilters() { document.getElementById('searchResults').value=''; document.getElementById('filterSection').value=''; window.resultsCurrentPage=1; if(window.renderStudentResultsTableGlobal) window.renderStudentResultsTableGlobal(); }
@@ -1217,6 +1274,7 @@ onAuthStateChanged(auth, async user => {
         showErrorModal('Error loading data: '+err.message);
     }
 });
+        // CHANGE THIS (around line with _loadingTimeout):
         const _loadingTimeout = setTimeout(() => {
     document.getElementById('loadingScreen').style.display = 'none';
     document.getElementById('mainContent').classList.remove('hidden');
@@ -1293,6 +1351,8 @@ function populateSectionSortDropdown() {
 function renderScheduleTable(tests, enabledTestsMap) {
     const tb = document.getElementById('scheduleTableBody');
     if (!tests.length) {
+        // If sections haven't loaded yet, show loading skeleton instead of empty state
+        
         if (window.assignedSections.length>0) {
             const info = window.assignedSections.map(s=>`${s.section} (${s.students} students)`).join(', ');
             tb.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No Active Test Schedules</div><div class="empty-text">You have: <strong>${info}</strong><br><br>Click "Schedule New Test" to create a fitness test.</div></div></td></tr>`;
@@ -1325,7 +1385,10 @@ function renderScheduleTable(tests, enabledTestsMap) {
         const prog = `${test.completedStudents||0}/${test.totalStudents||0}`;
         const secInfo = window.assignedSections.find(s=>s.section===test.section);
         const schedInfo = secInfo ? `${secInfo.time} / ${secInfo.day} / ${secInfo.room}` : 'Not Set';
-        const normBadge = test.customNorms?.thresholds ? `<br><small style="color:#7c3aed;font-weight:600;">🎛 Custom norms set</small>` : '';
+       const testKey = resolveTestKey(test.testName || '');
+        const sectionNormKey = `${test.section}__${testKey}`;
+        const hasStudentNorms = !!(testKey && window._sectionTestNormsSet?.has(sectionNormKey));
+        const normBadge = (test.customNorms?.thresholds || hasStudentNorms) ? `<br><small style="color:#7c3aed;font-weight:600;">🎛 Custom norms set</small>` : '';
         return `<tr style="${isEnabled&&isOverdue?'background-color:#f0f9ff;':''}">
             <td data-label="Test Name">${esc(test.testName||'Unnamed')}${normBadge}${isEnabled&&isOverdue?`<br><small style="color:#2d6fc4;font-weight:600;">✓ Enabled for ${enabledCount}</small>`:''}</td>
             <td data-label="Section">${esc(test.section||'N/A')}<br><small style="color:#8a98ae;font-size:12px;">${esc(schedInfo)}</small></td>
@@ -1345,21 +1408,24 @@ function renderScheduleTable(tests, enabledTestsMap) {
 
 async function loadScheduledTests(userEmail, userId) {
     try {
-        // OPTIMIZED: resolve sections with indexed email query first
-        window.assignedSections = await resolveAssignedSections(userEmail);
-
-        // Query scheduled tests by email (indexed)
-        // Real-time listener for scheduled tests
         if (window._scheduledTestsUnsub) window._scheduledTestsUnsub();
+
+        // Start sections resolution in parallel — don't await before starting snapshot
+        const sectionsPromise = resolveAssignedSections(userEmail);
 
         window._scheduledTestsUnsub = onSnapshot(
             query(collection(db,'scheduledTests'), where('professorEmail','==',userEmail)),
             async (testsSnap) => {
+                // Wait for sections only when snapshot first fires (already running in parallel)
+                if (!window.assignedSections?.length) {
+                    window.assignedSections = await sectionsPromise;
+                }
                 // Permissions
                 const permSnap = await getDocs(query(collection(db,'testPermissions'), where('grantedBy','==',userEmail)));
                 const enabledTestsMap = new Map();
                 permSnap.forEach(d => { const p=d.data(); if(!enabledTestsMap.has(p.testId)) enabledTestsMap.set(p.testId,[]); enabledTestsMap.get(p.testId).push(p.studentEmail); });
 
+                window._sectionsResolved = true;
                 window.allScheduledTests = [];
                 testsSnap.forEach(d => window.allScheduledTests.push({ id:d.id, ...d.data() }));
                 window.allScheduledTests.sort((a,b) => {
@@ -1378,6 +1444,29 @@ async function loadScheduledTests(userEmail, userId) {
                 });
 
                 window._enabledTestsMap = enabledTestsMap;
+
+                // Build Set of "section__testKey" where any student has a custom norm
+                window._sectionTestNormsSet = new Set();
+                try {
+                    const combos = new Map(); // "section__testKey" → Set of emails
+                    window.allScheduledTests.forEach(t => {
+                        const tk = resolveTestKey(t.testName || '');
+                        if (!tk || tk === 'skinfold') return;
+                        const key = `${t.section}__${tk}`;
+                        if (!combos.has(key)) combos.set(key, new Set());
+                        (t.selectedStudents || []).filter(Boolean).forEach(e => combos.get(key).add(e));
+                    });
+                    await Promise.all([...combos.entries()].map(async ([key, emails]) => {
+                        const tk = key.split('__')[1];
+                        for (const email of emails) {
+                            try {
+                                const snap = await getDoc(doc(db, 'studentNorms', email, 'tests', tk));
+                                if (snap.exists()) { window._sectionTestNormsSet.add(key); break; }
+                            } catch (_) {}
+                        }
+                    }));
+                } catch (e) { console.warn('Could not load section norms set:', e); }
+
                 populateSectionSortDropdown();
                 renderScheduleTable(window.allScheduledTests, enabledTestsMap);
             },
@@ -1841,6 +1930,7 @@ window.showScheduleTestModal = function() {
     }
     document.getElementById('testType').value = '';
     clearVideoURL();
+    updateAttemptsDisplay();
     document.getElementById('attemptsAllowed').value = '2';
     document.getElementById('attemptsDisplay').value = '2 Attempts';
     updateAttemptsDisplay();
@@ -1976,7 +2066,12 @@ window.editTest = async function(testId) {
     } catch(e) { showErrorModal('Error loading test: '+e.message); }
 };
 
-window.closeEditTestModal = () => document.getElementById('editTestModal').style.display='none';
+window.closeEditTestModal = () => {
+    document.getElementById('editTestModal').style.display = 'none';
+    // Always wipe norm state so it doesn't bleed into the next edit session
+    window._editPendingNorm = null;
+    window._editHadCustomNorms = false;
+};
 
 window.saveEditTest = async function() {
     const testId=document.getElementById('editTestId').value;
@@ -2042,23 +2137,32 @@ function readScheduleNorms() {
         window._editPendingNorm = null;
 
         async function loadEditNormPanel(testData) {
-            // Norm panel removed — just store pending norm silently for saveEditTest
-            const tt = testData?.testName || '';
-            if (!tt || tt.toLowerCase().includes('skinfold')) { window._editPendingNorm = null; return; }
-            const norm = testData?.customNorms?.thresholds
-                ? { ...testData.customNorms, source: 'test-custom' }
-                : await getDefaultThresholds(resolveTestKey(tt), 'male', '19-22');
-            window._editPendingNorm = norm
-                ? { thresholds: { ...norm.thresholds }, lowerIsBetter: norm.lowerIsBetter ?? false, source: norm.source }
-                : null;
-        }
+    // Always reset first — prevents stale data from a previous edit session
+    window._editPendingNorm = null;
+    window._editHadCustomNorms = false;
+
+    const tt = testData?.testName || '';
+    if (!tt || tt.toLowerCase().includes('skinfold')) return;
+    
+    // Only mark as having custom norms if the Firestore doc explicitly has them
+    if (testData?.customNorms?.thresholds) {
+        window._editPendingNorm = {
+            thresholds: { ...testData.customNorms.thresholds },
+            lowerIsBetter: testData.customNorms.lowerIsBetter ?? false,
+            source: 'test-custom'
+        };
+        window._editHadCustomNorms = true;
+    }
+    
+}
 
         window.toggleEditNormPanel     = function() {};
         window.resetEditNormsToDefault = async function() {};
 
         function readEditNorms() {
-            return window._editPendingNorm || null;
-        }
+    if (!window._editHadCustomNorms || !window._editPendingNorm) return null;
+    return window._editPendingNorm;
+}
 
         // ── Per-student Norm Modal ────────────────────────────────────────
         window._studentCustomNorms = new Map();
@@ -2290,7 +2394,16 @@ window.saveStudentNormOverride = async function() {
     try {
         await saveStudentNorm(db, studentEmail, testKey, {Excellent:e,Good:g,Average:a,'Below Average':b}, {lowerIsBetter:lb,unit:testKey==='steptest'?'bpm':testKey==='sitreach'?'cm':'reps',setProfessorEmail:window.currentUser.email});
         if (!window._studentCustomNorms.has(studentEmail)) window._studentCustomNorms.set(studentEmail,new Map());
-        window._studentCustomNorms.get(studentEmail).set(testKey,true);
+       window._studentCustomNorms.get(studentEmail).set(testKey, true);
+
+        // Update badge map immediately — find section from testInfoHeader
+        const currentSection = document.getElementById('testInfoHeader').textContent.split(' - ')[1]?.trim() || '';
+        if (currentSection && testKey) {
+            if (!window._sectionTestNormsSet) window._sectionTestNormsSet = new Set();
+            window._sectionTestNormsSet.add(`${currentSection}__${testKey}`);
+            renderScheduleTable(window.allScheduledTests, window._enabledTestsMap || new Map());
+        }
+
         window.closeStudentNormModal();
         showSuccessModal(`✅ Custom norms saved for ${document.getElementById('snStudentName').textContent}!`);
         renderStudentListForTest(document.getElementById('studentSearchBox').value);
@@ -2313,9 +2426,22 @@ window.clearStudentNorm = function() {
                 }
             }
             
+            // Remove from badge map if no other student in this section still has norms
+            const currentSection = document.getElementById('testInfoHeader').textContent.split(' - ')[1]?.trim() || '';
+            const sectionNormKey = `${currentSection}__${testKey}`;
+            if (window._sectionTestNormsSet?.has(sectionNormKey)) {
+                let anyRemaining = false;
+                for (const [, normsMap] of (window._studentCustomNorms || new Map()).entries()) {
+                    if (normsMap instanceof Map && normsMap.has(testKey)) { anyRemaining = true; break; }
+                }
+                if (!anyRemaining) {
+                    window._sectionTestNormsSet.delete(sectionNormKey);
+                    renderScheduleTable(window.allScheduledTests, window._enabledTestsMap || new Map());
+                }
+            }
+
             window.closeStudentNormModal();
             showSuccessModal('Norms reset to default for this student.');
-            // Re-render with current search filter so badge and button color update immediately
             renderStudentListForTest(document.getElementById('studentSearchBox').value);
         } catch(err) { showErrorModal('Error: '+err.message); }
     }, ()=>{});

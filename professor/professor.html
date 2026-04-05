@@ -358,7 +358,72 @@
                     <div class="text-[11px] text-blue font-semibold mt-1 hidden" id="statActivitiesFilter"></div>
                 </div>
             </div>
-
+            <!-- ─── DASHBOARD OVERVIEW PANELS ─── -->
+ 
+            <!-- Row: Monitoring Snapshot + Lessons & Activities Summary -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-7">
+            
+                <!-- Monitoring Snapshot -->
+                <div class="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b border-border flex items-center justify-between">
+                        <div class="flex items-center gap-2.5 text-[14px] font-semibold text-navy">
+                            <div class="w-7 h-7 rounded-lg bg-info-bg text-info flex items-center justify-center text-xs">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            Activity Monitoring
+                        </div>
+                        <a href="monitoringactivities.html" class="text-[11px] text-blue font-semibold hover:underline flex items-center gap-1">Monitor <i class="fas fa-arrow-right text-[10px]"></i></a>
+                    </div>
+                    <div class="p-5">
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-surface rounded-xl p-3.5 text-center">
+                                <div class="text-[26px] font-bold font-mono text-info" id="overviewTotalSubmissions">—</div>
+                                <div class="text-[10px] text-text-muted uppercase tracking-[0.6px] mt-1">Total Submissions</div>
+                            </div>
+                            <div class="bg-surface rounded-xl p-3.5 text-center">
+                                <div class="text-[26px] font-bold font-mono text-success" id="overviewCompletedTests">—</div>
+                                <div class="text-[10px] text-text-muted uppercase tracking-[0.6px] mt-1">Completed Tests</div>
+                            </div>
+                        </div>
+                        <!-- Recent submissions -->
+                        <div class="text-[10px] font-semibold text-text-muted uppercase tracking-[0.7px] mb-2">Recent Submissions</div>
+                        <div id="overviewRecentSubmissions" class="space-y-1.5">
+                            <div class="text-[12px] text-text-muted py-2">Loading…</div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Lessons & Activities Summary -->
+                <div class="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b border-border flex items-center justify-between">
+                        <div class="flex items-center gap-2.5 text-[14px] font-semibold text-navy">
+                            <div class="w-7 h-7 rounded-lg bg-purple-bg text-purple flex items-center justify-center text-xs">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            Lessons Summary
+                        </div>
+                        <a href="addlesson.html" class="text-[11px] text-blue font-semibold hover:underline flex items-center gap-1">Manage <i class="fas fa-arrow-right text-[10px]"></i></a>
+                    </div>
+                    <div class="p-5">
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-purple-bg/50 rounded-xl p-3.5 text-center border border-purple/10">
+                                <div class="text-[26px] font-bold font-mono text-purple" id="overviewTotalLessons">—</div>
+                                <div class="text-[10px] text-text-muted uppercase tracking-[0.6px] mt-1">Lessons Published</div>
+                            </div>
+                            <div class="bg-warning-bg/50 rounded-xl p-3.5 text-center border border-warning/10">
+                                <div class="text-[26px] font-bold font-mono text-warning" id="overviewScheduledTests">—</div>
+                                <div class="text-[10px] text-text-muted uppercase tracking-[0.6px] mt-1">Activities Posted</div>
+                            </div>
+                        </div>
+                        <!-- Recent lessons -->
+                        <div class="text-[10px] font-semibold text-text-muted uppercase tracking-[0.7px] mb-2">Recent Lessons</div>
+                        <div id="overviewRecentLessons" class="space-y-1.5">
+                            <div class="text-[12px] text-text-muted py-2">Loading…</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Sections Panel -->
             <div class="bg-white rounded-2xl border border-border shadow-sm mb-6 overflow-hidden" id="sectionsPanel">
                 <div class="px-6 py-4 border-b border-border flex items-center justify-between flex-wrap gap-3">
@@ -425,7 +490,7 @@
             </div>
 
         </div>
-
+            
         <!-- Footer -->
         <footer class="bg-gradient-to-r from-navy to-navy-light text-white py-8 sm:py-12">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
@@ -595,7 +660,9 @@
             setupUI();
 
             // Fire both in parallel — no sequential await
-            await Promise.all([loadSections(), loadActivities(), loadRecentActivity()]);
+            await loadSections();  // MUST finish first so allSections is populated
+            await Promise.all([loadActivities(), loadRecentActivity()]);
+            await loadDashboardOverviews();
 
         } catch (err) {
             console.error('Dashboard init error:', err);
@@ -808,7 +875,536 @@
         }
     }
     window.loadRecentActivity = loadRecentActivity;
-
+    // ── Dashboard Overview Panels ──────────────────────────────────────────────
+     async function loadDashboardOverviews() {
+ 
+        // Guard: nothing to do if no sections assigned
+        if (!allSections || !allSections.length) {
+            _setOverviewEmpty();
+            return;
+        }
+ 
+        const CATEGORY_ORDER_LOCAL = {
+            'Excellent': 5, 'Good': 4, 'Average': 3, 'Below Average': 2, 'Poor': 1
+        };
+        const VALID_CATS = new Set(['Excellent', 'Good', 'Average', 'Below Average', 'Poor']);
+ 
+        function getOverallCat(cats) {
+            if (!cats || !cats.length) return null;
+            const total = cats.reduce((s, c) => s + (CATEGORY_ORDER_LOCAL[c] || 3), 0);
+            const avg = total / cats.length;
+            if (avg >= 4.5) return 'Excellent';
+            if (avg >= 3.5) return 'Good';
+            if (avg >= 2.5) return 'Average';
+            if (avg >= 1.5) return 'Below Average';
+            return 'Poor';
+        }
+ 
+        // ── Build lookup structures from allSections ──────────────────────────────
+ 
+        const sectionNamesSet = new Set(allSections.map(s => s.name));
+ 
+        // email → sectionName  (built from sections.students arrays)
+        const emailToSection = new Map();
+        allSections.forEach(sec => {
+            (sec.students || []).forEach(st => {
+                if (st.email) emailToSection.set(st.email.toLowerCase(), sec.name);
+            });
+        });
+ 
+        // Also pull from 'students' collection to catch students not embedded in section docs
+        try {
+            const secNames = [...sectionNamesSet];
+            const chunks = [];
+            for (let i = 0; i < secNames.length; i += 30) chunks.push(secNames.slice(i, i + 30));
+            await Promise.all(chunks.map(chunk =>
+                getDocs(query(collection(db, 'students'), where('section', 'in', chunk)))
+                    .then(snap => snap.forEach(d => {
+                        const sd = d.data();
+                        if (sd.email && sd.section) {
+                            emailToSection.set(sd.email.toLowerCase(), sd.section);
+                        }
+                    }))
+                    .catch(() => {})
+            ));
+        } catch (_) {}
+ 
+        // ── Fetch ALL testResults (no where clause — same as sectionranklist.html) ─
+        // Filter client-side by whether the student belongs to one of our sections.
+ 
+        // bestMap: `email___groupKey` → { email, section, category, categoryScore }
+        const bestMap = new Map();
+ 
+        try {
+            const snap = await getDocs(collection(db, 'testResults'));
+ 
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                if (data.status !== 'completed') return;
+ 
+                const se = (data.studentEmail || '').toLowerCase();
+                if (!se) return;
+ 
+                // Resolve which section this student belongs to
+                // Priority: stored section field → email lookup
+                let section = null;
+                if (data.section && sectionNamesSet.has(data.section)) {
+                    section = data.section;
+                } else {
+                    section = emailToSection.get(se) || null;
+                }
+                if (!section) return; // not one of our students
+ 
+                // Resolve category — use stored value (same as grades.html primary path)
+                const storedCat = data.score || data.category || null;
+                if (!storedCat || !VALID_CATS.has(storedCat)) return;
+ 
+                // Skip skinfold tests from overall score (same as grades.html)
+                const testName = (data.testName || '').toLowerCase();
+                const isSkinfold = testName.includes('skinfold') ||
+                                   testName.includes('body fat') ||
+                                   testName.includes('caliper') ||
+                                   testName.includes('body composition');
+                if (isSkinfold) return;
+ 
+                // Dedup key: best attempt per student per test group
+                // (mirrors sectionranklist.html groupKey logic)
+                const groupKey = data.scheduledTestId || data.testId || data.testName || docSnap.id;
+                const mk = `${se}___${groupKey}`;
+ 
+                const existing = bestMap.get(mk);
+                const curScore = CATEGORY_ORDER_LOCAL[storedCat] || 0;
+                const exScore  = existing ? (CATEGORY_ORDER_LOCAL[existing.category] || 0) : 0;
+ 
+                if (!existing || curScore > exScore) {
+                    bestMap.set(mk, {
+                        email: se,
+                        section,
+                        category: storedCat,
+                        categoryScore: curScore
+                    });
+                }
+            });
+        } catch (e) {
+            console.error('[Dashboard] testResults fetch error:', e);
+        }
+        
+        // ── Per-student: aggregate best-per-test categories ───────────────────────
+        // studentCatMap: email → { categories[], section }
+        const studentCatMap = new Map();
+        bestMap.forEach(entry => {
+            if (!studentCatMap.has(entry.email)) {
+                studentCatMap.set(entry.email, { categories: [], section: entry.section });
+            }
+            studentCatMap.get(entry.email).categories.push(entry.category);
+        });
+            
+        // ── PANEL 1 — Student Performance Overview ────────────────────────────────
+        try {
+            const catCounts = {
+                'Excellent': 0, 'Good': 0, 'Average': 0, 'Below Average': 0, 'Poor': 0
+            };
+            let totalGraded = 0;
+ 
+            studentCatMap.forEach(val => {
+                const overall = getOverallCat(val.categories);
+                if (overall && VALID_CATS.has(overall)) {
+                    catCounts[overall]++;
+                    totalGraded++;
+                }
+            });
+ 
+            const gradeEl = document.getElementById('overviewTotalGraded');
+            const excellEl = document.getElementById('overviewExcellentCount');
+            const needsEl = document.getElementById('overviewNeedsWork');
+            if (gradeEl)  gradeEl.textContent  = totalGraded;
+            if (excellEl) excellEl.textContent = catCounts['Excellent'];
+            if (needsEl)  needsEl.textContent  = catCounts['Below Average'] + catCounts['Poor'];
+ 
+            const catColors = {
+                'Excellent':     '#0e8a5f',
+                'Good':          '#2d6fc4',
+                'Average':       '#b07e16',
+                'Below Average': '#c0392b',
+                'Poor':          '#991b1b'
+            };
+            const CATS = ['Excellent', 'Good', 'Average', 'Below Average', 'Poor'];
+            const barsEl = document.getElementById('overviewGradesBars');
+if (barsEl) {
+    if (totalGraded === 0) {
+        barsEl.innerHTML =
+            '<div class="text-[12px] text-text-muted text-center py-4">No grade data yet.</div>';
+    } else {
+        barsEl.innerHTML = CATS.map(cat => {
+            const count = catCounts[cat];
+            const pct   = Math.round((count / totalGraded) * 100);
+            return `
+            <div class="flex items-center gap-3">
+                <div class="text-[11px] font-semibold text-text-secondary w-[95px] flex-shrink-0">
+                    ${escapeHtml(cat)}
+                </div>
+                <div class="flex-1 h-2 bg-border rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-500"
+                         style="width:${pct}%;background:${catColors[cat]}"></div>
+                </div>
+                <div class="text-[11px] font-bold text-text-primary w-6 text-right">${count}</div>
+            </div>`;
+        }).join('');
+    }
+}
+        } catch (e) { console.error('[Dashboard] Grades overview error:', e); }
+ 
+        // ── PANEL 2 — Section Rankings ─────────────────────────────────────────────
+        // Exact same composite formula as sectionranklist.html calculateRankings():
+        //   compositeScore = (sectionCategoryScore/5)*0.6 + completionRate*0.4
+        try {
+            // Build per-section aggregation
+            // sectionAgg: secName → { totalStudents, studentScores: Map<email, bestScore> }
+            const sectionAgg = new Map();
+            allSections.forEach(sec => {
+                sectionAgg.set(sec.name, {
+                    name:          sec.name,
+                    totalStudents: (sec.students || []).length,
+                    studentScores: new Map() // email → best categoryScore
+                });
+            });
+ 
+            // Fill in student scores from bestMap
+            bestMap.forEach(entry => {
+                const agg = sectionAgg.get(entry.section);
+                if (!agg) return;
+                const prev = agg.studentScores.get(entry.email) || 0;
+                if (entry.categoryScore > prev) {
+                    agg.studentScores.set(entry.email, entry.categoryScore);
+                }
+            });
+ 
+            // Compute composite score
+            const sectionScores = [];
+            sectionAgg.forEach(agg => {
+                const studentsWithGrades = agg.studentScores.size;
+                const totalStudents      = agg.totalStudents || studentsWithGrades || 1;
+                const completionRate     = studentsWithGrades / totalStudents; // 0..1
+ 
+                const sectionCategoryScore = studentsWithGrades > 0
+                    ? [...agg.studentScores.values()].reduce((a, b) => a + b, 0) / studentsWithGrades
+                    : 0;
+ 
+                const compositeScore = (sectionCategoryScore / 5) * 0.6 + completionRate * 0.4;
+ 
+                let category = 'No Data';
+                if (studentsWithGrades > 0) {
+                    if (sectionCategoryScore >= 4.5)      category = 'Excellent';
+                    else if (sectionCategoryScore >= 3.5) category = 'Good';
+                    else if (sectionCategoryScore >= 2.5) category = 'Average';
+                    else if (sectionCategoryScore >= 1.5) category = 'Below Average';
+                    else                                  category = 'Poor';
+                }
+ 
+                sectionScores.push({
+                    name: agg.name,
+                    students: totalStudents,
+                    studentsWithGrades,
+                    compositeScore,
+                    category
+                });
+            });
+ 
+            sectionScores.sort((a, b) => b.compositeScore - a.compositeScore);
+ 
+            const rankMedals = ['🥇', '🥈', '🥉'];
+            const catColor   = {
+                'Excellent':     'text-success',
+                'Good':          'text-info',
+                'Average':       'text-warning',
+                'Below Average': 'text-danger',
+                'Poor':          'text-danger',
+                'No Data':       'text-text-muted'
+            };
+ 
+            const rankEl = document.getElementById('overviewRankList');
+if (rankEl) {
+    if (!sectionScores.length) {
+        rankEl.innerHTML =
+            '<div class="text-[12px] text-text-muted text-center py-4">No sections yet.</div>';
+    } else {
+        rankEl.innerHTML = sectionScores.slice(0, 5).map((s, i) => `
+                    <div class="flex items-center gap-3 py-2 px-3 rounded-xl hover:bg-surface transition-all">
+                        <div class="w-7 h-7 rounded-full flex items-center justify-content text-sm font-bold
+                                    flex-shrink-0 ${i < 3 ? 'bg-accent/10' : 'bg-surface border border-border'}">
+                            ${i < 3
+                                ? rankMedals[i]
+                                : `<span class="text-text-muted font-mono text-[11px]">${i + 1}</span>`
+                            }
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-[13px] font-semibold text-text-primary truncate">
+                                ${escapeHtml(s.name)}
+                            </div>
+                            <div class="text-[11px] text-text-muted">
+                                ${s.students} students · ${s.studentsWithGrades} graded
+                            </div>
+                        </div>
+                        <div class="text-[11px] font-bold flex-shrink-0 ${catColor[s.category] || 'text-text-muted'}">
+                            ${escapeHtml(s.category)}
+                        </div>
+                    </div>`).join('');
+    }
+}
+        } catch (e) { console.error('[Dashboard] Rankings overview error:', e); }
+ 
+        // ── PANEL 3 — Activity Monitoring Snapshot ────────────────────────────────
+        try {
+            const secArr     = [...sectionNamesSet];
+            let totalSubs    = 0;
+            const recentSubs = [];
+            const seenKeys   = new Set();
+ 
+            if (secArr.length) {
+                // Query by section in chunks of 10 (Firestore IN limit)
+                const chunks = [];
+                for (let i = 0; i < secArr.length; i += 10) chunks.push(secArr.slice(i, i + 10));
+ 
+                await Promise.all(chunks.map(async chunk => {
+                    try {
+                        const snap = await getDocs(query(
+                            collection(db, 'testResults'),
+                            where('status', '==', 'completed'),
+                            where('section', 'in', chunk)
+                        ));
+                        snap.forEach(d => {
+                            const data = d.data();
+                            const key  = `${data.studentEmail}_${data.testId || d.id}`;
+                            if (seenKeys.has(key)) return;
+                            seenKeys.add(key);
+                            totalSubs++;
+                            if (recentSubs.length < 3) {
+                                let when = null;
+                                if (data.submittedAt) {
+                                    when = data.submittedAt.toDate
+                                        ? data.submittedAt.toDate()
+                                        : new Date(
+                                            data.submittedAt.seconds
+                                                ? data.submittedAt.seconds * 1000
+                                                : data.submittedAt
+                                          );
+                                }
+                                recentSubs.push({
+                                    name:    data.studentName || 'Unknown',
+                                    test:    data.testName    || 'Activity',
+                                    section: data.section     || '',
+                                    when
+                                });
+                            }
+                        });
+                    } catch (_) {}
+                }));
+ 
+                // Fallback: also count by studentEmail for students whose results
+                // may not have the section field set correctly
+                if (totalSubs === 0 && emailToSection.size > 0) {
+                    const allEmails = [...emailToSection.keys()];
+                    const emailChunks = [];
+                    for (let i = 0; i < allEmails.length; i += 10)
+                        emailChunks.push(allEmails.slice(i, i + 10));
+ 
+                    await Promise.all(emailChunks.map(async chunk => {
+                        try {
+                            const snap = await getDocs(query(
+                                collection(db, 'testResults'),
+                                where('status', '==', 'completed'),
+                                where('studentEmail', 'in', chunk)
+                            ));
+                            snap.forEach(d => {
+                                const data = d.data();
+                                const key  = `${data.studentEmail}_${data.testId || d.id}`;
+                                if (seenKeys.has(key)) return;
+                                seenKeys.add(key);
+                                totalSubs++;
+                                if (recentSubs.length < 3) {
+                                    let when = null;
+                                    if (data.submittedAt) {
+                                        when = data.submittedAt.toDate
+                                            ? data.submittedAt.toDate()
+                                            : new Date(
+                                                data.submittedAt.seconds
+                                                    ? data.submittedAt.seconds * 1000
+                                                    : data.submittedAt
+                                              );
+                                    }
+                                    recentSubs.push({
+                                        name:    data.studentName || 'Unknown',
+                                        test:    data.testName    || 'Activity',
+                                        section: data.section || emailToSection.get((data.studentEmail||'').toLowerCase()) || '',
+                                        when
+                                    });
+                                }
+                            });
+                        } catch (_) {}
+                    }));
+                }
+            }
+ 
+            const el1 = document.getElementById('overviewTotalSubmissions');
+            const el2 = document.getElementById('overviewCompletedTests');
+            if (el1) el1.textContent = totalSubs;
+            if (el2) el2.textContent = totalSubs;
+ 
+            const subEl = document.getElementById('overviewRecentSubmissions');
+            if (subEl) {
+                if (!recentSubs.length) {
+                    subEl.innerHTML =
+                        '<div class="text-[12px] text-text-muted">No submissions yet.</div>';
+                } else {
+                    subEl.innerHTML = recentSubs.map(s => {
+                        const whenStr = s.when
+                            ? s.when.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            : '';
+                        return `
+                        <div class="flex items-center gap-2.5 py-1.5 border-b border-border last:border-0">
+                            <div class="w-6 h-6 rounded-full bg-info-bg text-info flex items-center
+                                        justify-center text-[10px] font-bold flex-shrink-0">
+                                ${escapeHtml((s.name || '?').charAt(0).toUpperCase())}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[12px] font-semibold text-text-primary truncate">
+                                    ${escapeHtml(s.name)}
+                                </div>
+                                <div class="text-[11px] text-text-muted truncate">
+                                    ${escapeHtml(s.test)} · ${escapeHtml(s.section)}
+                                </div>
+                            </div>
+                            <div class="text-[10px] text-text-muted flex-shrink-0">
+                                ${escapeHtml(whenStr)}
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            }
+        } catch (e) { console.error('[Dashboard] Monitoring snapshot error:', e); }
+ 
+        // ── PANEL 4 — Lessons & Activities Summary ────────────────────────────────
+        try {
+            let totalLessons    = 0;
+            const recentLessons = [];
+            const profEmail     = (currentProfessor.email || currentUser.email || '').toLowerCase();
+ 
+            // Primary: by professorEmail
+            try {
+                const snap = await getDocs(
+                    query(collection(db, 'lessons'), where('professorEmail', '==', profEmail))
+                );
+                snap.forEach(d => {
+                    const data = d.data();
+                    if (data.archived) return;
+                    totalLessons++;
+                    if (recentLessons.length < 3) _pushLesson(recentLessons, data);
+                });
+            } catch (_) {}
+ 
+            // Fallback: by section name (catches legacy records)
+            if (totalLessons === 0 && sectionNamesSet.size > 0) {
+                const secArr = [...sectionNamesSet];
+                const chunks = [];
+                for (let i = 0; i < secArr.length; i += 10) chunks.push(secArr.slice(i, i + 10));
+                await Promise.all(chunks.map(async chunk => {
+                    try {
+                        const snap = await getDocs(
+                            query(collection(db, 'lessons'), where('section', 'in', chunk))
+                        );
+                        snap.forEach(d => {
+                            const data = d.data();
+                            if (data.archived) return;
+                            totalLessons++;
+                            if (recentLessons.length < 3) _pushLesson(recentLessons, data);
+                        });
+                    } catch (_) {}
+                }));
+            }
+ 
+            const lessonsEl   = document.getElementById('overviewTotalLessons');
+            const schedTestEl = document.getElementById('overviewScheduledTests');
+            if (lessonsEl)   lessonsEl.textContent   = totalLessons;
+            if (schedTestEl) schedTestEl.textContent =
+                document.getElementById('statActivities')?.textContent || '0';
+ 
+            const lessEl = document.getElementById('overviewRecentLessons');
+            if (lessEl) {
+                if (!recentLessons.length) {
+                    lessEl.innerHTML =
+                        '<div class="text-[12px] text-text-muted">No lessons published yet.</div>';
+                } else {
+                    lessEl.innerHTML = recentLessons.map(l => {
+                        const whenStr = l.when
+                            ? l.when.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            : '';
+                        return `
+                        <div class="flex items-center gap-2.5 py-1.5 border-b border-border last:border-0">
+                            <div class="w-6 h-6 rounded-lg bg-purple-bg text-purple flex items-center
+                                        justify-center text-[10px] flex-shrink-0">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[12px] font-semibold text-text-primary truncate">
+                                    ${escapeHtml(l.title)}
+                                </div>
+                                <div class="text-[11px] text-text-muted truncate">
+                                    ${escapeHtml(l.section)}
+                                </div>
+                            </div>
+                            <div class="text-[10px] text-text-muted flex-shrink-0">
+                                ${escapeHtml(whenStr)}
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            }
+        } catch (e) { console.error('[Dashboard] Lessons overview error:', e); }
+    }
+ 
+    // ── Helper: push a lesson entry into array ────────────────────────────────
+    function _pushLesson(arr, data) {
+        let when = null;
+        if (data.createdAt) {
+            when = data.createdAt.toDate
+                ? data.createdAt.toDate()
+                : new Date(
+                    data.createdAt.seconds
+                        ? data.createdAt.seconds * 1000
+                        : data.createdAt
+                  );
+        }
+        arr.push({
+            title:   data.title || data.lessonTitle || 'Untitled Lesson',
+            section: data.section || data.sectionName || '',
+            when
+        });
+    }
+ 
+    // ── Helper: set all overview panels to empty state ────────────────────────
+    function _setOverviewEmpty() {
+        const targets = [
+            ['overviewTotalGraded',       '0'],
+            ['overviewExcellentCount',     '0'],
+            ['overviewNeedsWork',          '0'],
+            ['overviewTotalSubmissions',   '0'],
+            ['overviewCompletedTests',     '0'],
+            ['overviewTotalLessons',       '0'],
+            ['overviewScheduledTests',     '0'],
+        ];
+        targets.forEach(([id, val]) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+        });
+        const empty = (id, msg) => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = `<div class="text-[12px] text-text-muted text-center py-4">${msg}</div>`;
+        };
+        empty('overviewGradesBars',        'No sections assigned yet.');
+        empty('overviewRankList',          'No sections assigned yet.');
+        empty('overviewRecentSubmissions', 'No submissions yet.');
+        empty('overviewRecentLessons',     'No lessons published yet.');
+    }
     function getTimeAgo(date) {
         if (!date) return 'Unknown time';
         const sec = Math.floor((Date.now() - date.getTime()) / 1000);
