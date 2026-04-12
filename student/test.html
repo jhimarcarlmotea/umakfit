@@ -641,169 +641,191 @@
         // ========== PROCESS: TESTS (available + overdue) ==========
         // Uses already-fetched testResults — zero extra queries
 
-        async function processTests(scheduledTests, testResults) {
-            const now = new Date();
-            availableTests = [];
-            overdueTests = [];
+                // ========== PROCESS: TESTS (available + overdue) ==========
+        // FIXED: A test is ONLY overdue if NO attempt was submitted BEFORE the deadline
+        // (regardless of professor override or view-only status)
 
-            // Build attempts map from already-fetched testResults (no extra queries!)
-            const attemptsMap = new Map(); // testId -> { attempts, hasExcellent }
-            await Promise.all(testResults.map(async r => {
-                const testId = r.testId;
-                if (!testId) return;
-                if (!attemptsMap.has(testId)) attemptsMap.set(testId, { attempts: 0, hasExcellent: false });
-                const entry = attemptsMap.get(testId);
-                entry.attempts++;
-                const rawResult = r.result ?? r.resultData ?? r.rawResult;
-                const normCat = await resolveNormCategoryForStudent(r.testName, rawResult, testId);
-                if (normCat === 'Excellent') entry.hasExcellent = true;
-            }));
+ async function processTests(scheduledTests, testResults) {
+    const now = new Date();
+    availableTests = [];
+    overdueTests = [];
 
-            // Separate available vs overdue
-            const seenIds = new Set();
-            for (const test of scheduledTests) {
-                if (seenIds.has(test.id)) continue;
-                seenIds.add(test.id);
+    // ✅ Build attempts map FIRST, fully awaited — before any rendering
+    const attemptsMap = new Map();
+    await Promise.all(testResults.map(async r => {
+        const testId = r.testId;
+        if (!testId) return;
+        if (!attemptsMap.has(testId)) attemptsMap.set(testId, { attempts: 0, hasExcellent: false });
+        const entry = attemptsMap.get(testId);
+        entry.attempts++;
+        const rawResult = r.result ?? r.resultData ?? r.rawResult;
+        const normCat = await resolveNormCategoryForStudent(r.testName, rawResult, testId);
+        if (normCat === 'Excellent') entry.hasExcellent = true;
+    }));
 
-                const isStudentSelected = test.selectedStudents?.length
-                    ? test.selectedStudents.some(e => (e || '').trim().toLowerCase() === (studentData.email || '').trim().toLowerCase())
-                    : true;
-                test.isViewOnly = !isStudentSelected;
+    // ✅ Separate available vs overdue AFTER attemptsMap is complete
+    const seenIds = new Set();
+    for (const test of scheduledTests) {
+        if (seenIds.has(test.id)) continue;
+        seenIds.add(test.id);
 
-                let deadline;
-                if (test.deadlineDateTime) {
-                    deadline = new Date(test.deadlineDateTime);
-                } else {
-                    deadline = new Date(test.deadline);
-                    if (test.deadlineTime) { const [h, m] = test.deadlineTime.split(':').map(Number); deadline.setHours(h, m, 0, 0); }
-                    else deadline.setHours(23, 59, 59, 999);
-                }
+        const isStudentSelected = test.selectedStudents?.length
+            ? test.selectedStudents.some(e => (e || '').trim().toLowerCase() === (studentData.email || '').trim().toLowerCase())
+            : true;
+        test.isViewOnly = !isStudentSelected;
 
-if (deadline < now) {
-    const attemptData = attemptsMap.get(test.id) || { attempts: 0, hasExcellent: false };
-    const isProfessorEnabled = cachedTestPermissions.has(test.id);
-
-    if (attemptData.attempts === 0 || isProfessorEnabled) {
-        overdueTests.push(test);
-    }
-} else {
-    availableTests.push(test);
-}
-            }
-
-            renderCategoryCards(attemptsMap);
-            renderOverdueTests(overdueTests, testResults);
+        let deadline;
+        if (test.deadlineDateTime) {
+            deadline = new Date(test.deadlineDateTime);
+        } else {
+            deadline = new Date(test.deadline);
+            if (test.deadlineTime) { const [h, m] = test.deadlineTime.split(':').map(Number); deadline.setHours(h, m, 0, 0); }
+            else deadline.setHours(23, 59, 59, 999);
         }
+
+        const hasAttempt = (attemptsMap.get(test.id)?.attempts ?? 0) > 0;
+        const isProfessorEnabled = cachedTestPermissions.has(test.id);
+
+        if (deadline < now) {
+            // Overdue: only show if no attempt yet, OR professor re-enabled
+            if (!hasAttempt || isProfessorEnabled) {
+                overdueTests.push(test);
+            }
+        } else {
+            availableTests.push(test);
+        }
+    }
+
+    // ✅ Render ONLY after everything is computed — no more flash
+    renderCategoryCards(attemptsMap);
+    renderOverdueTests(overdueTests, testResults);
+}
+function getExpandedCategories() {
+    const expanded = new Set();
+    document.querySelectorAll('.fitness-category-card.category-expanded')
+        .forEach(el => expanded.add(el.id));
+    return expanded;
+}
 
         // ========== RENDER: CATEGORY CARDS ==========
 
-        function renderCategoryCards(attemptsMap) {
-            const container = document.getElementById('categoryCardsContainer');
-            if (availableTests.length === 0) { renderEmptyState(); return; }
+ function renderCategoryCards(attemptsMap) {
+    const expandedIds = getExpandedCategories(); // ← save expanded state BEFORE re-render
 
-            const categorizedTests = { 'Cardiorespiratory Endurance':[], 'Muscular Strength and Endurance':[], 'Flexibility':[], 'Body Composition':[] };
-            availableTests.forEach(test => {
-                const cat = getCategoryForTest(test.testName);
-                if (categorizedTests[cat]) categorizedTests[cat].push(test);
-                else categorizedTests['Cardiorespiratory Endurance'].push(test);
-            });
+    const container = document.getElementById('categoryCardsContainer');
+    if (availableTests.length === 0) { renderEmptyState(); return; }
 
-            let html = '';
-            for (const [category, tests] of Object.entries(categorizedTests)) {
-                const categoryData = testCategories[category];
-                if (!categoryData) continue;
-                const categoryId = category.replace(/\s+/g, '-').toLowerCase();
+    const categorizedTests = { 'Cardiorespiratory Endurance':[], 'Muscular Strength and Endurance':[], 'Flexibility':[], 'Body Composition':[] };
+    availableTests.forEach(test => {
+        const cat = getCategoryForTest(test.testName);
+        if (categorizedTests[cat]) categorizedTests[cat].push(test);
+        else categorizedTests['Cardiorespiratory Endurance'].push(test);
+    });
 
-                const remainingTests = tests.filter(t => {
-                    const a = attemptsMap?.get(t.id) || { attempts: 0, hasExcellent: false };
-                    if (a.hasExcellent) return false;
-                    return t.attemptsAllowed === 0 || a.attempts < t.attemptsAllowed;
-                }).length;
+    let html = '';
+    for (const [category, tests] of Object.entries(categorizedTests)) {
+        const categoryData = testCategories[category];
+        if (!categoryData) continue;
+        const categoryId = category.replace(/\s+/g, '-').toLowerCase();
 
-                html += `
-                <div class="fitness-category-card group category-collapsed" id="category-${categoryId}">
-                    <div class="category-header relative overflow-hidden bg-white p-5 sm:p-6 border-2 border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors z-10" onclick="toggleCategory('${categoryId}')">
-                        <div class="absolute inset-0 opacity-5 pointer-events-none"><div class="absolute inset-0" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);"></div></div>
-                        <div class="relative flex items-center gap-4">
-                            <div class="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-2xl flex items-center justify-center shadow-md transform group-hover:scale-105 transition-transform duration-300 border-2 border-gray-200">
-                                <img class="w-10 h-10 sm:w-12 sm:h-12 object-contain" src="${categoryData.icon}" alt="${category}" />
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h3 class="text-lg sm:text-xl font-black text-gray-900 mb-1 uppercase tracking-tight leading-tight">${category}</h3>
-                                <p class="text-xs sm:text-sm text-gray-600 font-medium">${categoryData.subtitle}</p>
-                                <div class="mt-2 flex items-center gap-2 text-xs text-gray-500"><i class="bi bi-lightning-charge-fill"></i><span>${remainingTests} Test${remainingTests !== 1 ? 's' : ''} Available</span></div>
-                            </div>
-                            <div class="flex-shrink-0"><i class="bi bi-chevron-down text-2xl text-gray-400 chevron-icon"></i></div>
-                        </div>
+        const remainingTests = tests.filter(t => {
+            const a = attemptsMap?.get(t.id) || { attempts: 0, hasExcellent: false };
+            if (a.hasExcellent) return false;
+            return t.attemptsAllowed === 0 || a.attempts < t.attemptsAllowed;
+        }).length;
+
+        html += `
+        <div class="fitness-category-card group category-collapsed" id="category-${categoryId}">
+            <div class="category-header relative overflow-hidden bg-white p-5 sm:p-6 border-2 border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors z-10" onclick="toggleCategory('${categoryId}')">
+                <div class="absolute inset-0 opacity-5 pointer-events-none"><div class="absolute inset-0" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);"></div></div>
+                <div class="relative flex items-center gap-4">
+                    <div class="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-2xl flex items-center justify-center shadow-md transform group-hover:scale-105 transition-transform duration-300 border-2 border-gray-200">
+                        <img class="w-10 h-10 sm:w-12 sm:h-12 object-contain" src="${categoryData.icon}" alt="${category}" />
                     </div>
-                    <div class="category-tests ${tests.length > 2 ? 'scrollable' : ''}">
-                        <div class="category-tests-inner">`;
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-lg sm:text-xl font-black text-gray-900 mb-1 uppercase tracking-tight leading-tight">${category}</h3>
+                        <p class="text-xs sm:text-sm text-gray-600 font-medium">${categoryData.subtitle}</p>
+                        <div class="mt-2 flex items-center gap-2 text-xs text-gray-500"><i class="bi bi-lightning-charge-fill"></i><span>${remainingTests} Test${remainingTests !== 1 ? 's' : ''} Available</span></div>
+                    </div>
+                    <div class="flex-shrink-0"><i class="bi bi-chevron-down text-2xl text-gray-400 chevron-icon"></i></div>
+                </div>
+            </div>
+            <div class="category-tests ${tests.length > 2 ? 'scrollable' : ''}">
+                <div class="category-tests-inner">`;
 
-                if (tests.length === 0 || remainingTests === 0) {
-                    html += `<div class="text-center py-12"><div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 flex items-center justify-center"><i class="bi bi-inbox text-3xl text-gray-300"></i></div><p class="text-sm font-semibold text-gray-400">No tests in this category</p></div>`;
-                } else {
-                    html += `<div class="grid grid-cols-1 gap-3 sm:gap-4">`;
-                    tests.forEach(test => {
-                        const attemptData = attemptsMap?.get(test.id) || { attempts: 0, hasExcellent: false };
-                        const currentAttempts = attemptData.attempts;
-                        const isUnlimited = test.attemptsAllowed === 0;
-                        const hasAttempts = currentAttempts > 0;
-                        const canRetry = !attemptData.hasExcellent && (isUnlimited || currentAttempts < test.attemptsAllowed);
-                        if (attemptData.hasExcellent) return;
-                        if (!isUnlimited && hasAttempts && currentAttempts >= test.attemptsAllowed) return;
-                        const isViewOnly = test.isViewOnly === true;
-                        const testDateTime = new Date(`${test.date}T${test.time || '00:00'}`);
-                        const now = new Date();
-                        const isFutureTest = testDateTime > now;
-                        let statusIcon = 'circle', statusText = 'Not Started';
-                        if (isFutureTest) { statusIcon = 'calendar-event'; const dateStr = testDateTime.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); const timeStr = testDateTime.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit', hour12:true }); statusText = `Available on ${dateStr} at ${timeStr}`; }
-                        else if (isViewOnly) { statusIcon = 'eye'; statusText = 'View Only'; }
-                        else if (attemptData.hasExcellent) { statusIcon = 'trophy-fill'; statusText = 'Excellent achieved!'; }
-                        else if (!isUnlimited && currentAttempts >= test.attemptsAllowed) { statusIcon = 'check-circle-fill'; statusText = `All ${currentAttempts} attempt${currentAttempts !== 1 ? 's' : ''} completed`; }
-                        else if (hasAttempts) { statusIcon = 'arrow-clockwise'; statusText = `${currentAttempts} completed attempt${currentAttempts !== 1 ? 's' : ''}`; }
-                        else { statusIcon = 'play-circle'; statusText = 'Ready to Start'; }
-                        html += `
-                        <div class="test-workout-card group/test relative bg-gray-50 rounded-xl border-2 ${(!isUnlimited && currentAttempts >= test.attemptsAllowed) ? 'border-green-200 hover:border-green-400' : 'border-gray-200 hover:border-gray-400'} overflow-hidden hover:shadow-md transition-all duration-300">
-                            <div class="absolute left-0 top-0 bottom-0 w-1.5 ${(!isUnlimited && currentAttempts >= test.attemptsAllowed) ? 'bg-green-500' : 'bg-gray-900'}"></div>
-                            <div class="pl-4 pr-3 sm:pr-4 py-4">
-                                <div class="flex flex-col sm:flex-row gap-4">
+        if (tests.length === 0 || remainingTests === 0) {
+            html += `<div class="text-center py-12"><div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 flex items-center justify-center"><i class="bi bi-inbox text-3xl text-gray-300"></i></div><p class="text-sm font-semibold text-gray-400">No tests in this category</p></div>`;
+        } else {
+            html += `<div class="grid grid-cols-1 gap-3 sm:gap-4">`;
+            tests.forEach(test => {
+                const attemptData = attemptsMap?.get(test.id) || { attempts: 0, hasExcellent: false };
+                const currentAttempts = attemptData.attempts;
+                const isUnlimited = test.attemptsAllowed === 0;
+                const hasAttempts = currentAttempts > 0;
+                const canRetry = !attemptData.hasExcellent && (isUnlimited || currentAttempts < test.attemptsAllowed);
+                if (attemptData.hasExcellent) return;
+                if (!isUnlimited && hasAttempts && currentAttempts >= test.attemptsAllowed) return;
+                const isViewOnly = test.isViewOnly === true;
+                const testDateTime = new Date(`${test.date}T${test.time || '00:00'}`);
+                const now = new Date();
+                const isFutureTest = testDateTime > now;
+                let statusIcon = 'circle', statusText = 'Not Started';
+                if (isFutureTest) { statusIcon = 'calendar-event'; const dateStr = testDateTime.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); const timeStr = testDateTime.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit', hour12:true }); statusText = `Available on ${dateStr} at ${timeStr}`; }
+                else if (isViewOnly) { statusIcon = 'eye'; statusText = 'View Only'; }
+                else if (attemptData.hasExcellent) { statusIcon = 'trophy-fill'; statusText = 'Excellent achieved!'; }
+                else if (!isUnlimited && currentAttempts >= test.attemptsAllowed) { statusIcon = 'check-circle-fill'; statusText = `All ${currentAttempts} attempt${currentAttempts !== 1 ? 's' : ''} completed`; }
+                else if (hasAttempts) { statusIcon = 'arrow-clockwise'; statusText = `${currentAttempts} completed attempt${currentAttempts !== 1 ? 's' : ''}`; }
+                else { statusIcon = 'play-circle'; statusText = 'Ready to Start'; }
+                html += `
+                <div class="test-workout-card group/test relative bg-gray-50 rounded-xl border-2 ${(!isUnlimited && currentAttempts >= test.attemptsAllowed) ? 'border-green-200 hover:border-green-400' : 'border-gray-200 hover:border-gray-400'} overflow-hidden hover:shadow-md transition-all duration-300">
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${(!isUnlimited && currentAttempts >= test.attemptsAllowed) ? 'bg-green-500' : 'bg-gray-900'}"></div>
+                    <div class="pl-4 pr-3 sm:pr-4 py-4">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start gap-2 mb-3">
                                     <div class="flex-1 min-w-0">
-                                        <div class="flex items-start gap-2 mb-3">
-                                            <div class="flex-1 min-w-0">
-                                                <h4 class="text-base sm:text-lg font-bold text-gray-900 leading-tight mb-1">${test.testName}</h4>
-                                                <div class="flex items-center gap-2"><i class="bi bi-${statusIcon} text-gray-700 text-sm"></i><span class="text-xs sm:text-sm font-semibold text-gray-700">${statusText}</span></div>
-                                            </div>
-                                        </div>
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
-                                            <div class="flex items-center gap-2 text-gray-600"><i class="bi bi-calendar-check text-gray-400"></i><span class="font-medium">${test.date || 'No date set'}</span></div>
-                                            <div class="flex items-center gap-2 text-gray-600"><i class="bi bi-alarm text-gray-400"></i><span class="font-medium">${formatDeadline(test.deadline, test.deadlineTime)}</span></div>
-                                            ${hasAttempts
-                                                ? `<div class="flex items-center gap-2 text-gray-700"><i class="bi bi-clipboard-check text-gray-400"></i><span class="font-medium">${isUnlimited ? `${currentAttempts} recorded attempt${currentAttempts !== 1 ? 's' : ''}` : `${currentAttempts}/${test.attemptsAllowed} attempt${test.attemptsAllowed !== 1 ? 's' : ''} used`}</span></div>`
-                                                : `<div class="flex items-center gap-2 text-gray-700"><i class="bi bi-infinity text-gray-400"></i><span class="font-bold">${isUnlimited ? 'Unlimited tries' : `${test.attemptsAllowed} attempt${test.attemptsAllowed !== 1 ? 's' : ''}`}</span></div>`}
-                                        </div>
-                                    </div>
-                                    <div class="flex sm:flex-col justify-end items-end sm:items-stretch gap-2 sm:min-w-[140px]">
-                                        ${isFutureTest
-                                            ? `<div class="flex-1 sm:flex-initial px-5 py-3 bg-blue-100 text-blue-700 rounded-xl font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 border-2 border-blue-300 cursor-not-allowed"><i class="bi bi-calendar-check"></i><span>Available Soon</span></div>`
-                                            : isViewOnly
-                                                ? `<div class="flex-1 sm:flex-initial px-5 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 border-2 border-gray-300 cursor-not-allowed"><i class="bi bi-eye"></i><span>View Only</span></div>`
-                                                : canRetry
-                                                    ? `<button onclick="startTest('${test.id}')" class="workout-start-btn flex-1 sm:flex-initial px-5 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm uppercase tracking-wide hover:bg-black hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"><i class="bi bi-${hasAttempts ? 'arrow-clockwise' : 'play-fill'}"></i><span>${hasAttempts ? 'Retry' : 'Start'}</span></button>`
-                                                   : `<div class="flex-1 sm:flex-initial px-5 py-3 bg-green-100 text-green-700 rounded-xl font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 border-2 border-green-300"><i class="bi bi-${attemptData.hasExcellent ? 'trophy-fill' : 'check-circle-fill'}"></i><span>${attemptData.hasExcellent ? 'Excellent!' : 'Completed'}</span></div>`}
+                                        <h4 class="text-base sm:text-lg font-bold text-gray-900 leading-tight mb-1">${test.testName}</h4>
+                                        <div class="flex items-center gap-2"><i class="bi bi-${statusIcon} text-gray-700 text-sm"></i><span class="text-xs sm:text-sm font-semibold text-gray-700">${statusText}</span></div>
                                     </div>
                                 </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+                                    <div class="flex items-center gap-2 text-gray-600"><i class="bi bi-calendar-check text-gray-400"></i><span class="font-medium">${test.date || 'No date set'}</span></div>
+                                    <div class="flex items-center gap-2 text-gray-600"><i class="bi bi-alarm text-gray-400"></i><span class="font-medium">${formatDeadline(test.deadline, test.deadlineTime)}</span></div>
+                                    ${hasAttempts
+                                        ? `<div class="flex items-center gap-2 text-gray-700"><i class="bi bi-clipboard-check text-gray-400"></i><span class="font-medium">${isUnlimited ? `${currentAttempts} recorded attempt${currentAttempts !== 1 ? 's' : ''}` : `${currentAttempts}/${test.attemptsAllowed} attempt${test.attemptsAllowed !== 1 ? 's' : ''} used`}</span></div>`
+                                        : `<div class="flex items-center gap-2 text-gray-700"><i class="bi bi-infinity text-gray-400"></i><span class="font-bold">${isUnlimited ? 'Unlimited tries' : `${test.attemptsAllowed} attempt${test.attemptsAllowed !== 1 ? 's' : ''}`}</span></div>`}
+                                </div>
                             </div>
-                        </div>`;
-                    });
-                    html += `</div>`;
-                    if (tests.length > 2) html += `<div class="scroll-indicator"><i class="bi bi-chevron-down"></i></div>`;
-                }
-
-                html += `</div></div></div>`;
-            }
-            container.innerHTML = html;
+                            <div class="flex sm:flex-col justify-end items-end sm:items-stretch gap-2 sm:min-w-[140px]">
+                                ${isFutureTest
+                                    ? `<div class="flex-1 sm:flex-initial px-5 py-3 bg-blue-100 text-blue-700 rounded-xl font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 border-2 border-blue-300 cursor-not-allowed"><i class="bi bi-calendar-check"></i><span>Available Soon</span></div>`
+                                    : isViewOnly
+                                        ? `<div class="flex-1 sm:flex-initial px-5 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 border-2 border-gray-300 cursor-not-allowed"><i class="bi bi-eye"></i><span>View Only</span></div>`
+                                        : canRetry
+                                            ? `<button onclick="startTest('${test.id}')" class="workout-start-btn flex-1 sm:flex-initial px-5 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm uppercase tracking-wide hover:bg-black hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"><i class="bi bi-${hasAttempts ? 'arrow-clockwise' : 'play-fill'}"></i><span>${hasAttempts ? 'Retry' : 'Start'}</span></button>`
+                                            : `<div class="flex-1 sm:flex-initial px-5 py-3 bg-green-100 text-green-700 rounded-xl font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 border-2 border-green-300"><i class="bi bi-${attemptData.hasExcellent ? 'trophy-fill' : 'check-circle-fill'}"></i><span>${attemptData.hasExcellent ? 'Excellent!' : 'Completed'}</span></div>`}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            html += `</div>`;
+            if (tests.length > 2) html += `<div class="scroll-indicator"><i class="bi bi-chevron-down"></i></div>`;
         }
 
+        html += `</div></div></div>`;
+    }
+    container.innerHTML = html;
+
+    // ← restore expanded state AFTER re-render
+    expandedIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.add('category-expanded');
+            el.classList.remove('category-collapsed');
+        }
+    });
+}
         // ========== RENDER: OVERDUE TESTS ==========
         // Uses pre-fetched testResults and testPermissions — zero extra queries
 
@@ -1017,10 +1039,9 @@ if (deadline < now) {
 
         // ========== LIVE LISTENERS (minimal scope, no re-fetching all data) ==========
 
- function setupLiveListeners(initialTestResults) {
+function setupLiveListeners(initialTestResults) {
     if (!studentData?.section) return;
 
-    // Listen for new/changed scheduled tests
     const testsQuery = query(collection(db, 'scheduledTests'), where('section', '==', studentData.section));
     registerListener(onSnapshot(testsQuery, async (snap) => {
         const updatedTests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1031,7 +1052,6 @@ if (deadline < now) {
         await processTests(updatedTests, updatedResults);
     }, (_) => {}));
 
-    // Listen for new test results
     const resultsQuery = query(collection(db, 'testResults'), where('studentEmail', '==', studentData.email));
     registerListener(onSnapshot(resultsQuery, async (snap) => {
         const updatedResults = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1040,21 +1060,19 @@ if (deadline < now) {
         processPerformanceDashboard(updatedResults);
         const updatedTests = await fetchScheduledTests(studentData.section);
         await processTests(updatedTests, updatedResults);
+        // ✅ Re-render overdue immediately after new result comes in
+        renderOverdueTests(overdueTests, allTestHistory);
     }, (_) => {}));
 
-    // Listen for testPermissions — re-render overdue immediately
     const permQuery = query(collection(db, 'testPermissions'), where('studentEmail', '==', studentData.email));
     registerListener(onSnapshot(permQuery, (snap) => {
         const ids = new Set();
         snap.forEach(d => { if (d.data().testId) ids.add(d.data().testId); });
         cachedTestPermissions = ids;
-        // Immediately re-render overdue with updated permissions
         renderOverdueTests(overdueTests, allTestHistory);
-        // Also re-render category cards in case an overdue test was unlocked
         buildAttemptsMapFromHistory().then(map => renderCategoryCards(map));
     }, (_) => {}));
 
-    // Listen for notifications
     if (studentData.section !== 'Not Assigned') {
         const notifQuery = query(collection(db, 'notifications'), where('section', '==', studentData.section), where('studentEmail', '==', studentData.email));
         registerListener(onSnapshot(notifQuery, (snap) => {
@@ -1066,12 +1084,13 @@ if (deadline < now) {
 
         // ========== DEADLINE WATCHER ==========
 function setupDeadlineWatcher() {
-    // Check every 10 seconds if any available test deadline has passed
     setInterval(async () => {
         const now = new Date();
-        let anyExpired = false;
+        let anyChanged = false;
 
-        availableTests = availableTests.filter(test => {
+        // Check available tests for expired deadlines
+        const stillAvailable = [];
+        for (const test of availableTests) {
             let dl;
             if (test.deadlineDateTime) dl = new Date(test.deadlineDateTime);
             else {
@@ -1079,23 +1098,44 @@ function setupDeadlineWatcher() {
                 if (test.deadlineTime) { const [h, m] = test.deadlineTime.split(':').map(Number); dl.setHours(h, m, 0, 0); }
                 else dl.setHours(23, 59, 59, 999);
             }
-            if (dl < now) {
-                if (!overdueTests.find(o => o.id === test.id)) {
-                    overdueTests.push(test);
-                }
-                anyExpired = true;
-                return false;
-            }
-            return true;
-        });
 
-        if (anyExpired) {
+            if (dl < now) {
+                // Check if ANY attempt was submitted BEFORE the deadline
+                const hasAttemptBeforeDeadline = allTestHistory.some(r => {
+                    if (r.testId !== test.id) return false;
+                    const submittedAt = r.submittedAt?.toDate?.() || new Date(r.submittedAt || 0);
+                    return submittedAt <= dl;
+                });
+
+                const isProfessorEnabled = cachedTestPermissions.has(test.id);
+
+                if (!hasAttemptBeforeDeadline || isProfessorEnabled) {
+                    // Only add to overdue if not already there
+                    if (!overdueTests.find(o => o.id === test.id)) {
+                        overdueTests.push(test);
+                        anyChanged = true;
+                    }
+                }
+                // Either way, remove from available
+                anyChanged = true;
+            } else {
+                stillAvailable.push(test);
+            }
+        }
+
+        // Update availableTests list
+        if (availableTests.length !== stillAvailable.length) {
+            availableTests = stillAvailable;
+            anyChanged = true;
+        }
+
+        // Always re-render if anything changed
+        if (anyChanged) {
             const attemptsMap = await buildAttemptsMapFromHistory();
             renderCategoryCards(attemptsMap);
-            // Re-render overdue with the latest test results and permissions
             renderOverdueTests(overdueTests, allTestHistory);
         }
-    }, 10000);
+    }, 5000); // Check every 5 seconds
 }
 
         async function buildAttemptsMapFromHistory() {
@@ -1165,9 +1205,31 @@ function setupOverduePollFallback() {
         }
 
         function isProfileComplete(sd) {
-            if (!sd) return false;
-            return sd.age > 0 && sd.gender && sd.gender !== 'Not Specified' && sd.height > 0 && sd.weight > 0 && sd.contactNumber && sd.contactNumber !== 'Not Provided' && sd.contactNumber.trim() !== '';
-        }
+    if (!sd) return false;
+    
+    // Check if birthday exists (mas reliable ito kaysa age)
+    const hasBirthday = sd.birthday && sd.birthday !== '';
+    
+    // Alternative: check age kung walang birthday
+    const hasAge = sd.age && sd.age > 0;
+    
+    // Check kung may valid age (either from birthday or direct age)
+    const validAge = hasBirthday || hasAge;
+    
+    // Check gender
+    const validGender = sd.gender && sd.gender !== 'Not Specified' && sd.gender !== '';
+    
+    // Check height and weight
+    const validHeight = sd.height && sd.height > 0;
+    const validWeight = sd.weight && sd.weight > 0;
+    
+    // Check contact number (optional - pwedeng hindi required)
+    const validContact = sd.contactNumber && sd.contactNumber !== 'Not Provided' && sd.contactNumber.trim() !== '';
+    
+    // ✅ REQUIRED FIELDS: age/birthday, gender, height, weight
+    // (contact number ay optional para hindi mahirapan ang students)
+    return validAge && validGender && validHeight && validWeight;
+}
 
         function renderEmptyState() {
             const container = document.getElementById('categoryCardsContainer');
