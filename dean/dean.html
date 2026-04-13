@@ -528,13 +528,7 @@
                         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-royal to-blue flex items-center justify-center text-white text-[13px]"><i class="fas fa-list-ol"></i></div>
                         Section Rankings
                     </div>
-                    <div class="flex items-center gap-2.5 flex-wrap">
-                        
-                        <select class="px-3.5 py-2 border border-border rounded-lg text-[13px] text-text-primary bg-surface cursor-pointer focus:outline-none focus:border-blue font-sans" id="collegeFilter" onchange="filterRankings()">
-                            <option value="all">All Colleges</option>
-                        </select>
-                       
-                    </div>
+                    
                 </div>
                 <div class="overflow-x-auto">
                     <table class="custom-table">
@@ -3014,35 +3008,62 @@ const sorted = [...withData].sort((a, b) => {
             extraFromCache.forEach(t => { seen.add(t.id); rawTests.push(t); });
         }
     } catch(e) { console.error('viewStudentDetails fetch error:', e); }
+    
+    
+       function resolveCanonicalKey(testName) {
+        const tl = (testName || '').toLowerCase();
+        if (tl.includes('push'))                              return 'pushup';
+        if (tl.includes('curl'))                              return 'curlup';
+        if (tl.includes('sit') && tl.includes('reach'))      return 'sitreach';
+        if (tl.includes('step') || tl.includes('3-minute'))  return 'steptest';
+        if (tl.includes('skinfold') || tl.includes('skin fold')) return 'skinfold';
+        return null;
+    }
+
     const normDocCache = new Map();
-    const testKeys = new Set();
+    const canonicalKeys = new Set();
+    const testIds = new Set();
+
     rawTests.forEach(t => {
-        const tl = (t.testName || '').toLowerCase();
-        let key = null;
-        if (tl.includes('push')) key = 'push_up';
-        else if (tl.includes('curl')) key = 'curl_up';
-        else if (tl.includes('sit') && tl.includes('reach')) key = 'sit_and_reach';
-        else if (tl.includes('step') || tl.includes('3-minute')) key = 'step_test';
-        else if (tl.includes('skinfold') || tl.includes('skin fold')) key = 'skinfold';
-        if (key) testKeys.add(key);
+        const k = resolveCanonicalKey(t.testName);
+        if (k) canonicalKeys.add(k);
+        if (t.testId) testIds.add(t.testId);
     });
+
     const normFetches = [];
-    testKeys.forEach(key => {
-        const docId = `${key}_${stuGender}_${stuAgeGroup}`;
-        normFetches.push(
-            db.collection('fitnessNorms').doc(docId).get()
-              .then(snap => { if (snap.exists) normDocCache.set(`default:${key}`, snap.data()); })
-              .catch(() => {})
-        );
+
+    canonicalKeys.forEach(key => {
+        // Priority 1 — student-specific norms (by email)
         if (stuEmail) {
             normFetches.push(
-                db.collection('studentNorms').doc(stuEmail).collection('tests').doc(key).get()
+                db.collection('studentNorms').doc(stuEmail)
+                  .collection('tests').doc(key).get()
                   .then(snap => { if (snap.exists) normDocCache.set(`student:${key}`, snap.data()); })
                   .catch(() => {})
             );
         }
+        // Priority 1 fallback — student-specific norms (by umakId)
+        if (stuUmak) {
+            normFetches.push(
+                db.collection('studentNorms').doc(stuUmak)
+                  .collection('tests').doc(key).get()
+                  .then(snap => {
+                      if (snap.exists && !normDocCache.has(`student:${key}`))
+                          normDocCache.set(`student:${key}`, snap.data());
+                  })
+                  .catch(() => {})
+            );
+        }
+        // Priority 3 — default fitnessNorms from DB
+        const fitnessDocId = `${key}_${stuGender}_${stuAgeGroup}`;
+        normFetches.push(
+            db.collection('fitnessNorms').doc(fitnessDocId).get()
+              .then(snap => { if (snap.exists) normDocCache.set(`fitness:${key}`, snap.data()); })
+              .catch(() => {})
+        );
     });
-    const testIds = new Set(rawTests.map(t => t.testId).filter(Boolean));
+
+    // Priority 2 — scheduledTest customNorms
     testIds.forEach(tid => {
         normFetches.push(
             db.collection('scheduledTests').doc(tid).get()
@@ -3050,6 +3071,7 @@ const sorted = [...withData].sort((a, b) => {
               .catch(() => {})
         );
     });
+
     await Promise.all(normFetches);
 
     function applyThresholds(nd, value) {
@@ -3057,62 +3079,54 @@ const sorted = [...withData].sort((a, b) => {
         for (const cat of ['Excellent', 'Good', 'Average', 'Below Average']) {
             const threshold = nd.thresholds[cat];
             if (threshold == null) continue;
-            if (lowerIsBetter && value <= threshold) return cat;
+            if ( lowerIsBetter && value <= threshold) return cat;
             if (!lowerIsBetter && value >= threshold) return cat;
         }
         return 'Poor';
     }
 
-    function resolveTestKey(testName) {
-        const tl = (testName || '').toLowerCase();
-        if (tl.includes('push')) return 'push_up';
-        if (tl.includes('curl')) return 'curl_up';
-        if (tl.includes('sit') && tl.includes('reach')) return 'sit_and_reach';
-        if (tl.includes('step') || tl.includes('3-minute')) return 'step_test';
-        if (tl.includes('skinfold') || tl.includes('skin fold')) return 'skinfold';
-        return null;
-    }
+    function getNormCatForTest(t) {
+        const tl = (t.testName || '').toLowerCase();
 
- function getNormCatForTest(t) {
-    const testKey = resolveTestKey(t.testName);
-    const value   = extractNumericResult(t.result || t.resultData);
- 
-    // Skinfold
-    if ((t.testName || '').toLowerCase().includes('skinfold')) {
-        const raw = String(t.result || t.resultData || '');
-        const m   = raw.match(/\(([^)]+)\)/);
-        if (m) {
-            const cls = m[1];
-            if (cls === 'Athletic' || cls === 'Fitness') return 'Excellent';
-            if (cls === 'Essential Fat') return 'Good';
-            if (cls === 'Average')       return 'Average';
-            if (cls === 'Overfat')       return 'Below Average';
-            if (cls === 'Obese')         return 'Poor';
+        // Skinfold — category is embedded in the result string
+        if (tl.includes('skinfold') || tl.includes('skin fold')) {
+            const raw = String(t.result || t.resultData || '');
+            const m   = raw.match(/\(([^)]+)\)/);
+            if (m) {
+                const cls = m[1];
+                if (cls === 'Athletic' || cls === 'Fitness')  return 'Excellent';
+                if (cls === 'Essential Fat')                  return 'Good';
+                if (cls === 'Average')                        return 'Average';
+                if (cls === 'Overfat')                        return 'Below Average';
+                if (cls === 'Obese')                          return 'Poor';
+            }
+            return 'Average';
         }
-        return 'Average';
-    }
- 
-    if (!testKey) return getNormCategory(t.testName, t.result || t.resultData, stuGender, stuAgeGroup);
- 
-    // 1. Student-specific norms
-    const stuNorm = normDocCache.get(`student:${testKey}`);
-    if (stuNorm?.thresholds) return applyThresholds(stuNorm, value);
- 
-    // 2. customNorms on scheduledTest (set via addactivities.html)
-    if (t.testId) {
-        const sched = normDocCache.get(`scheduled:${t.testId}`);
-        if (sched?.customNorms?.thresholds) return applyThresholds(sched.customNorms, value);
-    }
- 
-    // 3. Default fitnessNorms from DB
-    const defNorm = normDocCache.get(`default:${testKey}`);
-    if (defNorm?.thresholds) return applyThresholds(defNorm, value);
- 
-    // 4. Hardcoded fallback
-    return getNormCategory(t.testName, t.result || t.resultData, stuGender, stuAgeGroup) || 'Average';
-}
 
+        const canonicalKey = resolveCanonicalKey(t.testName);
+        const value        = extractNumericResult(t.result || t.resultData);
 
+        // Priority 1 — student-specific norms
+        if (canonicalKey) {
+            const stuNorm = normDocCache.get(`student:${canonicalKey}`);
+            if (stuNorm?.thresholds) return applyThresholds(stuNorm, value);
+        }
+
+        // Priority 2 — scheduled-test customNorms
+        if (t.testId) {
+            const sched = normDocCache.get(`scheduled:${t.testId}`);
+            if (sched?.customNorms?.thresholds) return applyThresholds(sched.customNorms, value);
+        }
+
+        // Priority 3 — default fitnessNorms from DB
+        if (canonicalKey) {
+            const fitNorm = normDocCache.get(`fitness:${canonicalKey}`);
+            if (fitNorm?.thresholds) return applyThresholds(fitNorm, value);
+        }
+
+        // Priority 4 — hardcoded fallback
+        return getNormCategory(t.testName, t.result || t.resultData, stuGender, stuAgeGroup) || 'Average';
+    }
 
     const testGroups = {};
     rawTests.forEach(t => {
@@ -3836,169 +3850,262 @@ async function forceUpdateAllRoleReferences(email, uid, name, newRole) {
 }
     window.closeEditRoleModal = function() { document.getElementById('editRoleModal').style.display='none'; currentUserToEdit=null; };
 
-    // Replace the existing updateUserRole function with this enhanced version
-window.updateUserRole = async function() {
-    if(!currentUserToEdit) return;
+ 
+// ══════════════════════════════════════════════════════════════════
+//  REPLACE the entire window.updateUserRole function in dean.html
+//  with this version.  Find:
+//    window.updateUserRole = async function() {
+//  and replace everything up to (and including) the closing  };
+// ══════════════════════════════════════════════════════════════════
+
+window.updateUserRole = async function () {
+    if (!currentUserToEdit) return;
+
     const newRole = document.getElementById('editRoleSelect')?.value;
-    if(!newRole) { 
-        await showDeanAlert('Please select a role.', {title:'Missing Role', type:'warning'}); 
-        return; 
+    if (!newRole) {
+        await showDeanAlert('Please select a role.', { title: 'Missing Role', type: 'warning' });
+        return;
     }
-    if(newRole === currentUserToEdit.currentRole) { 
-        await showDeanAlert('This is already the current role.', {title:'No Changes', type:'info'}); 
-        return; 
+    if (newRole === currentUserToEdit.currentRole) {
+        await showDeanAlert('This is already the current role.', { title: 'No Changes', type: 'info' });
+        return;
     }
-    
+
     const confirmed = await showDeanConfirm(
-        `Change ${currentUserToEdit.name}'s role to ${newRole.charAt(0).toUpperCase() + newRole.slice(1)}?`, 
-        {title:'Confirm Role Change', confirmText:'Yes, update role', cancelText:'Cancel'}
+        `Change <strong>${currentUserToEdit.name}</strong>'s role from <strong>${currentUserToEdit.currentRole}</strong> to <strong>${newRole}</strong>?`,
+        { title: 'Confirm Role Change', confirmText: 'Yes, update role', cancelText: 'Cancel' }
     );
-    if(!confirmed) return;
-    
+    if (!confirmed) return;
+
+    // ── Show loading overlay ──────────────────────────────────────
+    const overlay = document.createElement('div');
+    overlay.style.cssText =
+        'position:fixed;inset:0;background:rgba(10,22,40,0.7);backdrop-filter:blur(4px);' +
+        'display:flex;align-items:center;justify-content:center;z-index:99999;';
+    overlay.innerHTML = `
+        <div style="background:#fff;border-radius:20px;padding:2rem 2.5rem;text-align:center;
+                    font-family:'DM Sans',sans-serif;box-shadow:0 20px 60px rgba(0,0,0,0.3);min-width:260px;">
+            <div class="spinner" style="margin:0 auto 1rem;"></div>
+            <div style="font-weight:600;color:#0a1628;font-size:15px;" id="roleUpdateStatus">Updating role…</div>
+            <div style="font-size:12px;color:#8a98ae;margin-top:4px;" id="roleUpdateSub">Please wait</div>
+        </div>`;
+    document.body.appendChild(overlay);
+
+    const setStatus = (msg, sub = '') => {
+        const s = document.getElementById('roleUpdateStatus');
+        const b = document.getElementById('roleUpdateSub');
+        if (s) s.textContent = msg;
+        if (b) b.textContent = sub;
+    };
+
     try {
-        const userDocId = currentUserToEdit.docId;
-        const userEmail = currentUserToEdit.email;
-        const userUid = currentUserToEdit.id;
-        
-        // 1. Update the main users collection
-        let ref = db.collection('users').doc(userDocId);
-        let doc = await ref.get();
-        if (!doc.exists) {
-            ref = db.collection('users').doc(userUid);
-            doc = await ref.get();
+        const { name, email, currentRole: oldRole, id: uid, docId } = currentUserToEdit;
+        const emailLower = (email || '').toLowerCase().trim();
+        const emailKey   = emailLower.replace(/\./g, '_');
+
+        // ── 1.  Resolve the canonical Firestore document reference ──
+        setStatus('Finding user record…');
+        let canonicalRef = null;
+
+        // Try docId first
+        if (docId) {
+            const snap = await db.collection('users').doc(docId).get();
+            if (snap.exists) canonicalRef = snap.ref;
         }
-        if (!doc.exists) {
-            // Try by email
-            const emailQuery = await db.collection('users').where('email', '==', userEmail).limit(1).get();
-            if (!emailQuery.empty) {
-                ref = emailQuery.docs[0].ref;
-                doc = emailQuery.docs[0];
+        // Fallback: uid
+        if (!canonicalRef && uid) {
+            const snap = await db.collection('users').doc(uid).get();
+            if (snap.exists) canonicalRef = snap.ref;
+        }
+        // Fallback: email query
+        if (!canonicalRef) {
+            const qs = await db.collection('users')
+                .where('email', '==', emailLower)
+                .limit(1).get();
+            if (!qs.empty) canonicalRef = qs.docs[0].ref;
+        }
+        if (!canonicalRef) throw new Error('User document not found in Firestore.');
+
+        const canonicalData = (await canonicalRef.get()).data();
+        const resolvedUid   = canonicalData.uid || canonicalRef.id;
+
+        // ── 2.  Update ALL users-collection docs that reference this person ──
+        setStatus('Updating user records…');
+
+        const updatePayload = {
+            role:      newRole,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        };
+
+        // Gather every doc that belongs to this account
+        const docsToUpdate = new Set();
+        docsToUpdate.add(canonicalRef.path);
+
+        const uidDoc = db.collection('users').doc(resolvedUid);
+        if ((await uidDoc.get()).exists) docsToUpdate.add(uidDoc.path);
+
+        const emailKeyDoc = db.collection('users').doc(emailKey);
+        if ((await emailKeyDoc.get()).exists) docsToUpdate.add(emailKeyDoc.path);
+
+        const emailQuery = await db.collection('users')
+            .where('email', '==', emailLower).get();
+        emailQuery.forEach(d => docsToUpdate.add(d.ref.path));
+
+        // Write all in one batch
+        const batch1 = db.batch();
+        docsToUpdate.forEach(path => {
+            batch1.update(db.doc(path), updatePayload);
+        });
+        await batch1.commit();
+
+        // ── 3.  Handle role-specific collection transfers ──────────
+        setStatus('Transferring to correct collection…', `${oldRole} → ${newRole}`);
+
+        // Collection names per role
+        const ROLE_COLLECTION = {
+            dean:      'deans',
+            professor: 'professors',
+            secretary: 'secretaries',
+            student:   'students',
+        };
+
+        // REMOVE from old role collection
+        const oldColl = ROLE_COLLECTION[oldRole];
+        if (oldColl) {
+            const removeBatch = db.batch();
+            let removed = false;
+
+            // By resolvedUid
+            const oldByUid = db.collection(oldColl).doc(resolvedUid);
+            if ((await oldByUid.get()).exists) { removeBatch.delete(oldByUid); removed = true; }
+
+            // By email
+            const oldByEmail = await db.collection(oldColl)
+                .where('email', '==', emailLower).get();
+            oldByEmail.forEach(d => { removeBatch.delete(d.ref); removed = true; });
+
+            if (removed) await removeBatch.commit();
+        }
+
+        // ADD to new role collection
+        const newColl = ROLE_COLLECTION[newRole];
+        if (newColl) {
+            const newDocRef = db.collection(newColl).doc(resolvedUid);
+            await newDocRef.set({
+                uid:       resolvedUid,
+                email:     emailLower,
+                name:      name,
+                role:      newRole,
+                status:    'active',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            }, { merge: true });
+        }
+
+        // ── 4.  Extra side-effects per role transition ─────────────
+        setStatus('Applying extra updates…');
+
+        // If leaving professor role → unassign from sections
+        if (oldRole === 'professor') {
+            const sectSnap = await db.collection('sections')
+                .where('professorId', '==', resolvedUid).get();
+            if (!sectSnap.empty) {
+                const sectBatch = db.batch();
+                sectSnap.forEach(d => sectBatch.update(d.ref, {
+                    professorId:    null,
+                    professorEmail: null,
+                    professorName:  'Unassigned',
+                    updatedAt:      firebase.firestore.FieldValue.serverTimestamp(),
+                }));
+                await sectBatch.commit();
             }
         }
-        
-        if (!doc.exists) throw new Error('User document not found');
-        
-        // Store old role for cross-collection cleanup
-        const oldRole = doc.data().role;
-        
-        // Update the main user document
-        await ref.update({
-            role: newRole,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        // 2. CRITICAL: Handle cross-collection role data
-        // If changing TO dean, also create/update deans collection
-        if (newRole === 'dean') {
-            const deanRef = db.collection('deans').doc(userUid);
-            await deanRef.set({
-                uid: userUid,
-                email: userEmail,
-                name: currentUserToEdit.name,
-                role: 'dean',
-                status: 'active',
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-        } 
-        // If changing FROM dean, remove from deans collection
-        else if (oldRole === 'dean') {
-            const deanRef = db.collection('deans').doc(userUid);
-            await deanRef.delete().catch(() => {});
-        }
-        
-        // If changing TO professor, ensure professor-specific data
+
+        // If moving to professor role → ensure sections knows their name
         if (newRole === 'professor') {
-            // Update sections collection if this professor is assigned to sections
-            const sectionsQuery = await db.collection('sections')
-                .where('professorId', '==', userUid)
-                .get();
-            const batch = db.batch();
-            sectionsQuery.forEach(sectionDoc => {
-                batch.update(sectionDoc.ref, {
-                    professorId: userUid,
-                    professorEmail: userEmail,
-                    professorName: currentUserToEdit.name,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            });
-            await batch.commit();
+            const sectSnap = await db.collection('sections')
+                .where('professorEmail', '==', emailLower).get();
+            if (!sectSnap.empty) {
+                const sectBatch = db.batch();
+                sectSnap.forEach(d => sectBatch.update(d.ref, {
+                    professorId:   resolvedUid,
+                    professorName: name,
+                    updatedAt:     firebase.firestore.FieldValue.serverTimestamp(),
+                }));
+                await sectBatch.commit();
+            }
         }
-        
-        // If changing FROM professor, clear professor assignments from sections
-        if (oldRole === 'professor') {
-            const sectionsQuery = await db.collection('sections')
-                .where('professorId', '==', userUid)
-                .get();
-            const batch = db.batch();
-            sectionsQuery.forEach(sectionDoc => {
-                batch.update(sectionDoc.ref, {
-                    professorId: null,
-                    professorEmail: null,
-                    professorName: 'Unassigned',
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            });
-            await batch.commit();
-        }
-        
-        // 3. Update any other references based on email
-        const emailKey = userEmail.replace(/\./g, '_');
-        const emailDocRef = db.collection('users').doc(emailKey);
-        const emailDoc = await emailDocRef.get();
-        if (emailDoc.exists) {
-            await emailDocRef.update({
-                role: newRole,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        }
-        
-        // 4. Log the role change activity
+
+        // ── 5.  Activity log ───────────────────────────────────────
         await db.collection('activityLogs').add({
-            type: 'role_change',
-            userId: userUid,
-            userName: currentUserToEdit.name,
-            userEmail: userEmail,
-            oldRole: oldRole,
-            newRole: newRole,
-            changedBy: currentUser?.uid || 'dean_system',
+            type:          'role_change',
+            userId:        resolvedUid,
+            userName:      name,
+            userEmail:     emailLower,
+            oldRole,
+            newRole,
+            changedBy:     currentUser?.uid || 'dean_system',
             changedByName: deanData?.name || currentUser?.displayName || 'Dean',
             changedByRole: 'dean',
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            timestamp:     firebase.firestore.FieldValue.serverTimestamp(),
         });
-        
-        await showDeanAlert(
-            `✅ ${currentUserToEdit.name}'s role has been updated from <strong>${oldRole}</strong> to <strong>${newRole}</strong>.<br><br>
-             The user must sign out and sign back in for all changes to take full effect.`,
-            { title: 'Role Updated', type: 'success' }
+
+        // ── 6.  Update local in-memory array immediately ───────────
+        const acct = allAccounts.find(a =>
+            a.docId === docId || a.id === uid || (a.email || '').toLowerCase() === emailLower
         );
-        
-        closeEditRoleModal();
-        
-        // 5. Force refresh all data to clear any caches
-        await loadAllAccounts();
-        await loadDashboardStats();
-        await loadSections();
-        await loadSectionRankings();
-        
-        // 6. If the current user's role was changed, force logout
-        if (userEmail === currentUser?.email) {
-            await showDeanAlert(
-                'Your role has been changed. You will be signed out to apply the changes.',
-                { title: 'Role Changed', type: 'info' }
-            );
-            setTimeout(() => {
-                auth.signOut().then(() => {
-                    window.location.href = '/login/index.html';
-                });
-            }, 2000);
+        if (acct) {
+            acct.role    = newRole;
+            acct.college = newRole === 'student'
+                ? (acct.userData?.section || acct.userData?.assignedSection || 'N/A')
+                : 'College of Human Kinetics';
         }
-        
-    } catch(e) { 
-        console.error('updateUserRole error:', e);
-        await showDeanAlert('❌ Error: ' + e.message, { title: 'Update Failed', type: 'error' }); 
+        filteredAccounts = filteredAccounts.map(a =>
+            (a.docId === docId || a.id === uid || (a.email || '').toLowerCase() === emailLower)
+                ? { ...a, role: newRole }
+                : a
+        );
+
+        overlay.remove();
+        closeEditRoleModal();
+
+        await showDeanAlert(
+            `<strong>${name}</strong> has been moved from <strong>${oldRole}</strong> to <strong>${newRole}</strong>.<br><br>
+             All collections have been updated.`,
+            { title: 'Role Updated', type: 'success', confirmText: 'Done' }
+        );
+
+        // ── 7.  Re-render the table immediately (no full reload) ───
+        updateRoleFilterOptions();
+        renderAccountsTable();
+        updateTotalAccountsCount();
+
+        // Background refresh so server data is consistent
+        loadAllAccounts().then(() => {
+            loadDashboardStats();
+            loadSections();
+            loadSectionRankings();
+            if (newRole === 'student' || oldRole === 'student') loadStudentRankings();
+        });
+
+        // ── 8.  If changing current user's own role → sign out ─────
+        if (emailLower === (currentUser?.email || '').toLowerCase()) {
+            await showDeanAlert(
+                'Your own role was changed. You will be signed out to apply the new permissions.',
+                { title: 'Signing you out…', type: 'info' }
+            );
+            setTimeout(() => auth.signOut().then(() => {
+                window.location.href = '/login/index.html';
+            }), 1500);
+        }
+
+    } catch (err) {
+        overlay.remove();
+        console.error('updateUserRole error:', err);
+        await showDeanAlert('Update failed: ' + err.message, { title: 'Error', type: 'error' });
     }
 };
+
 
     window.toggleAccountStatus = async function(docId,newStatus) {
         const a=allAccounts.find(ac=>ac.docId===docId); if(!a) return;
@@ -4270,14 +4377,21 @@ window.updateUserRole = async function() {
     }
 };
 
-window.deleteSection = async function(sectionName) {
-    // Confirm first
+// ══════════════════════════════════════════════════════════════════
+//  REPLACE the entire window.deleteSection function in dean.html
+//  Find:   window.deleteSection = async function(sectionName) {
+//  Replace everything up to (and including) the closing  };
+// ══════════════════════════════════════════════════════════════════
+
+window.deleteSection = async function (sectionName) {
     const confirmed = await showDeanConfirm(
         `Delete section <strong>${sectionName}</strong>?<br><br>
          This will permanently delete:<br>
          • The section record<br>
          • All enrolled students in this section<br>
-         • All BMI assessments for those students<br><br>
+         • All BMI assessments for those students<br>
+         • All test results for those students<br>
+         • All student norm overrides for those students<br><br>
          <strong>Professors will NOT be deleted.</strong> This cannot be undone.`,
         {
             title: 'Delete Section',
@@ -4288,154 +4402,201 @@ window.deleteSection = async function(sectionName) {
     );
     if (!confirmed) return;
 
-    try {
-        // Show loading modal
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.id = 'deleteSectionLoading';
-        loadingOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,22,40,0.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:99999;';
-        loadingOverlay.innerHTML = `
-            <div style="background:#fff;border-radius:20px;padding:2rem 2.5rem;text-align:center;font-family:'DM Sans',sans-serif;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-                <div class="spinner" style="margin:0 auto 1rem;"></div>
-                <div style="font-weight:600;color:#0a1628;font-size:15px;" id="deleteSectionStatus">Deleting section...</div>
-                <div style="font-size:12px;color:#8a98ae;margin-top:4px;" id="deleteSectionSub">Please wait</div>
-            </div>`;
-        document.body.appendChild(loadingOverlay);
+    // ── Loading overlay ──────────────────────────────────────────
+    const loadingOverlay = document.createElement('div');
+    loadingOverlay.id = 'deleteSectionLoading';
+    loadingOverlay.style.cssText =
+        'position:fixed;inset:0;background:rgba(10,22,40,0.7);backdrop-filter:blur(4px);' +
+        'display:flex;align-items:center;justify-content:center;z-index:99999;';
+    loadingOverlay.innerHTML = `
+        <div style="background:#fff;border-radius:20px;padding:2rem 2.5rem;text-align:center;
+                    font-family:'DM Sans',sans-serif;box-shadow:0 20px 60px rgba(0,0,0,0.3);min-width:280px;">
+            <div class="spinner" style="margin:0 auto 1rem;"></div>
+            <div style="font-weight:600;color:#0a1628;font-size:15px;" id="deleteSectionStatus">Deleting section…</div>
+            <div style="font-size:12px;color:#8a98ae;margin-top:4px;" id="deleteSectionSub">Please wait</div>
+        </div>`;
+    document.body.appendChild(loadingOverlay);
 
-        const updateStatus = (msg, sub) => {
-            const s = document.getElementById('deleteSectionStatus');
-            const b = document.getElementById('deleteSectionSub');
-            if (s) s.textContent = msg;
-            if (b) b.textContent = sub || '';
-        };
+    const setStatus = (msg, sub = '') => {
+        const s = document.getElementById('deleteSectionStatus');
+        const b = document.getElementById('deleteSectionSub');
+        if (s) s.textContent = msg;
+        if (b) b.textContent = sub;
+    };
 
-        const BATCH_SIZE = 400; // Firestore batch limit is 500, stay safe
-
-        // ── Helper: delete documents in batches ──
-        async function batchDelete(docs) {
-            for (let i = 0; i < docs.length; i += BATCH_SIZE) {
-                const batch = db.batch();
-                docs.slice(i, i + BATCH_SIZE).forEach(d => batch.delete(d.ref));
-                await batch.commit();
-            }
+    // ── Batch-delete helper (respects Firestore 500-op limit) ────
+    const BATCH_SIZE = 400;
+    async function batchDelete(docs) {
+        for (let i = 0; i < docs.length; i += BATCH_SIZE) {
+            const batch = db.batch();
+            docs.slice(i, i + BATCH_SIZE).forEach(d => batch.delete(d.ref || d));
+            await batch.commit();
         }
+    }
 
-        // ── Step 1: Find all students in this section ──
-        updateStatus('Finding students...', `Section: ${sectionName}`);
+    // ── Delete all docs inside a subcollection (any size) ────────
+    async function deleteSubcollection(collRef) {
+        // Firestore JS SDK v8 (compat) does not expose listCollections on the
+        // client, so we just get() the subcollection directly.
+        const snap = await collRef.get();
+        if (snap.empty) return 0;
+        await batchDelete(snap.docs);
+        return snap.size;
+    }
 
-        const studentUids   = new Set();
-        const studentEmails = new Set();
+    try {
+        // ── Step 1: Identify all students in this section ────────
+        setStatus('Finding students…', `Section: ${sectionName}`);
+
+        const studentUids    = new Set();
+        const studentEmails  = new Set();
         const studentUmakIds = new Set();
 
-        // Check users collection
-        const usersSnap = await db.collection('users')
-            .where('role', '==', 'student')
-            .get();
+        const studentUserDocs  = [];
+        const studentCollDocs  = [];
 
-        const studentUserDocs = [];
+        // users collection (role === student)
+        const usersSnap = await db.collection('users')
+            .where('role', '==', 'student').get();
         usersSnap.forEach(d => {
             const data = d.data();
-            const sec = data.section || data.assignedSection || data.class || data.sectionName || '';
-            if (sec === sectionName) {
-                studentUserDocs.push(d);
-                studentUids.add(d.id);
-                if (data.email)   studentEmails.add(data.email.toLowerCase());
-                if (data.umakId)  studentUmakIds.add(data.umakId.trim().toUpperCase());
-                const rawId = (data.studentId || '').replace(/^student_/i, '').trim();
-                if (rawId) studentUmakIds.add(rawId.toUpperCase());
-            }
+            const sec  = data.section || data.assignedSection || data.class || data.sectionName || '';
+            if (sec !== sectionName) return;
+            studentUserDocs.push(d);
+            studentUids.add(d.id);
+            if (data.email)    studentEmails.add(data.email.toLowerCase());
+            if (data.umakId)   studentUmakIds.add(data.umakId.trim().toUpperCase());
+            const rawId = (data.studentId || '').replace(/^student_/i, '').trim();
+            if (rawId) studentUmakIds.add(rawId.toUpperCase());
         });
 
-        // Also check students collection
+        // students collection
         const studentsCollSnap = await db.collection('students').get();
-        const studentCollDocs = [];
         studentsCollSnap.forEach(d => {
             const data = d.data();
-            const sec = data.section || data.assignedSection || data.class || data.sectionName || '';
-            if (sec === sectionName) {
-                studentCollDocs.push(d);
-                studentUids.add(d.id);
-                if (data.email)  studentEmails.add(data.email.toLowerCase());
-                if (data.umakId) studentUmakIds.add(data.umakId.trim().toUpperCase());
-            }
+            const sec  = data.section || data.assignedSection || data.class || data.sectionName || '';
+            if (sec !== sectionName) return;
+            studentCollDocs.push(d);
+            studentUids.add(d.id);
+            if (data.email)  studentEmails.add(data.email.toLowerCase());
+            if (data.umakId) studentUmakIds.add(data.umakId.trim().toUpperCase());
         });
 
         const totalStudents = studentUids.size;
-        updateStatus(`Found ${totalStudents} student(s)`, 'Deleting BMI records...');
+        setStatus(`Found ${totalStudents} student(s)`, 'Collecting records to delete…');
 
-        // ── Step 2: Delete BMI records for these students ──
+        // ── Step 2: Delete BMI records ───────────────────────────
+        setStatus('Deleting BMI records…');
         const bmiSnap = await db.collection('BMI').get();
         const bmiToDelete = [];
         bmiSnap.forEach(d => {
-            const data = d.data();
-            const sec  = data.section || data.assignedSection || '';
+            const data      = d.data();
+            const sec       = data.section || data.assignedSection || '';
             const docEmail  = (data.email || data.studentEmail || '').toLowerCase();
-            const docUmakId = (data.umakId || (data.studentId||'').replace(/^student_/i,'')).trim().toUpperCase();
+            const docUmakId = (data.umakId || (data.studentId || '').replace(/^student_/i, '')).trim().toUpperCase();
             const docUid    = data.uid || data.userId || data.studentId || d.id;
-
             if (
                 sec === sectionName ||
                 studentUids.has(docUid) ||
                 (docEmail  && studentEmails.has(docEmail)) ||
                 (docUmakId && studentUmakIds.has(docUmakId))
-            ) {
-                bmiToDelete.push(d);
-            }
+            ) bmiToDelete.push(d);
         });
-
-        updateStatus(`Deleting ${bmiToDelete.length} BMI record(s)...`, 'Almost done...');
         await batchDelete(bmiToDelete);
 
-        // ── Step 3: Delete testResults for these students ──
+        // ── Step 3: Delete testResults ───────────────────────────
+        setStatus('Deleting test results…');
         const testSnap = await db.collection('testResults').get();
         const testsToDelete = [];
         testSnap.forEach(d => {
-            const data = d.data();
+            const data      = d.data();
             const sec       = data.section || '';
             const docEmail  = (data.studentEmail || data.email || '').toLowerCase();
             const docUmakId = (data.umakId || '').trim().toUpperCase();
             const docUid    = data.studentId || data.uid || d.id;
-
             if (
                 sec === sectionName ||
                 studentUids.has(docUid) ||
                 (docEmail  && studentEmails.has(docEmail)) ||
                 (docUmakId && studentUmakIds.has(docUmakId))
-            ) {
-                testsToDelete.push(d);
-            }
+            ) testsToDelete.push(d);
         });
-
-        updateStatus(`Deleting ${testsToDelete.length} test record(s)...`, 'Cleaning up...');
         await batchDelete(testsToDelete);
 
-        // ── Step 4: Delete student user documents ──
-        updateStatus(`Deleting ${totalStudents} student account(s)...`, '');
+        // ── Step 4: Delete studentNorms subcollections ───────────
+        // studentNorms/{email}/tests/{testKey}
+        // We must delete the /tests sub-docs first, then the parent doc.
+        setStatus('Deleting student norm overrides…');
+        let normsDeleted = 0;
+
+        // Build the set of email keys we need to clean up
+        const normEmailKeys = new Set();
+        studentEmails.forEach(e => normEmailKeys.add(e));
+
+        // Also check by uid / umakId keys in studentNorms collection
+        // (some professors may have saved norms keyed by uid or umakId)
+        studentUids.forEach(u => normEmailKeys.add(u));
+        studentUmakIds.forEach(u => normEmailKeys.add(u.toLowerCase()));
+
+        // Fetch every doc in studentNorms that matches any of our keys
+        // Firestore `in` operator accepts max 30 values per query; chunk if needed
+        const normKeys = Array.from(normEmailKeys).filter(Boolean);
+        const CHUNK = 30;
+        const normParentDocs = [];
+
+        for (let i = 0; i < normKeys.length; i += CHUNK) {
+            const chunk = normKeys.slice(i, i + CHUNK);
+            // Try direct doc lookups (most common pattern: keyed by email)
+            const gets = await Promise.all(
+                chunk.map(k => db.collection('studentNorms').doc(k).get().catch(() => null))
+            );
+            gets.forEach(snap => {
+                if (snap && snap.exists) normParentDocs.push(snap);
+            });
+        }
+
+        // For each parent doc, delete its /tests subcollection then the doc itself
+        for (const parentSnap of normParentDocs) {
+            const testsRef = parentSnap.ref.collection('tests');
+            const n = await deleteSubcollection(testsRef);
+            normsDeleted += n;
+            await parentSnap.ref.delete();
+            normsDeleted++;
+        }
+
+        setStatus(`Deleted ${normsDeleted} norm record(s)`, 'Removing student accounts…');
+
+        // ── Step 5: Delete student user documents ────────────────
+        setStatus(`Deleting ${totalStudents} student account(s)…`);
         await batchDelete(studentUserDocs);
         await batchDelete(studentCollDocs);
 
-        // ── Step 5: Delete the section document itself ──
-        updateStatus('Deleting section record...', '');
+        // ── Step 6: Delete the section document itself ───────────
+        setStatus('Deleting section record…');
         const sectionSnap = await db.collection('sections')
-            .where('name', '==', sectionName)
-            .get();
+            .where('name', '==', sectionName).get();
         await batchDelete(sectionSnap.docs);
 
-        // Also try by document ID (in case section doc ID matches name)
+        // Fallback: try by document ID (section name as doc ID)
         try {
             const byId = await db.collection('sections').doc(sectionName).get();
             if (byId.exists) await byId.ref.delete();
-        } catch(e) {}
+        } catch (_) { /* ignore */ }
 
-        // ── Done ──
+        // ── Done ─────────────────────────────────────────────────
         loadingOverlay.remove();
 
         await showDeanAlert(
             `Section <strong>${sectionName}</strong> has been deleted.<br><br>
-             Removed: ${totalStudents} student(s), ${bmiToDelete.length} BMI record(s), ${testsToDelete.length} test result(s).`,
+             Removed:<br>
+             • ${totalStudents} student account(s)<br>
+             • ${bmiToDelete.length} BMI record(s)<br>
+             • ${testsToDelete.length} test result(s)<br>
+             • ${normsDeleted} student norm record(s)`,
             { title: 'Section Deleted', type: 'success', confirmText: 'Done' }
         );
 
-        // Refresh all data
+        // Refresh all relevant data
         await loadTestResults();
         await loadSections();
         await loadSectionRankings();
