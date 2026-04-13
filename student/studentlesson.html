@@ -506,7 +506,7 @@ import { getFirestore, collection, query, where, getDocs, onSnapshot, doc, updat
   async function checkUnreadNotifications() {
     try {
         if (!studentData?.section) return;
-        const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)));
+        const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section)));
         const readKey = `readNotifications_${studentData.email}`;
         const deletedKey = `deletedNotifications_${studentData.email}`;
         const read = JSON.parse(localStorage.getItem(readKey) || '[]');
@@ -530,7 +530,7 @@ import { getFirestore, collection, query, where, getDocs, onSnapshot, doc, updat
             body.innerHTML = `<div class="py-6 px-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl block mb-3"></i><p class="text-gray-600 text-sm">No section assigned</p></div>`;
             return;
         }
-        const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)));
+        const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section)));
         const readKey = `readNotifications_${studentData.email}`;
         const deletedKey = `deletedNotifications_${studentData.email}`;
         const read = JSON.parse(localStorage.getItem(readKey) || '[]');
@@ -600,7 +600,7 @@ import { getFirestore, collection, query, where, getDocs, onSnapshot, doc, updat
  async function updateNotificationBadgeAfterRead() {
     try {
         if (!studentData?.section) return;
-        const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)));
+        const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section)));
         const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
         const deleted = JSON.parse(localStorage.getItem(`deletedNotifications_${studentData.email}`) || '[]');
         let unread = 0;
@@ -631,7 +631,7 @@ window.deleteAllNotifications = function() {
     const deletedKey = `deletedNotifications_${studentData?.email}`;
     const readKey = `readNotifications_${studentData?.email}`;
     // We need the cached list — re-fetch and delete all
-    getDocs(query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)))
+    getDocs(query(collection(db,'notifications'), where('section','==',studentData.section)))
         .then(snap => {
             const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
             snap.forEach(d => { if (!deleted.includes(d.id)) deleted.push(d.id); });
@@ -685,7 +685,7 @@ function showToast(message, type = 'info') {
             if (!studentData?.section) return;
             if (unsubscribeNotifListener) unsubscribeNotifListener();
             unsubscribeNotifListener = onSnapshot(
-                query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)),
+                query(collection(db,'notifications'), where('section','==',studentData.section)),
                 () => checkUnreadNotifications(),
                 (e) => console.error(e)
             );

@@ -1103,17 +1103,21 @@ async function saveLessonAction(title, sections, type, desc, ytLink, pubDate, st
     async function createNotification(lessonData, lessonId){
     try{
         const sectionsList = lessonData.sections ? lessonData.sections.join(', ') : lessonData.section;
-        await addDoc(collection(db,'notifications'),{
-            type:'new_lesson',
-            title:`New Lesson: ${lessonData.title}`,
-            message:`A new ${lessonData.type} lesson "${lessonData.title}" has been published for ${sectionsList}.`,
-            sections: lessonData.sections || [lessonData.section],
-            lessonId,
-            lessonTitle:lessonData.title,
-            professorEmail:currentProfessor.email,
-            isRead:false,
-            createdAt:serverTimestamp()
-        });
+       const sectionsArray = lessonData.sections || [lessonData.section];
+for (const sec of sectionsArray) {
+    await addDoc(collection(db,'notifications'),{
+        type:'new_lesson',
+        title:`New Lesson: ${lessonData.title}`,
+        message:`A new ${lessonData.type} lesson "${lessonData.title}" has been published for ${sectionsList}.`,
+        section: sec,
+        sections: sectionsArray,
+        lessonId,
+        lessonTitle:lessonData.title,
+        professorEmail:currentProfessor.email,
+        isRead:false,
+        createdAt:serverTimestamp()
+    });
+}
     } catch(e){
         console.error('Notification error:',e);
     }
