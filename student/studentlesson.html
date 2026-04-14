@@ -502,7 +502,11 @@ import { getFirestore, collection, query, where, getDocs, onSnapshot, doc, updat
         }
 
         // ========== NOTIFICATIONS ==========
-
+            function buildDedupKey(data) {
+    const titleKey = (data.title || '').replace(/\d+/g, '').replace(/\s+/g, ' ').trim();
+    const messageKey = (data.message || '').substring(0, 80);
+    return `${titleKey}|${messageKey}`;
+}
   async function checkUnreadNotifications() {
     try {
         if (!studentData?.section) return;
@@ -515,7 +519,13 @@ import { getFirestore, collection, query, where, getDocs, onSnapshot, doc, updat
         // Build active list
         const allNotifs = [];
         snap.forEach(d => allNotifs.push({ id: d.id, ...d.data() }));
-        const active = allNotifs.filter(n => !deleted.includes(n.id));
+        const deletedKeysKey = `deletedNotifKeys_${studentData.email}`;
+        const deletedKeys = JSON.parse(localStorage.getItem(deletedKeysKey) || '[]');
+        const active = allNotifs.filter(n => {
+            if (deleted.includes(n.id)) return false;
+            if (deletedKeys.includes(buildDedupKey(n))) return false;
+            return true;
+        });
 
         // Deduplicate by title|message|timestamp (same logic as dropdown)
         const seen = new Set(), unique = [];
@@ -551,7 +561,13 @@ import { getFirestore, collection, query, where, getDocs, onSnapshot, doc, updat
 
         const allNotifs = [];
         snap.forEach(d => allNotifs.push({ id: d.id, ...d.data() }));
-        const active = allNotifs.filter(n => !deleted.includes(n.id));
+        const deletedKeysKey2 = `deletedNotifKeys_${studentData.email}`;
+const deletedKeys2 = JSON.parse(localStorage.getItem(deletedKeysKey2) || '[]');
+const active = allNotifs.filter(n => {
+    if (deleted.includes(n.id)) return false;
+    if (deletedKeys2.includes(buildDedupKey(n))) return false;
+    return true;
+});
 
         if (active.length === 0) {
             body.innerHTML = `<div class="py-6 px-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl block mb-3"></i><p class="text-gray-600 text-sm">No notifications yet</p></div>`;
@@ -624,7 +640,13 @@ import { getFirestore, collection, query, where, getDocs, onSnapshot, doc, updat
 
         const allNotifs = [];
         snap.forEach(d => allNotifs.push({ id: d.id, ...d.data() }));
-        const active = allNotifs.filter(n => !deleted.includes(n.id));
+        const deletedKeysKey3 = `deletedNotifKeys_${studentData.email}`;
+const deletedKeys3 = JSON.parse(localStorage.getItem(deletedKeysKey3) || '[]');
+const active = allNotifs.filter(n => {
+    if (deleted.includes(n.id)) return false;
+    if (deletedKeys3.includes(buildDedupKey(n))) return false;
+    return true;
+});
 
         // Deduplicate
         const seen = new Set(), unique = [];
