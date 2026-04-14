@@ -1375,12 +1375,22 @@ const CATEGORY_ORDER = { 'Excellent': 5, 'Good': 4, 'Average': 3, 'Below Average
     }
             function renderDashboardOverview({ uw, nm, ow, ob, preCount, postCount }) {
   
-        const perStudentTests = new Map(); // studentKey → Map(testKey → best attempt)
+       const perStudentTests = new Map(); // studentKey → Map(testKey → best attempt)
         testResults.forEach(t => {
             if (!t.score || t.score <= 0) return;
             const studentKey = t.studentId || t.studentEmail || t.umakId || t.email || t.id;
-            const testKey = t.testId || t.scheduledTestId || t.testName;
-            if (!studentKey || !testKey) return;
+            if (!studentKey) return;
+            
+            // Generate canonical key to group multiple attempts into 1 unique test
+            const tl = (t.testName || '').toLowerCase();
+            let testKey = tl.replace(/[^a-z]/g, '');
+            if (tl.includes('push')) testKey = 'pushup';
+            else if (tl.includes('curl')) testKey = 'curlup';
+            else if (tl.includes('sit') && tl.includes('reach')) testKey = 'sitreach';
+            else if (tl.includes('step') || tl.includes('3-minute')) testKey = 'steptest';
+            else if (tl.includes('skinfold') || tl.includes('skin fold')) testKey = 'skinfold';
+            if (!testKey) testKey = t.testName || 'unknown';
+
             if (!perStudentTests.has(studentKey)) perStudentTests.set(studentKey, new Map());
             const stuMap = perStudentTests.get(studentKey);
             const existing = stuMap.get(testKey);
@@ -2025,36 +2035,47 @@ function _resolveNormCategory({ testName, result, testId, studentEmail, genderKe
 
 // Keep ALL attempts per student for accurate test counts
 // Score dedup happens per-student when building rankings
-const bestPerStudentTest = {};
+// Deduplicate: per student per section, keep only BEST score per test group
+const perSectionStudentBest = {};
+const secActiveStudents = {};
+
 testResults.forEach(t => {
     const sec = t.section; if (!sec) return;
     const score = t.score || 0; if (score <= 0) return;
-    // Use unique doc id so ALL attempts are preserved
-    bestPerStudentTest[t.id || Math.random()] = t;
+
+    const studentKey = (
+        t.umakId ||
+        (t.studentId || '').replace(/^student_/i, '').trim() ||
+        t.studentEmail || t.email || t.uid || t.id
+    );
+    if (!studentKey) return;
+
+    if (!secActiveStudents[sec]) secActiveStudents[sec] = new Set();
+    secActiveStudents[sec].add(studentKey.toUpperCase());
+
+    const testGroupKey = t.testId || t.scheduledTestId || t.testName;
+    const compositeKey = `${sec}:::${studentKey.toUpperCase()}`;
+    if (!perSectionStudentBest[compositeKey]) perSectionStudentBest[compositeKey] = new Map();
+    const stuMap = perSectionStudentBest[compositeKey];
+
+    const existing = stuMap.get(testGroupKey);
+    const existingRank = existing ? (NORM_RANK_MAP[existing.category] || existing.score || 0) : -1;
+    const currentRank  = NORM_RANK_MAP[t.category] || score;
+    if (!existing || currentRank > existingRank) stuMap.set(testGroupKey, { ...t, score });
 });
 
-Object.values(bestPerStudentTest).forEach(t => {
-            const sec = t.section;
-            const score = t.score;
-            const type = t.type || 'unknown';
-            if (!secData[sec]) {
-                secData[sec] = { pre: [], post: [], preScores: [], postScores: [], allScores: [], bmiPreValues: [], bmiPostValues: [] };
-                secStudents[sec] = new Set();
-                secMeta[sec] = { college: 'College of Human Kinetics', professor: 'Unassigned', studentCount: 0, professorEmail: '', professorId: '' };
-            }
-            if (type === 'pre') {
-                secData[sec].pre.push(t);
-                secData[sec].preScores.push(score);
-                secData[sec].allScores.push(score);
-            } else if (type === 'post') {
-                secData[sec].post.push(t);
-                secData[sec].postScores.push(score);
-                secData[sec].allScores.push(score);
-            } else {
-                secData[sec].allScores.push(score);
-            }
-            const sk = t.studentId || t.studentEmail; if (sk) secStudents[sec].add(sk);
-        });
+Object.entries(perSectionStudentBest).forEach(([compositeKey, stuMap]) => {
+    const sec = compositeKey.split(':::')[0];
+    if (!secData[sec]) return;
+    stuMap.forEach(t => {
+        const type = (t.type || t.testType || '').toLowerCase();
+        const score = t.score || 0;
+        secData[sec].allScores.push(score);
+        if (type === 'pre')  { secData[sec].pre.push(t);  secData[sec].preScores.push(score); }
+        if (type === 'post') { secData[sec].post.push(t); secData[sec].postScores.push(score); }
+        const sk = t.studentId || t.studentEmail; if (sk) secStudents[sec].add(sk);
+    });
+});
 
         sectionRankings = []; allColleges.clear();
 
@@ -2100,8 +2121,8 @@ sectionRankings.push({
                 postTestAvg: parseFloat(postAvg.toFixed(2)),
                 improvement: parseFloat((postAvg - preAvg).toFixed(2)),
                 avgScore: parseFloat(avgScore.toFixed(2)),
-                totalTests: data.allScores.length,
-                hasData: data.allScores.length > 0,
+                totalTests: data.allScores.length || 0,
+                hasData: (data.allScores.length || 0) > 0,
                 preScores: data.preScores,
                 postScores: data.postScores,
                 allScores: data.allScores,
@@ -2116,7 +2137,10 @@ sectionRankings.push({
             });
         }
 
-        const withData    = sectionRankings.filter(s => s.hasData).sort((a, b) => b.avgScore - a.avgScore);
+const withData = sectionRankings.filter(s => s.hasData).sort((a, b) => {
+    if (b.totalTests !== a.totalTests) return b.totalTests - a.totalTests;
+    return b.avgScore - a.avgScore;
+});
         const withoutData = sectionRankings.filter(s => !s.hasData).sort((a, b) => a.name.localeCompare(b.name));
         sectionRankings   = [...withData, ...withoutData];
 
@@ -2149,7 +2173,12 @@ sectionRankings.push({
     if(type==='pre') filteredRankings.sort((a,b)=>b.preTestAvg-a.preTestAvg);
     else if(type==='post') filteredRankings.sort((a,b)=>b.postTestAvg-a.postTestAvg);
     else if(type==='improvement') filteredRankings.sort((a,b)=>b.improvement-a.improvement);
-    else filteredRankings.sort((a,b)=>b.avgScore-a.avgScore);
+else filteredRankings.sort((a, b) => {
+    if (!a.hasData && !b.hasData) return a.name.localeCompare(b.name);
+    if (!a.hasData) return 1; if (!b.hasData) return -1;
+    if (b.totalTests !== a.totalTests) return b.totalTests - a.totalTests;
+    return b.avgScore - a.avgScore;
+});
     window.sectionRankingCurrentPage = 1; // reset on filter
     renderSectionRankingTable();
 };
@@ -2299,7 +2328,10 @@ async function loadTopSections() {
     const tbody = document.getElementById('topSectionsTableBody'); if (!tbody) return;
 
     // Only sections that actually have test data
-    const top = sectionRankings.filter(s => s.hasData).slice(0, 5);
+const top = sectionRankings
+    .filter(s => s.hasData)
+    .sort((a, b) => b.totalTests !== a.totalTests ? b.totalTests - a.totalTests : b.avgScore - a.avgScore)
+    .slice(0, 5);
 
     if (!top.length) {
         tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div style="font-size:14px;color:#8a98ae;">No section data available yet.</div></div></td></tr>`;
@@ -2606,10 +2638,20 @@ async function loadStudentRankings() {
             });
             
    // Deduplicate by testId — keep highest-ranked attempt (mirrors modal + studentgrades.html)
+// Deduplicate by Canonical Test Type — keep highest-ranked attempt
 const NORM_RANK_MAP = { 'Excellent': 5, 'Good': 4, 'Average': 3, 'Below Average': 2, 'Poor': 1 };
 const uniqueTestMap = new Map();
 studentTests.forEach(t => {
-    const groupKey = t.testId || t.scheduledTestId || t.testName;
+    // Generate canonical group key to merge multiple attempts of the same exam
+    const tl = (t.testName || '').toLowerCase();
+    let groupKey = tl.replace(/[^a-z]/g, '');
+    if (tl.includes('push')) groupKey = 'pushup';
+    else if (tl.includes('curl')) groupKey = 'curlup';
+    else if (tl.includes('sit') && tl.includes('reach')) groupKey = 'sitreach';
+    else if (tl.includes('step') || tl.includes('3-minute')) groupKey = 'steptest';
+    else if (tl.includes('skinfold') || tl.includes('skin fold')) groupKey = 'skinfold';
+    if (!groupKey) groupKey = t.testName || 'unknown';
+
     const currentRank = NORM_RANK_MAP[t.category] || (t.score || 0);
     const existing = uniqueTestMap.get(groupKey);
     const existingRank = existing ? (NORM_RANK_MAP[existing.category] || (existing.score || 0)) : -1;
@@ -2706,8 +2748,11 @@ data.hasData = uniqueTests.length > 0;
         });
 const withData = studentRankings.filter(s => s.hasData)
 .sort((a, b) => {
+        // Priority 1: Highest Completion Rate (Number of UNIQUE tests taken)
         if (b.testsTaken !== a.testsTaken) return b.testsTaken - a.testsTaken;
+        // Priority 2: Tie-breaker - Highest Average Score
         if (b.avgScore !== a.avgScore) return b.avgScore - a.avgScore;
+        // Priority 3: Tie-breaker - Alphabetical Name
         return a.name.localeCompare(b.name);
     });
         const withoutData = studentRankings.filter(s => !s.hasData)
@@ -2743,12 +2788,16 @@ const withData = studentRankings.filter(s => s.hasData)
         else if (type === 'post') mt = s.postScores && s.postScores.length > 0;
         return ms && msc && mt;
     });
-    const withData = filteredStudentRankings.filter(s => s.hasData)
+   const withData = filteredStudentRankings.filter(s => s.hasData)
         .sort((a, b) => {
+            // Priority 1: Highest Completion Rate (Number of UNIQUE tests taken)
             if (b.testsTaken !== a.testsTaken) return b.testsTaken - a.testsTaken;
+            // Priority 2: Tie-breaker - Highest Average Score
             if (b.avgScore !== a.avgScore) return b.avgScore - a.avgScore;
+            // Priority 3: Tie-breaker - Alphabetical Name
             return a.name.localeCompare(b.name);
         });
+
     const withoutData = filteredStudentRankings.filter(s => !s.hasData)
         .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -2949,11 +2998,14 @@ function generateProfessorEmail(professorName) {
 
     // Top student = rank #1 in the table (same sort as renderStudentRankingTable)
     // Sort: most tests first, then highest avgScore, then alphabetical
-const sorted = [...withData].sort((a, b) => {
-    if (b.testsTaken !== a.testsTaken) return b.testsTaken - a.testsTaken;
-    if (b.avgScore !== a.avgScore) return b.avgScore - a.avgScore;
-    return a.name.localeCompare(b.name);
-});
+    const sorted = [...withData].sort((a, b) => {
+        // Priority 1: Highest Completion Rate (Number of UNIQUE tests taken)
+        if (b.testsTaken !== a.testsTaken) return b.testsTaken - a.testsTaken;
+        // Priority 2: Tie-breaker - Highest Average Score
+        if (b.avgScore !== a.avgScore) return b.avgScore - a.avgScore;
+        // Priority 3: Tie-breaker - Alphabetical Name
+        return a.name.localeCompare(b.name);
+    });
     if (sorted.length > 0) {
         const top = sorted[0];
         document.getElementById('topStudentName').textContent = top.name;
@@ -3341,7 +3393,7 @@ const testRows = sortedTests.length ? sortedTests.map(t => {
             <td data-label="Score" style="text-align:center;font-size:13px;font-weight:600;color:#0a1628;">${resultDisplay}</td>
             <td data-label="Attempt" style="text-align:center;font-size:13px;color:#4a5a72;">Attempt ${attemptNum}</td>
         </tr>`;
-    }).join('') : '<tr><td colspan="5" style="text-align:center;color:#8a98ae;padding:24px 16px;font-size:13px;">No test history available yet.缓解</tr>';
+    }).join('') : '<tr><td colspan="5" style="text-align:center;color:#8a98ae;padding:24px 16px;font-size:13px;">No test history available yet.</tr>';
 
     // ── BMI history ──
     const bmiHistory = (s.bmiRecords || []).sort((a,b) => {
@@ -3357,7 +3409,7 @@ const testRows = sortedTests.length ? sortedTests.map(t => {
             <td data-label="Category"><span class="bmi-pill ${getBMICategoryClass(cat)}">${getBMICategoryDisplay(cat)}</span></td>
             <td data-label="Date" style="font-size:12px;color:#8a98ae;">${isNaN(d)?'N/A':d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</td>
         </tr>`;
-    }).join('') : '<tr><td colspan="3" style="text-align:center;color:#8a98ae;padding:24px 16px;font-size:13px;">No BMI records available yet.缓解</tr>';
+    }).join('') : '<tr><td colspan="3" style="text-align:center;color:#8a98ae;padding:24px 16px;font-size:13px;">No BMI records available yet.</tr>';
 
     // ── Norm badge style (matches studentgrades.html) ──
     function normBadgeStyle(cat) {
@@ -3453,7 +3505,7 @@ function renderPreAssessmentsTable(data) {
     const rows = data !== undefined ? data : preAssessments;
     const tbody = document.getElementById('preAssessmentsTableBody'); if (!tbody) return;
     if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div style="font-size:48px;color:#c5cfe0;margin-bottom:16px;"><i class="fas fa-clipboard"></i></div><div style="font-size:17px;font-weight:600;color:#0a1628;margin-bottom:8px;">No Records</div><div style="font-size:14px;color:#8a98ae;">No pre-assessment data found.</div></div>缓解</tr>`;
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div style="font-size:48px;color:#c5cfe0;margin-bottom:16px;"><i class="fas fa-clipboard"></i></div><div style="font-size:17px;font-weight:600;color:#0a1628;margin-bottom:8px;">No Records</div><div style="font-size:14px;color:#8a98ae;">No pre-assessment data found.</div></div></tr>`;
         renderPreAssessmentPagination(rows);
         return;
     }
