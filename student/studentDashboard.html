@@ -888,11 +888,11 @@
             return snap.docs.map(d => ({ id: d.id, ...d.data() }));
         }
 
-        async function fetchNotifications(section, email) {
-            if (!section || section === 'Not Assigned') return [];
-            const snap = await getDocs(query(collection(db, 'notifications'), where('section', '==', section), where('studentEmail', '==', email)));
-            return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        }
+async function fetchNotifications(section) {
+    if (!section || section === 'Not Assigned') return [];
+    const snap = await getDocs(query(collection(db, 'notifications'), where('section', '==', section)));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
 
         async function fetchSectionStudents(section) {
             if (!section || section === 'Not Assigned') return [];
@@ -1369,19 +1369,22 @@ async function processAndUpdateStats(testResults) {
         }
 
         // ========== NOTIFICATIONS ==========
-
 async function processAndUpdateNotifications(notifications) {
     const readKey = `readNotifications_${studentData?.email}`;
     const deletedKey = `deletedNotifications_${studentData?.email}`;
-    
-    let readNotifications = JSON.parse(localStorage.getItem(readKey) || '[]');
-    let deletedNotifications = JSON.parse(localStorage.getItem(deletedKey) || '[]');
-    
-    // Filter out deleted notifications
-    const activeNotifications = notifications.filter(n => !deletedNotifications.includes(n.id));
-    
-    const unreadCount = activeNotifications.filter(n => !readNotifications.includes(n.id)).length;
-    updateNotificationBadge(unreadCount);
+    const read = JSON.parse(localStorage.getItem(readKey) || '[]');
+    const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
+
+    const active = notifications.filter(n => !deleted.includes(n.id));
+
+    const seen = new Set(), unique = [];
+    active.forEach(n => {
+        const k = `${n.title}|${n.message}`;
+        if (!seen.has(k)) { seen.add(k); unique.push(n); }
+    });
+
+    const unread = unique.filter(n => !read.includes(n.id)).length;
+    updateNotificationBadge(unread);
 }
 
         function updateNotificationBadge(count) {
@@ -1392,8 +1395,8 @@ async function processAndUpdateNotifications(notifications) {
                 else el.classList.add('hidden');
             });
         }
-
- async function loadNotificationDropdown() {
+// REPLACE the entire loadNotificationDropdown function WITH:
+async function loadNotificationDropdown() {
     const isMobile = window.innerWidth < 1024;
     const bodyId = isMobile ? 'notificationDropdownBodyMobile' : 'notificationDropdownBody';
     const dropdownBody = document.getElementById(bodyId);
@@ -1405,34 +1408,30 @@ async function processAndUpdateNotifications(notifications) {
     }
 
     try {
-        const notifications = await fetchNotifications(studentData.section, studentData.email);
+        const notifications = await fetchNotifications(studentData.section);
         const readKey = `readNotifications_${studentData.email}`;
         const deletedKey = `deletedNotifications_${studentData.email}`;
-        
-        let readNotifications = JSON.parse(localStorage.getItem(readKey) || '[]');
-        let deletedNotifications = JSON.parse(localStorage.getItem(deletedKey) || '[]');
-        
-        // Filter out deleted notifications
-        const activeNotifications = notifications.filter(n => !deletedNotifications.includes(n.id));
-        
-        if (activeNotifications.length === 0) {
+        const read = JSON.parse(localStorage.getItem(readKey) || '[]');
+        const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
+
+        const active = notifications.filter(n => !deleted.includes(n.id));
+
+        if (active.length === 0) {
             dropdownBody.innerHTML = `<div class="p-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl mb-3 block"></i><p class="text-gray-600">No notifications yet</p></div>`;
             return;
         }
 
-        // Deduplicate
-        const seen = new Set();
-        const unique = activeNotifications.filter(n => {
-            const k = `${n.title}|${n.message}|${n.createdAt?.toDate?.().getTime() || ''}`;
-            if (seen.has(k)) return false; seen.add(k); return true;
+        const seen = new Set(), unique = [];
+        active.forEach(n => {
+            const k = `${n.title}|${n.message}`;
+            if (!seen.has(k)) { seen.add(k); unique.push(n); }
         });
-
         unique.sort((a, b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)));
 
         let html = '';
         unique.slice(0, 5).forEach(n => {
             const dateStr = n.createdAt?.toDate?.()?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) || 'Recently';
-            const isRead = readNotifications.includes(n.id);
+            const isRead = read.includes(n.id);
             html += `
                 <div class="notification-item p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors ${isRead ? 'bg-gray-50' : 'bg-white'}" data-notification-id="${n.id}">
                     <div class="flex justify-between items-start">
@@ -1441,7 +1440,7 @@ async function processAndUpdateNotifications(notifications) {
                             <p class="text-gray-600 text-sm mb-1 leading-relaxed">${escapeHtml(n.message || '')}</p>
                             <small class="text-gray-400 text-xs">${dateStr}</small>
                         </div>
-                        <button onclick="event.stopPropagation(); deleteSingleNotification('${n.id}', true)" 
+                        <button onclick="event.stopPropagation(); deleteSingleNotification('${n.id}', true)"
                             class="ml-2 text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50"
                             title="Delete notification">
                             <i class="bi bi-trash3 text-sm"></i>
@@ -1449,28 +1448,26 @@ async function processAndUpdateNotifications(notifications) {
                     </div>
                 </div>`;
         });
-        
-        // Add "Delete All" button if there are notifications
-        if (unique.length > 0) {
-            html += `
-                <div class="p-3 border-t border-gray-200 bg-gray-50">
-                    <button onclick="deleteAllNotificationsFromDropdown()" 
-                        class="w-full py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold text-xs transition-all flex items-center justify-center gap-2">
-                        <i class="bi bi-trash3"></i> Delete All Notifications
-                    </button>
-                </div>`;
-        }
-        
+
+        html += `
+            <div class="p-3 border-t border-gray-200 bg-gray-50">
+                <button onclick="deleteAllNotificationsFromDropdown()"
+                    class="w-full py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold text-xs transition-all flex items-center justify-center gap-2">
+                    <i class="bi bi-trash3"></i> Delete All Notifications
+                </button>
+            </div>`;
+
         dropdownBody.innerHTML = html;
 
-        // Mark unread as read when dropdown opens
-        const unreadIds = unique.filter(n => !readNotifications.includes(n.id)).map(n => n.id);
+        const unreadIds = unique.filter(n => !read.includes(n.id)).map(n => n.id);
         if (unreadIds.length) {
-            const updated = [...new Set([...readNotifications, ...unreadIds])];
-            localStorage.setItem(readKey, JSON.stringify(updated));
-            updateNotificationBadge(0);
+            localStorage.setItem(readKey, JSON.stringify([...new Set([...read, ...unreadIds])]));
         }
-
+        // Clear badge after opening dropdown
+        ['navNotificationCount', 'navNotificationCountMobile'].forEach(id => {
+            const el = document.getElementById(id); if (!el) return;
+            el.textContent = '0'; el.classList.add('hidden');
+        });
     } catch (_) {}
 }
 
@@ -1513,55 +1510,42 @@ window.deleteSingleNotification = function(notificationId, isFromDropdown = fals
     
     showToast('Notification deleted', 'success');
 };
-
-// Delete all notifications
 window.deleteAllNotificationsFromDropdown = function() {
     if (!confirm('Delete ALL notifications permanently? This cannot be undone.')) return;
-    
-    // First, fetch current notifications to get all IDs
-    fetchNotifications(studentData.section, studentData.email).then(notifications => {
+    fetchNotifications(studentData.section).then(notifications => {
         const deletedKey = `deletedNotifications_${studentData?.email}`;
         let deletedNotifications = JSON.parse(localStorage.getItem(deletedKey) || '[]');
-        
-        // Add all notification IDs to deleted list
         notifications.forEach(n => {
-            if (!deletedNotifications.includes(n.id)) {
-                deletedNotifications.push(n.id);
-            }
+            if (!deletedNotifications.includes(n.id)) deletedNotifications.push(n.id);
         });
         localStorage.setItem(deletedKey, JSON.stringify(deletedNotifications));
-        
-        // Clear read list
         const readKey = `readNotifications_${studentData?.email}`;
         localStorage.setItem(readKey, JSON.stringify([]));
-        
-        // Refresh dropdown
         loadNotificationDropdown();
-        
-        // Update badge
         updateNotificationBadgeAfterDelete();
-        
         showToast('All notifications deleted', 'success');
-    }).catch(() => {
-        showToast('Error deleting notifications', 'error');
-    });
+    }).catch(() => { showToast('Error deleting notifications', 'error'); });
 };
 
-// Update notification badge after delete
+// WITH
 async function updateNotificationBadgeAfterDelete() {
     if (!studentData?.email) return;
-    
     const deletedKey = `deletedNotifications_${studentData?.email}`;
     const readKey = `readNotifications_${studentData?.email}`;
-    
-    let deletedNotifications = JSON.parse(localStorage.getItem(deletedKey) || '[]');
-    let readNotifications = JSON.parse(localStorage.getItem(readKey) || '[]');
-    
+    const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
+    const read = JSON.parse(localStorage.getItem(readKey) || '[]');
     try {
-        const notifications = await fetchNotifications(studentData.section, studentData.email);
-        const activeNotifications = notifications.filter(n => !deletedNotifications.includes(n.id));
-        const unreadCount = activeNotifications.filter(n => !readNotifications.includes(n.id)).length;
-        updateNotificationBadge(unreadCount);
+        const notifications = await fetchNotifications(studentData.section);
+        const active = notifications.filter(n => !deleted.includes(n.id));
+
+        const seen = new Set(), unique = [];
+        active.forEach(n => {
+            const k = `${n.title}|${n.message}`;
+            if (!seen.has(k)) { seen.add(k); unique.push(n); }
+        });
+
+        const unread = unique.filter(n => !read.includes(n.id)).length;
+        updateNotificationBadge(unread);
     } catch (_) {}
 }
 

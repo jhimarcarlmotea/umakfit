@@ -637,42 +637,57 @@ async function fetchNotificationsOnce() {
     if (!studentData?.section) return [];
     try {
         const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section)));
-        const seen = new Set();
-        const result = [];
         
-        // Get deleted notification IDs from localStorage
         const deletedIds = JSON.parse(localStorage.getItem(`deletedNotifications_${studentData?.email}`) || '[]');
         const deletedSet = new Set(deletedIds);
         
-        snap.forEach(d => {
-            const data = d.data();
-            // Skip if notification is deleted
-            if (deletedSet.has(d.id)) return;
+        // Better deduplication - group by activity content
+        const uniqueMap = new Map();
+        
+        snap.forEach(docSnap => {
+            const data = docSnap.data();
+            const notifId = docSnap.id;
             
-            const key = `${data.title}|${data.message}|${data.createdAt?.toDate?.().getTime()||''}`;
-            if (!seen.has(key)) { 
-                seen.add(key); 
-                result.push({ id:d.id, ...data }); 
+            if (deletedSet.has(notifId)) return;
+            
+            // Create key based on title and message (without dynamic parts)
+            const titleKey = (data.title || '').replace(/\d+/g, '').replace(/\s+/g, ' ').trim();
+            const messageKey = (data.message || '').substring(0, 80);
+            const dedupKey = `${titleKey}|${messageKey}`;
+            
+            const existing = uniqueMap.get(dedupKey);
+            const currentTime = data.createdAt?.toDate?.() || new Date(0);
+            const existingTime = existing?.createdAt?.toDate?.() || new Date(0);
+            
+            // Keep only the most recent of duplicate activities
+            if (!existing || currentTime > existingTime) {
+                uniqueMap.set(dedupKey, { id: notifId, ...data });
             }
         });
+        
+        const result = Array.from(uniqueMap.values());
         return result.sort((a,b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)));
-    } catch(e) { console.error(e); return []; }
+        
+    } catch(e) { 
+        console.error(e); 
+        return []; 
+    }
 }
         async function loadAllNotifications() {
-            document.getElementById('loadingNotifs').style.display = 'flex';
-            allNotifications = await fetchNotificationsOnce();
-            document.getElementById('loadingNotifs').style.display = 'none';
-            renderNotifications();
+    document.getElementById('loadingNotifs').style.display = 'flex';
+    allNotifications = await fetchNotificationsOnce();
+    document.getElementById('loadingNotifs').style.display = 'none';
+    renderNotifications();
 
-            // ✅ Real-time listener (clean up previous first)
-            if (!studentData?.section) return;
-            if (unsubscribeNotifications) unsubscribeNotifications();
-            const q = query(collection(db,'notifications'), where('section','==',studentData.section));
-            unsubscribeNotifications = onSnapshot(q, async () => {
-                allNotifications = await fetchNotificationsOnce();
-                renderNotifications();
-            }, e => console.error('Snapshot error:', e));
-        }
+    // Real-time listener (clean up previous first)
+    if (!studentData?.section) return;
+    if (unsubscribeNotifications) unsubscribeNotifications();
+    const q = query(collection(db,'notifications'), where('section','==',studentData.section));
+    unsubscribeNotifications = onSnapshot(q, async () => {
+        allNotifications = await fetchNotificationsOnce();
+        renderNotifications();
+    }, e => console.error('Snapshot error:', e));
+}
 
         // ========== DROPDOWN (uses already-fetched allNotifications) ==========
         function loadNotificationDropdown(isMobile = false) {
