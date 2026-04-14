@@ -628,9 +628,9 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import {
-            getFirestore, doc, getDoc, collection, query,
-            where, getDocs, orderBy, limit, updateDoc
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    getFirestore, doc, getDoc, collection, query,
+    where, getDocs, orderBy, limit, updateDoc, onSnapshot
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         import { getNormCategory, getNormDoc, resolveTestKey, resolveAgeGroup, resolveGender, extractNumericResult } from './normLookup.js';
 
         const firebaseConfig = {
@@ -893,7 +893,118 @@ async function fetchNotifications(section) {
     const snap = await getDocs(query(collection(db, 'notifications'), where('section', '==', section)));
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
+            function setupRealtimeNotificationListener(section, email) {
+    if (!section || section === 'Not Assigned') return;
 
+    const deletedKey = `deletedNotifications_${email}`;
+    const readKey = `readNotifications_${email}`;
+
+    // Listen to notifications collection in realtime
+    const notifQuery = query(collection(db, 'notifications'), where('section', '==', section));
+    onSnapshot(notifQuery, (snapshot) => {
+        const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
+        const read = JSON.parse(localStorage.getItem(readKey) || '[]');
+
+        const active = snapshot.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .filter(n => !deleted.includes(n.id));
+
+        const seen = new Set(), unique = [];
+        active.forEach(n => {
+            const k = `${n.title}|${n.message}`;
+            if (!seen.has(k)) { seen.add(k); unique.push(n); }
+        });
+
+        const unread = unique.filter(n => !read.includes(n.id)).length;
+        updateNotificationBadge(unread);
+    });
+
+    // Listen to scheduledTests (activities) in realtime
+    const testsQuery = query(
+        collection(db, 'scheduledTests'),
+        where('section', '==', section),
+        where('isVisible', '==', true)
+    );
+    onSnapshot(testsQuery, async (snapshot) => {
+        const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
+        const read = JSON.parse(localStorage.getItem(readKey) || '[]');
+
+        const newTests = snapshot.docChanges()
+            .filter(change => change.type === 'added')
+            .map(change => ({ id: change.doc.id, ...change.doc.data() }));
+
+        if (newTests.length === 0) return;
+
+        // Store auto-generated notifications for new tests in localStorage
+        const autoKey = `autoNotifTests_${email}`;
+        const alreadyNotified = JSON.parse(localStorage.getItem(autoKey) || '[]');
+
+        let addedCount = 0;
+        newTests.forEach(test => {
+            if (!alreadyNotified.includes(test.id)) {
+                alreadyNotified.push(test.id);
+                addedCount++;
+            }
+        });
+
+        if (addedCount > 0) {
+            localStorage.setItem(autoKey, JSON.stringify(alreadyNotified));
+
+            // Re-calculate badge: existing unread notifs + new unread test notifications
+            const notifSnap = await getDocs(query(collection(db, 'notifications'), where('section', '==', section)));
+            const notifs = notifSnap.docs.map(d => ({ id: d.id, ...d.data() })).filter(n => !deleted.includes(n.id));
+
+            const seen = new Set(), unique = [];
+            notifs.forEach(n => {
+                const k = `${n.title}|${n.message}`;
+                if (!seen.has(k)) { seen.add(k); unique.push(n); }
+            });
+
+            const unreadNotifs = unique.filter(n => !read.includes(n.id)).length;
+
+            // Count unread auto-notified tests (test ids not yet in read list)
+            const unreadTests = alreadyNotified.filter(id => !read.includes(`test_${id}`)).length;
+
+            updateNotificationBadge(unreadNotifs + unreadTests);
+        }
+    });
+
+    // Listen to lessons in realtime
+    const lessonsQuery = query(
+        collection(db, 'lessons'),
+        where('section', '==', section),
+        where('isVisible', '==', true)
+    );
+    onSnapshot(lessonsQuery, (snapshot) => {
+        const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
+        const read = JSON.parse(localStorage.getItem(readKey) || '[]');
+
+        const autoKey = `autoNotifLessons_${email}`;
+        const alreadyNotified = JSON.parse(localStorage.getItem(autoKey) || '[]');
+
+        const newLessons = snapshot.docChanges()
+            .filter(change => change.type === 'added')
+            .map(change => ({ id: change.doc.id, ...change.doc.data() }));
+
+        let addedCount = 0;
+        newLessons.forEach(lesson => {
+            if (!alreadyNotified.includes(lesson.id)) {
+                alreadyNotified.push(lesson.id);
+                addedCount++;
+            }
+        });
+
+        if (addedCount > 0) {
+            localStorage.setItem(autoKey, JSON.stringify(alreadyNotified));
+
+            const unreadLessons = alreadyNotified.filter(id => !read.includes(`lesson_${id}`)).length;
+
+            // Add to existing badge count
+            const currentBadge = parseInt(document.getElementById('navNotificationCount')?.textContent || '0') || 0;
+            updateNotificationBadge(currentBadge + unreadLessons);
+        }
+    });
+}
         async function fetchSectionStudents(section) {
             if (!section || section === 'Not Assigned') return [];
             const snap = await getDocs(query(collection(db, 'students'), where('section', '==', section)));
@@ -969,6 +1080,9 @@ if (rawStudent?._ref) {
             // Calendar after data loaded (needs scheduledTests)
             generateMiniCalendar(scheduledTests);
             setupDashboardDeadlineWatcher();
+
+           
+            setupRealtimeNotificationListener(studentData.section, studentData.email);
         }
 
         // ========== PROCESS STATS ==========

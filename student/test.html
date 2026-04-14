@@ -576,11 +576,11 @@
             return snap.docs.map(d => ({ id: d.id, ...d.data() }));
         }
 
-        async function fetchNotifications(section, email) {
-            if (!section || section === 'Not Assigned') return [];
-            const snap = await getDocs(query(collection(db, 'notifications'), where('section', '==', section), where('studentEmail', '==', email)));
-            return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        }
+        async function fetchNotifications(section) {
+        if (!section || section === 'Not Assigned') return [];
+        const snap = await getDocs(query(collection(db, 'notifications'), where('section', '==', section)));
+        return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
 
         async function fetchTestPermissions(email) {
             try {
@@ -621,7 +621,7 @@
             const [testResults, scheduledTests, notifications, testPermissions] = await Promise.all([
                 fetchAllTestResults(studentData.email),
                 fetchScheduledTests(studentData.section),
-                fetchNotifications(studentData.section, studentData.email),
+                fetchNotifications(studentData.section),
                 fetchTestPermissions(studentData.email)
             ]);
 
@@ -996,8 +996,12 @@ function processNotifications(notifications) {
     
     // Filter out deleted notifications
     const activeNotifications = notifications.filter(n => !deletedNotifications.includes(n.id));
-    
-    const unreadCount = activeNotifications.filter(n => !readNotifications.includes(n.id)).length;
+    const seen = new Set(), uniqueActive = [];
+    activeNotifications.forEach(n => {
+        const k = `${n.title}|${n.message}`;
+        if (!seen.has(k)) { seen.add(k); uniqueActive.push(n); }
+    });
+    const unreadCount = uniqueActive.filter(n => !readNotifications.includes(n.id)).length;
     updateNotificationBadge(unreadCount);
 }
 
@@ -1035,7 +1039,7 @@ function loadNotificationDropdown() {
 
     const seen = new Set(), unique = [];
     activeNotifications.forEach(n => {
-        const k = `${n.title}|${n.message}|${n.createdAt?.toDate?.().getTime() || ''}`;
+        const k = `${n.title}|${n.message}`;
         if (!seen.has(k)) { seen.add(k); unique.push(n); }
     });
     unique.sort((a,b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)));
@@ -1167,7 +1171,7 @@ async function updateNotificationBadgeAfterDelete() {
     let readNotifications = JSON.parse(localStorage.getItem(readKey) || '[]');
     
     try {
-        const notifications = await fetchNotifications(studentData.section, studentData.email);
+        const notifications = await fetchNotifications(studentData.section);
         const activeNotifications = notifications.filter(n => !deletedNotifications.includes(n.id));
         const unreadCount = activeNotifications.filter(n => !readNotifications.includes(n.id)).length;
         updateNotificationBadge(unreadCount);
@@ -1243,7 +1247,7 @@ function setupLiveListeners(initialTestResults) {
     }, (_) => {}));
 
     if (studentData.section !== 'Not Assigned') {
-        const notifQuery = query(collection(db, 'notifications'), where('section', '==', studentData.section), where('studentEmail', '==', studentData.email));
+        const notifQuery = query(collection(db, 'notifications'), where('section', '==', studentData.section));
         registerListener(onSnapshot(notifQuery, (snap) => {
             cachedNotifications = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             processNotifications(cachedNotifications);

@@ -1241,19 +1241,27 @@
   async function checkUnreadNotifications() {
     try {
         if (!studentData?.section) return;
-        const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)));
+        const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section)));
         const readKey = `readNotifications_${studentData.email}`;
         const deletedKey = `deletedNotifications_${studentData.email}`;
         const read = JSON.parse(localStorage.getItem(readKey) || '[]');
         const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
-        let unread = 0;
-        snap.forEach(d => {
-            if (!deleted.includes(d.id) && !read.includes(d.id)) unread++;
-        });
-        ['navNotificationCount','navNotificationCountMobile'].forEach(id => {
-            const el = document.getElementById(id); if (!el) return;
-            if (unread > 0) { el.textContent = unread; el.classList.remove('hidden'); } else el.classList.add('hidden');
-        });
+       const allNotifs = [];
+    snap.forEach(d => allNotifs.push({ id: d.id, ...d.data() }));
+    const active = allNotifs.filter(n => !deleted.includes(n.id));
+
+    // Deduplicate by title|message so multi-section notifications count as 1
+    const seen = new Set(), uniqueActive = [];
+    active.forEach(n => {
+        const k = `${n.title}|${n.message}`;
+        if (!seen.has(k)) { seen.add(k); uniqueActive.push(n); }
+    });
+
+    const unread = uniqueActive.filter(n => !read.includes(n.id)).length;
+    ['navNotificationCount','navNotificationCountMobile'].forEach(id => {
+        const el = document.getElementById(id); if (!el) return;
+        if (unread > 0) { el.textContent = unread; el.classList.remove('hidden'); } else el.classList.add('hidden');
+    });
     } catch(e) { console.error(e); }
 }
 
@@ -1265,7 +1273,7 @@
             body.innerHTML = `<div class="py-6 px-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl block mb-3"></i><p class="text-gray-600 text-sm">No section assigned</p></div>`;
             return;
         }
-        const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)));
+        const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section)));
         const readKey = `readNotifications_${studentData.email}`;
         const deletedKey = `deletedNotifications_${studentData.email}`;
         const read = JSON.parse(localStorage.getItem(readKey) || '[]');
@@ -1282,7 +1290,7 @@
 
         const seen = new Set(), unique = [];
         active.forEach(n => {
-            const k = `${n.title}|${n.message}|${n.createdAt?.toDate?.().getTime() || ''}`;
+            const k = `${n.title}|${n.message}`;
             if (!seen.has(k)) { seen.add(k); unique.push(n); }
         });
         unique.sort((a,b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)));
@@ -1322,8 +1330,12 @@
         const unreadIds = unique.filter(n => !read.includes(n.id)).map(n => n.id);
         if (unreadIds.length > 0) {
             localStorage.setItem(readKey, JSON.stringify([...new Set([...read, ...unreadIds])]));
-            updateNotificationBadgeAfterRead();
         }
+        // Always update badge after opening dropdown (clear to 0 since all visible ones are now read)
+        ['navNotificationCount','navNotificationCountMobile'].forEach(id => {
+            const el = document.getElementById(id); if (!el) return;
+            el.textContent = '0'; el.classList.add('hidden');
+        });
     } catch(e) { console.error(e); }
 }
         function markNotificationsAsRead(notificationIds) {
@@ -1339,11 +1351,20 @@
  async function updateNotificationBadgeAfterRead() {
     try {
         if (!studentData?.section) return;
-        const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)));
+        const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section)));
         const read = JSON.parse(localStorage.getItem(`readNotifications_${studentData.email}`) || '[]');
         const deleted = JSON.parse(localStorage.getItem(`deletedNotifications_${studentData.email}`) || '[]');
-        let unread = 0;
-        snap.forEach(d => { if (!deleted.includes(d.id) && !read.includes(d.id)) unread++; });
+        const allNotifs = [];
+        snap.forEach(d => allNotifs.push({ id: d.id, ...d.data() }));
+        const active = allNotifs.filter(n => !deleted.includes(n.id));
+
+        const seen = new Set(), uniqueActive = [];
+        active.forEach(n => {
+            const k = `${n.title}|${n.message}`;
+            if (!seen.has(k)) { seen.add(k); uniqueActive.push(n); }
+        });
+
+        const unread = uniqueActive.filter(n => !read.includes(n.id)).length;
         ['navNotificationCount','navNotificationCountMobile'].forEach(id => {
             const el = document.getElementById(id); if (!el) return;
             if (unread > 0) { el.textContent = unread; el.classList.remove('hidden'); } else el.classList.add('hidden');
@@ -1375,7 +1396,7 @@ window.deleteAllNotifications = function() {
     const deletedKey = `deletedNotifications_${studentData?.email}`;
     const readKey = `readNotifications_${studentData?.email}`;
     // We need the cached list — re-fetch and delete all
-    getDocs(query(collection(db,'notifications'), where('section','==',studentData.section), where('studentEmail','==',studentData.email)))
+    getDocs(query(collection(db,'notifications'), where('section','==',studentData.section)))
         .then(snap => {
             const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
             snap.forEach(d => { if (!deleted.includes(d.id)) deleted.push(d.id); });
@@ -1430,12 +1451,11 @@ function showToast(message, type = 'info') {
             try {
                 if (!studentData || !studentData.section) return;
 
-// setupNotificationListener — may email filter na rin
-const notificationsQuery = query(
-    collection(db, 'notifications'),
-    where('section', '==', studentData.section),
-    where('studentEmail', '==', studentData.email) // ← ito rin
-);
+       
+        const notificationsQuery = query(
+            collection(db, 'notifications'),
+            where('section', '==', studentData.section)
+        );
                 
                 onSnapshot(notificationsQuery, (snapshot) => {
                     console.log('🔔 Notification update detected!');
