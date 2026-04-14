@@ -887,7 +887,11 @@
             const snap = await getDocs(query(collection(db, 'scheduledTests'), where('section', '==', section), where('isVisible', '==', true)));
             return snap.docs.map(d => ({ id: d.id, ...d.data() }));
         }
-
+        function buildDedupKey(data) {
+    const titleKey = (data.title || '').replace(/\d+/g, '').replace(/\s+/g, ' ').trim();
+    const messageKey = (data.message || '').substring(0, 80);
+    return `${titleKey}|${messageKey}`;
+}
 async function fetchNotifications(section) {
     if (!section || section === 'Not Assigned') return [];
     const snap = await getDocs(query(collection(db, 'notifications'), where('section', '==', section)));
@@ -1486,10 +1490,17 @@ async function processAndUpdateStats(testResults) {
 async function processAndUpdateNotifications(notifications) {
     const readKey = `readNotifications_${studentData?.email}`;
     const deletedKey = `deletedNotifications_${studentData?.email}`;
+    const deletedKeysKey = `deletedNotifKeys_${studentData?.email}`;
     const read = JSON.parse(localStorage.getItem(readKey) || '[]');
     const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
+    const deletedKeys = JSON.parse(localStorage.getItem(deletedKeysKey) || '[]');
 
-    const active = notifications.filter(n => !deleted.includes(n.id));
+    const active = notifications.filter(n => {
+        if (deleted.includes(n.id)) return false;
+        const dedupKey = buildDedupKey(n);
+        if (deletedKeys.includes(dedupKey)) return false;
+        return true;
+    });
 
     const seen = new Set(), unique = [];
     active.forEach(n => {
@@ -1528,7 +1539,13 @@ async function loadNotificationDropdown() {
         const read = JSON.parse(localStorage.getItem(readKey) || '[]');
         const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
 
-        const active = notifications.filter(n => !deleted.includes(n.id));
+        const deletedKeysKey2 = `deletedNotifKeys_${studentData?.email}`;
+        const deletedKeys2 = JSON.parse(localStorage.getItem(deletedKeysKey2) || '[]');
+        const active = notifications.filter(n => {
+            if (deleted.includes(n.id)) return false;
+            if (deletedKeys2.includes(buildDedupKey(n))) return false;
+            return true;
+        });
 
         if (active.length === 0) {
             dropdownBody.innerHTML = `<div class="p-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl mb-3 block"></i><p class="text-gray-600">No notifications yet</p></div>`;
@@ -1650,7 +1667,13 @@ async function updateNotificationBadgeAfterDelete() {
     const read = JSON.parse(localStorage.getItem(readKey) || '[]');
     try {
         const notifications = await fetchNotifications(studentData.section);
-        const active = notifications.filter(n => !deleted.includes(n.id));
+        const deletedKeysKey3 = `deletedNotifKeys_${studentData?.email}`;
+const deletedKeys3 = JSON.parse(localStorage.getItem(deletedKeysKey3) || '[]');
+const active = notifications.filter(n => {
+    if (deleted.includes(n.id)) return false;
+    if (deletedKeys3.includes(buildDedupKey(n))) return false;
+    return true;
+});
 
         const seen = new Set(), unique = [];
         active.forEach(n => {

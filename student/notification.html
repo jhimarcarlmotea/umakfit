@@ -473,35 +473,28 @@ function renderNotifications() {
             saveReadList([...new Set([...getReadList(), ...allIds])]);
             renderNotifications();
         };
-        // Delete a single notification (soft delete - mark as deleted in localStorage)
-// Delete a single notification
-window.deleteSingleNotification = function(notificationId) {
-    // Show confirmation
+       window.deleteSingleNotification = function(notificationId) {
     if (!confirm('Delete this notification permanently?')) return;
     
-    // Get current deleted list
-    let deletedList = JSON.parse(localStorage.getItem(`deletedNotifications_${studentData?.email}`) || '[]');
-    
-    // Add to deleted list if not already there
-    if (!deletedList.includes(notificationId)) {
-        deletedList.push(notificationId);
-        localStorage.setItem(`deletedNotifications_${studentData?.email}`, JSON.stringify(deletedList));
+    const notif = allNotifications.find(n => n.id === notificationId);
+    if (notif) {
+        // Save by dedup key so it persists across reloads
+        const deletedKeys = getDeletedKeys();
+        if (!deletedKeys.includes(notif.dedupKey)) {
+            saveDeletedKeys([...deletedKeys, notif.dedupKey]);
+        }
+        // Also save by ID for backward compat with other pages
+        let deletedIds = JSON.parse(localStorage.getItem(`deletedNotifications_${studentData?.email}`) || '[]');
+        if (!deletedIds.includes(notificationId)) {
+            deletedIds.push(notificationId);
+            localStorage.setItem(`deletedNotifications_${studentData?.email}`, JSON.stringify(deletedIds));
+        }
     }
-    
-    // Also remove from read list if present
+
     const readList = getReadList();
-    if (readList.includes(notificationId)) {
-        const newReadList = readList.filter(id => id !== notificationId);
-        localStorage.setItem(`readNotifications_${studentData?.email}`, JSON.stringify(newReadList));
-    }
-    
-    // Remove from local array
+    saveReadList(readList.filter(id => id !== notificationId));
     allNotifications = allNotifications.filter(n => n.id !== notificationId);
-    
-    // Re-render
     renderNotifications();
-    
-    // Show toast
     showToast('Notification deleted', 'success');
 };
 
@@ -512,50 +505,41 @@ window.deleteAllNotifications = function() {
         return;
     }
     
-    // Show confirmation with count
-    if (!confirm(`Delete ALL ${allNotifications.length} notification${allNotifications.length !== 1 ? 's' : ''} permanently? This cannot be undone.`)) return;
+    const count = allNotifications.length;
+    if (!confirm(`Delete ALL ${count} notification${count !== 1 ? 's' : ''} permanently? This cannot be undone.`)) return;
     
-    // Get all notification IDs
-    const allIds = allNotifications.map(n => n.id);
-    
-    // Add all to deleted list
-    let deletedList = JSON.parse(localStorage.getItem(`deletedNotifications_${studentData?.email}`) || '[]');
-    allIds.forEach(id => {
-        if (!deletedList.includes(id)) {
-            deletedList.push(id);
-        }
-    });
-    localStorage.setItem(`deletedNotifications_${studentData?.email}`, JSON.stringify(deletedList));
-    
-    // Clear read list as well
+    // Save dedup keys so they stay deleted across reloads
+    const existingKeys = getDeletedKeys();
+    const newKeys = allNotifications.map(n => n.dedupKey).filter(Boolean);
+    saveDeletedKeys([...new Set([...existingKeys, ...newKeys])]);
+
+    // Also save by ID for backward compat with other pages
+    const existingIds = JSON.parse(localStorage.getItem(`deletedNotifications_${studentData?.email}`) || '[]');
+    const newIds = allNotifications.map(n => n.id);
+    localStorage.setItem(`deletedNotifications_${studentData?.email}`, JSON.stringify([...new Set([...existingIds, ...newIds])]));
+
     localStorage.setItem(`readNotifications_${studentData?.email}`, JSON.stringify([]));
     
-    // Clear local array
     allNotifications = [];
-    
-    // Re-render
     renderNotifications();
-    
-    // Show toast
-    showToast(`Deleted ${allIds.length} notification${allIds.length !== 1 ? 's' : ''}`, 'success');
+    showToast(`Deleted ${count} notification${count !== 1 ? 's' : ''}`, 'success');
 };
 
 // Restore ALL deleted notifications
 window.restoreAllNotifications = function() {
-    const deletedList = JSON.parse(localStorage.getItem(`deletedNotifications_${studentData?.email}`) || '[]');
-    if (!deletedList.length) {
+    const deletedKeys = getDeletedKeys();
+    if (!deletedKeys.length) {
         showToast('No deleted notifications to restore', 'info');
         return;
     }
     
-    if (!confirm(`Restore ${deletedList.length} deleted notification${deletedList.length !== 1 ? 's' : ''}?`)) return;
+    if (!confirm(`Restore all deleted notifications?`)) return;
     
-    // Clear deleted list
+    // Clear both storage keys
+    localStorage.removeItem(`deletedNotifKeys_${studentData?.email}`);
     localStorage.removeItem(`deletedNotifications_${studentData?.email}`);
     
-    // Reload all notifications
     loadAllNotifications();
-    
     showToast('All notifications restored', 'success');
 };
 
@@ -633,41 +617,48 @@ function updateNavBadge(count) {
                 studentData = { displayName: user.displayName || 'Student', email: user.email, section: null };
             }
         }
+// Build the stable dedup key for a notification (same logic everywhere)
+function buildDedupKey(data) {
+    const titleKey = (data.title || '').replace(/\d+/g, '').replace(/\s+/g, ' ').trim();
+    const messageKey = (data.message || '').substring(0, 80);
+    return `${titleKey}|${messageKey}`;
+}
+
+function getDeletedKeys() {
+    return JSON.parse(localStorage.getItem(`deletedNotifKeys_${studentData?.email}`) || '[]');
+}
+
+function saveDeletedKeys(keys) {
+    localStorage.setItem(`deletedNotifKeys_${studentData?.email}`, JSON.stringify(keys));
+}
+
 async function fetchNotificationsOnce() {
     if (!studentData?.section) return [];
     try {
         const snap = await getDocs(query(collection(db,'notifications'), where('section','==',studentData.section)));
         
-        const deletedIds = JSON.parse(localStorage.getItem(`deletedNotifications_${studentData?.email}`) || '[]');
-        const deletedSet = new Set(deletedIds);
-        
-        // Better deduplication - group by activity content
+        const deletedKeys = new Set(getDeletedKeys());
         const uniqueMap = new Map();
         
         snap.forEach(docSnap => {
             const data = docSnap.data();
             const notifId = docSnap.id;
+            const dedupKey = buildDedupKey(data);
             
-            if (deletedSet.has(notifId)) return;
-            
-            // Create key based on title and message (without dynamic parts)
-            const titleKey = (data.title || '').replace(/\d+/g, '').replace(/\s+/g, ' ').trim();
-            const messageKey = (data.message || '').substring(0, 80);
-            const dedupKey = `${titleKey}|${messageKey}`;
+            // Skip if this content was deleted
+            if (deletedKeys.has(dedupKey)) return;
             
             const existing = uniqueMap.get(dedupKey);
             const currentTime = data.createdAt?.toDate?.() || new Date(0);
             const existingTime = existing?.createdAt?.toDate?.() || new Date(0);
             
-            // Keep only the most recent of duplicate activities
             if (!existing || currentTime > existingTime) {
-                uniqueMap.set(dedupKey, { id: notifId, ...data });
+                uniqueMap.set(dedupKey, { id: notifId, dedupKey, ...data });
             }
         });
         
         const result = Array.from(uniqueMap.values());
         return result.sort((a,b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)));
-        
     } catch(e) { 
         console.error(e); 
         return []; 

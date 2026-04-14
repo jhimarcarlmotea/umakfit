@@ -855,24 +855,33 @@ const notifQuery = query(
                 processNotifications(cachedNotifications);
             }, () => {}));
         }
-
+            function buildDedupKey(data) {
+    const titleKey = (data.title || '').replace(/\d+/g, '').replace(/\s+/g, ' ').trim();
+    const messageKey = (data.message || '').substring(0, 80);
+    return `${titleKey}|${messageKey}`;
+}
         // ========== NOTIFICATIONS ==========
 function processNotifications(notifications) {
     const readKey = `readNotifications_${studentData?.email}`;
     const deletedKey = `deletedNotifications_${studentData?.email}`;
-    const read = JSON.parse(localStorage.getItem(readKey) || '[]');
-    const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
-
-    const active = notifications.filter(n => !deleted.includes(n.id));
-
-    const seen = new Set(), unique = [];
-    active.forEach(n => {
-        const k = `${n.title}|${n.message}`;
-        if (!seen.has(k)) { seen.add(k); unique.push(n); }
+    const deletedKeysKey = `deletedNotifKeys_${studentData?.email}`;
+    
+    let readNotifications = JSON.parse(localStorage.getItem(readKey) || '[]');
+    let deletedNotifications = JSON.parse(localStorage.getItem(deletedKey) || '[]');
+    let deletedKeys = JSON.parse(localStorage.getItem(deletedKeysKey) || '[]');
+    
+    const activeNotifications = notifications.filter(n => {
+        if (deletedNotifications.includes(n.id)) return false;
+        if (deletedKeys.includes(buildDedupKey(n))) return false;
+        return true;
     });
-
-    const unread = unique.filter(n => !read.includes(n.id)).length;
-    updateNotificationBadge(unread);
+    const seen = new Set(), uniqueActive = [];
+    activeNotifications.forEach(n => {
+        const k = `${n.title}|${n.message}`;
+        if (!seen.has(k)) { seen.add(k); uniqueActive.push(n); }
+    });
+    const unreadCount = uniqueActive.filter(n => !readNotifications.includes(n.id)).length;
+    updateNotificationBadge(unreadCount);
 }
 
         function updateNotificationBadge(count) {
@@ -895,7 +904,13 @@ function loadNotificationDropdown() {
     const read = JSON.parse(localStorage.getItem(readKey) || '[]');
     const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
 
-    const active = cachedNotifications.filter(n => !deleted.includes(n.id));
+    const deletedKeysKey2 = `deletedNotifKeys_${studentData?.email}`;
+const deletedKeys2 = JSON.parse(localStorage.getItem(deletedKeysKey2) || '[]');
+const active = cachedNotifications.filter(n => {
+    if (deleted.includes(n.id)) return false;
+    if (deletedKeys2.includes(buildDedupKey(n))) return false;
+    return true;
+});
 
     if (active.length === 0) {
         dropBody.innerHTML = `<div class="p-8 text-center text-gray-400"><i class="bi bi-bell-slash text-5xl mb-3 block"></i><p class="text-gray-600">No notifications yet</p></div>`;
@@ -1034,7 +1049,13 @@ async function updateNotificationBadgeAfterDelete() {
     const read = JSON.parse(localStorage.getItem(readKey) || '[]');
     try {
         const notifications = await fetchNotifications(studentData.section);
-        const active = notifications.filter(n => !deleted.includes(n.id));
+        const deletedKeysKey3 = `deletedNotifKeys_${studentData?.email}`;
+const deletedKeys3 = JSON.parse(localStorage.getItem(deletedKeysKey3) || '[]');
+const active = notifications.filter(n => {
+    if (deleted.includes(n.id)) return false;
+    if (deletedKeys3.includes(buildDedupKey(n))) return false;
+    return true;
+});
 
         const seen = new Set(), unique = [];
         active.forEach(n => {
