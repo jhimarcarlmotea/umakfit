@@ -4752,64 +4752,114 @@ window.deleteSection = async function (sectionName) {
         await batchDelete(bmiToDelete);
 
         // ── Step 3: Delete testResults ───────────────────────────
-        setStatus('Deleting test results…');
-        const testSnap = await db.collection('testResults').get();
-        const testsToDelete = [];
-        testSnap.forEach(d => {
-            const data      = d.data();
-            const sec       = data.section || '';
-            const docEmail  = (data.studentEmail || data.email || '').toLowerCase();
-            const docUmakId = (data.umakId || '').trim().toUpperCase();
-            const docUid    = data.studentId || data.uid || d.id;
-            if (
-                sec === sectionName ||
-                studentUids.has(docUid) ||
-                (docEmail  && studentEmails.has(docEmail)) ||
-                (docUmakId && studentUmakIds.has(docUmakId))
-            ) testsToDelete.push(d);
-        });
-        await batchDelete(testsToDelete);
+        // ── Step 3: Delete testResults ───────────────────────────
+setStatus('Deleting test results…');
+const testSnap = await db.collection('testResults').get();
+const testsToDelete = [];
+testSnap.forEach(d => {
+    const data      = d.data();
+    const sec       = data.section || '';
+    const docEmail  = (data.studentEmail || data.email || '').toLowerCase();
+    const docUmakId = (data.umakId || '').trim().toUpperCase();
+    const docUid    = data.studentId || data.uid || d.id;
+    if (
+        sec === sectionName ||
+        studentUids.has(docUid) ||
+        (docEmail  && studentEmails.has(docEmail)) ||
+        (docUmakId && studentUmakIds.has(docUmakId))
+    ) testsToDelete.push(d);
+});
+await batchDelete(testsToDelete);
 
-        // ── Step 4: Delete studentNorms subcollections ───────────
-        // studentNorms/{email}/tests/{testKey}
-        // We must delete the /tests sub-docs first, then the parent doc.
-        setStatus('Deleting student norm overrides…');
-        let normsDeleted = 0;
+// ── Step 3b: Delete scheduledTests for this section ──────
+setStatus('Deleting scheduled tests…');
+const scheduledSnap = await db.collection('scheduledTests')
+    .where('section', '==', sectionName)
+    .get();
+const scheduledToDelete = [];
+scheduledSnap.forEach(d => scheduledToDelete.push(d));
+await batchDelete(scheduledToDelete);
 
-        // Build the set of email keys we need to clean up
-        const normEmailKeys = new Set();
-        studentEmails.forEach(e => normEmailKeys.add(e));
+// Also delete related testPermissions for those scheduled tests
+const scheduledIds = scheduledToDelete.map(d => d.id);
+if (scheduledIds.length > 0) {
+    const PERM_CHUNK = 10;
+    for (let i = 0; i < scheduledIds.length; i += PERM_CHUNK) {
+        const chunk = scheduledIds.slice(i, i + PERM_CHUNK);
+        try {
+            const permSnap = await db.collection('testPermissions')
+                .where('testId', 'in', chunk)
+                .get();
+            const permsToDelete = [];
+            permSnap.forEach(d => permsToDelete.push(d));
+            await batchDelete(permsToDelete);
+        } catch (_) { /* permissions collection may not exist */ }
+    }
+}
 
-        // Also check by uid / umakId keys in studentNorms collection
-        // (some professors may have saved norms keyed by uid or umakId)
-        studentUids.forEach(u => normEmailKeys.add(u));
-        studentUmakIds.forEach(u => normEmailKeys.add(u.toLowerCase()));
+// Also delete related notifications for those scheduled tests
+if (scheduledIds.length > 0) {
+    const NOTIF_CHUNK = 10;
+    for (let i = 0; i < scheduledIds.length; i += NOTIF_CHUNK) {
+        const chunk = scheduledIds.slice(i, i + NOTIF_CHUNK);
+        try {
+            const notifSnap = await db.collection('notifications')
+                .where('testId', 'in', chunk)
+                .get();
+            const notifsToDelete = [];
+            notifSnap.forEach(d => notifsToDelete.push(d));
+            await batchDelete(notifsToDelete);
+        } catch (_) { /* notifications collection may not exist */ }
+    }
+}
 
-        // Fetch every doc in studentNorms that matches any of our keys
-        // Firestore `in` operator accepts max 30 values per query; chunk if needed
-        const normKeys = Array.from(normEmailKeys).filter(Boolean);
-        const CHUNK = 30;
-        const normParentDocs = [];
+        // ── Step 4: Delete studentNorms for this section's students ONLY ───
+// Structure: studentNorms/{email}/tests/{testKey}
+// Only delete norm docs for emails that belong to THIS section.
+// Do NOT delete the parent studentNorms/{email} doc — the student
+// may exist in another section and have norms there too.
+setStatus('Deleting student norm overrides…');
+let normsDeleted = 0;
 
-        for (let i = 0; i < normKeys.length; i += CHUNK) {
-            const chunk = normKeys.slice(i, i + CHUNK);
-            // Try direct doc lookups (most common pattern: keyed by email)
-            const gets = await Promise.all(
-                chunk.map(k => db.collection('studentNorms').doc(k).get().catch(() => null))
-            );
-            gets.forEach(snap => {
-                if (snap && snap.exists) normParentDocs.push(snap);
+// Only use verified student emails from this section
+const normEmailKeys = new Set();
+studentEmails.forEach(e => normEmailKeys.add(e));
+
+const normKeys = Array.from(normEmailKeys).filter(Boolean);
+const TEST_KEYS = ['pushup', 'curlup', 'sitreach', 'steptest', 'skinfold'];
+const CHUNK = 30;
+
+// For each student email, delete only the /tests sub-docs
+// Leave the parent studentNorms/{email} doc intact (other sections may use it)
+for (let i = 0; i < normKeys.length; i += CHUNK) {
+    const chunk = normKeys.slice(i, i + CHUNK);
+    await Promise.all(chunk.map(async email => {
+        try {
+            // Fetch all test norm docs for this student
+            const testsRef = db.collection('studentNorms').doc(email).collection('tests');
+            const testsSnap = await testsRef.get();
+            if (testsSnap.empty) return;
+
+            const deleteBatch = db.batch();
+            let batchCount = 0;
+            testsSnap.forEach(testDoc => {
+                // Only delete known fitness test keys
+                if (TEST_KEYS.includes(testDoc.id)) {
+                    deleteBatch.delete(testDoc.ref);
+                    batchCount++;
+                    normsDeleted++;
+                }
             });
-        }
+            if (batchCount > 0) await deleteBatch.commit();
 
-        // For each parent doc, delete its /tests subcollection then the doc itself
-        for (const parentSnap of normParentDocs) {
-            const testsRef = parentSnap.ref.collection('tests');
-            const n = await deleteSubcollection(testsRef);
-            normsDeleted += n;
-            await parentSnap.ref.delete();
-            normsDeleted++;
-        }
+            // If no test norm docs remain, clean up the empty parent doc too
+            const remaining = await testsRef.get();
+            if (remaining.empty) {
+                await db.collection('studentNorms').doc(email).delete();
+            }
+        } catch (_) { /* skip errors for individual students */ }
+    }));
+}
 
         setStatus(`Deleted ${normsDeleted} norm record(s)`, 'Removing student accounts…');
 
@@ -4834,14 +4884,15 @@ window.deleteSection = async function (sectionName) {
         loadingOverlay.remove();
 
         await showDeanAlert(
-            `Section <strong>${sectionName}</strong> has been deleted.<br><br>
-             Removed:<br>
-             • ${totalStudents} student account(s)<br>
-             • ${bmiToDelete.length} BMI record(s)<br>
-             • ${testsToDelete.length} test result(s)<br>
-             • ${normsDeleted} student norm record(s)`,
-            { title: 'Section Deleted', type: 'success', confirmText: 'Done' }
-        );
+    `Section <strong>${sectionName}</strong> has been deleted.<br><br>
+     Removed:<br>
+     • ${totalStudents} student account(s)<br>
+     • ${bmiToDelete.length} BMI record(s)<br>
+     • ${testsToDelete.length} test result(s)<br>
+     • ${scheduledToDelete.length} scheduled test(s)<br>
+     • ${normsDeleted} student norm record(s)`,
+    { title: 'Section Deleted', type: 'success', confirmText: 'Done' }
+);
 
         // Refresh all relevant data
         await loadTestResults();
