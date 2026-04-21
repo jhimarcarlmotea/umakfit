@@ -425,7 +425,7 @@
                                 <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
                                     <i class="bi bi-graph-up-arrow text-white text-lg"></i>
                                 </div>
-                                Overall Progress
+                               Weekly Overall Progress
                             </h2>
                             <a href="./progress.html" class="text-sm text-green-600 font-semibold hover:text-green-700 hover:underline flex items-center gap-1">
                                 View full progress <i class="bi bi-arrow-right"></i>
@@ -652,6 +652,7 @@
         let allTestResults = [];
         let normCache = new Map();
         let overallProgressChartInstance = null;
+        let normDocsCache = new Map();
 
         const NORM_RANKS = { 'Excellent':5,'Good':4,'Average':3,'Below Average':2,'Poor':1,'Athletic':5,'Fitness':4,'Essential Fat':3,'Overfat':2,'Obese':1,'Completed':3 };
         const NORM_LABELS_RANK = {1:'Poor', 2:'Below Average', 3:'Average', 4:'Good', 5:'Excellent'};
@@ -863,13 +864,115 @@
 
         // ========== PARALLEL NORM BATCH ==========
         // Resolves norm categories for an array of result objects in parallel
-        async function batchGetNormCategories(results) {
-            const promises = results.map(r =>
-                getNormCategoryWithPriority(r.testName, r.result ?? r.resultData, r.testId).catch(() => null)
-            );
-            return Promise.all(promises);
-        }
+// ========== PARALLEL NORM BATCH ==========
+// Resolves norm categories for an array of result objects in parallel
+async function batchGetNormCategories(results) {
+    const promises = results.map(r =>
+        getNormCategoryWithPriority(r.testName, r.result ?? r.resultData, r.testId).catch(() => null)
+    );
+    return Promise.all(promises);
+}
 
+// ========== NORM DOC PREFETCH (same pattern as studentgrades.html) ==========
+async function prefetchNormDocs(results) {
+    const gender = _genderKey();
+    const ageGroup = _ageGroup();
+    const email = studentData?.email || '';
+    const testKeys = new Set();
+    const testIds = new Set();
+
+    results.forEach(r => {
+        const testKey = resolveTestKey(r.testName);
+        if (testKey) testKeys.add(testKey);
+        if (r.testId) testIds.add(r.testId);
+    });
+
+    const fetchPromises = [];
+
+    if (email) {
+        testKeys.forEach(testKey => {
+            fetchPromises.push(
+                getDoc(doc(db, 'studentNorms', email, 'tests', testKey))
+                    .then(snap => ({ type: 'student', key: testKey, snap }))
+                    .catch(() => null)
+            );
+        });
+    }
+
+    testKeys.forEach(testKey => {
+        fetchPromises.push(
+            getDoc(doc(db, 'fitnessNorms', `${testKey}_${gender}_${ageGroup}`))
+                .then(snap => ({ type: 'default', key: `${testKey}_${gender}_${ageGroup}`, snap }))
+                .catch(() => null)
+        );
+    });
+
+    testIds.forEach(testId => {
+        fetchPromises.push(
+            getDoc(doc(db, 'scheduledTests', testId))
+                .then(snap => ({ type: 'scheduled', key: testId, snap }))
+                .catch(() => null)
+        );
+    });
+
+    const fetched = await Promise.all(fetchPromises);
+    fetched.forEach(result => {
+        if (!result || !result.snap.exists()) return;
+        normDocsCache.set(`${result.type}:${result.key}`, result.snap.data());
+    });
+}
+
+// ========== SYNC NORM LOOKUP (uses prefetched cache, zero Firestore calls) ==========
+function getNormCategorySync(testName, result, testId = null) {
+    if (!studentData || !testName) return null;
+    const testKey = resolveTestKey(testName);
+    if (!testKey) return null;
+
+    const gender = _genderKey();
+    const ageGroup = _ageGroup();
+    const value = extractNumericResult(result);
+    const cacheKey = `${studentData?.email}|${testKey}|${gender}|${ageGroup}|${testId || 'none'}|${value}`;
+    if (normCache.has(cacheKey)) return normCache.get(cacheKey);
+
+    function applyThresh(nd, v) {
+        const lower = nd.lowerIsBetter ?? false;
+        for (const cat of ['Excellent', 'Good', 'Average', 'Below Average']) {
+            const t = nd.thresholds[cat];
+            if (t == null) continue;
+            if (lower && v <= t) return cat;
+            if (!lower && v >= t) return cat;
+        }
+        return 'Poor';
+    }
+
+    // Priority 1: student-specific norms
+    const studentNorm = normDocsCache.get(`student:${testKey}`);
+    if (studentNorm?.thresholds) {
+        const cat = applyThresh(studentNorm, value);
+        normCache.set(cacheKey, cat);
+        return cat;
+    }
+
+    // Priority 2: test-level customNorms
+    if (testId) {
+        const scheduledData = normDocsCache.get(`scheduled:${testId}`);
+        if (scheduledData?.customNorms?.thresholds) {
+            const cat = applyThresh(scheduledData.customNorms, value);
+            normCache.set(cacheKey, cat);
+            return cat;
+        }
+    }
+
+    // Priority 3: default fitnessNorms
+    const defaultNorm = normDocsCache.get(`default:${testKey}_${gender}_${ageGroup}`);
+    if (defaultNorm?.thresholds) {
+        const cat = applyThresh(defaultNorm, value);
+        normCache.set(cacheKey, cat);
+        return cat;
+    }
+
+    return null;
+}
         // ========== DATA FETCHING (Parallel) ==========
 
         async function fetchStudentDoc(userEmail) {
@@ -1069,8 +1172,10 @@ if (rawStudent?._ref) {
                 fetchNotifications(studentData.section, studentData.email),
                 fetchSectionStudents(studentData.section)
             ]);
+// Phase 3: Prefetch all norm docs in one parallel batch (same as studentgrades.html)
+            await prefetchNormDocs(testResults);
 
-            // Phase 3: Process everything in parallel
+            // Phase 4: Process everything in parallel (uses cached norms — zero extra Firestore calls)
             await Promise.all([
                 processAndUpdateStats(testResults),
                 processAndUpdatePerformance(testResults, scheduledTests, sectionStudents),
@@ -1091,14 +1196,16 @@ if (rawStudent?._ref) {
 
         // ========== PROCESS STATS ==========
 
- // Replace the processAndUpdateStats function with this updated version
-async function processAndUpdateStats(testResults) {
+ async function processAndUpdateStats(testResults) {
     try {
-        // Deduplicate: keep only the best-performing attempt per testId (matches studentgrades.html logic)
+        // Deduplicate: keep only the best-performing attempt per testId
         const testGroups = {};
         for (const result of testResults) {
             const testId = result.testId || result.scheduledTestId || result.testName;
-            const normCat = await getNormCategoryWithPriority(result.testName, result.result ?? result.resultData, result.testId);
+            // FIX: use sync lookup from prefetched cache instead of async Firestore calls
+            const normCat = getNormCategorySync(
+                result.testName, result.result ?? result.resultData, result.testId
+            );
             const rank = normCat ? (NORM_RANKS[normCat] ?? 3) : 0;
             const dateObj = result.submittedAt?.toDate?.() || (result.submittedAt ? new Date(result.submittedAt) : new Date(0));
 
@@ -1117,12 +1224,11 @@ async function processAndUpdateStats(testResults) {
 
         let avgLabel = '--';
         let bestCategory = '--';
-        let bestRank = 0;
+        let bestRank = -1; // FIX: start at -1 so first result always sets it
 
         if (allRanks.length > 0) {
             const avgRank = allRanks.reduce((a, b) => a + b, 0) / allRanks.length;
 
-            // rankToCategory logic matching studentgrades.html
             if (avgRank >= 4.5) avgLabel = 'Excellent';
             else if (avgRank >= 3.5) avgLabel = 'Good';
             else if (avgRank >= 2.5) avgLabel = 'Average';
@@ -1309,6 +1415,8 @@ async function processAndUpdateStats(testResults) {
 
         // ========== STRONGEST CATEGORY (parallel) ==========
 
+// ========== STRONGEST CATEGORY ==========
+
         async function calculateStrongestCategory(testResults) {
             try {
                 if (!studentData?.email) {
@@ -1325,9 +1433,6 @@ async function processAndUpdateStats(testResults) {
                     return;
                 }
 
-                // Batch all norm lookups in parallel
-                const normCats = await batchGetNormCategories(relevant);
-
                 const catRanks = {
                     'Cardiorespiratory Endurance': [],
                     'Muscular Strength and Endurance': [],
@@ -1335,9 +1440,12 @@ async function processAndUpdateStats(testResults) {
                     'Body Composition': []
                 };
 
-                relevant.forEach((r, i) => {
+                // FIX: use sync lookup instead of batchGetNormCategories
+                relevant.forEach(r => {
                     const cat = getCategoryForTestProgress(r.testName);
-                    const normCat = normCats[i] || 'Completed';
+                    const normCat = getNormCategorySync(
+                        r.testName, r.result ?? r.resultData, r.testId
+                    ) || 'Completed';
                     const rank = NORM_RANKS[normCat] || 3;
                     if (catRanks[cat]) catRanks[cat].push(rank);
                 });
@@ -1369,7 +1477,6 @@ async function processAndUpdateStats(testResults) {
                 document.getElementById('strongestCategoryScore').textContent = 'Unable to calculate';
             }
         }
-
         // ========== UPCOMING TESTS ==========
 
         async function processAndUpdateUpcomingTests(scheduledTests, testResults) {
@@ -1719,11 +1826,17 @@ function escapeHtml(str) {
 }
         // ========== RECENT RESULT ==========
 
+// ========== RECENT RESULT ==========
+
         async function processAndUpdateRecentResult(testResults) {
             const container = document.getElementById('recentTestResultCard');
             if (!container) return;
 
-            const completed = testResults.filter(r => r.status === 'completed');
+            // FIX: include overdue and late statuses, not just 'completed'
+            const completed = testResults.filter(r =>
+                r.status === 'completed' || r.status === 'overdue' || r.status === 'late'
+            );
+
             if (completed.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-16 bg-gray-50 rounded-xl">
@@ -1742,8 +1855,10 @@ function escapeHtml(str) {
 
             const latest = completed[0];
 
-            // Get norm category for latest result
-            const normCat = await getNormCategoryWithPriority(latest.testName, latest.result ?? latest.resultData, latest.testId) || 'Completed';
+            // FIX: use sync lookup from prefetched cache
+            const normCat = getNormCategorySync(
+                latest.testName, latest.result ?? latest.resultData, latest.testId
+            ) || 'Completed';
 
             let submittedDate;
             if (latest.submittedAt?.toDate) submittedDate = latest.submittedAt.toDate();
@@ -1765,16 +1880,21 @@ function escapeHtml(str) {
             };
             const color = normColors[normCat] || normColors['Completed'];
 
+            const isLate = latest.status === 'overdue' || latest.status === 'late';
+
             container.innerHTML = `
                 <div class="bg-gray-50 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:bg-gray-100 transition-colors border border-gray-200">
                     <div class="flex-1 min-w-0">
-                        <h4 class="font-semibold text-gray-900 text-sm sm:text-base mb-2">${latest.testName}</h4>
+                        <h4 class="font-semibold text-gray-900 text-sm sm:text-base mb-2">
+                            ${latest.testName}
+                            ${isLate ? '<span class="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">⚠️ Late</span>' : ''}
+                        </h4>
                         <div class="flex items-center gap-2 flex-wrap mb-1">
                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border ${color.bg} ${color.text} ${color.border}">
                                 <i class="bi bi-award-fill"></i> ${normCat}
                             </span>
                         </div>
-                        <small class="text-gray-500 text-xs">Completed: ${dateStr}</small>
+                        <small class="text-gray-500 text-xs">Submitted: ${dateStr}</small>
                     </div>
                     <button data-result-id="${latest.id}" class="view-result-btn w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-blue-700 hover:-translate-y-0.5 hover:shadow-lg transition-all whitespace-nowrap">
                         View Result
@@ -1867,117 +1987,172 @@ function escapeHtml(str) {
                 }
             } catch (_) {}
         }
+async function createOverallProgressChart(testResults) {
+    const container = document.getElementById('overallProgressChart');
+    if (!container || !studentData?.email) return;
 
-        async function createOverallProgressChart(testResults) {
-            const container = document.getElementById('overallProgressChart');
-            if (!container || !studentData?.email) return;
+    try {
+        const relevant = testResults.filter(r => ['completed','overdue','late'].includes(r.status));
 
-            try {
-                const relevant = testResults.filter(r => ['completed','overdue','late'].includes(r.status));
-                relevant.sort((a, b) => {
-                    const dA = a.submittedAt?.toDate?.() || new Date(a.date || 0);
-                    const dB = b.submittedAt?.toDate?.() || new Date(b.date || 0);
-                    return dA - dB;
-                });
-
-                if (relevant.length === 0) {
-                    container.innerHTML = `
-                        <div class="text-center py-12">
-                            <i class="bi bi-graph-up text-6xl text-gray-300 mb-3"></i>
-                            <p class="text-gray-600 font-semibold mb-1">No test results yet</p>
-                            <small class="text-gray-400">Complete tests to see your overall performance per week</small>
-                            <div class="mt-4"><a href="./test.html" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-sm hover:from-blue-600 hover:to-blue-700 transition-all inline-block">Take Your First Test</a></div>
-                        </div>`;
-                    return;
-                }
-
-                // Batch all norm lookups in parallel
-                const normCats = await batchGetNormCategories(relevant);
-
-                const weekMap = new Map();
-                relevant.forEach((r, i) => {
-                    const normCat = normCats[i] || 'Completed';
-                    const rank = NORM_RANKS[normCat] || 3;
-                    let testDate = new Date();
-                    if (r.submittedAt?.toDate) testDate = r.submittedAt.toDate();
-                    else if (r.submittedAt?.seconds) testDate = new Date(r.submittedAt.seconds * 1000);
-                    else if (r.submittedAt) testDate = new Date(r.submittedAt);
-                    const wk = `${testDate.getFullYear()}-W${String(getWeekNumber(testDate)).padStart(2, '0')}`;
-                    if (!weekMap.has(wk)) weekMap.set(wk, { ranks: [], date: testDate });
-                    weekMap.get(wk).ranks.push(rank);
-                    weekMap.get(wk).date = testDate;
-                });
-
-                const sortedWeeks = Array.from(weekMap.entries()).sort((a, b) => a[1].date - b[1].date);
-                const labels = sortedWeeks.map(([, d]) => {
-                    const dt = d.date;
-                    return `${dt.toLocaleDateString('en-US', { month: 'short' })} ${dt.getDate()}, ${dt.getFullYear()}`;
-                });
-                const ranks = sortedWeeks.map(([, d]) => Math.round(d.ranks.reduce((a, b) => a + b, 0) / d.ranks.length * 10) / 10);
-                const normLabels = ['', 'Poor', 'Below Avg', 'Average', 'Good', 'Excellent'];
-                const rankColors = { 5:'#059669', 4:'#2563eb', 3:'#d97706', 2:'#ea580c', 1:'#dc2626' };
-                const pointColors = ranks.map(r => rankColors[Math.round(r)] || '#64748b');
-                const weekDataForTooltip = sortedWeeks.map(([key, data]) => ({ key, ...data }));
-
-                if (overallProgressChartInstance) { overallProgressChartInstance.destroy(); overallProgressChartInstance = null; }
-                container.innerHTML = '<canvas id="overallProgressCanvas"></canvas>';
-                const canvas = document.getElementById('overallProgressCanvas');
-                if (!canvas) return;
-
-                const ctx = canvas.getContext('2d');
-                const grad = ctx.createLinearGradient(0, 0, 0, 350);
-                grad.addColorStop(0, 'rgba(16,185,129,0.2)');
-                grad.addColorStop(1, 'rgba(16,185,129,0.02)');
-
-                overallProgressChartInstance = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels,
-                        datasets: [{
-                            label: 'Overall (avg classification)',
-                            data: ranks,
-                            backgroundColor: grad,
-                            borderColor: '#059669',
-                            borderWidth: 3,
-                            pointBackgroundColor: pointColors,
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: sortedWeeks.length === 1 ? 10 : 6,
-                            pointHoverRadius: 10,
-                            fill: true,
-                            tension: 0.35
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: 'rgba(255,255,255,0.97)',
-                                titleColor: '#1e293b', bodyColor: '#475569',
-                                borderColor: '#e2e8f0', borderWidth: 1,
-                                padding: 12, displayColors: false,
-                                callbacks: {
-                                    title: ctx => 'Week of ' + labels[ctx[0].dataIndex],
-                                    label: ctx => {
-                                        const w = weekDataForTooltip[ctx.dataIndex];
-                                        const avg = w.ranks.reduce((a, b) => a + b, 0) / w.ranks.length;
-                                        return `Overall: ${normLabels[Math.round(avg)] || '—'} (${w.ranks.length} test${w.ranks.length !== 1 ? 's' : ''})`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: { min: 0, max: 5, ticks: { stepSize: 1, callback: v => normLabels[v] || '', font: { size: 10, weight: '600' }, color: '#94a3b8' }, grid: { color: 'rgba(0,0,0,0.04)' } },
-                            x: { ticks: { font: { size: 10, weight: '500' }, color: '#94a3b8', maxRotation: 35, minRotation: 0 }, grid: { display: false } }
-                        }
-                    }
-                });
-            } catch (_) {
-                container.innerHTML = `<div class="text-center py-12"><i class="bi bi-exclamation-circle text-red-500 text-6xl mb-3"></i><p class="text-red-500 font-semibold mb-1">Error loading chart</p></div>`;
-            }
+        if (relevant.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="bi bi-graph-up text-6xl text-gray-300 mb-3"></i>
+                    <p class="text-gray-600 font-semibold mb-1">No test results yet</p>
+                    <small class="text-gray-400">Complete tests to see your overall performance per week</small>
+                    <div class="mt-4"><a href="./test.html" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-sm hover:from-blue-600 hover:to-blue-700 transition-all inline-block">Take Your First Test</a></div>
+                </div>`;
+            return;
         }
 
+        // ── STEP 1: Deduplicate by testId — keep BEST rank per testId ──
+        // Kung nag-retry ang student, kukunin lang ang pinakamataas na norm rank.
+        const bestPerTest = new Map(); // key: testId → { rank, normCat, date }
+
+        relevant.forEach(r => {
+            const testKey = r.testId || r.scheduledTestId || r.testName || 'unknown';
+
+            const normCat = getNormCategorySync(
+                r.testName, r.result ?? r.resultData, r.testId
+            ) || 'Completed';
+            const rank = NORM_RANKS[normCat] || 3;
+
+            let testDate = new Date();
+            if (r.submittedAt?.toDate) testDate = r.submittedAt.toDate();
+            else if (r.submittedAt?.seconds) testDate = new Date(r.submittedAt.seconds * 1000);
+            else if (r.submittedAt) testDate = new Date(r.submittedAt);
+            else if (r.date) testDate = new Date(r.date);
+
+            const existing = bestPerTest.get(testKey);
+            if (!existing || rank > existing.rank) {
+                // Palitan kung mas mataas ang rank ng bagong attempt
+                bestPerTest.set(testKey, { rank, normCat, date: testDate });
+            }
+        });
+
+        // ── STEP 2: Group unique best results by ISO week ──
+        const weekMap = new Map(); // key: "YYYY-WWW" → { ranks: [], date: Date }
+
+        bestPerTest.forEach(({ rank, date }) => {
+            const wk = `${date.getFullYear()}-W${String(getWeekNumber(date)).padStart(2, '0')}`;
+
+            if (!weekMap.has(wk)) {
+                // Itago ang pinakamaagang date ng week para sa label
+                weekMap.set(wk, { ranks: [], date });
+            }
+            weekMap.get(wk).ranks.push(rank);
+        });
+
+        // ── STEP 3: Sort weeks chronologically ──
+        const sortedWeeks = Array.from(weekMap.entries()).sort((a, b) => a[1].date - b[1].date);
+
+        const labels = sortedWeeks.map(([, d]) =>
+            `Week of ${d.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+        );
+
+        // Average rank ng UNIQUE tests sa bawat week (rounded to 1 decimal)
+        const ranks = sortedWeeks.map(([, d]) =>
+            Math.round(d.ranks.reduce((a, b) => a + b, 0) / d.ranks.length * 10) / 10
+        );
+
+        const normLabels = ['', 'Poor', 'Below Avg', 'Average', 'Good', 'Excellent'];
+        const rankColors = { 5: '#059669', 4: '#2563eb', 3: '#d97706', 2: '#ea580c', 1: '#dc2626' };
+        const pointColors = ranks.map(r => rankColors[Math.round(r)] || '#64748b');
+        const weekDataForTooltip = sortedWeeks.map(([key, data]) => ({ key, ...data }));
+
+        if (overallProgressChartInstance) {
+            overallProgressChartInstance.destroy();
+            overallProgressChartInstance = null;
+        }
+
+        container.innerHTML = '<canvas id="overallProgressCanvas"></canvas>';
+        const canvas = document.getElementById('overallProgressCanvas');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        const grad = ctx.createLinearGradient(0, 0, 0, 350);
+        grad.addColorStop(0, 'rgba(16,185,129,0.18)');
+        grad.addColorStop(1, 'rgba(16,185,129,0.01)');
+
+        overallProgressChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Weekly performance',
+                    data: ranks,
+                    backgroundColor: grad,
+                    borderColor: '#059669',
+                    borderWidth: 2.5,
+                    pointBackgroundColor: pointColors,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2.5,
+                    pointRadius: sortedWeeks.length === 1 ? 12 : 9,
+                    pointHoverRadius: 13,
+                    fill: true,
+                    tension: 0.35
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(255,255,255,0.97)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#475569',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            title: ctx => labels[ctx[0].dataIndex],
+                            label: ctx => {
+                                const w = weekDataForTooltip[ctx.dataIndex];
+                                const avg = w.ranks.reduce((a, b) => a + b, 0) / w.ranks.length;
+                                const label = normLabels[Math.round(avg)] || '—';
+                                const count = w.ranks.length;
+                                return `Overall: ${label} (${count} unique test${count !== 1 ? 's' : ''} this week)`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 5,
+                        ticks: {
+                            stepSize: 1,
+                            callback: v => normLabels[v] || '',
+                            font: { size: 10, weight: '600' },
+                            color: '#94a3b8'
+                        },
+                        grid: { color: 'rgba(0,0,0,0.04)' }
+                    },
+                    x: {
+                        ticks: {
+                            font: { size: 10, weight: '500' },
+                            color: '#94a3b8',
+                            maxRotation: 35,
+                            minRotation: 0
+                        },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+    } catch (err) {
+        console.error('Overall progress chart error:', err);
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <i class="bi bi-exclamation-circle text-red-500 text-6xl mb-3"></i>
+                <p class="text-red-500 font-semibold mb-1">Error loading chart</p>
+                <small class="text-gray-400">Please refresh the page</small>
+            </div>`;
+    }
+}
         function initializeFitnessOverviewChart() {
             const canvas = document.getElementById('fitnessOverviewChart');
             if (!canvas) return;
@@ -2139,10 +2314,16 @@ function escapeHtml(str) {
             setTimeout(() => { if (n.parentElement) n.remove(); }, 10000);
         }
 
-        function isProfileComplete(studentData) {
-            return studentData && studentData.age > 0 && studentData.gender && studentData.gender !== 'Not Specified' &&
-                   studentData.height > 0 && studentData.weight > 0 && studentData.contactNumber && studentData.contactNumber !== 'Not Provided';
-        }
+function isProfileComplete(studentData) {
+    if (!studentData) return false;
+    const hasBirthday = studentData.birthday && studentData.birthday !== '';
+    const hasAge = studentData.age && studentData.age > 0;
+    const validAge = hasBirthday || hasAge;
+    const validGender = studentData.gender && studentData.gender !== 'Not Specified' && studentData.gender !== '';
+    const validHeight = studentData.height && studentData.height > 0;
+    const validWeight = studentData.weight && studentData.weight > 0;
+    return validAge && validGender && validHeight && validWeight;
+}
 
         function showProfileRequiredModal() {
             let modal = document.getElementById('profileRequiredModal');
@@ -2156,8 +2337,7 @@ function escapeHtml(str) {
             modal.classList.remove('hidden');
         }
         window.closeProfileRequiredModal = () => document.getElementById('profileRequiredModal')?.classList.add('hidden');
-        window.goToEditProfile = () => window.location.href = './studentProfile.html?editProfile=true';
-
+window.goToEditProfile = () => window.location.href = './studentProfile.html?editProfile=true';
         // ========== LOGOUT ==========
 
         function showLogoutConfirmPopup() {

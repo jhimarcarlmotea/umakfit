@@ -1,9 +1,9 @@
 // shared/emailNotifier.js
 // Single EmailJS template handles both test and lesson emails
 
-const EMAIL_SERVICE_ID  = 'service_j1jvhff';
+const EMAIL_SERVICE_ID  = 'service_nlclozn';
 const EMAIL_TEMPLATE_ID = 'test-notification'; // reuse existing template
-const EMAILJS_PUBLIC_KEY = 'Bvq89wr_TcM1LUITl';
+const EMAILJS_PUBLIC_KEY = 'Vr6ccYqxOyf_7gNzO';
 
 function buildTestEmailHTML({ student_name, test_name, section, professor_name, test_date, test_time, deadline_date, deadline_time }) {
     return `<!DOCTYPE html>
