@@ -840,13 +840,30 @@ function getExpandedCategories() {
             const seenIds = new Set();
             overdueTestsArray.forEach(t => { if (!seenIds.has(t.id)) { seenIds.add(t.id); unique.push(t); } });
 
-            countBadge.textContent = unique.length;
+            // Count only tests that are not fully completed (for badge)
+            const activeCount = unique.filter(test => {
+                const testResultsForTest = (testResults || []).filter(r => r.testId === test.id);
+                const attempts = testResultsForTest.length;
+                const isUnlimited = test.attemptsAllowed === 0;
+                const hasExcellent = testResultsForTest.some(r => {
+                    const rawResult = r.result ?? r.resultData ?? r.rawResult;
+                    return getNormCategory(r.testName, rawResult) === 'Excellent';
+                });
+                const isProfessorEnabled = cachedTestPermissions.has(test.id);
+                const allAttemptsUsed = !isUnlimited && attempts >= (test.attemptsAllowed || 1);
+                return !(hasExcellent || (allAttemptsUsed && !isProfessorEnabled));
+            }).length;
+            countBadge.textContent = activeCount || '';
             if (unique.length === 0) {
                 countBadge.classList.add('hidden');
                 container.innerHTML = `<div class="text-center py-12"><div class="w-20 h-20 mx-auto mb-4 bg-green-100 rounded-2xl flex items-center justify-center"><i class="bi bi-check-circle-fill text-4xl text-green-600"></i></div><p class="text-lg font-bold text-gray-800 mb-2">All Caught Up!</p><small class="text-sm text-gray-500">No overdue tests</small></div>`;
                 return;
             }
-            countBadge.classList.remove('hidden');
+             if (activeCount > 0) {
+                countBadge.classList.remove('hidden');
+            } else {
+                countBadge.classList.add('hidden');
+            }
 
             // Build completion map from already-fetched testResults
             const completionMap = new Map();
@@ -854,8 +871,17 @@ function getExpandedCategories() {
                 const testResultsForTest = (testResults || []).filter(r => r.testId === test.id);
                 const attempts = testResultsForTest.length;
                 const isUnlimited = test.attemptsAllowed === 0;
+
+                // Check if any attempt achieved Excellent
+                const hasExcellent = testResultsForTest.some(r => {
+                    const rawResult = r.result ?? r.resultData ?? r.rawResult;
+                    const normCat = getNormCategory(r.testName, rawResult);
+                    return normCat === 'Excellent';
+                });
+
                 completionMap.set(test.id, {
-                    completed: !isUnlimited && attempts >= (test.attemptsAllowed || 1),
+                    completed: hasExcellent || (!isUnlimited && attempts >= (test.attemptsAllowed || 1)),
+                    hasExcellent,
                     attempts,
                     attemptsAllowed: test.attemptsAllowed || 1
                 });
@@ -868,10 +894,10 @@ function getExpandedCategories() {
                 const isViewOnly = test.isViewOnly === true;
                 const isProfessorEnabled = cachedTestPermissions.has(test.id) || test.professorEnabled === true;
                 html += `
-                        <div class="bg-white border-2 ${isCompleted ? 'border-gray-300' : isProfessorEnabled ? 'border-blue-200' : isViewOnly ? 'border-gray-200' : 'border-red-300'} rounded-xl p-4 hover:shadow-md transition-all overdue-test-card">                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
+                        <div class="bg-white border-2 ${completion.hasExcellent ? 'border-gray-300' : isCompleted ? 'border-red-400' : isProfessorEnabled ? 'border-blue-200' : isViewOnly ? 'border-gray-200' : 'border-red-300'} rounded-xl p-4 hover:shadow-md transition-all overdue-test-card">                   <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
                         <div class="flex-1 min-w-0">
                             <div class="flex items-start gap-3 mb-2">
-                              <div class="flex-shrink-0 w-10 h-10 ${isCompleted ? 'bg-gray-400' : isProfessorEnabled ? 'bg-blue-500' : isViewOnly ? 'bg-gray-400' : 'bg-red-500'} rounded-lg flex items-center justify-center">
+                              <div class="flex-shrink-0 w-10 h-10 ${completion.hasExcellent ? 'bg-gray-500' : isCompleted ? 'bg-red-500' : isProfessorEnabled ? 'bg-blue-500' : isViewOnly ? 'bg-gray-400' : 'bg-red-500'} rounded-lg flex items-center justify-center">
                                     <i class="bi bi-${isCompleted ? 'check-circle-fill' : isProfessorEnabled ? 'unlock-fill' : isViewOnly ? 'eye-fill' : 'exclamation-triangle-fill'} text-white"></i>
                                 </div>
                                 <div class="flex-1">
@@ -879,16 +905,16 @@ function getExpandedCategories() {
                                     <div class="flex flex-wrap items-center gap-2 text-sm">
                                         ${isViewOnly ? `<span class="bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded-full"><i class="bi bi-eye"></i> View Only</span>` : ''}
                                         ${isProfessorEnabled && !isCompleted && !isViewOnly ? `<span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded-full"><i class="bi bi-unlock"></i> Enabled by Professor</span>` : ''}
-                                        ${isCompleted ? `<span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full"><i class="bi bi-check-circle"></i> Completed</span>` : ''}
+                                        ${completion.hasExcellent ? `<span class="bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded-full"><i class="bi bi-check-circle-fill"></i> Completed</span>` : isCompleted ? `<span class="bg-red-100 text-red-700 text-xs font-semibold px-2 py-1 rounded-full"><i class="bi bi-exclamation-circle"></i> Completed (Overdue)</span>` : ''}
                                     </div>
                                 </div>
                             </div>
                             <div class="text-sm pl-0">
-                                ${isCompleted ? `<p class="text-green-600 font-semibold">${completion.attempts} Attempt${completion.attempts !== 1 ? 's' : ''} submitted</p>` : isViewOnly ? `<p class="text-gray-500">You are not selected for this test</p>` : isProfessorEnabled ? `<p class="text-blue-600 font-semibold">Enabled by professor · ${completion.attempts > 0 ? `${completion.attempts}/${completion.attemptsAllowed} attempt${completion.attemptsAllowed !== 1 ? 's' : ''} used` : 'No attempts yet'}</p>` : `<p class="text-red-600 font-semibold">Overdue: ${formatDeadline(test.deadline, test.deadlineTime)}</p>`}
+                               ${completion.hasExcellent ? `<p class="text-gray-600 font-semibold">${completion.attempts} Attempt${completion.attempts !== 1 ? 's' : ''} submitted</p>` : isCompleted ? `<p class="text-red-600 font-semibold">${completion.attempts} Attempt${completion.attempts !== 1 ? 's' : ''} submitted (overdue)</p>`: isViewOnly ? `<p class="text-gray-500">You are not selected for this test</p>` : isProfessorEnabled ? `<p class="text-blue-600 font-semibold">Enabled by professor · ${completion.attempts > 0 ? `${completion.attempts}/${completion.attemptsAllowed} attempt${completion.attemptsAllowed !== 1 ? 's' : ''} used` : 'No attempts yet'}</p>` : `<p class="text-red-600 font-semibold">Overdue: ${formatDeadline(test.deadline, test.deadlineTime)}</p>`}
                             </div>
                         </div>
                         <div class="w-full lg:w-auto lg:min-w-[140px]">
-                            ${isCompleted ? `<div class="w-full px-4 py-2.5 bg-gray-300 text-gray-600 rounded-lg font-bold text-sm text-center"><i class="bi bi-check-circle-fill mr-1"></i> Done</div>`: isViewOnly ? `<div class="w-full px-4 py-2.5 bg-gray-200 text-gray-500 rounded-lg font-semibold text-sm text-center cursor-not-allowed"><i class="bi bi-eye-slash mr-1"></i> View Only</div>` : isProfessorEnabled ? `<button onclick="startOverdueTest('${test.id}', '${encodeURIComponent(test.testName)}')" class="w-full px-4 py-2.5 bg-blue-500 text-white rounded-lg font-bold text-sm hover:bg-blue-600 hover:shadow-md transition-all flex items-center justify-center gap-2"><i class="bi bi-${completion.attempts > 0 ? 'arrow-clockwise' : 'play-fill'}"></i> ${completion.attempts > 0 ? 'Retry' : 'Take Test'}</button>` : `<div class="w-full px-4 py-2.5 bg-gray-100 text-gray-500 rounded-lg font-semibold text-sm text-center border border-gray-200"><i class="bi bi-lock-fill mr-1"></i> Locked</div>`}
+                            ${completion.hasExcellent ? `<div class="w-full px-4 py-2.5 bg-gray-300 text-gray-600 rounded-lg font-bold text-sm text-center"><i class="bi bi-check-circle-fill mr-1"></i> Done</div>` : isCompleted ? `<div class="w-full px-4 py-2.5 bg-gray-300 text-gray-600 rounded-lg font-bold text-sm text-center"><i class="bi bi-check-circle-fill mr-1"></i> Done</div>`:isViewOnly ? `<div class="w-full px-4 py-2.5 bg-gray-200 text-gray-500 rounded-lg font-semibold text-sm text-center cursor-not-allowed"><i class="bi bi-eye-slash mr-1"></i> View Only</div>` : isProfessorEnabled ? `<button onclick="startOverdueTest('${test.id}', '${encodeURIComponent(test.testName)}')" class="w-full px-4 py-2.5 bg-blue-500 text-white rounded-lg font-bold text-sm hover:bg-blue-600 hover:shadow-md transition-all flex items-center justify-center gap-2"><i class="bi bi-${completion.attempts > 0 ? 'arrow-clockwise' : 'play-fill'}"></i> ${completion.attempts > 0 ? 'Retry' : 'Take Test'}</button>` : `<div class="w-full px-4 py-2.5 bg-gray-100 text-gray-500 rounded-lg font-semibold text-sm text-center border border-gray-200"><i class="bi bi-lock-fill mr-1"></i> Locked</div>`}
                         </div>
                     </div>
                 </div>`;

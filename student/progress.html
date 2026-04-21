@@ -263,7 +263,11 @@
                     <div style="width:1px;height:40px;background:#d1fae5;align-self:center;"></div>
                     <div style="text-align:center;min-width:60px;"><div id="previewImproved" style="font-size:1.6rem;font-weight:800;color:#10b981;font-family:'Manrope',sans-serif;line-height:1;">—</div><div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;margin-top:2px;">Improved</div></div>
                     <div style="width:1px;height:40px;background:#d1fae5;align-self:center;"></div>
-                    <div style="text-align:center;min-width:100px;"><div id="previewBestGain" style="font-size:1rem;font-weight:800;color:#10b981;font-family:'Manrope',sans-serif;line-height:1.2;white-space:nowrap;">—</div><div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;margin-top:2px;">Best Gain</div></div>
+                    <div style="text-align:center;min-width:100px;">
+                        <div id="previewBestGain" style="font-size:1rem;font-weight:800;color:#10b981;font-family:'Manrope',sans-serif;line-height:1.2;white-space:nowrap;">—</div>
+                        <div id="previewBestGainTest" style="font-size:11px;color:#059669;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;"></div>
+                        <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;margin-top:2px;">Best Gain</div>
+                    </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:0.5rem;background:linear-gradient(135deg,#10b981,#059669);color:white;padding:0.65rem 1.25rem;border-radius:10px;font-weight:700;font-size:13px;white-space:nowrap;box-shadow:0 4px 12px rgba(16,185,129,0.3);">
                     <i class="bi bi-eye"></i> View Details <i class="bi bi-chevron-right" style="font-size:11px;"></i>
@@ -291,13 +295,23 @@
             </div>
             <button onclick="closeImprovementModal()" style="width:36px;height:36px;border-radius:50%;border:none;background:#f1f5f9;color:#64748b;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.2s;flex-shrink:0;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'"><i class="bi bi-x-lg"></i></button>
         </div>
-        <div id="improvementSummaryStrip" style="padding:0.75rem 1.75rem;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-bottom:1px solid #bbf7d0;display:none;">
+         <div id="improvementSummaryStrip" style="padding:0.75rem 1.75rem;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-bottom:1px solid #bbf7d0;display:none;">
             <div style="display:flex;flex-wrap:wrap;gap:1.5rem;align-items:center;justify-content:center;">
-                <div style="text-align:center;"><div id="summaryTotalTests" style="font-size:1.5rem;font-weight:800;color:#15803d;font-family:'Manrope',sans-serif;">0</div><div style="font-size:11px;color:#166534;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Tests Taken</div></div>
+                <div style="text-align:center;">
+                    <div id="summaryTotalTests" style="font-size:1.5rem;font-weight:800;color:#15803d;font-family:'Manrope',sans-serif;">0</div>
+                    <div style="font-size:11px;color:#166534;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Tests Taken</div>
+                </div>
                 <div style="width:1px;height:40px;background:#86efac;"></div>
-                <div style="text-align:center;"><div id="summaryImproved" style="font-size:1.5rem;font-weight:800;color:#15803d;font-family:'Manrope',sans-serif;">0</div><div style="font-size:11px;color:#166534;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Improved</div></div>
+                <div style="text-align:center;">
+                    <div id="summaryImproved" style="font-size:1.5rem;font-weight:800;color:#15803d;font-family:'Manrope',sans-serif;">0</div>
+                    <div style="font-size:11px;color:#166534;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Improved</div>
+                </div>
                 <div style="width:1px;height:40px;background:#86efac;"></div>
-                <div style="text-align:center;"><div id="summaryBestGain" style="font-size:1.1rem;font-weight:800;color:#15803d;font-family:'Manrope',sans-serif;white-space:nowrap;">—</div><div style="font-size:11px;color:#166534;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Best Gain</div></div>
+                <div style="text-align:center;min-width:100px;">
+                    <div id="summaryBestGain" style="font-size:1rem;font-weight:800;color:#15803d;font-family:'Manrope',sans-serif;line-height:1.2;white-space:nowrap;">—</div>
+                    <div id="summaryBestGainTest" style="font-size:11px;color:#059669;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;"></div>
+                    <div style="font-size:11px;color:#166534;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Best Gain</div>
+                </div>
             </div>
         </div>
         <div class="improvement-modal-body" id="improvementModalBody">
@@ -565,7 +579,10 @@ function getNormCategorySync(testName, result, testId = null) {
     const gender = _genderKey();
     const ageGroup = _ageGroup();
     const value = extractNumericResult(result);
-    const cacheKey = `${studentData?.email}|${testKey}|${gender}|${ageGroup}|${testId || 'none'}`;
+    
+    // FIX: include value in cache key so different scores get different classifications
+    const cacheKey = `${studentData?.email}|${testKey}|${gender}|${ageGroup}|${testId || 'none'}|${value}`;
+    
     if (normCache.has(cacheKey)) return normCache.get(cacheKey);
 
     // 1. Student-specific norms
@@ -637,19 +654,41 @@ function renderNormTimeline(containerId, items, categoryName) {
         return;
     }
 
-    const firstRank = normRank(items[0].normCat);
-    const lastRank  = normRank(items[items.length - 1].normCat);
-    let trendHTML = '';
-    if (items.length >= 2) {
-        const diff = lastRank - firstRank;
-        if (diff > 0)      trendHTML = `<span style="font-size:12px;color:#059669;font-weight:700;background:#f0fdf4;padding:4px 12px;border-radius:20px;border:1px solid #86efac;display:inline-flex;align-items:center;gap:3px;"><i class="bi bi-arrow-up-short"></i> Improving</span>`;
-        else if (diff < 0) trendHTML = `<span style="font-size:12px;color:#dc2626;font-weight:700;background:#fef2f2;padding:4px 12px;border-radius:20px;border:1px solid #fca5a5;display:inline-flex;align-items:center;gap:3px;"><i class="bi bi-arrow-down-short"></i> Declining</span>`;
-        else               trendHTML = `<span style="font-size:12px;color:#64748b;font-weight:700;background:#f1f5f9;padding:4px 12px;border-radius:20px;border:1px solid #e2e8f0;display:inline-flex;align-items:center;gap:3px;"><i class="bi bi-dash"></i> Consistent</span>`;
-    } else {
-        trendHTML = normBadgeHTML(items[0].normCat, true);
-    }
+const lastRank         = normRank(items[items.length - 1].normCat);
+const secondToLastRank = normRank(items[items.length - 2]?.normCat ?? items[0].normCat);
 
-    const labels   = items.map(it => it.testName.length > 14 ? it.testName.substring(0,13)+'…' : it.testName);
+let trendHTML = '';
+if (items.length >= 2) {
+    const recentDiff = lastRank - secondToLastRank;
+
+    let trend = '';
+    if (recentDiff > 0)      trend = 'improving';
+    else if (recentDiff < 0) trend = 'declining';
+    else                     trend = 'consistent';
+
+    if (trend === 'improving')
+        trendHTML = `<span style="font-size:12px;color:#059669;font-weight:700;background:#f0fdf4;padding:4px 12px;border-radius:20px;border:1px solid #86efac;display:inline-flex;align-items:center;gap:3px;"><i class="bi bi-arrow-up-short"></i> Improving</span>`;
+    else if (trend === 'declining')
+        trendHTML = `<span style="font-size:12px;color:#dc2626;font-weight:700;background:#fef2f2;padding:4px 12px;border-radius:20px;border:1px solid #fca5a5;display:inline-flex;align-items:center;gap:3px;"><i class="bi bi-arrow-down-short"></i> Declining</span>`;
+    else
+        trendHTML = `<span style="font-size:12px;color:#64748b;font-weight:700;background:#f1f5f9;padding:4px 12px;border-radius:20px;border:1px solid #e2e8f0;display:inline-flex;align-items:center;gap:3px;"><i class="bi bi-dash"></i> Consistent</span>`;
+} else {
+    trendHTML = normBadgeHTML(items[0].normCat, true);
+}
+
+    // Build labels: test name + date + time
+    const labels = items.map(it => {
+        const shortName = it.testName.length > 12 ? it.testName.substring(0, 11) + '…' : it.testName;
+        // date is already a string like "Jan 5, 2025"; we need the raw Date for time
+        const dateObj = it.dateObj; // we'll attach this below
+        let dateLabel = it.date || '';
+        let timeLabel = '';
+        if (dateObj instanceof Date && !isNaN(dateObj)) {
+            timeLabel = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+        return [shortName, dateLabel, timeLabel];
+    });
+
     const ranks    = items.map(it => normRank(it.normCat));
     const bdColors = ranks.map(r => normRankColor(r).border);
 
@@ -679,21 +718,74 @@ function renderNormTimeline(containerId, items, categoryName) {
         type: 'line',
         data: {
             labels,
-            datasets: [{ label:'Classification', data:ranks, backgroundColor:grad, borderColor:bdColors[0], borderWidth:3,
-                pointBackgroundColor:bdColors, pointBorderColor:'#fff', pointBorderWidth:3,
-                pointRadius:items.length===1?10:7, pointHoverRadius:12, fill:true, tension:0.35,
-                segment:{ borderColor: ctx => bdColors[Math.min(ctx.p1DataIndex, bdColors.length-1)] } }]
+            datasets: [{ 
+                label: 'Classification', 
+                data: ranks, 
+                backgroundColor: grad, 
+                borderColor: bdColors[0], 
+                borderWidth: 3,
+                pointBackgroundColor: bdColors, 
+                pointBorderColor: '#fff', 
+                pointBorderWidth: 3,
+                pointRadius: items.length === 1 ? 10 : 7, 
+                pointHoverRadius: 12, 
+                fill: true, 
+                tension: 0.35,
+                segment: { borderColor: ctx => bdColors[Math.min(ctx.p1DataIndex, bdColors.length - 1)] } 
+            }]
         },
         options: {
-            responsive:true, maintainAspectRatio:false,
+            responsive: true, 
+            maintainAspectRatio: false,
             plugins: {
-                legend:{ display:false },
-                tooltip:{ backgroundColor:'rgba(255,255,255,0.97)', titleColor:'#1e293b', bodyColor:'#475569', borderColor:'#e2e8f0', borderWidth:1, padding:12, displayColors:false,
-                    callbacks:{ title: ctx => items[ctx[0].dataIndex].testName, label: ctx => { const it = items[ctx.dataIndex]; return it.normCat + '  •  ' + it.date; } } }
+                legend: { display: false },
+                tooltip: { 
+                    backgroundColor: 'rgba(255,255,255,0.97)', 
+                    titleColor: '#1e293b', 
+                    bodyColor: '#475569', 
+                    borderColor: '#e2e8f0', 
+                    borderWidth: 1, 
+                    padding: 12, 
+                    displayColors: false,
+                    callbacks: { 
+                        title: ctx => {
+                            const it = items[ctx[0].dataIndex];
+                            return it.testName;
+                        },
+                        label: ctx => {
+                            const it = items[ctx.dataIndex];
+                            const lines = [`Classification: ${it.normCat}`];
+                            if (it.date) lines.push(`Date: ${it.date}`);
+                            if (it.dateObj instanceof Date && !isNaN(it.dateObj)) {
+                                const time = it.dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                                lines.push(`Time: ${time}`);
+                            }
+                            return lines;
+                        }
+                    } 
+                }
             },
             scales: {
-                y:{ min:0, max:5, ticks:{ stepSize:1, callback:v=>normLabels[v]||'', font:{size:10,weight:'600'}, color:'#94a3b8' }, grid:{color:'rgba(0,0,0,0.04)'} },
-                x:{ ticks:{ font:{size:10,weight:'500'}, color:'#94a3b8', maxRotation:20, minRotation:0 }, grid:{display:false} }
+                y: { 
+                    min: 0, max: 5, 
+                    ticks: { stepSize: 1, callback: v => normLabels[v] || '', font: { size: 10, weight: '600' }, color: '#94a3b8' }, 
+                    grid: { color: 'rgba(0,0,0,0.04)' } 
+                },
+                x: { 
+                    ticks: { 
+                        font: { size: 9, weight: '500' }, 
+                        color: '#94a3b8', 
+                        maxRotation: 30, 
+                        minRotation: 0,
+                        callback: function(val, index) {
+                            // Show test name on first line only
+                            const label = this.getLabelForValue(val);
+                            if (Array.isArray(label)) return label[0]; // just test name on axis
+                            return label;
+                        }
+                    }, 
+                    grid: { display: false } 
+                }
             }
         }
     });
@@ -717,23 +809,47 @@ window.handleModalOverlayClick = function(e) {
 function buildTestGroups(raw) {
     const groups = {};
     for (const result of raw) {
-        const testId = result.testId || result.id;
-        if (!groups[testId]) groups[testId] = { testName: result.testName, category: getCategoryForTest(result.testName), attempts: [] };
+        // Group by testId (scheduled test instance), not testName
+        // This keeps different scheduled tests with the same name separate
+        const groupKey = result.testId || result.testName;
 
-        const normCat = getNormCategorySync(result.testName, result.result || result.resultData, result.testId) || 'Completed';
+        if (!groups[groupKey]) {
+            groups[groupKey] = { 
+                testName: result.testName, 
+                category: getCategoryForTest(result.testName), 
+                attempts: [] 
+            };
+        }
+
+        const resultValue = result.result ?? result.resultData ?? result.score ?? result.value ?? '';
+        
+        const normCat = getNormCategorySync(
+            result.testName, 
+            resultValue,
+            result.testId
+        ) || 'Completed';
+
         let testDate = new Date();
         if (result.submittedAt) {
             if (result.submittedAt.toDate) testDate = result.submittedAt.toDate();
             else if (result.submittedAt.seconds) testDate = new Date(result.submittedAt.seconds * 1000);
             else testDate = new Date(result.submittedAt);
+        } else if (result.completedAt) {
+            if (result.completedAt.toDate) testDate = result.completedAt.toDate();
+            else if (result.completedAt.seconds) testDate = new Date(result.completedAt.seconds * 1000);
+            else testDate = new Date(result.completedAt);
         }
-        groups[testId].attempts.push({
-            normCat, rank: normRank(normCat), date: testDate,
+
+        groups[groupKey].attempts.push({
+            normCat, 
+            rank: normRank(normCat), 
+            date: testDate,
             dateStr: testDate.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
-            status: result.status
+            status: result.status,
+            rawResult: resultValue
         });
     }
-    Object.values(groups).forEach(g => g.attempts.sort((a,b) => a.date - b.date));
+    Object.values(groups).forEach(g => g.attempts.sort((a, b) => a.date - b.date));
     return groups;
 }
 
@@ -747,34 +863,29 @@ function renderImprovementModal() {
         return;
     }
 
-    // Synchronous now — no await needed since normDocs are pre-fetched
     const groups = buildTestGroups(allRawResults);
-    const sorted = Object.values(groups).sort((a,b) => b.attempts.length - a.attempts.length || a.testName.localeCompare(b.testName));
 
-    let improved = 0, bestGainLabel = '—', bestGainDiff = 0;
-    sorted.forEach(g => {
-        if (g.attempts.length >= 2) {
-            const firstRank = g.attempts[0].rank;
-            const bestRank  = Math.max(...g.attempts.map(a => a.rank));
-            const diff = bestRank - firstRank;
-            if (diff > 0) {
-                improved++;
-                if (diff > bestGainDiff) {
-                    bestGainDiff = diff;
-                    const best = g.attempts.find(a => a.rank === bestRank);
-                    bestGainLabel = `${g.attempts[0].normCat} → ${best.normCat}`;
-                }
-            }
-        }
+    // Sort by most recent attempt date (descending)
+    const sorted = Object.values(groups).sort((a, b) => {
+        const aLatest = Math.max(...a.attempts.map(att => att.date instanceof Date ? att.date.getTime() : new Date(att.date).getTime()));
+        const bLatest = Math.max(...b.attempts.map(att => att.date instanceof Date ? att.date.getTime() : new Date(att.date).getTime()));
+        return bLatest - aLatest; // most recent first
     });
+
+    const { total, improved, gainLabel, gainTest } = computeSummaryStats(
+        Object.fromEntries(sorted.map(g => [g.testName, g]))
+    );
 
     document.getElementById('summaryTotalTests').textContent = sorted.length;
     document.getElementById('summaryImproved').textContent   = improved;
-    document.getElementById('summaryBestGain').textContent   = bestGainLabel;
+    const sbEl = document.getElementById('summaryBestGain');
+    const sbtEl = document.getElementById('summaryBestGainTest');
+    if (sbEl) sbEl.textContent = gainLabel;
+    if (sbtEl) sbtEl.textContent = gainTest ? `in ${gainTest}` : '';
     strip.style.display = 'block';
 
     let html = '';
-    for (const group of sorted) {
+    sorted.forEach((group, groupIndex) => {
         const catInfo   = getCategoryTag(group.category);
         const attempts  = group.attempts;
         const hasMulti  = attempts.length >= 2;
@@ -783,6 +894,7 @@ function renderImprovementModal() {
         const bestRank  = Math.max(...attempts.map(a => a.rank));
         const bestAttempt = attempts.find(a => a.rank === bestRank);
         const rankDiff  = lastRank - firstRank;
+        const isLatest  = groupIndex === 0; // first in sorted = most recent
 
         let overallBadge = '';
         if (hasMulti) {
@@ -793,12 +905,17 @@ function renderImprovementModal() {
             overallBadge = `<span class="dir-badge dir-same">1 attempt</span>`;
         }
 
+        // "Most Recent" highlight badge for the first card only
+        const recentBadge = isLatest 
+            ? `<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;display:inline-flex;align-items:center;gap:4px;"><i class="bi bi-clock-fill" style="font-size:9px;"></i> Most Recent</span>` 
+            : '';
+
         html += `
-        <div class="test-improvement-card">
+        <div class="test-improvement-card" style="${isLatest ? 'border-color:#3b82f6;box-shadow:0 4px 20px rgba(59,130,246,0.15);' : ''}">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:0.85rem;flex-wrap:wrap;">
                 <div style="flex:1;min-width:0;">
                     <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.35rem;">
-                        <span class="category-tag ${catInfo.cls}">${catInfo.label}</span>${overallBadge}
+                        <span class="category-tag ${catInfo.cls}">${catInfo.label}</span>${overallBadge}${recentBadge}
                     </div>
                     <h4 style="font-size:15px;font-weight:700;color:#1e293b;margin:0;line-height:1.3;">${group.testName}</h4>
                 </div>
@@ -827,50 +944,77 @@ function renderImprovementModal() {
             </div>
             ${hasMulti?`<div style="margin-top:0.75rem;padding:0.6rem 0.75rem;background:${rankDiff>0?'#f0fdf4':rankDiff<0?'#fff5f5':'#f8fafc'};border-radius:8px;border:1px solid ${rankDiff>0?'#bbf7d0':rankDiff<0?'#fecaca':'#e2e8f0'};"><div style="font-size:12px;color:${rankDiff>0?'#15803d':rankDiff<0?'#dc2626':'#64748b'};font-weight:600;display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;"><i class="bi bi-${rankDiff>0?'graph-up-arrow':rankDiff<0?'graph-down-arrow':'dash-circle'}"></i>${rankDiff>0?`Classification improved: <strong>${attempts[0].normCat} → ${attempts[attempts.length-1].normCat}</strong>`:rankDiff<0?`Classification declined: <strong>${attempts[0].normCat} → ${attempts[attempts.length-1].normCat}</strong>`:`Classification maintained: <strong>${attempts[0].normCat}</strong>`}</div></div>`:''}
         </div>`;
-    }
+    });
+
     body.innerHTML = html;
 }
+        // ========== SHARED SUMMARY HELPER ==========
+function computeSummaryStats(groups) {
+    const arr = Object.values(groups);
+    let improved = 0;
+    let bestGainLabel = '—', bestGainTest = '';
+    let mostRecentImprovedMs = -1; // track most recent improved test
 
+    arr.forEach(g => {
+        if (g.attempts.length >= 2) {
+            const firstRank = g.attempts[0].rank;
+            const bestRank  = Math.max(...g.attempts.map(a => a.rank));
+            if (bestRank > firstRank) {
+                improved++;
+
+                // Get the date of the best (most improved) attempt
+                const bestAttempt = g.attempts.find(a => a.rank === bestRank);
+                const attemptMs = bestAttempt.date instanceof Date 
+                    ? bestAttempt.date.getTime() 
+                    : new Date(bestAttempt.date).getTime();
+
+                // Pick the most recently improved test
+                if (attemptMs > mostRecentImprovedMs) {
+                    mostRecentImprovedMs = attemptMs;
+                    bestGainLabel = `${g.attempts[0].normCat} → ${bestAttempt.normCat}`;
+                    bestGainTest = g.testName;
+                }
+            }
+        }
+    });
+
+    return {
+        total: arr.length,
+        improved,
+        gainLabel: mostRecentImprovedMs > -1 ? bestGainLabel : '—',
+        gainTest:  mostRecentImprovedMs > -1 ? bestGainTest  : ''
+    };
+}
 // ========== UPDATE PREVIEW CARD (synchronous after prefetch) ==========
 function updateImprovementPreview() {
     if (allRawResults.length === 0) {
         document.getElementById('previewTotalTests').textContent = '0';
         document.getElementById('previewImproved').textContent  = '0';
-        document.getElementById('previewBestGain').textContent  = '—';
+        const pgEl = document.getElementById('previewBestGain');
+        const pgtEl = document.getElementById('previewBestGainTest');
+        if (pgEl) pgEl.textContent = '—';
+        if (pgtEl) pgtEl.textContent = '';
         return;
     }
     const groups = buildTestGroups(allRawResults);
-    const arr = Object.values(groups);
-    let improved = 0, bestGainLabel = '—', bestGainDiff = 0;
-    arr.forEach(g => {
-        if (g.attempts.length >= 2) {
-            const firstRank = g.attempts[0].rank;
-            const bestRank  = Math.max(...g.attempts.map(a => a.rank));
-            const diff = bestRank - firstRank;
-            if (diff > 0) {
-                improved++;
-                if (diff > bestGainDiff) {
-                    bestGainDiff = diff;
-                    const best = g.attempts.find(a => a.rank === bestRank);
-                    bestGainLabel = `${g.attempts[0].normCat} → ${best.normCat}`;
-                }
-            }
-        }
-    });
-    document.getElementById('previewTotalTests').textContent = arr.length;
+    const { total, improved, gainLabel, gainTest } = computeSummaryStats(groups);
+
+    document.getElementById('previewTotalTests').textContent = total;
     document.getElementById('previewImproved').textContent  = improved;
-    document.getElementById('previewBestGain').textContent  = bestGainLabel;
+    const pgEl = document.getElementById('previewBestGain');
+    const pgtEl = document.getElementById('previewBestGainTest');
+    if (pgEl) pgEl.textContent = gainLabel;
+    if (pgtEl) pgtEl.textContent = gainTest ? `in ${gainTest}` : '';
 }
 
 // ========== MAIN LOAD (fully parallel) ==========
 
 async function loadProgressData(userEmail) {
     try {
-        // Phase 1: Fetch test results
         const snap = await getDocs(query(
             collection(db, 'testResults'),
             where('studentEmail', '==', userEmail),
-            where('status', 'in', ['completed', 'overdue', 'late'])
+            where('status', 'in', ['completed', 'overdue', 'late', 'submitted'])
         ));
 
         if (snap.empty) {
@@ -903,18 +1047,28 @@ async function loadProgressData(userEmail) {
 }
 
 function processProgressData() {
-    // Build latest-per-test map
-    const latestByTestId = {};
-    for (const r of allRawResults) {
-        const tid = r.testId || r.id;
-        let dt = new Date();
-        if (r.submittedAt) {
-            if (r.submittedAt.toDate) dt = r.submittedAt.toDate();
-            else if (r.submittedAt.seconds) dt = new Date(r.submittedAt.seconds * 1000);
-            else dt = new Date(r.submittedAt);
-        }
-        if (!latestByTestId[tid] || dt > latestByTestId[tid].date) latestByTestId[tid] = {...r, date: dt};
+    const NORM_RANK_MAP = { Excellent:5, Good:4, Average:3, 'Below Average':2, Poor:1, Completed:3 };
+
+    // Group by testId to get best result per scheduled test instance
+   const latestByTestId = {};
+for (const r of allRawResults) {
+    // Use doc ID as fallback to guarantee uniqueness per result
+    const key = r.testId || `${r.testName}_${r.id}`;
+    let dt = new Date();
+    if (r.submittedAt) {
+        if (r.submittedAt.toDate) dt = r.submittedAt.toDate();
+        else if (r.submittedAt.seconds) dt = new Date(r.submittedAt.seconds * 1000);
+        else dt = new Date(r.submittedAt);
     }
+    const normCat = r.normCat || getNormCategorySync(r.testName, r.result || r.resultData, r.testId) || 'Completed';
+    const newRank = NORM_RANK_MAP[normCat] ?? 3;
+    const existing = latestByTestId[key];
+    const existingRank = existing ? (NORM_RANK_MAP[existing.normCat] ?? 3) : -1;
+
+    if (!existing || newRank > existingRank || (newRank === existingRank && dt > existing.date)) {
+        latestByTestId[key] = { ...r, date: dt, normCat };
+    }
+}
 
     const categoryData = {
         'Cardiorespiratory Endurance': [],
@@ -931,20 +1085,26 @@ function processProgressData() {
     let latestDate = null, latestTestName = 'No tests taken';
 
     for (const r of Object.values(latestByTestId)) {
-        // Synchronous — uses pre-fetched norm docs
-        const normCat  = getNormCategorySync(r.testName, r.result || r.resultData, r.testId) || 'Completed';
+        const normCat  = r.normCat || getNormCategorySync(r.testName, r.result || r.resultData, r.testId) || 'Completed';
         const category = getCategoryForTest(r.testName);
         const rank     = normRank(normCat);
         const dateStr  = r.date.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
 
         if (categoryData[category] !== undefined) {
-            categoryData[category].push({ testName: r.testName, normCat, date: dateStr, ts: r.date.getTime() });
+            categoryData[category].push({ 
+                testName: r.testName, 
+                normCat, 
+                date: dateStr,
+                dateObj: r.date,      // attach raw Date for time display
+                ts: r.date.getTime() 
+            });
             if (rank > categoryBestRank[category]) categoryBestRank[category] = rank;
         }
         if (!latestDate || r.date > latestDate) { latestDate = r.date; latestTestName = r.testName; }
     }
 
-    Object.keys(categoryData).forEach(cat => categoryData[cat].sort((a,b) => a.ts - b.ts));
+    // Sort each category by date ascending so chart flows left→right chronologically
+    Object.keys(categoryData).forEach(cat => categoryData[cat].sort((a, b) => a.ts - b.ts));
 
     const totalTests = Object.keys(latestByTestId).length;
 
@@ -968,7 +1128,7 @@ function processProgressData() {
     document.getElementById('lastTestDate').textContent = latestDate ? latestDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '--';
     document.getElementById('lastTestName').innerHTML = `<i class="bi bi-clock-history"></i>&nbsp;<span>${latestTestName}</span>`;
 
-    // Render charts (all synchronous)
+    // Render charts
     renderNormTimeline('cardioChart',      categoryData['Cardiorespiratory Endurance'],     'Cardiorespiratory Endurance');
     renderNormTimeline('muscularChart',    categoryData['Muscular Strength and Endurance'], 'Muscular Strength and Endurance');
     renderNormTimeline('flexibilityChart', categoryData['Flexibility'],                     'Flexibility');
@@ -1310,7 +1470,10 @@ function setupEventListeners() {
 
 // ========== AUTH ==========
 
-const loadingTimeout = setTimeout(() => { document.getElementById('loadingScreen').style.display = 'none'; }, 1500);
+const loadingTimeout = setTimeout(() => { 
+    const ls = document.getElementById('loadingScreen'); 
+    if (ls) ls.style.display = 'none'; 
+}, 1500);
 const unsubscribeAuth = onAuthStateChanged(auth, async user => {
     if (user) {
         try {
@@ -1367,7 +1530,8 @@ const unsubscribeAuth = onAuthStateChanged(auth, async user => {
             console.error('Error loading page:', error);
         } finally {
             clearTimeout(loadingTimeout);
-            document.getElementById('loadingScreen').style.display = 'none';
+            const ls = document.getElementById('loadingScreen');
+            if (ls) ls.style.display = 'none';
         }
     } else {
         clearTimeout(loadingTimeout);

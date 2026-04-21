@@ -2180,6 +2180,8 @@ window.switchTab = function(tab) {
 // Replace the loadOverdueStudents function with this fixed version
 
 window.loadOverdueStudents = async function() {
+    if (window._isLoadingOverdue) return;
+    window._isLoadingOverdue = true;
     try {
         overdueStudents = [];
         const now = new Date();
@@ -2268,7 +2270,10 @@ const isProfessorEnabled = enabledMap.has(key);
 // Mirror student-side exactly: skip if student has ANY attempt (unless professor re-enabled)
 if (attemptCount > 0 && !isProfessorEnabled) return;
 
-overdueStudents.push({
+            const alreadyAdded = overdueStudents.some(o => o.studentEmail === email && o.testId === test.id);
+            if (alreadyAdded) return;
+
+            overdueStudents.push({
                         studentName: stu.name || 'Unknown',
                         studentEmail: email,
                         studentId: stu.student_id || stu.studentId || 'N/A',
@@ -2300,6 +2305,8 @@ repetitions: completed?.repetitions ?? null,
     } catch (err) {
         console.error('loadOverdueStudents error:', err);
         window.showErrorModal('Error loading overdue students: ' + err.message);
+    } finally {
+        window._isLoadingOverdue = false;
     }
 };
 
