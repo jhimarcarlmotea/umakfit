@@ -5589,6 +5589,11 @@ function parseDeanPDFText(text) {
         cancelDeanImport();
     }
 }
+// ═══════════════════════════════════════════════════════════════════════
+// PATCH: Replace the entire buildDeanImportPreview function in dean.html
+// Find:   async function buildDeanImportPreview(studentData, fallbackMeta) {
+// Replace everything up to the closing  }
+// ═══════════════════════════════════════════════════════════════════════
 
 async function buildDeanImportPreview(studentData, fallbackMeta) {
     const first = studentData[0] || {};
@@ -5604,31 +5609,120 @@ async function buildDeanImportPreview(studentData, fallbackMeta) {
         academicYear: first.academic_year || fallbackMeta.academicYear || ''
     };
 
+    // ─── Count per section ──────────────────────────────────────────────
     const sectionCounts = {};
     studentData.forEach(r => {
         const sec = (r.section || 'Unspecified Section').trim();
         sectionCounts[sec] = (sectionCounts[sec] || 0) + 1;
     });
     const sectionEntries = Object.entries(sectionCounts);
-    const details = sectionEntries
-        .map(([sec, count]) => `• <strong>${sec}</strong>: ${count} student${count !== 1 ? 's' : ''}`)
-        .join('<br>');
-    const confirmed = await showDeanConfirm(
-        `Found <strong>${sectionEntries.length}</strong> section${sectionEntries.length !== 1 ? 's' : ''} and <strong>${studentData.length}</strong> total students.<br><br>${details}<br><br>Continue to preview list?`,
-        { title: 'Found Section(s)', type: 'info', confirmText: 'Continue to Preview', cancelText: 'Cancel' }
-    );
-    if (!confirmed) {
-        cancelDeanImport();
-    return;
+
+    // ─── CHECK: Which sections already have students in Firestore? ──────
+    const blockedSections = new Set();   // sections that already have data
+    const sectionExistingCounts = {};    // sectionName → existing count
+
+    for (const [secName] of sectionEntries) {
+        try {
+            // Check the sections collection (roster)
+            const secDoc = await db.collection('sections').doc(secName).get();
+            if (secDoc.exists) {
+                const students = secDoc.data().students || [];
+                if (students.length > 0) {
+                    blockedSections.add(secName);
+                    sectionExistingCounts[secName] = students.length;
+                }
+            }
+        } catch (e) {
+            console.warn('Could not check section:', secName, e);
+        }
     }
 
-    deanCurrentImportData = { data: studentData, metadata: meta };
+    // ─── Build the confirmation message ────────────────────────────────
+    const allowedSections = sectionEntries.filter(([sec]) => !blockedSections.has(sec));
+    const blockedList     = sectionEntries.filter(([sec]) =>  blockedSections.has(sec));
+
+    let confirmMsg = `Found <strong>${sectionEntries.length}</strong> section${sectionEntries.length !== 1 ? 's' : ''} and <strong>${studentData.length}</strong> total students.<br><br>`;
+
+    // Show allowed sections
+    if (allowedSections.length > 0) {
+        confirmMsg += `<div style="margin-bottom:10px;">`;
+        confirmMsg += `<div style="font-size:12px;font-weight:700;color:#0e8a5f;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">✅ Ready to Import</div>`;
+        confirmMsg += allowedSections.map(([sec, count]) =>
+            `• <strong>${sec}</strong>: ${count} student${count !== 1 ? 's' : ''}`
+        ).join('<br>');
+        confirmMsg += `</div>`;
+    }
+
+    // Show blocked sections with existing student counts
+    if (blockedList.length > 0) {
+        confirmMsg += `<div style="background:#fce8e6;border:1px solid #f5b8b0;border-radius:10px;padding:12px 14px;margin-top:8px;">`;
+        confirmMsg += `<div style="font-size:12px;font-weight:700;color:#c0392b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">⛔ Already Has Students — Will Be Skipped</div>`;
+        confirmMsg += blockedList.map(([sec, count]) =>
+            `• <strong>${sec}</strong>: ${count} incoming, but already has <strong>${sectionExistingCounts[sec]}</strong> existing student${sectionExistingCounts[sec] !== 1 ? 's' : ''}`
+        ).join('<br>');
+        confirmMsg += `<div style="font-size:11px;color:#c0392b;margin-top:8px;">To re-import a section, delete it first from Section Rankings.</div>`;
+        confirmMsg += `</div>`;
+    }
+
+    // ─── If ALL sections are blocked, abort immediately ─────────────────
+    if (allowedSections.length === 0) {
+        await showDeanAlert(
+            `All section${blockedList.length !== 1 ? 's' : ''} in this file already have existing students:<br><br>` +
+            blockedList.map(([sec]) =>
+                `• <strong>${sec}</strong> — ${sectionExistingCounts[sec]} existing student${sectionExistingCounts[sec] !== 1 ? 's' : ''}`
+            ).join('<br>') +
+            `<br><br>To re-import, delete the section first from <strong>Section Rankings → Delete</strong>.`,
+            { title: 'Import Blocked', type: 'error', confirmText: 'OK' }
+        );
+        cancelDeanImport();
+        return;
+    }
+
+    // ─── If some sections are blocked, confirm to proceed with the rest ─
+    confirmMsg += `<br>`;
+    if (blockedList.length > 0) {
+        confirmMsg += `Only <strong>${allowedSections.length}</strong> section${allowedSections.length !== 1 ? 's' : ''} will be imported. Continue?`;
+    } else {
+        confirmMsg += `Continue to preview list?`;
+    }
+
+    const confirmed = await showDeanConfirm(confirmMsg, {
+        title: blockedList.length > 0 ? 'Partial Import Warning' : 'Found Section(s)',
+        type: blockedList.length > 0 ? 'warning' : 'info',
+        confirmText: blockedList.length > 0 ? `Import ${allowedSections.length} Section${allowedSections.length !== 1 ? 's' : ''} Only` : 'Continue to Preview',
+        cancelText: 'Cancel'
+    });
+
+    if (!confirmed) {
+        cancelDeanImport();
+        return;
+    }
+
+    // ─── Filter out blocked sections from the data ──────────────────────
+    const filteredStudentData = studentData.filter(r =>
+        !blockedSections.has((r.section || '').trim())
+    );
+
+    if (!filteredStudentData.length) {
+        await showDeanAlert('No valid students to import after filtering blocked sections.', {
+            title: 'Nothing to Import', type: 'warning'
+        });
+        cancelDeanImport();
+        return;
+    }
+
+    // Update meta to use first allowed row
+    const firstAllowed = filteredStudentData[0] || {};
+    meta.professorName = firstAllowed.professor || meta.professorName;
+    meta.courseCode    = firstAllowed.course_code || meta.courseCode;
+    meta.section       = firstAllowed.section || meta.section;
+
+    deanCurrentImportData = { data: filteredStudentData, metadata: meta };
     deanPreviewCurrentPage = 1;
-    populateDeanSectionFilter(studentData);
+    populateDeanSectionFilter(filteredStudentData);
     showDeanPreviewTable();
 
-   
-    const uniqueSecs = [...new Set(studentData.map(r => (r.section || '').trim()).filter(Boolean))];
+    const uniqueSecs = [...new Set(filteredStudentData.map(r => (r.section || '').trim()).filter(Boolean))];
     const btn = document.getElementById('deanProcessImportBtn');
     if (btn) {
         btn.innerHTML = uniqueSecs.length > 1
